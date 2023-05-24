@@ -1,13 +1,13 @@
-# NOTE: If you're a VSCode user, you might like our VSCode extension: https://marketplace.visualstudio.com/items?itemName=Kurtosis.kurtosis-extension
-
-NAME_ARG = "name"
-
-# For more information on...
-#  - the 'run' function:  https://docs.kurtosis.com/concepts-reference/packages#runnable-packages
-#  - the 'plan' object:   https://docs.kurtosis.com/starlark-reference/plan
-#  - the 'args' object:   https://docs.kurtosis.com/next/concepts-reference/args
+icon_node_launcher = import_module("github.com/hugobyte/chain-package/services/icon/icon.star")
 def run(plan, args):
-    name = args.get(NAME_ARG, "John Snow")
-    plan.print("Hello, " + name)
+   
+    plan.print("Starting Deployment Tool")
 
-    # Try out a plan.add_service here (https://docs.kurtosis.com/starlark-reference/plan#add_service)
+    if args["chain"] == "ICON":
+        ip = icon_node_launcher.launch_icon_node(plan,args)
+        plan.print(ip)
+        response = plan.exec(service_name="icon",recipe=ExecRecipe(command=["../bin/goloop","rpc","lastblock","--uri","http://"+ip+"/api/v3"]),)
+        plan.print(response)
+    else:
+        plan.print("Not Configured")
+
