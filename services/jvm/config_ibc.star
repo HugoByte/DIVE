@@ -15,3 +15,20 @@ deploy = plan.exec(
     recipe=exec_recipe
 )
 
+def instantiate(paln, service_name,wallet_name, label, ):
+    exec_recipe = ExecRecipe(command=[
+        "--from",
+        wallet_name,
+        "--gas auto",
+        "--label",
+        label,
+        "--no-admin",
+        "--chain_id constantine-2",
+        "--node",
+        node-url,
+        "--fees 300uconst"
+    ],)
+instantiate = plan.exec(
+    service_name=service_name,
+    recipe=exec_recipe
+)
