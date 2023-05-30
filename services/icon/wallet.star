@@ -19,4 +19,4 @@ def get_network_wallet_public_key(plan,service_name):
     execute_cmd = ExecRecipe(command=["./bin/goloop","ks","pubkey","-k","config/keystore.json","-p","gochain"])
     result = plan.exec(service_name=service_name,recipe=execute_cmd)
 
-    return result["output"].strip()
+    return result["output"]
