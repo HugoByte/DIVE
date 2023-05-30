@@ -1,9 +1,9 @@
 # icon_node_launcher = import_module("github.com/hugobyte/chain-package/services/icon/node_launcher.star")
 # wallet_creator = import_module("github.com/hugobyte/chain-package/services/icon/contract_deployer.star")
-wallet = import_module("github.com/hugobyte/chain-package/services/icon/wallet.star")
-setup_node = import_module("github.com/hugobyte/chain-package/services/icon/setup_icon_node.star")
+wallet = import_module("github.com/hugobyte/chain-package/services/icon/src/wallet.star")
+setup_node = import_module("github.com/hugobyte/chain-package/services/icon/src/setup_icon_node.star")
 
-icon_node_launcher = import_module("github.com/hugobyte/chain-package/services/icon/start_icon_node.star")
+icon_node_launcher = import_module("github.com/hugobyte/chain-package/services/icon/src/start_icon_node.star")
 
 def run(plan,args):
 

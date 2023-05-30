@@ -5,9 +5,9 @@ EXECUTABLE_PATH = "./bin/goloop"
 ICON_BASE_CONFIG_FILES_PATH = "/goloop/config/"
 ICON_CONTRACT_DIR = "/goloop/contracts/"
 ICON_BASE_CONFIG_FILES_KEY = "base_config"
-DEFAULT_ICON_BASE_CONFIG_FILES_PATH = "github.com/hugobte/chain-pacakge/articats/jvm/base-config/"
+DEFAULT_ICON_BASE_CONFIG_FILES_PATH = "github.com/hugobte/chain-pacakge/services/icon/static-files/base-config/"
 ICON_CONTRACT_DIR_KEY = "contracts"
-DEFAULT_ICON_CONTRACT_DIR = "github.com/hugobte/chain-pacakge/articats/jvm/contracts/"
+DEFAULT_ICON_CONTRACT_DIR = "github.com/hugobte/chain-pacakge/services/icon/static-files/contracts"
 ICON_RPC_PORT_KEY = "rpc"
 
 def start_icon_node(plan,args):
