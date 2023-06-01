@@ -13,10 +13,16 @@ def get_network_wallet_address(plan,service_name):
     execute_cmd = ExecRecipe(command=["jq",".address","config/keystore.json"])
     result = plan.exec(service_name=service_name,recipe=execute_cmd)
 
-    return result["output"].strip()
+    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % result["output"] ])
+    result = plan.exec(service_name=service_name,recipe=execute_cmd)
+
+    return result["output"].strip().replace("\n","")
     
 def get_network_wallet_public_key(plan,service_name):
     execute_cmd = ExecRecipe(command=["./bin/goloop","ks","pubkey","-k","config/keystore.json","-p","gochain"])
     result = plan.exec(service_name=service_name,recipe=execute_cmd)
 
-    return result["output"]
+    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % result["output"] ])
+    result = plan.exec(service_name=service_name,recipe=execute_cmd)
+
+    return result["output"].strip().replace("\n","")
