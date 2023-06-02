@@ -201,8 +201,10 @@ def register_prep_node_publickey(plan,service_name,address,pubkey,uri,keystorepa
 def ensure_decentralisation(plan,service_name,prep_address,uri,keystorepath,keypassword,nid):
     main_preps = get_main_preps(plan,service_name,uri)
     plan.print(main_preps)
+
     response = get_prep(plan,service_name,prep_address,uri)
     response_code = response.get("extract.code")
+
 
     plan.print("registerPRep")
     name =  "node_"+prep_address
@@ -212,15 +214,7 @@ def ensure_decentralisation(plan,service_name,prep_address,uri,keystorepath,keyp
     bond_amount = "0x152d02c7e14af6800000"
     stake = get_stake_amount(plan,service_name,bond_amount,min_delegated)
 
-
-    
-
-
     response = register_prep(plan,service_name,name,uri,keystorepath,keypassword,nid)
-
-
-    
-
 
     plan.print("ICON: setStake")
 
@@ -309,4 +303,3 @@ def configure_node(plan,args):
     plan.print(main_preps)
 
     setup_node(plan,service_name,uri,keystorepath,keypassword,nid,prep_address)
-
