@@ -1,0 +1,15 @@
+{
+    "cosmos1": {
+    "key": "default",
+    "chain_id":"osmosis-1",
+    "rpc-addr": "http://osmosis.strange.love:26657",
+    "account-prefix": "osmo",
+    "keyring-backend": "test",
+    "gas-adjustment": 1.2,
+    "gas-prices": "0.001uosmo",
+    "debug": true,
+    "timeout": "20s",
+    "output-format": "json",
+    "sign-mode": "direct"
+    }
+}

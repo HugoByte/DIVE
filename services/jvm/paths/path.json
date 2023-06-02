@@ -1,0 +1,18 @@
+{
+    "paths": {
+    "src": {
+        "chain_id": "cosmoshub-4",
+        "client_id": "07-tendermint-259",
+        "connection_id": "connection-257"
+    },
+    "dst": {
+        "chain_id": "osmosis-1",
+        "client_id": "07-tendermint-1",
+        "connection_id": "connection-1"
+    },
+    "src_channel_filter": {
+        "rule": "allowlist",
+        "channel-list": "channel-141" 
+    }
+}
+}
