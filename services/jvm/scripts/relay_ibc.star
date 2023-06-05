@@ -27,8 +27,10 @@ def relay(plan,args,gaia_data, relayer_conf, relayer_dir):
 
     execute_cmd = ExecRecipe(command=["-d",gaia_data, "&&", "! $1" , " == ", "skip"],)
     result = plan.exec(service_name="service_name", recipe=execute_cmd)
-    plan.print()
-    #
+    # plan.print()
+    n = input("$0 will delete "+gaia_data+"and" +relayer_conf+ "folder. Do you wish to continue? (y/n): ")
+    if n.lower() != "y":
+        exit(1)
 
     exec = ExecRecipe(command=["rm", "-rf", gaia_data, "&>" , "/dev", "/null"],)
     res = plan.exec(service_name="service_name", recipe=exec)
@@ -38,7 +40,8 @@ def relay(plan,args,gaia_data, relayer_conf, relayer_dir):
     cmd = ExecRecipe(command=["killall", "gaiad", "&>", "/dev", "/null"],)
     res = plan.exec(service_name="service_name", recipe=cmd)
 
-    #
+    chainid0 = "cosmos0"
+    chainid1 = "cosmos1"
 
     plan.print("generating gaia configurations")
     execute_cmd = ExecRecipe(command=[
