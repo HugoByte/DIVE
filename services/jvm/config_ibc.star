@@ -1,34 +1,48 @@
-def deploy(plan, service_name, contract_path, wallet_name, node_url):
+def deploy(plan, service_name, binary_file_path, wallet_name, node_url):
     exec_recipe = ExecRecipe(command=[
-        contract_path
+        binary_file_path,
         "--from",
         wallet_name
-        "--chain_id constantine-2",
+        "--chain_id"
+        "constantine-2",
         "--node ",
-        node_url
-        "--fees 3397uconst",
-        "--gas auto",
-        "--output json"
+        node_url,
+        "--fees",
+        "3397uconst",
+        "--gas",
+        "auto",
+        "--output",
+        "json"
     ],)
-deploy = plan.exec(
-    service_name=service_name,
-    recipe=exec_recipe
-)
 
-def instantiate(paln, service_name,wallet_name, label, ):
+    deploy = plan.exec(
+        service_name=service_name,
+        recipe=exec_recipe
+    )
+    return deploy["output"]
+
+
+def instantiate(plan, service_name, code_id, init_msg, wallet_name, label, node_url):
     exec_recipe = ExecRecipe(command=[
+        code_id,
+        init_msg,
         "--from",
         wallet_name,
-        "--gas auto",
+        "--gas
+        "auto",
         "--label",
         label,
         "--no-admin",
-        "--chain_id constantine-2",
+        "--chain_id"
+        "constantine-2",
         "--node",
         node-url,
-        "--fees 300uconst"
+        "--fees"
+        "300uconst"
     ],)
-instantiate = plan.exec(
-    service_name=service_name,
-    recipe=exec_recipe
-)
+
+    instantiate = plan.exec(
+        service_name=service_name,
+        recipe=exec_recipe
+    )
+    return instantiate["output"]
