@@ -10,6 +10,7 @@ def relay(plan,args,chain_config_path, deployment_path):
         ))
     else:
         RELAY_BIN
+
     SRC_NETWORK = plan.exec(service_name="hello", recipe=ExecRecipe(command=["jq", "."+SRC+".network", deployment_path],))
     SRC_BMC_ADDRESS = plan.exec(service_name="hello", recipe=ExecRecipe(command=["jq", "."+SRC+".contracts.bmc"],))
     SRC_ADDRESS = "btp://"+SRC_NETWORK+"/"+SRC_BMC_ADDRESS
@@ -42,23 +43,33 @@ def relay(plan,args,chain_config_path, deployment_path):
         plan.print("Using BTP Block node")
         BMV_BRIDGE = False
 
-    RELAY_BIN [
-        "--direction", "both",
-        "--src_address", SRC_ADDRESS,
-        "--src.endpoint", SRC_ENDPOINT,
-        "--src.key_store", SRC_KEY_STORE,
-        "--src.key_password", SRC_KEY_PASSWORD,
-        "--src.bridge_mode", BMV_BRIDGE,
-        "--dst.address", DST_ADDRESS,
-        "--dst.endpoint", DST_ENDPOINT,
-        "--dst.key_store", DST_KEY_STORE,
-        "--dst.key_password", DST_KEY_PASSWORD,
+    exec_command = ExecRecipe(command=[
+        RELAY_BIN,
+        "--direction",
+        "both",
+        "--src.address",
+        SRC_ADDRESS,
+        "--src.endpoint",
+        SRC_ENDPOINT,
+        "--src.key_store",
+        SRC_KEY_STORE,
+        "--src.key_password",
+        SRC_KEY_PASSWORD,
+        "--src.bridge_mode",
+        BMV_BRIDGE,
+        "--dst.address",
+        DST_ADDRESS,
+        "--dst.endpoint",
+        DST_ENDPOINT,
+        "--dst.key_store"
+        DST_KEY_STORE,
+        "dst.key_password",
+        DST_KEY_PASSWORD,
         "start"
-    ]
+    ],)
+    result = plan.exec(service_name="hello", recipe=exec_command)
 
-def run(plan,args):
-    plan.print("hello")
-    result =  relay(plan, args, chain_config_path, deployment_path)
-run()
+    return result["output"]
+
 
     
