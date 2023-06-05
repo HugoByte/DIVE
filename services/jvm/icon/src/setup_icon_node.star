@@ -1,4 +1,4 @@
-wallet_config = import_module("github.com/hugobyte/chain-package/services/icon/node-service/src/wallet.star")
+wallet_config = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/wallet.star")
 
 BTP_VERSION = "21"
 

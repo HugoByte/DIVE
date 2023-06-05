@@ -1,4 +1,4 @@
-icon = import_module("github.com/hugobyte/chain-package/services/icon/icon.star")
+icon = import_module("github.com/hugobyte/chain-package/services/jvm/icon/icon.star")
 
 
 def run(plan,args):
