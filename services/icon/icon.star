@@ -10,4 +10,4 @@ def icon(plan,args):
     elif args["deploy"] == "contract":
         plan.print("deploying Contract")
 
-        contract_deployment_service.start_contract_deploy_service(plan)
+        contract_deployment_service.start_contract_deploy_service(plan,args)
