@@ -1,4 +1,4 @@
-wallet_config = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/wallet.star")
+wallet_config = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/node-setup/wallet.star")
 
 BTP_VERSION = "21"
 
@@ -63,7 +63,7 @@ def register_prep(plan,service_name,name,uri,keystorepath,keypassword,nid):
 
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result,assertion="==",target_value="0x1")
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
     plan.print("Completed RegisterPrep")
 
@@ -82,7 +82,7 @@ def get_tx_result(plan,service_name,tx_hash,uri):
    
     result = plan.wait(service_name=service_name,recipe=post_request,field="code",assertion="==",target_value=200)
 
-    return result["extract.status"]
+    return result
 
 def set_stake(plan,service_name,amount,uri,keystorepath,keypassword,nid):
     
@@ -98,7 +98,7 @@ def set_stake(plan,service_name,amount,uri,keystorepath,keypassword,nid):
     tx_hash = result["output"].replace('"',"")
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result,assertion="==",target_value="0x1")
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
     plan.print("Set Stake Completed")
 
@@ -113,7 +113,7 @@ def set_delegation(plan,service_name,address,amount,uri,keystorepath,keypassword
     tx_hash = result["output"].replace('"',"")
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result,assertion="==",target_value="0x1")
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
 def set_bonder_list(plan,service_name,address,uri,keystorepath,keypassword,nid):
     method="setBonderList"
@@ -125,7 +125,7 @@ def set_bonder_list(plan,service_name,address,uri,keystorepath,keypassword,nid):
     tx_hash = result["output"].replace('"',"")
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result,assertion="==",target_value="0x1")
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
 def set_bond(plan,service_name,address,amount,uri,keystorepath,keypassword,nid):
 
@@ -138,7 +138,7 @@ def set_bond(plan,service_name,address,amount,uri,keystorepath,keypassword,nid):
     tx_hash = result["output"].replace('"',"")
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result,assertion="==",target_value="0x1")
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
 def get_revision(plan,service_name):
 
@@ -169,7 +169,7 @@ def set_revision(plan,service_name,uri,code,keystorepath,keypassword,nid):
     tx_hash = result["output"].replace('"',"")
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result,assertion="==",target_value="0x1")
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
 def get_prep_node_public_key(plan,service_name,address):
     post_request = PostHttpRequestRecipe(
@@ -196,7 +196,7 @@ def register_prep_node_publickey(plan,service_name,address,pubkey,uri,keystorepa
     tx_hash = result["output"].replace('"',"")
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result,assertion="==",target_value="0x1")
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
 def ensure_decentralisation(plan,service_name,prep_address,uri,keystorepath,keypassword,nid):
     main_preps = get_main_preps(plan,service_name,uri)
@@ -303,3 +303,57 @@ def configure_node(plan,args):
     plan.print(main_preps)
 
     setup_node(plan,service_name,uri,keystorepath,keypassword,nid,prep_address)
+
+def open_btp_network(plan,service_name,args,uri,keystorepath,keypassword,nid):
+    name = args["name"]
+    owner = args["owner"]
+    method="openBTPNetwork"
+    params='{"networkTypeName":"eth","name":"%s","owner":"%s"}' % (name,owner)
+
+    exec_command = ["./bin/goloop","rpc","sendtx","call","--to","cx0000000000000000000000000000000000000001","--method",method,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","50000000000","--nid",nid]
+    result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
+
+    tx_hash = result["output"].replace('"',"")
+    tx_result = filter_event(plan,service_name,tx_hash)
+
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+
+    return tx_result
+
+def get_last_block(plan,service_name):
+
+    post_request = PostHttpRequestRecipe(
+
+        port_id="rpc",
+        endpoint="/api/v3/icon_dex",
+        content_type="application/json",
+        body='{"jsonrpc": "2.0","id": 1,"method": "icx_getLastBlock"}',
+        extract={
+            "height": ".result.height"
+        }
+    )
+
+    response = plan.wait(service_name,recipe=post_request,field="code",assertion="==",target_value=200)
+
+    plan.print(response)
+
+    return response["extract.height"]
+
+def filter_event(plan,service_name,tx_hash):
+
+    post_request = PostHttpRequestRecipe(
+        port_id="rpc",
+        endpoint="/api/v3/icon_dex",
+        content_type="application/json",
+        body='{ "jsonrpc": "2.0", "method": "icx_getTransactionResult", "id": 1, "params": { "txHash": %s } }' % tx_hash,
+        extract={
+            "status" : ".result.status",
+            "network_type_id": '.result["eventLogs"] | .[0].indexed | .[1]',
+            "network_id" :  '.result["eventLogs"] | .[0].indexed | .[2]'
+        }
+    )
+   
+    result = plan.wait(service_name=service_name,recipe=post_request,field="code",assertion="==",target_value=200)
+
+    return result
+

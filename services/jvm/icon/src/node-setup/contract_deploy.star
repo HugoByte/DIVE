@@ -2,16 +2,16 @@ DEFAULT_KEYSTORE_PATH = "config/keystore.json"
 DEFAULT_KEY_SECRET = "gochain"
 DEFAULT_STEP_LIMIT = "5000000000"
 
-def deploy_contract(plan,service_name,args):
+def deploy_contract(plan,service_name,contract_name,init_message,args):
 
-    contract_path = args.get("contract_name")
-    init_message = args.get("init_message")
+    contract = contract_name+".jar"
+
     keystore_path = args.get("keystore",DEFAULT_KEYSTORE_PATH)
     keystore_password = args.get("keypassword",DEFAULT_KEY_SECRET)
     uri = args.get("uri")
     setp_limit = args.get("step_limit",DEFAULT_STEP_LIMIT)
 
-    execute_command = ["./bin/goloop","rpc","sendtx","deploy","contracts/"+contract_path,"--content_type","application/java","--key_store",keystore_path,"--key_password",keystore_password,"--step_limit",setp_limit,"--uri",uri,"--nid","0x3"]
+    execute_command = ["./bin/goloop","rpc","sendtx","deploy","contracts/"+contract,"--content_type","application/java","--key_store",keystore_path,"--key_password",keystore_password,"--step_limit",setp_limit,"--uri",uri,"--nid","0x3"]
     for i in init_message:
         execute_command.append("--param")
         execute_command.append("{0}={1}".format(i["key"],i["value"]))

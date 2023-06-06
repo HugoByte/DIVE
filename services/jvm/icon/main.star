@@ -1,7 +1,9 @@
-wallet = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/wallet.star")
-setup_node = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/setup_icon_node.star")
-icon_node_launcher = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/start_icon_node.star")
-contract_service = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/contract_deploy.star")
+wallet = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/node-setup/wallet.star")
+setup_node = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/node-setup/setup_icon_node.star")
+icon_node_launcher = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/node-setup/start_icon_node.star")
+contract_service = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/node-setup/contract_deploy.star")
+
+relay_setup = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/relay-setup/contract_configuration.star")
 
 def node_service(plan,args):
 
@@ -59,4 +61,8 @@ def icon_service(plan,args):
         response = contract_deployer(plan,args)
 
         plan.print("ScoreAddress %s" % response)
+
+    else: 
+        relay_setup.open_btp_network(plan,"ICON","src","dst","cx0000000000000000000000000000000000000000","http://172.16.1.2:9080/api/v3/icon_dex","config/keystore.json","gochain","0x3")
+
 
