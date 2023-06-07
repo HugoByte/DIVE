@@ -357,3 +357,50 @@ def filter_event(plan,service_name,tx_hash):
 
     return result
 
+def get_btp_network_info(plan,service_name,network_id):
+
+    post_request = PostHttpRequestRecipe(
+        port_id="rpc",
+        endpoint="/api/v3/icon_dex",
+        content_type="application/json",
+        body='{ "jsonrpc": "2.0", "method": "btp_getNetworkInfo", "id": 1, "params": { "id": "%s" } }' % network_id,
+        extract={
+            "start_height" : '.result.startHeight',
+        }
+    )
+
+    plan.print(post_request)
+
+    result = plan.wait(service_name=service_name,recipe=post_request,field="code",assertion="==",target_value=200)
+
+    exec_command = ["python","-c","print(hex(int(%s) + 1))" % result["extract.start_height"]]
+    result = plan.exec(service_name,recipe=ExecRecipe(exec_command))
+
+    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % result["output"] ])
+    result = plan.exec(service_name=service_name,recipe=execute_cmd)
+
+    return result["output"].strip()
+
+def get_btp_header(plan,service_name,network_id,receipt_height):
+
+    post_request = PostHttpRequestRecipe(
+        port_id="rpc",
+        endpoint="/api/v3/icon_dex",
+        content_type="application/json",
+        body='{ "jsonrpc": "2.0", "method": "btp_getHeader", "id": 1, "params": { "networkID": "%s" ,"height": "%s" } }' % (network_id,receipt_height),
+        extract={
+            "header" : '.result',
+        }
+    )
+
+    result = plan.wait(service_name=service_name,recipe=post_request,field="code",assertion="==",target_value=200)
+
+    command = ExecRecipe(command=["python", "-c","from base64 import b64encode, b64decode; print(b64decode('%s').hex())" % result["extract.header"]])
+
+    first_header_hex = plan.exec(service_name,recipe=command)
+
+    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % first_header_hex["output"] ])
+    result = plan.exec(service_name=service_name,recipe=execute_cmd)
+
+    return result["output"].strip()
+
