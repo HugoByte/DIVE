@@ -72,4 +72,108 @@ def deploy_bmv_btpblock_java(plan,service_name,bmc_address,src_network_id,networ
 
     return score_address
 
-def deploy_bmv_bridge_java(plan,)
+def deploy_bmv_bridge_java(plan,service_name,bmc_address,dst_network,offset,args):
+
+    init_message = {
+        "_bmc": bmc_address,
+        "_net": dst_network,
+        "_offset": offset
+    }
+
+    tx_hash = contract_deployment_service.deploy_contract(plan,service_name,"bmv-bridge",init_message,args)
+
+    score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
+
+    plan.print("BMV-BTPBlock: deployed ")
+
+    return score_address
+
+def add_verifier(plan,service_name,bmc_address,dst_chain_network,bmv_address,uri,keystorepath,keypassword,nid):
+
+    method = "addVerifier"
+    params = '{"_net":"%s","_addr":"%s"}' % (dst_chain_network,bmv_address)
+
+    exec_command = ["./bin/goloop","rpc","sendtx","call","--to",bmc_address,"--method",method,"--value",value,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","50000000000","--nid",nid]
+
+    result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
+
+    tx_hash = result["output"].replace('"',"")
+
+
+    tx_result = get_tx_result(plan,service_name,tx_hash,uri)
+
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+
+    return tx_result
+
+
+def add_btp_link(plan,service_name,bmc_address,dst_bmc_address,src_network_id,uri,keystorepath,keypassword,nid):
+
+    method = "addBTPLink"
+
+    params = '{"_link":"%s","_networkId":"%s}' %(dst_bmc_address,src_network_id)
+
+    exec_command = ["./bin/goloop","rpc","sendtx","call","--to",bmc_address,"--method",method,"--value",value,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","50000000000","--nid",nid]
+
+    result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
+
+    tx_hash = result["output"].replace('"',"")
+
+
+    tx_result = get_tx_result(plan,service_name,tx_hash,uri)
+
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+
+    return tx_result
+
+
+def add_relay(plan,service_name,dst_bmc_address,relay_address,uri,keystorepath,keypassword,nid):
+
+    method = "addRelay"
+    params = '{"_link":"%s","_addr":"%s"}' % (dst_bmc_address,relay_address)
+
+    exec_command = ["./bin/goloop","rpc","sendtx","call","--to",bmc_address,"--method",method,"--value",value,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","50000000000","--nid",nid]
+
+    result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
+
+    tx_hash = result["output"].replace('"',"")
+
+
+    tx_result = get_tx_result(plan,service_name,tx_hash,uri)
+
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+
+
+    return tx_result
+
+
+def setup_link_icon(plan,service_name,bmc_address,dst_chain_network,dst_chain_bmc_address,src_chain_network_id,bmv_address,relay_address,args):
+
+    dst_bmc_address = get_btp_address(dst_chain_network,dst_chain_bmc_address)
+
+    plan.print(dst_bmc_address)
+
+    uri = args["uri"]
+    keystorepath = args["keystorepath"]
+    keypassword = args["keypassword"]
+    nid = args["nid"]
+
+    response = add_verifier(plan,service_name,bmc_address,dst_chain_network,bmv_address,uri,keystorepath,keypassword,nid)
+
+    plan.print(response)
+
+    response = add_btp_link(plan,service_name,bmc_address,dst_bmc_address,src_chain_network_id,uri,keystorepath,keypassword,nid)
+
+    plan.print(response)
+
+
+    response =  add_relay(plan,service_name,dst_bmc_address,relay_address,uri,keystorepath,keypassword,nid)
+
+    plan.print(response)
+
+
+    plan.print("Icon Link Setup Completed")
+
+def get_btp_address(network,dapp):
+
+    return "btp://{0}/{1}".format(network,dapp)
