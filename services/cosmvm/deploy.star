@@ -1,10 +1,17 @@
 wallet_config = import_module("github.com/hugobyte/chain-package/services/cosmvm/wallet.star")
 
-def deploy(plan,service_name,artifacts_path, node_uri, init_message):
+def deploy(plan,service_name,artifacts_path, init_message, args):
     plan.print("Deploying the contract")
 
+    node_uri = args.get("uri")
+
     execute_cmd = ExecRecipe(command=["archwayd", "tx", "wasm", "store", artifacts_path, "--from", wallet_config, "--node", node_uri, "--chain-id", "constantine-2", "--gas-prices", "0.25aconst", "--gas", "auto", "--gas-adjustment", "1.3", "-y", "--output","json"],)
-    plan.exec(service_name=service_name, recipe=execute_cmd)
+    for i in init_message:
+        execute_cmd.append("--param")
+        execute_cmd.append("{0}={1}".format(i["key"],i["value"]))
+    result = plan.exec(service_name=service_name, recipe=execute_cmd)
+
+    return result["output"]
     RES = plan.print(execute_cmd)
 
     # Getting the code id
@@ -18,6 +25,10 @@ def deploy(plan,service_name,artifacts_path, node_uri, init_message):
     plan.print("Instantiating the contract")
     exec = ExecRecipe(command=["archwayd", "tx", "wasm", "instantiate", CODE_ID, "--from", wallet_config, "--node", node_uri, "--chain-id", "constantine-2", "--gas-prices", "0.25aconst", "--gas auto", "--gas-adjustment", "1.3", "--no-admin" ],)
     plan.exec(service_name="service_name", recipe=exec)
+
+
+def query(plan,node_uri):
+    plan.print("Executing")
 
     # Getting the contract address
 
@@ -42,15 +53,4 @@ def deploy(plan,service_name,artifacts_path, node_uri, init_message):
     # Querying the entire contract state
 
     query = ExecRecipe(command=["archwayd", "query", "wasm", "contract-state", "all", contract, "--node" ,node_uri ],)
-
-
-
-    
-
-
-   
-        
-
-
-
 
