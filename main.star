@@ -1,4 +1,6 @@
 # NOTE: If you're a VSCode user, you might like our VSCode extension: https://marketplace.visualstudio.com/items?itemName=Kurtosis.kurtosis-extension
+cosmvm = import_module("github.com/hugobyte/chain-package/services/cosmvm/start_node.star")
+# deploy = import_module("github.com/hugobyte/chain-package/services/cosmvm/deploy.star")
 
 NAME_ARG = "name"
 
@@ -9,5 +11,8 @@ NAME_ARG = "name"
 def run(plan, args):
     name = args.get(NAME_ARG, "John Snow")
     plan.print("Hello, " + name)
+
+    cosmvm.run(plan,args)
+    # deploy.run(plan,args)
 
     # Try out a plan.add_service here (https://docs.kurtosis.com/starlark-reference/plan#add_service)
