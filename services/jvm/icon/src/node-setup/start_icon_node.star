@@ -1,4 +1,4 @@
-ICON_SERVICE_NAME = "ICON"
+ICON_SERVICE_NAME = "icon-node"
 ICON_NODE_IMAGE = "iconloop/goloop-icon:v1.3.5"
 ICON_RPC_PRIVATE_PORT = 9080
 ICON_RPC_PUBLIC_PORT = 8090
@@ -6,9 +6,9 @@ EXECUTABLE_PATH = "./bin/goloop"
 ICON_BASE_CONFIG_FILES_PATH = "/goloop/config/"
 ICON_CONTRACT_DIR = "/goloop/contracts/"
 ICON_BASE_CONFIG_FILES_KEY = "config_file_path"
-DEFAULT_ICON_BASE_CONFIG_FILES_PATH = "github.com/hugobte/chain-pacakge/services/jvm/icon/static-files/config/"
+DEFAULT_ICON_BASE_CONFIG_FILES_PATH = "github.com/hugobyte/chain-pacakge/services/jvm/icon/static-files/config/"
 ICON_CONTRACT_DIR_KEY = "contract_file_path"
-DEFAULT_ICON_CONTRACT_DIR = "github.com/hugobte/chain-pacakge/services/jvm/icon/static-files/contracts/"
+DEFAULT_ICON_CONTRACT_DIR = "github.com/hugobyte/chain-pacakge/services/jvm/icon/static-files/contracts/"
 ICON_RPC_PORT_KEY = "rpc"
 PUBLIC_IP_ADDRESS = "127.0.0.1"
 ICON_RPC_ENDPOINT_PATH = "api/v3/icon_dex"
@@ -36,7 +36,7 @@ def start_icon_node(plan,args):
         },
         files={
             ICON_BASE_CONFIG_FILES_PATH : "config-files",
-            ICON_CONTRACT_DIR : "contracts"
+            ICON_CONTRACT_DIR : "contracts",
         },
         env_vars={
             "GOLOOP_LOG_LEVEL": "trace",
@@ -49,22 +49,30 @@ def start_icon_node(plan,args):
     )
 
     icon_node_service_response = plan.add_service(name=ICON_SERVICE_NAME,config=icon_node_service_config)
-    plan.exec(service_name=icon_node_service_response.name,recipe=ExecRecipe(command=["apk","add","jq"]))
+    plan.exec(service_name=icon_node_service_response.name,recipe=ExecRecipe(command=["/bin/sh","-c","apk add jq && mv config/relay bin/"]))
 
     public_url = get_service_url(PUBLIC_IP_ADDRESS,icon_node_service_config.public_ports,ICON_RPC_ENDPOINT_PATH)
     private_url = get_service_url(icon_node_service_response.ip_address,icon_node_service_response.ports,ICON_RPC_ENDPOINT_PATH)
+
+    chain_id = plan.exec(service_name=icon_node_service_response.name,recipe=ExecRecipe(command=["/bin/sh","-c","./bin/goloop chain inspect 0xacbc4e --format {{.NID}} | tr -d '\n\r'"]))
+
+    network = "{0}.icon".format(chain_id["output"])
     
-    response = struct(
-        service_config = icon_node_service_config,
-        node_service_response = icon_node_service_response,
-        public_url = public_url,
-        private_url = private_url
+    
+    return struct(
+        service_name = icon_node_service_response.name,
+        network_name = "icon",
+        network = network,
+        nid = chain_id["output"],
+        endpoint = private_url,
+        endpoint_public = public_url,
+        keystore_path = "config/keystore.json",
+        keypassword= "gochain"
     )
-    
-    return response
 
 def get_service_url(ip_address,ports,path):
     port_id = ports[ICON_RPC_PORT_KEY].number
     protocol = ports[ICON_RPC_PORT_KEY].application_protocol
     url = "{0}://{1}:{2}/{3}".format(protocol,ip_address,port_id,path)
     return url
+

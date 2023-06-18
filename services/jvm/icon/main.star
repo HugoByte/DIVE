@@ -3,29 +3,13 @@ setup_node = import_module("github.com/hugobyte/chain-package/services/jvm/icon/
 icon_node_launcher = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/node-setup/start_icon_node.star")
 contract_service = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/node-setup/contract_deploy.star")
 
-relay_setup = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/relay-setup/contract_configuration.star")
+# relay_setup = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/relay-setup/contract_configuration.star")
 
 def node_service(plan,args):
 
-    plan.print("Starting Kurtosis Package")
     node_service = icon_node_launcher.start_icon_node(plan,args)
 
-    uri = node_service.private_url
-        
-    adddress =  wallet.get_network_wallet_address(plan,node_service.node_service_response.name)
-
-    data = {
-             "service_name": node_service.node_service_response.name,
-             "prep_address":adddress,
-             "uri":uri,
-             "keystorepath": "config/keystore.json",
-             "keypassword":"gochain",
-             "nid":"0x3"  
-    }        
-    r = setup_node.configure_node(plan,data)
-    plan.print(r)
-
-    plan.print("COMPLETED")
+    plan.print("Icon Node Started")
 
     return node_service
    
@@ -62,7 +46,7 @@ def icon_service(plan,args):
 
         plan.print("ScoreAddress %s" % response)
 
-    else: 
-        relay_setup.open_btp_network(plan,"ICON","src","dst","cx0000000000000000000000000000000000000000","http://172.16.1.2:9080/api/v3/icon_dex","config/keystore.json","gochain","0x3")
+    # else: 
+    #     relay_setup.open_btp_network(plan,"ICON","src","dst","cx0000000000000000000000000000000000000000","http://172.16.1.2:9080/api/v3/icon_dex","config/keystore.json","gochain","0x3")
 
 

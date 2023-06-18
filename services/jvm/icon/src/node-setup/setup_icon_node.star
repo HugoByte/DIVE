@@ -232,8 +232,6 @@ def ensure_decentralisation(plan,service_name,prep_address,uri,keystorepath,keyp
 
     set_bond(plan,service_name,prep_address,bond_amount,uri,keystorepath,keypassword,nid)
 
-    return True 
-
 
     
     
@@ -285,19 +283,24 @@ def get_stake_amount(plan,service_name,bond_amount,min_delegated):
     return result["output"].strip().replace("\n","")
 
 def configure_node(plan,args):
+
+    plan.print("Configuring ICON Node")
+
+    icon_config_data = args["chains"]["icon"]
     
 
-    service_name = args["service_name"]
-    prep_address = args["prep_address"]
-    uri = args["uri"]
-    keystorepath = args["keystorepath"]
-    keypassword = args["keypassword"]
-    nid = args["nid"]
+    service_name = icon_config_data["service_name"]
+    uri = icon_config_data["endpoint"]
+    keystorepath = icon_config_data["keystore_path"]
+    keypassword = icon_config_data["keypassword"]
+    nid = icon_config_data["nid"]
+
+    prep_address =  wallet_config.get_network_wallet_address(plan,service_name)
 
     
-    success = ensure_decentralisation(plan,service_name,prep_address,uri,keystorepath,keypassword,nid)
+    ensure_decentralisation(plan,service_name,prep_address,uri,keystorepath,keypassword,nid)
 
-    plan.wait(service_name,recipe=ExecRecipe(command=["/bin/sh","-c","sleep 300s && echo 'success'"]),field="code",assertion="==",target_value=0,timeout="400s")
+    plan.wait(service_name,recipe=ExecRecipe(command=["/bin/sh","-c","sleep 200s && echo 'success'"]),field="code",assertion="==",target_value=0,timeout="400s")
 
     main_preps = get_main_preps(plan,service_name,uri)
     plan.print(main_preps)
@@ -335,8 +338,6 @@ def get_last_block(plan,service_name):
 
     response = plan.wait(service_name,recipe=post_request,field="code",assertion="==",target_value=200)
 
-    plan.print(response)
-
     return response["extract.height"]
 
 def filter_event(plan,service_name,tx_hash):
@@ -348,8 +349,8 @@ def filter_event(plan,service_name,tx_hash):
         body='{ "jsonrpc": "2.0", "method": "icx_getTransactionResult", "id": 1, "params": { "txHash": %s } }' % tx_hash,
         extract={
             "status" : ".result.status",
-            "network_type_id": '.result["eventLogs"] | .[0].indexed | .[1]',
-            "network_id" :  '.result["eventLogs"] | .[0].indexed | .[2]'
+            "network_type_id": '.result["eventLogs"] | .[1].indexed | .[1]',
+            "network_id" :  '.result["eventLogs"] | .[1].indexed | .[2]'
         }
     )
    
@@ -403,4 +404,14 @@ def get_btp_header(plan,service_name,network_id,receipt_height):
     result = plan.exec(service_name=service_name,recipe=execute_cmd)
 
     return result["output"].strip()
+
+def int_to_hex(plan,service_name,number):
+
+    exec_command = ["python","-c","print(hex(int(%s)))" % number]
+    result = plan.exec(service_name,recipe=ExecRecipe(exec_command))
+
+    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % result["output"] ])
+    result = plan.exec(service_name=service_name,recipe=execute_cmd)
+
+    return result["output"]
 
