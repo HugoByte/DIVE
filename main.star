@@ -170,7 +170,7 @@ def start_relay(plan,args,src_btp_address,dst_btp_address,bridge):
     dst_keypassword =dst_config["keypassword"]
 
 
-    exec_command = ["./bin/relay","--direction","both","--src.address",src_btp_address,"--src.endpoint",src_endpoint,"--src.key_store",src_keystore,"--src.key_password",src_keypassword,"--src.bridge_mode=%s" % bridge,"--dst.address","http://%s" % dst_btp_address, "--dst.endpoint",dst_endpoint, "--dst.key_store",dst_keystore, "--dst.key_password",dst_keypassword,"start"]
+    exec_command = ["./bin/relay","--direction","both","--src.address",src_btp_address,"--src.endpoint",src_endpoint,"--src.key_store",src_keystore,"--src.key_password",src_keypassword,"--src.bridge_mode=%s" % bridge,"--dst.address", dst_btp_address, "--dst.endpoint","http://%s" % dst_endpoint, "--dst.key_store",dst_keystore, "--dst.key_password",dst_keypassword,"start"]
 
     plan.exec(service_name=src_service_name,recipe=ExecRecipe(command=exec_command))
 
