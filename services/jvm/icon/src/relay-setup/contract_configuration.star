@@ -32,7 +32,38 @@ def deploy_xcall(plan,bmc_address,args):
 
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
 
+    add_service(plan,bmc_address,score_address,args)
+
     return score_address   
+
+
+def add_service(plan,bmc_address,xcall_address,args):
+
+    plan.print("Adding xcall  to Bmc %s " % bmc_address)
+
+    icon_config = args["chains"]["icon"]
+    service_name = icon_config["service_name"]
+    uri = icon_config["endpoint"]
+    keystorepath = icon_config["keystore_path"]
+    keypassword = icon_config["keypassword"]
+    nid = icon_config["nid"]
+
+    method = "addService"
+    params = '{"_svc":"xcall","_addr":"%s"}' % xcall_address
+
+    exec_command = ["./bin/goloop","rpc","sendtx","call","--to",bmc_address,"--method",method,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","50000000000","--nid",nid]
+
+    plan.print(exec_command)
+    result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
+
+    tx_hash = result["output"].replace('"',"")
+
+
+    tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
+
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+
+
 
  
 def open_btp_network(plan,service_name,src,dst,bmc_address,uri,keystorepath,keypassword,nid):
@@ -196,3 +227,5 @@ def deploy_dapp(plan,xcall_address,args):
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
 
     return score_address   
+
+

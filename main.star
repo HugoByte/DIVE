@@ -5,7 +5,10 @@ eth_contract_service = import_module("github.com/hugobyte/chain-package/services
 eth_relay_service = import_module("github.com/hugobyte/chain-package/services/evm/eth/src/relay-setup/contract_configuration.star")
 eth_node = import_module("github.com/hugobyte/chain-package/services/evm/eth/src/node-setup/start-eth-node.star")
 icon_relay_service = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/relay-setup/contract_configuration.star")
-RELAY_SERVICE_IMAGE = 'alpine'
+RELAY_SERVICE_IMAGE = 'relay'
+RELAY_SERVICE_NAME = "btp-relay"
+RELAY_CONFIG_FILES_PATH = "/relay/config/"
+
 
 
 def run_node_service(plan,args):
@@ -170,26 +173,18 @@ def start_relay(plan,args,src_btp_address,dst_btp_address,bridge):
     dst_keypassword =dst_config["keypassword"]
 
 
-    exec_command = ["./bin/relay","--direction","both","--src.address",src_btp_address,"--src.endpoint",src_endpoint,"--src.key_store",src_keystore,"--src.key_password",src_keypassword,"--src.bridge_mode=%s" % bridge,"--dst.address", dst_btp_address, "--dst.endpoint","http://%s" % dst_endpoint, "--dst.key_store",dst_keystore, "--dst.key_password",dst_keypassword,"start"]
+    relay_service = ServiceConfig(
+        image=RELAY_SERVICE_IMAGE,
+        files={
+            RELAY_CONFIG_FILES_PATH: "config-files"
+        },
+        cmd=["/bin/sh","-c","./bin/relay --direction both --log_writer.filename log/relay.log --src.address %s --src.endpoint %s --src.key_store %s --src.key_password %s  --src.bridge_mode=%s --dst.address %s --dst.endpoint http://%s --dst.key_store %s --dst.key_password %s start " % (src_btp_address,src_endpoint,src_keystore,src_keypassword,bridge, dst_btp_address, dst_endpoint, dst_keystore, dst_keypassword)]
 
-    plan.exec(service_name=src_service_name,recipe=ExecRecipe(command=exec_command))
+    )
+
+    plan.add_service(name=RELAY_SERVICE_NAME,config=relay_service)
 
 
-# def run_icon_node_setup(plan,data):
-
-#     plan.print("Setting Up Icon Node")
-
-#     prep_adddress =  wallet.get_network_wallet_address(plan,node_service.service_name)
-
-#     data = {
-#              "service_name": icon_node_service_response.service_name,
-#              "prep_address":prep_adddress,
-#              "uri":icon_node_service_response.endpoint,
-#              "keystorepath":icon_node_service_response.keystore_path ,
-#              "keypassword":icon_node_service_response.keypassword,
-#              "nid":icon_node_service_response.nid  
-#     }        
-#     setup_node.configure_node(plan,data)
 
 
 
@@ -210,40 +205,15 @@ def run(plan,args):
     
 
 
-    
-    
 
 
 
 
-    
 
-    
-
-
-# def run(plan,args):
-
-#     plan.print("Starting Kurtosis Package")
-
-#     url = eth_node.start_eth_node(plan,args)
-    
-#     response = eth_contract_service.start_deploy_service(plan,args,url)
-
-#     plan.print(response)
-
-#     contract_address = eth_executor_service.deploy_contract(plan,response.name,"bmc",'{\"link\":\"eth\",\"chainNetwork\":\"0x543.eth\"}',"localnet","")
-
-#     plan.print(contract_address)
-
-#     contract_address = eth_executor_service.deploy_contract(plan,response.name,"bmv",'{ "src": { "name": "eth", "network": "0x543.eth", "networkTypeId": "0x1", "lastBlockHeight": "30375" }, "dst": { "name": "icon", "network": "0x3.icon", "firstBlockHeader": "0xf8468301037f00a0d090304264eeee3c3562152f2dc355601b0b423a948824fd0a012c11c3fc2fb4c00e01f80000f80097d6d594b040bff300eee91f7665ac8dcf89eb0871015306", "bmcAddress": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9\" } }',"localnet",'bridge="true"')
-   
-#     contract_address = eth_executor_service.deploy_contract(plan,response.name,"xcall",'{"name":"eth"}',"localnet",'')
-
-#     contract_address = eth_executor_service.deploy_contract(plan,response.name,"dapp",'{"name":"eth"}',"localnet",'')
 
 
 
 
    
-        
+
 
