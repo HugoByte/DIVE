@@ -2,11 +2,6 @@
 cosmvm = import_module("github.com/hugobyte/chain-package/services/cosmvm/start_node.star")
 contract = import_module("github.com/hugobyte/chain-package/services/cosmvm/deploy.star")
 
-
-# For more information on...
-#  - the 'run' function:  https://docs.kurtosis.com/concepts-reference/packages#runnable-packages
-#  - the 'plan' object:   https://docs.kurtosis.com/starlark-reference/plan
-#  - the 'args' object:   https://docs.kurtosis.com/next/concepts-reference/args
 def run(plan, args):
     
     cosmvm.run(plan,args)
@@ -14,10 +9,14 @@ def run(plan, args):
     # service_name = args.get("service_name","cosmos")
     plan.exec(service_name="cosmos", recipe=ExecRecipe(command=["/bin/sh","-c", "apk add jq"]))
     message = args.get("message", "message")
-    contract_name=args.get("contract_name","contract")
+    contract_name = args.get("contract_name","contract")
 
-    result = contract.deploy(plan,args,contract_name, message)
-    return result
+    # result = contract.deploy(plan,args,contract_name, message)
+    ibc_core = contract.deploy_core(plan,args)
+    return ibc_core
 
+    xcall = contract.deploy_xcall(plan,args,timeout_height, ibc_host)
+    return xcall
 
-    # Try out a plan.add_service here (https://docs.kurtosis.com/starlark-reference/plan#add_service)
+    light_client = contract.deploy_light_client(plan,args)
+    return light_client
