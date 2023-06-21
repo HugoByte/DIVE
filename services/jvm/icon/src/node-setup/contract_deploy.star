@@ -1,7 +1,10 @@
-DEFAULT_KEYSTORE_PATH = "config/keystore.json"
-DEFAULT_KEY_SECRET = "gochain"
-DEFAULT_STEP_LIMIT = "5000000000"
+DEFAULT_STEP_LIMIT = "500000000000"
 
+"""
+Deploys Contract on Icon Chain
+'contract_name' - Name of the Contract to be deployed
+'args' - Dict of params for deployment
+"""
 def deploy_contract(plan,contract_name,init_message,args):
 
     contract = contract_name+".jar"
@@ -21,6 +24,10 @@ def deploy_contract(plan,contract_name,init_message,args):
 
     return result["output"]
 
+"""
+Returns Contract Address
+'tx_hash' - transaction hash
+"""
 def get_score_address(plan,service_name,tx_hash):
 
     post_request = PostHttpRequestRecipe(
@@ -36,3 +43,4 @@ def get_score_address(plan,service_name,tx_hash):
     result = plan.wait(service_name=service_name,recipe=post_request,field="code",assertion="==",target_value=200)
 
     return result["extract.score_address"]
+

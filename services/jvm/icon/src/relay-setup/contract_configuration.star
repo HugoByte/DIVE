@@ -4,14 +4,14 @@ node_service = import_module("github.com/hugobyte/chain-package/services/jvm/ico
 def deploy_bmc(plan,args):
     plan.print("Deploying BMC Contract")
 
-    icon_config = args["chains"]["icon"]
 
 
-    init_message = '{"_net":"%s"}' % icon_config["network"]
 
-    tx_hash = contract_deployment_service.deploy_contract(plan,"bmc",init_message,icon_config)
+    init_message = '{"_net":"%s"}' % args["network"]
 
-    service_name = icon_config["service_name"]
+    tx_hash = contract_deployment_service.deploy_contract(plan,"bmc",init_message,args)
+
+    service_name = args["service_name"]
     
 
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
@@ -23,12 +23,12 @@ def deploy_xcall(plan,bmc_address,args):
 
     plan.print("Deploying xCall Contract")
 
-    icon_config = args["chains"]["icon"]
+
 
     init_message = '{"_bmc":"%s"}' % bmc_address
 
-    tx_hash = contract_deployment_service.deploy_contract(plan,"xcall",init_message,icon_config)
-    service_name = icon_config["service_name"]
+    tx_hash = contract_deployment_service.deploy_contract(plan,"xcall",init_message,args)
+    service_name = args["service_name"]
 
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
 
@@ -41,12 +41,11 @@ def add_service(plan,bmc_address,xcall_address,args):
 
     plan.print("Adding xcall  to Bmc %s " % bmc_address)
 
-    icon_config = args["chains"]["icon"]
-    service_name = icon_config["service_name"]
-    uri = icon_config["endpoint"]
-    keystorepath = icon_config["keystore_path"]
-    keypassword = icon_config["keypassword"]
-    nid = icon_config["nid"]
+    service_name = args["service_name"]
+    uri = args["endpoint"]
+    keystorepath = args["keystore_path"]
+    keypassword = args["keypassword"]
+    nid = args["nid"]
 
     method = "addService"
     params = '{"_svc":"xcall","_addr":"%s"}' % xcall_address
@@ -82,29 +81,18 @@ def open_btp_network(plan,service_name,src,dst,bmc_address,uri,keystorepath,keyp
 
 
 
-# def deploy_bmv_btpblock_java(plan,service_name,bmc_address,src_network_id,network_type_id,block_header,args):
+def deploy_bmv_btpblock_java(plan,bmc_address,dst_network_id,dst_network_type_id,first_block_header,args):
+    
+    init_message = '{"bmc": "%s","srcNetworkID": "%s","networkTypeID": "%s", "blockHeader": "0x%s","seqOffset": "0x0"}' % (bmc_address,dst_network_id,dst_network_type_id,first_block_header)
+    service_name = args["service_name"]
 
-#     network_id = args["network_id"]
+    tx_hash = contract_deployment_service.deploy_contract(plan,"bmv-btpblock",init_message,args)
 
-#     first_block_header = get_first_btpblock_header(plan,service_name,network_id)
-#     src_btp_network_info = get_btp_network_info(plan,icon_service_name,icon_nid)
+    score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
 
-#     src_first_block_header = icon_setup_node.get_btp_header(plan,icon_service_name,icon_nid,src_btp_network_info)
-#     init_message = {
-#       "bmc": bmc_address,
-#       "srcNetworkID": src_network_id,
-#       "networkTypeID": network_type_id,
-#       "blockHeader": first_block_header,
-#       "seqOffset": "0x0"
-#     }
+    plan.print("BMV-BTPBlock: deployed")
 
-#     tx_hash = contract_deployment_service.deploy_contract(plan,service_name,"bmv-btpblock",init_message,args)
-
-#     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
-
-#     plan.print("BMV-BTPBlock: deployed ")
-
-#     return score_address
+    return score_address
 
 def deploy_bmv_bridge_java(plan,service_name,bmc_address,dst_network,offset,args):
 
@@ -185,12 +173,10 @@ def setup_link_icon(plan,service_name,bmc_address,dst_chain_network,dst_chain_bm
 
     plan.print(dst_bmc_address)
 
-    icon_config_data = args["chains"]["icon"]
-
-    uri = icon_config_data["endpoint"]
-    keystorepath = icon_config_data["keystore_path"]
-    keypassword = icon_config_data["keypassword"]
-    nid = icon_config_data["nid"]
+    uri = args["endpoint"]
+    keystorepath = args["keystore_path"]
+    keypassword = args["keypassword"]
+    nid = args["nid"]
 
     response = add_verifier(plan,service_name,bmc_address,dst_chain_network,bmv_address,uri,keystorepath,keypassword,nid)
 
@@ -217,12 +203,12 @@ def deploy_dapp(plan,xcall_address,args):
 
     plan.print("Deploying dapp Contract")
 
-    icon_config = args["chains"]["icon"]
+    
 
     init_message = '{"_callService":"%s"}' % xcall_address
 
-    tx_hash = contract_deployment_service.deploy_contract(plan,"dapp-sample",init_message,icon_config)
-    service_name = icon_config["service_name"]
+    tx_hash = contract_deployment_service.deploy_contract(plan,"dapp-sample",init_message,args)
+    service_name = args["service_name"]
 
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
 

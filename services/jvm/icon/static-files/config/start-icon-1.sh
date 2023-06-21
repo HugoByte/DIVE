@@ -10,10 +10,10 @@ start_chain() {
   done
   echo $RES
 
-  CID=acbc4e
+  CID=42f1f3
   if [ ! -e ${GOLOOP_NODE_DIR}/${CID} ]; then
     # join chain
-    GENESIS=/goloop/config/genesis.zip
+    GENESIS=/goloop/config/genesis-icon-1.zip
     goloop chain join \
         --platform icon \
         --channel icon_dex \

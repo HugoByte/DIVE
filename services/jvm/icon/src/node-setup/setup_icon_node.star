@@ -58,7 +58,7 @@ def register_prep(plan,service_name,name,uri,keystorepath,keypassword,nid):
 
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
 
-    tx_hash = result["output"].replace('"',"")
+    tx_hash = result["output"]
 
 
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
@@ -95,7 +95,7 @@ def set_stake(plan,service_name,amount,uri,keystorepath,keypassword,nid):
     plan.print(exec_command)
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
 
-    tx_hash = result["output"].replace('"',"")
+    tx_hash = result["output"]
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
@@ -110,7 +110,7 @@ def set_delegation(plan,service_name,address,amount,uri,keystorepath,keypassword
     plan.print(exec_command)
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
 
-    tx_hash = result["output"].replace('"',"")
+    tx_hash = result["output"]
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
@@ -122,7 +122,7 @@ def set_bonder_list(plan,service_name,address,uri,keystorepath,keypassword,nid):
     exec_command = ["./bin/goloop","rpc","sendtx","call","--to","cx0000000000000000000000000000000000000000","--method",method,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","50000000000","--nid",nid]
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
 
-    tx_hash = result["output"].replace('"',"")
+    tx_hash = result["output"]
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
@@ -135,7 +135,7 @@ def set_bond(plan,service_name,address,amount,uri,keystorepath,keypassword,nid):
     exec_command = ["./bin/goloop","rpc","sendtx","call","--to","cx0000000000000000000000000000000000000000","--method",method,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","50000000000","--nid",nid]
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
 
-    tx_hash = result["output"].replace('"',"")
+    tx_hash = result["output"]
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
@@ -166,7 +166,7 @@ def set_revision(plan,service_name,uri,code,keystorepath,keypassword,nid):
     exec_command = ["./bin/goloop","rpc","sendtx","call","--to","cx0000000000000000000000000000000000000001","--method",method,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","50000000000","--nid",nid]
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
 
-    tx_hash = result["output"].replace('"',"")
+    tx_hash = result["output"]
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
@@ -193,7 +193,7 @@ def register_prep_node_publickey(plan,service_name,address,pubkey,uri,keystorepa
     plan.print(exec_command)
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
 
-    tx_hash = result["output"].replace('"',"")
+    tx_hash = result["output"]
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
@@ -262,7 +262,7 @@ def setup_node(plan,service_name,uri,keystorepath,keypassword,nid,prep_address):
 def hex_to_int(plan,service_name,hex_number):
     exec_command = ["printf", "\"%u\"",hex_number,"|","jq tonumber"]
     result = plan.exec(service_name,recipe=ExecRecipe(command=exec_command))
-    return result["output"].strip()
+    return result["output"]
 
 def get_min_delegated_amount(plan,service_name,total_supply):
     exec_command = ["python","-c","print(hex(int(%s / 500)))" % total_supply]
@@ -271,7 +271,7 @@ def get_min_delegated_amount(plan,service_name,total_supply):
     execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % result["output"] ])
     result = plan.exec(service_name=service_name,recipe=execute_cmd)
 
-    return result["output"].strip()
+    return result["output"]
 
 def get_stake_amount(plan,service_name,bond_amount,min_delegated):
     exec_command = ["python","-c","print(hex(int(%s) + int(%s)))" %(min_delegated,bond_amount)]
@@ -280,20 +280,17 @@ def get_stake_amount(plan,service_name,bond_amount,min_delegated):
     execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % result["output"] ])
     result = plan.exec(service_name=service_name,recipe=execute_cmd)
 
-    return result["output"].strip().replace("\n","")
+    return result["output"]
 
 def configure_node(plan,args):
 
     plan.print("Configuring ICON Node")
 
-    icon_config_data = args["chains"]["icon"]
-    
-
-    service_name = icon_config_data["service_name"]
-    uri = icon_config_data["endpoint"]
-    keystorepath = icon_config_data["keystore_path"]
-    keypassword = icon_config_data["keypassword"]
-    nid = icon_config_data["nid"]
+    service_name = args["service_name"]
+    uri = args["endpoint"]
+    keystorepath = args["keystore_path"]
+    keypassword = args["keypassword"]
+    nid = args["nid"]
 
     prep_address =  wallet_config.get_network_wallet_address(plan,service_name)
 
@@ -316,7 +313,7 @@ def open_btp_network(plan,service_name,args,uri,keystorepath,keypassword,nid):
     exec_command = ["./bin/goloop","rpc","sendtx","call","--to","cx0000000000000000000000000000000000000001","--method",method,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","50000000000","--nid",nid]
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
 
-    tx_hash = result["output"].replace('"',"")
+    tx_hash = result["output"]
     tx_result = filter_event(plan,service_name,tx_hash)
 
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
@@ -380,7 +377,7 @@ def get_btp_network_info(plan,service_name,network_id):
     execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % result["output"] ])
     result = plan.exec(service_name=service_name,recipe=execute_cmd)
 
-    return result["output"].strip()
+    return result["output"]
 
 def get_btp_header(plan,service_name,network_id,receipt_height):
 
@@ -403,7 +400,7 @@ def get_btp_header(plan,service_name,network_id,receipt_height):
     execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % first_header_hex["output"] ])
     result = plan.exec(service_name=service_name,recipe=execute_cmd)
 
-    return result["output"].strip()
+    return result["output"]
 
 def int_to_hex(plan,service_name,number):
 
