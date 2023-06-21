@@ -9,7 +9,7 @@ def start_deploy_service(plan,args):
 
     plan.print("Starting Contract Deploy Service")
 
-    endpoint = args["chains"]["eth"]["endpoint"]
+    endpoint = args["endpoint"]
 
     plan.upload_files(src=CONTRACT_DEPLOYMENT_STATIC_FILES,name="static-files")
 
