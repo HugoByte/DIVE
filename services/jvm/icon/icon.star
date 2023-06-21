@@ -231,7 +231,7 @@ def deploy_dapp_icon(plan,src_chain,dst_chain,src_xcall_address,dst_xcall_addres
 
         return src_dapp_address,dst_dapp_address
 
-    return src_xcall_address,""
+    return src_dapp_address,""
 
 
 
