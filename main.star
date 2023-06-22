@@ -8,10 +8,84 @@ btp_relay = import_module("github.com/hugobyte/chain-package/services/relay/btp_
 
 
 
-
 def run(plan,args):
 
     plan.print("Starting")
+
+    return parse_input_and_start(plan,args)
+
+
+def parse_input_and_start(plan,args):
+
+    # Run a Single Node 
+
+    if args["action"] == "start_node":
+
+        node_name = args["node_name"]
+
+        run_node(plan,node_name,args)
+
+    # Run two different Node
+    if args["action"] == "start_nodes":
+
+        nodes = args["nodes"]
+
+        if len(nodes) == 1:
+
+            if  nodes[0] == "icon":
+
+                data = icon_service.start_node_service_icon_to_icon(plan)
+
+                return data
+            else:
+                plan.print("For now only Icon Node support for multi run")
+                return
+
+        if len(nodes) > 2:
+            plan.print("Maximum allowed node count is two")
+            return
+        
+        if nodes[0] == "icon" and nodes[1] == "icon":
+            data = icon_service.start_node_service_icon_to_icon(plan)
+            return data
+        
+        else:
+            node_0 = run_node(plan,nodes[0],args)
+            node_1 = run_node(plan,nodes[1],args)
+
+            return node_0,node_1
+
+
+    # Run nodes and setup relay
+
+    if args["action"] == "setup_relay":
+
+        if args["relay"]["name"] == "btp":
+            data = run_btp_setup(plan,args["relay"])
+            
+            return data
+
+        else:
+
+            plan.print("More Relay Support will be added soon")
+            return
+
+
+def run_node(plan,node_name,args):
+
+    if node_name == "icon":
+
+        return icon_service.start_node_service(plan)
+        
+    elif node_name == "eth":
+
+        return eth_node.start_eth_node_serivce(plan,args)
+
+    else :
+        plan.print("Unknown Chain Type. Expected ['icon','eth']")
+        return
+
+def run_btp_setup(plan,args):
 
     links = args["links"]
     source_chain = links["src"]
@@ -164,7 +238,8 @@ def run(plan,args):
     btp_relay.start_relayer(plan,source_chain,destination_chain,config_data,src_btp_address,dst_btp_address,bridge)
 
 
-    plan.print(config_data)
+    return config_data
+    
     
 
 
