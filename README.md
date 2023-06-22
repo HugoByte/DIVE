@@ -1,3 +1,5 @@
+![DIVE](img/DIVE.png)
+
 ## D.I.V.E.
 
 ### About
@@ -26,25 +28,56 @@ Before proceeding make sure to have
 - [**Evm Util Package**](./evm/) - This package is responsible for Uploading and Interacting with Smart Contracts Deployed on EVM based chains.
 - [**Evm BTP Integration**](./evm/) - This provides setup for Deploying BTP Smart Contracts and Relay Setup
 
-### Running Kurtosis
+### Running Dive
 
-```
-kurtosis run . '{"links":{"src":" ","dst":" "}, "bridge":"true"}' --enclave <enclave_name>
-```
+To run, we have the list of actions, as follows:
 
-- By running `kurtosis clean -a` , we can tear down the [encalve](https://docs.kurtosis.com/concepts-reference/enclaves/) and any of their artifacts.
+1. **start_node**
+2. **start_nodes**
+3. **setup_relay**
 
-Example.
+- Example for running single chain
 
-* For Icon-Ethereum
+    ```
+    kurtosis run . '{"action":"start_node","node_name":"icon"}' --enclave btp
+    ```
 
-```
-kurtosis run . '{"links":{"src":"icon","dst":"eth"}, "bridge":"true"}' --enclave btp
-```
+- Example for running multiple chains
 
-- For Icon-Icon
+    ```
+    kurtosis run . '{"action":"start_nodes","nodes":["icon"]}' --enclave btp
+    ```
 
-```
-kurtosis run . '{"links":{"src":"icon","dst":"icon"}, "bridge":"false"}' --enclave btp
-```
- *Note:* The `bridge` should be false for Icon to Icon
+    ```
+    kurtosis run . '{"action":"start_nodes","nodes":["icon","eth"]}' --enclave btp
+    ```
+
+- Example for running two chains wth relay
+
+    ```
+    kurtosis run . '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "icon"}"bridge":"false"}}' --enclave btp
+    ```
+    *Note:* The `bridge` should be false for Icon to Icon
+
+ ### Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+### License
+
+Distributed under the Apache 2.0 License. See [LICENSE](./LICENSE) for more information.
+
+### Feedback 
+
+We would happy to hear your thoughts on our project. Your feedback helps us improve and make it better for everyone... Please submit your valuable feedback [here](https://docs.google.com/forms/d/e/1FAIpQLScnesE-4IWPrFQ-W2FbRXHyQz8i_C0BVjIP_aWaxKe3myTgyw/viewform?usp=sharing)
+
+
+
