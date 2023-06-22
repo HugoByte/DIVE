@@ -1,81 +1,52 @@
-My Package
-============
-This is a [Kurtosis package](https://docs.kurtosis.com/concepts-reference/packages). It doesn't do much now, but it will soon!
+## Chain Package
+### About
 
-Run this package
-----------------
-If you have [Kurtosis installed][install-kurtosis], run:
+The Kurtosis package aim to implement its services and API for ICON Blockchain.
+The kurtosis services and API are designed to simplify the process of deploying various nodes and services for development and testing and enhance the overall user experience. Implementing kurtosis for the ICON blockchain can help ease the developers in the ecosystem to focus more on building the business logic without worrying about the setup which consumes a significant amount of time.
 
-<!-- TODO replace YOURUSER and THISREPO with the correct values -->
-```bash
-kurtosis run github.com/YOURUSER/THISREPO
+The vision is to making ICON the interoperable hub by easing the setup of BTP and IBC for ICON and the connecting chains.
+
+### Setup and requirements
+
+Before proceeding make sure to have
+
+- [Docker installed and running](https://docs.kurtosis.com/install#i-install--start-docker)
+- [Installed the kurtosis cli ](https://docs.kurtosis.com/install#ii-install-the-cli) or [(upgrading to the latest)](https://docs.kurtosis.com/upgrade)
+
+### Integrating chain
+
+##### ICON  
+##### ETHEREUM
+
+### Integrating node
+
+- [**Icon node service package**](./jvm) - This package is responsible for running the ICON node and providing the configuration to the given services.
+- [**Icon BTP Integration**](./jvm) - This provides the setup for Deploying BTP Smart Contracts and Relay
+- [**Evm chain node package**](./evm/) - This package is responsible for running the EVM chain node and providing the configuration to the given services.
+- [**Evm Util Package**](./evm/) - This package is responsible for Uploading and Interacting with Smart Contracts Deployed on EVM based chains.
+- [**Evm BTP Integration**](./evm/) - This provides setup for Deploying BTP Smart Contracts and Relay Setup
+
+### Running Kurtosis
+
+```
+kurtosis run . '{"links":{"src":" ","dst":" "}, "bridge":"true"}' --enclave <enclave_name>
 ```
 
-<!-- TODO Add a URL-encoded version of github.com/YOURUSER/THISREPO to right after "KURTOSIS_PACKAGE_LOCATOR=" in the link below -->
-<!-- TODO You can URL-encode a string using https://www.urlencoder.org/ -->
-If you don't have Kurtosis installed, [click here to run this package on the Kurtosis playground](https://gitpod.io/#KURTOSIS_PACKAGE_LOCATOR=/https://github.com/kurtosis-tech/playground-gitpod).
+- If we want to tear down the [encalve](https://docs.kurtosis.com/concepts-reference/enclaves/) and any of their artifacts, by running `kurtosis clean -a`
 
-To blow away the created [enclave][enclaves-reference], run `kurtosis clean -a`.
+#### Example
 
-#### Configuration
+* For Icon-Icon
 
-<details>
-    <summary>Click to see configuration</summary>
-
-You can configure this package using the JSON structure below. The default values for each parameter are shown.
-
-NOTE: the `//` lines are not valid JSON; you will need to remove them!
-
-<!-- TODO Parameterize your package as you prefer; see https://docs.kurtosis.com/next/concepts-reference/args for more -->
-```javascript
-{
-    // The name to print
-    "name": "John Snow"
-}
+```
+kurtosis run . '{"links":{"src":"icon","dst":"icon"}, "bridge":"false"}' --enclave btp
 ```
 
-The arguments can then be passed in to `kurtosis run`.
+**NOTE:** The `bridge` should be false for Icon to Icon.
 
-For example:
+* For Icon-Ethereum
 
-<!-- TODO replace YOURUSER and THISREPO with the correct values -->
-```bash
-kurtosis run github.com/YOURUSER/THISREPO '{"name":"Maynard James Keenan"}'
+```
+kurtosis run . '{"links":{"src":"icon","dst":"eth"}, "bridge":"true"}' --enclave btp
 ```
 
-You can also store the JSON args in a file, and use command expansion to slot them in:
-
-<!-- TODO replace YOURUSER and THISREPO with the correct values -->
-```bash
-kurtosis run github.com/YOURUSER/THISREPO "$(cat args.json)"
-```
-
-</details>
-
-Use this package in your package
---------------------------------
-Kurtosis packages can be composed inside other Kurtosis packages. To use this package in your package:
-
-<!-- TODO Replace YOURUSER and THISREPO with the correct values! -->
-First, import this package by adding the following to the top of your Starlark file:
-
-```python
-this_package = import_module("github.com/YOURUSER/THISREPO/main.star")
-```
-
-Then, call the this package's `run` function somewhere in your Starlark script:
-
-```python
-this_package_output = this_package.run(plan, args)
-```
-
-Develop on this package
------------------------
-1. [Install Kurtosis][install-kurtosis]
-1. Clone this repo
-1. For your dev loop, run `kurtosis clean -a && kurtosis run .` inside the repo directory
-
-
-<!-------------------------------- LINKS ------------------------------->
-[install-kurtosis]: https://docs.kurtosis.com/install
-[enclaves-reference]: https://docs.kurtosis.com/concepts-reference/enclaves
