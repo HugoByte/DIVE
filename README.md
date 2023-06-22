@@ -55,7 +55,7 @@ To run, we have the list of actions, as follows:
 - Example for running two chains wth relay
 
     ```
-    kurtosis run . '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "icon"},"bridge":"false"}}' --enclave btp
+    kurtosis run . '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "eth"},"bridge":"false"}}' --enclave btp
     ```
     *Note:* The `bridge` should be false for Icon to Icon
 
