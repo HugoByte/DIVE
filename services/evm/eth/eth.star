@@ -27,7 +27,7 @@ def deploy_bmv_eth(plan,bridge,data,args):
         return address
 
     else :
-        address = eth_relay_setup.deploy_bmv(plan,args,data.block_height,data.bmc,data.network,data.networkTypeId)
+        address = eth_relay_setup.deploy_bmv(plan,args,data.block_header,data.bmc,data.network,data.networkTypeId)
 
         return address
 

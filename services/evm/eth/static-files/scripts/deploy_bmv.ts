@@ -2,7 +2,6 @@ import { ethers } from "hardhat";
 import { Deployments } from "./config";
 const deployments = Deployments.getDefault();
 
-
 async function deploy_bmv(
   currentChain: string,
   srcChainfirstBlockHeader: string,
@@ -13,14 +12,13 @@ async function deploy_bmv(
 
   var currentChainBmc = depolyment_data.contracts.bmc;
 
-
   const BMVBtp = await ethers.getContractFactory("BtpMessageVerifier");
 
   const bmvBtp = await BMVBtp.deploy(
     currentChainBmc,
     srcChainNetwok,
     srcChainNetwokTypeId,
-    srcChainfirstBlockHeader,
+    "0x" + srcChainfirstBlockHeader,
     "0x0"
   );
   await bmvBtp.deployed();
@@ -70,10 +68,10 @@ async function main() {
   var data = JSON.parse(process.env.params?.toString());
 
   var currentChain = data.current_chain.name;
-  var srcFirstBlockHeader = data.src_chain.firstBlockHeader;
-  var srcChainNetwork = data.src_chain.network;
-  var srcChainNetworkTypeId = data.src_chain.networkTypeId;
-  var srcChainBmcAddr = data.src_chain.bmc;
+  var srcFirstBlockHeader = data.src.firstBlockHeader;
+  var srcChainNetwork = data.src.network;
+  var srcChainNetworkTypeId = data.src.networkTypeId;
+  var srcChainBmcAddr = data.src.bmc;
 
   await deploy_bmv(
     currentChain,
@@ -84,7 +82,6 @@ async function main() {
 
   await setup_link(currentChain, srcChainBmcAddr, srcChainNetwork);
 }
-
 
 main().catch((error) => {
   console.error(error);
