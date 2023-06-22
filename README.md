@@ -8,6 +8,8 @@ Dive deeply into the world of Blockchain and Web 3.0 using **D.I.V.E.** (Deploya
 
 The vision is to making ICON the interoperable hub by easing the setup of BTP and IBC for ICON and the connecting chains.
 
+This repository uses [kurtosis package](https://docs.kurtosis.com/concepts-reference/packages)
+
 ### Setup and requirements
 
 Before proceeding make sure to have
@@ -17,8 +19,8 @@ Before proceeding make sure to have
 
 ### Integrating chain
 
- - ICON  
- - ETHEREUM
+- ICON
+- ETHEREUM
 
 ### Integrating node
 
@@ -38,28 +40,29 @@ To run, we have the list of actions, as follows:
 
 - Example for running single chain
 
-    ```
-    kurtosis run . '{"action":"start_node","node_name":"icon"}' --enclave btp
-    ```
+  ```
+  kurtosis run . '{"action":"start_node","node_name":"icon"}' --enclave btp
+  ```
 
 - Example for running multiple chains
 
-    ```
-    kurtosis run . '{"action":"start_nodes","nodes":["icon"]}' --enclave btp
-    ```
+  ```
+  kurtosis run . '{"action":"start_nodes","nodes":["icon"]}' --enclave btp
+  ```
 
-    ```
-    kurtosis run . '{"action":"start_nodes","nodes":["icon","eth"]}' --enclave btp
-    ```
+  ```
+  kurtosis run . '{"action":"start_nodes","nodes":["icon","eth"]}' --enclave btp
+  ```
 
 - Example for running two chains wth relay
 
-    ```
-    kurtosis run . '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "eth"},"bridge":"false"}}' --enclave btp
-    ```
-    *Note:* The `bridge` should be false for Icon to Icon
+  ```
+  kurtosis run . '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "eth"},"bridge":"false"}}' --enclave btp
+  ```
 
- ### Contributing
+  _Note:_ The `bridge` should be false for Icon to Icon
+
+### Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
@@ -71,10 +74,14 @@ If you have a suggestion that would make this better, please fork the repo and c
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request.
 
+## References
+
+Special thanks to [Kurtosis-Tech](https://github.com/kurtosis-tech).
+
 ### License
 
 Distributed under the Apache 2.0 License. See [LICENSE](./LICENSE) for more information.
 
-### Feedback 
+### Feedback
 
 We would happy to hear your thoughts on our project. Your feedback helps us improve and make it better for everyone. Please submit your valuable feedback [here](https://docs.google.com/forms/d/e/1FAIpQLScnesE-4IWPrFQ-W2FbRXHyQz8i_C0BVjIP_aWaxKe3myTgyw/viewform?usp=sharing)
