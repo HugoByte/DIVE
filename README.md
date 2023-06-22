@@ -55,7 +55,7 @@ To run, we have the list of actions, as follows:
 - Example for running two chains wth relay
 
     ```
-    kurtosis run . '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "icon"}"bridge":"false"}}' --enclave btp
+    kurtosis run . '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "eth"},"bridge":"false"}}' --enclave btp
     ```
     *Note:* The `bridge` should be false for Icon to Icon
 
@@ -65,11 +65,11 @@ Contributions are what make the open source community such an amazing place to l
 
 If you have a suggestion that would make this better, please fork the repo and create a pull request.
 
-1. Fork the Project
+1. Fork the Project.
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+3. Commit your Changes (`git commit -m 'feature message'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+5. Open a Pull Request.
 
 ### License
 
