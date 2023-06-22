@@ -13,7 +13,7 @@ The vision is to making ICON the interoperable hub by easing the setup of BTP an
 Before proceeding make sure to have
 
 - [Docker installed and running](https://docs.kurtosis.com/install#i-install--start-docker)
-- [Installed the kurtosis cli ](https://docs.kurtosis.com/install#ii-install-the-cli) or [(upgrading to the latest)](https://docs.kurtosis.com/upgrade)
+- [Install the kurtosis cli ](https://docs.kurtosis.com/install#ii-install-the-cli) or [(upgrading to the latest)](https://docs.kurtosis.com/upgrade)
 
 ### Integrating chain
 
@@ -63,7 +63,7 @@ To run, we have the list of actions, as follows:
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+If you have a suggestion that would make this better, please fork the repo and create a pull request.
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -78,6 +78,3 @@ Distributed under the Apache 2.0 License. See [LICENSE](./LICENSE) for more info
 ### Feedback 
 
 We would happy to hear your thoughts on our project. Your feedback helps us improve and make it better for everyone. Please submit your valuable feedback [here](https://docs.google.com/forms/d/e/1FAIpQLScnesE-4IWPrFQ-W2FbRXHyQz8i_C0BVjIP_aWaxKe3myTgyw/viewform?usp=sharing)
-
-
-
