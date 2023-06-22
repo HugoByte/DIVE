@@ -32,7 +32,7 @@ Before proceeding make sure to have
 kurtosis run . '{"links":{"src":" ","dst":" "}, "bridge":"true"}' --enclave <enclave_name>
 ```
 
-- If we want to tear down the [encalve](https://docs.kurtosis.com/concepts-reference/enclaves/) and any of their artifacts, by running `kurtosis clean -a`
+- By running `kurtosis clean -a` , we can tear down the [encalve](https://docs.kurtosis.com/concepts-reference/enclaves/) and any of their artifacts.
 
 Example.
 
