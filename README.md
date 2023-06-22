@@ -15,8 +15,8 @@ Before proceeding make sure to have
 
 ### Integrating chain
 
-##### ICON  
-##### ETHEREUM
+ - ICON  
+ - ETHEREUM
 
 ### Integrating node
 
@@ -34,15 +34,7 @@ kurtosis run . '{"links":{"src":" ","dst":" "}, "bridge":"true"}' --enclave <enc
 
 - If we want to tear down the [encalve](https://docs.kurtosis.com/concepts-reference/enclaves/) and any of their artifacts, by running `kurtosis clean -a`
 
-#### Example
-
-* For Icon-Icon
-
-```
-kurtosis run . '{"links":{"src":"icon","dst":"icon"}, "bridge":"false"}' --enclave btp
-```
-
-**NOTE:** The `bridge` should be false for Icon to Icon.
+Example.
 
 * For Icon-Ethereum
 
@@ -50,3 +42,9 @@ kurtosis run . '{"links":{"src":"icon","dst":"icon"}, "bridge":"false"}' --encla
 kurtosis run . '{"links":{"src":"icon","dst":"eth"}, "bridge":"true"}' --enclave btp
 ```
 
+- For Icon-Icon
+
+```
+kurtosis run . '{"links":{"src":"icon","dst":"icon"}, "bridge":"false"}' --enclave btp
+```
+ *Note:* The `bridge` should be false for Icon to Icon
