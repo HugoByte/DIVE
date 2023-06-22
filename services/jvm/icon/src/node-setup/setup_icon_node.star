@@ -1,7 +1,8 @@
 wallet_config = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/node-setup/wallet.star")
 
-BTP_VERSION = "21"
+BTP_VERSION = "21" # REV Version
 
+# Returns the Main PREPS of the Network
 def get_main_preps(plan,service_name,uri):
     post_request = PostHttpRequestRecipe(
         port_id="rpc",
@@ -16,6 +17,7 @@ def get_main_preps(plan,service_name,uri):
     
     return result
 
+# Returns the PREP of the network
 def get_prep(plan,service_name,prep_address,uri):
     post_request = PostHttpRequestRecipe(
         port_id="rpc",
@@ -31,6 +33,7 @@ def get_prep(plan,service_name,prep_address,uri):
 
     return result
 
+# Returns Total ICX supply
 def get_total_supply(plan,service_name):
 
     post_request= PostHttpRequestRecipe(
@@ -67,7 +70,7 @@ def register_prep(plan,service_name,name,uri,keystorepath,keypassword,nid):
 
     plan.print("Completed RegisterPrep")
 
-
+# Returns transaction result based on the tx_hash
 def get_tx_result(plan,service_name,tx_hash,uri):
 
     post_request = PostHttpRequestRecipe(
@@ -84,6 +87,7 @@ def get_tx_result(plan,service_name,tx_hash,uri):
 
     return result
 
+# Sets Stake based on the `amount` given
 def set_stake(plan,service_name,amount,uri,keystorepath,keypassword,nid):
     
     method = "setStake"
@@ -102,6 +106,7 @@ def set_stake(plan,service_name,amount,uri,keystorepath,keypassword,nid):
 
     plan.print("Set Stake Completed")
 
+# Sets Delegation to `address` based on the `amount` given
 def set_delegation(plan,service_name,address,amount,uri,keystorepath,keypassword,nid):
     method="setDelegation"
     params='{"delegations":[{"address":"%s","value":"%s"}]}' % (address,amount)
@@ -115,6 +120,7 @@ def set_delegation(plan,service_name,address,amount,uri,keystorepath,keypassword
 
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
+# Sets the bonder list with `address` specified
 def set_bonder_list(plan,service_name,address,uri,keystorepath,keypassword,nid):
     method="setBonderList"
     params='{"bonderList":["%s"]}' % address
@@ -127,6 +133,7 @@ def set_bonder_list(plan,service_name,address,uri,keystorepath,keypassword,nid):
 
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
+# Sets Bond `amount` to `address`
 def set_bond(plan,service_name,address,amount,uri,keystorepath,keypassword,nid):
 
     method="setBond"
@@ -140,6 +147,7 @@ def set_bond(plan,service_name,address,amount,uri,keystorepath,keypassword,nid):
 
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
+# Returns Network revision
 def get_revision(plan,service_name):
 
     post_request = PostHttpRequestRecipe(
@@ -156,6 +164,7 @@ def get_revision(plan,service_name):
 
     return result["extract.rev_number"]
 
+# Sets Network Revision
 def set_revision(plan,service_name,uri,code,keystorepath,keypassword,nid):
 
     method="setRevision"
@@ -169,6 +178,7 @@ def set_revision(plan,service_name,uri,code,keystorepath,keypassword,nid):
 
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
+# Returns PREP Node Publci Key using `address` specified
 def get_prep_node_public_key(plan,service_name,address):
     post_request = PostHttpRequestRecipe(
         port_id="rpc",
@@ -182,6 +192,7 @@ def get_prep_node_public_key(plan,service_name,address):
 
     return result
 
+# Registers PREP Node Public Key
 def register_prep_node_publickey(plan,service_name,address,pubkey,uri,keystorepath,keypassword,nid):
     method="registerPRepNodePublicKey"
     
@@ -196,6 +207,7 @@ def register_prep_node_publickey(plan,service_name,address,pubkey,uri,keystorepa
 
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
+# Start decentralisation for btp relay
 def ensure_decentralisation(plan,service_name,prep_address,uri,keystorepath,keypassword,nid):
     main_preps = get_main_preps(plan,service_name,uri)
     plan.print(main_preps)
@@ -230,10 +242,7 @@ def ensure_decentralisation(plan,service_name,prep_address,uri,keystorepath,keyp
 
     set_bond(plan,service_name,prep_address,bond_amount,uri,keystorepath,keypassword,nid)
 
-
-    
-    
-
+# Setup Node for Btp Blocks
 def setup_node(plan,service_name,uri,keystorepath,keypassword,nid,prep_address):
     
     revision = get_revision(plan,service_name)
@@ -256,7 +265,7 @@ def setup_node(plan,service_name,uri,keystorepath,keypassword,nid,prep_address):
 
     plan.print(register_node_pubkey)
     
-
+# Returns Int from Hex value
 def hex_to_int(plan,service_name,hex_number):
     exec_command = ["python","-c","print(int(%s))" % hex_number]
     result = plan.exec(service_name,recipe=ExecRecipe(command=exec_command))
@@ -266,6 +275,7 @@ def hex_to_int(plan,service_name,hex_number):
     
     return result["output"]
 
+# Returns Minimum Amount for Delegation
 def get_min_delegated_amount(plan,service_name,total_supply):
     exec_command = ["python","-c","print(hex(int(%s / 500)))" % total_supply]
     result = plan.exec(service_name,recipe=ExecRecipe(exec_command))
@@ -275,6 +285,7 @@ def get_min_delegated_amount(plan,service_name,total_supply):
 
     return result["output"]
 
+# Calaculates the Amount for Staking
 def get_stake_amount(plan,service_name,bond_amount,min_delegated):
     exec_command = ["python","-c","print(hex(int(%s) + int(%s)))" %(min_delegated,bond_amount)]
     result = plan.exec(service_name,recipe=ExecRecipe(exec_command))
@@ -284,6 +295,7 @@ def get_stake_amount(plan,service_name,bond_amount,min_delegated):
 
     return result["output"]
 
+# Configure nodes
 def configure_node(plan,args):
 
     plan.print("Configuring ICON Node")
@@ -306,6 +318,7 @@ def configure_node(plan,args):
 
     setup_node(plan,service_name,uri,keystorepath,keypassword,nid,prep_address)
 
+# Opens Btp Netwok 
 def open_btp_network(plan,service_name,args,uri,keystorepath,keypassword,nid):
     name = args["name"]
     owner = args["owner"]
@@ -322,6 +335,7 @@ def open_btp_network(plan,service_name,args,uri,keystorepath,keypassword,nid):
 
     return tx_result
 
+# Returns Last Block From Chain 
 def get_last_block(plan,service_name):
 
     post_request = PostHttpRequestRecipe(
@@ -339,6 +353,7 @@ def get_last_block(plan,service_name):
 
     return response["extract.height"]
 
+# Filters Events
 def filter_event(plan,service_name,tx_hash):
 
     post_request = PostHttpRequestRecipe(
@@ -357,6 +372,7 @@ def filter_event(plan,service_name,tx_hash):
 
     return result
 
+# Returns Btp Network Info
 def get_btp_network_info(plan,service_name,network_id):
 
     post_request = PostHttpRequestRecipe(
@@ -381,6 +397,7 @@ def get_btp_network_info(plan,service_name,network_id):
 
     return result["output"]
 
+# Returns Btp Block Header
 def get_btp_header(plan,service_name,network_id,receipt_height):
 
     post_request = PostHttpRequestRecipe(
@@ -404,6 +421,7 @@ def get_btp_header(plan,service_name,network_id,receipt_height):
 
     return result["output"]
 
+# Converts Int to Hex
 def int_to_hex(plan,service_name,number):
 
     exec_command = ["python","-c","print(hex(int(%s)))" % number]

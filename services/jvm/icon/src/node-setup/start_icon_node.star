@@ -87,7 +87,7 @@ def get_service_url(ip_address,ports,path):
     return url
 
 
-
+# Retruns Service Config
 def get_service_config(id,private_port,public_port,p2p_listen_address,p2p_address,cid):
 
     return struct(

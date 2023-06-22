@@ -1,4 +1,4 @@
-
+# Deploy Contract to Eth Network
 def deploy_contract(plan,contract_name,params,network_name):
 
     plan.print("Deploying Contract {0}".format(contract_name))
@@ -12,6 +12,7 @@ def deploy_contract(plan,contract_name,params,network_name):
 
     plan.print(response)
 
+# Returns Address of Deployed Contract
 def get_contract_address(plan,contract_name):
 
     exec_command = ["/bin/sh","-c","cd static-files && cat deployments.json | jq -r .eth.contracts.%s | tr -d '\n\r'" % contract_name]

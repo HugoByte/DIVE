@@ -14,7 +14,7 @@ def run(plan,args):
 
     return parse_input_and_start(plan,args)
 
-
+# Parse Input based on actions
 def parse_input_and_start(plan,args):
 
     # Run a Single Node 
@@ -26,6 +26,7 @@ def parse_input_and_start(plan,args):
         run_node(plan,node_name,args)
 
     # Run two different Node
+
     if args["action"] == "start_nodes":
 
         nodes = args["nodes"]
@@ -70,7 +71,7 @@ def parse_input_and_start(plan,args):
             plan.print("More Relay Support will be added soon")
             return
 
-
+# Runs node based on node type
 def run_node(plan,node_name,args):
 
     if node_name == "icon":
@@ -85,6 +86,7 @@ def run_node(plan,node_name,args):
         plan.print("Unknown Chain Type. Expected ['icon','eth']")
         return
 
+# Starts btp relay setup
 def run_btp_setup(plan,args):
 
     links = args["links"]
@@ -148,10 +150,10 @@ def run_btp_setup(plan,args):
             "block_number" : dst_block_height
         }
 
-        config_data["chains"][source_chain]["networkTypeId"] = response.src_networkTypeId
-        config_data["chains"][source_chain]["networkId"] = response.src_networkId
-        config_data["chains"][destination_chain]["networkTypeId"] = response.dst_networkTypeId
-        config_data["chains"][destination_chain]["networkId"] = response.dst_networkId
+        config_data["chains"][source_chain]["networkTypeId"] = response.src_network_type_id
+        config_data["chains"][source_chain]["networkId"] = response.src_network_id
+        config_data["chains"][destination_chain]["networkTypeId"] = response.dst_network_type_id
+        config_data["chains"][destination_chain]["networkId"] = response.dst_network_id
 
         config_data["contracts"][source_chain] = src_contract_addresses
         config_data["contracts"][destination_chain] = dst_contract_addresses
@@ -221,8 +223,8 @@ def run_btp_setup(plan,args):
 
         config_data["contracts"][source_chain] = src_contract_addresses
         config_data["contracts"][destination_chain] = dst_contract_addresses
-        config_data["chains"][source_chain]["networkTypeId"] = src_response.networkTypeId
-        config_data["chains"][source_chain]["networkId"] = src_response.networkId
+        config_data["chains"][source_chain]["networkTypeId"] = src_response.network_type_id
+        config_data["chains"][source_chain]["networkId"] = src_response.network_id
 
 
     src_network = config_data["chains"][source_chain]["network"]

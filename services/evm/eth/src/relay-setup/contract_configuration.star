@@ -1,6 +1,6 @@
 eth_contract_deployer_service = import_module("github.com/hugobyte/chain-package/services/evm/eth/src/node-setup/contract-deployer.star")
 
-
+# Deploy Bmc contract on ETH and Returns it's address
 def deploy_bmc(plan,args):
 
     eth_config_data = args["chains"]["eth"]
@@ -24,6 +24,7 @@ def deploy_bmc(plan,args):
         bmc = bmc_address
     )
 
+# Deploy xCall Contract and returns it's address
 def deploy_xcall(plan,args):
 
     eth_config_data = args["chains"]["eth"]
@@ -38,7 +39,7 @@ def deploy_xcall(plan,args):
 
     return xcall_address
 
-
+# Deploy dapp Contract and returns it's address
 def deploy_dapp(plan,args):
 
     eth_config_data = args["chains"]["eth"]
@@ -54,7 +55,7 @@ def deploy_dapp(plan,args):
 
     return dapp_address
 
-
+# Deploy BmvBridge Contract and returns it's address
 def deploy_bmv_bridge(plan,args,lastblock_height,src_bmc_address,srcchain_network):
 
     eth_config_data = args["chains"]["eth"]
@@ -72,7 +73,7 @@ def deploy_bmv_bridge(plan,args,lastblock_height,src_bmc_address,srcchain_networ
 
     return bmvb
 
-
+# Deploy Bmv contract and returns it's address
 def deploy_bmv(plan,args,src_first_block_header,src_bmc_address,srcchain_network,srcchain_network_type_id):
 
     eth_config_data = args["chains"]["eth"]

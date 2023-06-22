@@ -18,6 +18,7 @@ ICON1_NODE_P2P_ADDRESS = 8081
 ICON0_NODE_CID = "0xacbc4e"
 ICON1_NODE_CID = "0x42f1f3"
 
+# Spins up ICON Node ID 0
 def start_icon_node_0(plan,service_config):
 
     plan.print("Starting Icon Node: Id 0")
@@ -26,6 +27,7 @@ def start_icon_node_0(plan,service_config):
 
     return node_service
 
+# Spins up ICON Node ID 1
 def start_icon_node_1(plan,service_config):
 
     plan.print("Starting Icon Node: Id 1")
@@ -34,6 +36,7 @@ def start_icon_node_1(plan,service_config):
 
     return node_service
 
+# Spins up ICON Nodes {ICON-0 & ICON-1}
 def start_node_service_icon_to_icon(plan):
 
     src_chain_config  = icon_node_launcher.get_service_config(ICON0_NODE_ID,ICON0_NODE_PRIVATE_RPC_PORT,ICON0_NODE_PUBLIC_RPC_PORT,ICON0_NODE_P2P_LISTEN_ADDRESS,ICON0_NODE_P2P_ADDRESS,ICON0_NODE_CID)
@@ -74,7 +77,7 @@ def start_node_service_icon_to_icon(plan):
         dst_config = dst_service_config
     )
 
-
+# Spins up single ICON node
 def start_node_service(plan):
 
     chain_config = icon_node_launcher.get_service_config(ICON0_NODE_ID,ICON0_NODE_PRIVATE_RPC_PORT,ICON0_NODE_PUBLIC_RPC_PORT,ICON0_NODE_P2P_LISTEN_ADDRESS,ICON0_NODE_P2P_ADDRESS,ICON0_NODE_CID)
@@ -96,6 +99,7 @@ def start_node_service(plan):
 
     return chain_service_config
 
+# Configures ICON Nodes setup
 def configure_icon_to_icon_node(plan,src_chain_config,dst_chain_config):
 
     plan.print("Configuring ICON Nodes")
@@ -103,18 +107,17 @@ def configure_icon_to_icon_node(plan,src_chain_config,dst_chain_config):
     setup_node.configure_node(plan,src_chain_config) 
     setup_node.configure_node(plan,dst_chain_config)
 
-
+# Configures ICON Node setup
 def configure_icon_node(plan,chain_config):
 
     plan.print("configure ICON Node")
 
     setup_node.configure_node(plan,chain_config) 
 
-
+# Deploys BMC on ICON
 def deploy_bmc_icon(plan,src_chain,dst_chain,args):
 
     src_config = args["chains"][src_chain]
-    
     
     src_bmc_address = icon_relay_setup.deploy_bmc(plan,src_config)
 
@@ -126,6 +129,7 @@ def deploy_bmc_icon(plan,src_chain,dst_chain,args):
 
     return src_bmc_address , ""
 
+# Deploys BMV for ICON to ICON setup
 def deploy_bmv_icon_to_icon(plan,src_chain,dst_chain,src_bmc_address,dst_bmc_address,args):
 
     src_chain_config = args["chains"][src_chain]
@@ -201,14 +205,15 @@ def deploy_bmv_icon_to_icon(plan,src_chain,dst_chain,src_bmc_address,dst_bmc_add
         dst_bmv = dst_bmv_address,
         src_block_height = src_last_block_height,
         dst_block_height = dst_last_block_height,
-        src_networkTypeId = src_open_btp_network_response["extract.network_type_id"],
-        src_networkId = src_open_btp_network_response["extract.network_id"],
-        dst_networkTypeId = dst_open_btp_network_response["extract.network_type_id"],
-        dst_networkId = dst_open_btp_network_response["extract.network_id"],
+        src_network_type_id = src_open_btp_network_response["extract.network_type_id"],
+        src_network_id = src_open_btp_network_response["extract.network_id"],
+        dst_network_type_id = dst_open_btp_network_response["extract.network_type_id"],
+        dst_network_id = dst_open_btp_network_response["extract.network_id"],
 
 
     )
 
+# Deploys xCall Contract on ICON nodes
 def deploy_xcall_icon(plan,src_chain,dst_chain,src_bmc_address,dst_bmc_address,args):
 
     src_config = args["chains"][src_chain]
@@ -225,6 +230,7 @@ def deploy_xcall_icon(plan,src_chain,dst_chain,src_bmc_address,dst_bmc_address,a
 
     return src_xcall_address,""
 
+# Deploys dApp Contract on ICON nodes
 def deploy_dapp_icon(plan,src_chain,dst_chain,src_xcall_address,dst_xcall_address,args):
 
     src_config = args["chains"][src_chain]
@@ -241,7 +247,7 @@ def deploy_dapp_icon(plan,src_chain,dst_chain,src_xcall_address,dst_xcall_addres
     return src_dapp_address,""
 
 
-
+# Deploy BMV on ICON Node
 def deploy_bmv_icon(plan,src_chain,dst_chain,src_bmc_address,dst_bmc_address,dst_last_block_height,args):
 
     src_chain_config = args["chains"][src_chain]
@@ -294,8 +300,8 @@ def deploy_bmv_icon(plan,src_chain,dst_chain,src_bmc_address,dst_bmc_address,dst
     return struct(
         bmc =  src_bmc_address,
         bmvbridge = src_bmv_address ,
-        networkTypeId = src_open_btp_net_response["extract.network_type_id"],
-        networkId = src_open_btp_net_response["extract.network_id"],
+        network_type_id = src_open_btp_net_response["extract.network_type_id"],
+        network_id = src_open_btp_net_response["extract.network_id"],
         block_header = src_first_block_header,
         block_height = src_chain_last_block_height,
         network = src_chain_network

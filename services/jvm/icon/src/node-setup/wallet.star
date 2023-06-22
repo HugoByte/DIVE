@@ -1,7 +1,7 @@
 """
 Creates Wallet with Given name and password
 'wallet_name' - Naming the genereated keystore
-'wallet_password' - Pasword used for sigining and Decrypting the Generated Keystore
+'wallet_password' - Password used for sigining and Decrypting the Generated Keystore
 """
 def create_wallet(plan,service_name,wallet_name,wallet_password):
     plan.print("Creating Wallet")
