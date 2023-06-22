@@ -1,4 +1,4 @@
-RELAY_SERVICE_IMAGE = 'relay'
+RELAY_SERVICE_IMAGE = 'hugobyte/btp-relay'
 RELAY_SERVICE_NAME = "btp-relay"
 RELAY_CONFIG_FILES_PATH = "/relay/config/"
 
