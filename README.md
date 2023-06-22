@@ -77,7 +77,7 @@ Distributed under the Apache 2.0 License. See [LICENSE](./LICENSE) for more info
 
 ### Feedback 
 
-We would happy to hear your thoughts on our project. Your feedback helps us improve and make it better for everyone... Please submit your valuable feedback [here](https://docs.google.com/forms/d/e/1FAIpQLScnesE-4IWPrFQ-W2FbRXHyQz8i_C0BVjIP_aWaxKe3myTgyw/viewform?usp=sharing)
+We would happy to hear your thoughts on our project. Your feedback helps us improve and make it better for everyone. Please submit your valuable feedback [here](https://docs.google.com/forms/d/e/1FAIpQLScnesE-4IWPrFQ-W2FbRXHyQz8i_C0BVjIP_aWaxKe3myTgyw/viewform?usp=sharing)
 
 
 
