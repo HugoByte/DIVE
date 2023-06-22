@@ -14,7 +14,15 @@ def deploy_bmc(plan,args):
 
     bmc_address = eth_contract_deployer_service.get_contract_address(plan,"bmc")
 
-    return bmc_address
+    bmcm_address = eth_contract_deployer_service.get_contract_address(plan,"bmcm")
+
+    bmcs_address = eth_contract_deployer_service.get_contract_address(plan,"bmcs")
+
+    return struct(
+        bmcm = bmcm_address,
+        bmcs = bmcs_address,
+        bmc = bmc_address
+    )
 
 def deploy_xcall(plan,args):
 

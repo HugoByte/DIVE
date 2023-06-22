@@ -198,7 +198,14 @@ def deploy_bmv_icon_to_icon(plan,src_chain,dst_chain,src_bmc_address,dst_bmc_add
         src_bmc = src_bmc_address,
         src_bmv = src_bmv_address,
         dst_bmc = dst_bmc_address,
-        dst_bmv = dst_bmv_address
+        dst_bmv = dst_bmv_address,
+        src_block_height = src_last_block_height,
+        dst_block_height = dst_last_block_height,
+        src_networkTypeId = src_open_btp_network_response["extract.network_type_id"],
+        src_networkId = src_open_btp_network_response["extract.network_id"],
+        dst_networkTypeId = dst_open_btp_network_response["extract.network_type_id"],
+        dst_networkId = dst_open_btp_network_response["extract.network_id"],
+
 
     )
 

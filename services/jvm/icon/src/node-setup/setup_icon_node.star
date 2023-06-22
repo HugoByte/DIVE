@@ -148,13 +148,11 @@ def get_revision(plan,service_name):
         content_type="application/json",
         body='{"jsonrpc": "2.0","id": 1,"method": "icx_call","params": {"to": "cx0000000000000000000000000000000000000000", "dataType": "call","data": {"method": "getRevision", "params": { }}}}',
         extract={
-            # "rev_number" : '.result'
              "rev_number": '.result[2:]| explode | reverse | map(if . > 96  then . - 87 else . - 48 end) | reduce .[] as $c ([1,0]; (.[0] * 16) as $b | [$b, .[1] + (.[0] * $c)])| .[1] | tonumber '
         }
     )
     result = plan.wait(service_name=service_name,recipe=post_request,field="code",assertion="==",target_value=200)
 
-    plan.print(result["extract.rev_number"])
 
     return result["extract.rev_number"]
 
@@ -260,8 +258,12 @@ def setup_node(plan,service_name,uri,keystorepath,keypassword,nid,prep_address):
     
 
 def hex_to_int(plan,service_name,hex_number):
-    exec_command = ["printf", "\"%u\"",hex_number,"|","jq tonumber"]
+    exec_command = ["python","-c","print(int(%s))" % hex_number]
     result = plan.exec(service_name,recipe=ExecRecipe(command=exec_command))
+
+    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % result["output"] ])
+    result = plan.exec(service_name=service_name,recipe=execute_cmd)
+    
     return result["output"]
 
 def get_min_delegated_amount(plan,service_name,total_supply):
