@@ -5,8 +5,8 @@ eth_node = import_module("github.com/hugobyte/dive/services/evm/eth/eth.star")
 icon_relay_setup = import_module("github.com/hugobyte/dive/services/jvm/icon/src/relay-setup/contract_configuration.star")
 icon_service = import_module("github.com/hugobyte/dive/services/jvm/icon/icon.star")
 btp_relay = import_module("github.com/hugobyte/dive/services/relay/btp_relay.star")
-
-
+cosmvm = import_module("github.com/hugobyte/chain-package/services/cosmvm/start_node.star")
+contract = import_module("github.com/hugobyte/chain-package/services/cosmvm/deploy.star")
 
 def run(plan,args):
 
@@ -242,28 +242,7 @@ def run_btp_setup(plan,args):
 
     return config_data
     
-    
-
-
-
-    
-
-
-    
-
-
-
-
-
-
-
-
-
-
-cosmvm = import_module("github.com/hugobyte/chain-package/services/cosmvm/start_node.star")
-contract = import_module("github.com/hugobyte/chain-package/services/cosmvm/deploy.star")
-
-def run(plan, args):
+def cosmwasm(plan, args):
     
     cosmvm.run(plan,args)
 
