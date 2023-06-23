@@ -254,12 +254,12 @@ def cosmwasm(plan, args):
     message = args.get("message", "message")
     contract_name = args.get("contract_name","contract")
    
-    ibc_core = cosm_contract.deploy_core(plan,args)
+    ibc_core = cosmvm_contract.deploy_core(plan,args)
     plan.print(ibc_core)
     
-    xcall = cosm_contract.deploy_xcall(plan,args, ibc_core)
+    xcall = cosmvm_contract.deploy_xcall(plan,args, ibc_core)
    
-    light_client = cosm_contract.deploy_light_client(plan,args)
+    light_client = cosmvm_contract.deploy_light_client(plan,args)
 
     return
    
