@@ -8,7 +8,7 @@ PATH = "/start-scripts/"
 CONTRACT_PATH = "/root/contracts/"
 
 
-def run(plan,args):
+def start_cosmos_node(plan,args):
 
     plan.print("Launching " +SERVICE_NAME+  " deployment service")
 

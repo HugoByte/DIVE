@@ -10,6 +10,9 @@ archwayd init node1 --chain-id my-chain
 
 PASSCODE="password"
 
+# adding jq
+apk add jq
+
 # adding the keys
 echo "Add keys"
 (echo $PASSCODE; echo $PASSCODE) | archwayd keys add node1-account

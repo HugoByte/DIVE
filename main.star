@@ -6,7 +6,7 @@ icon_relay_setup = import_module("github.com/hugobyte/dive/services/jvm/icon/src
 icon_service = import_module("github.com/hugobyte/dive/services/jvm/icon/icon.star")
 btp_relay = import_module("github.com/hugobyte/dive/services/relay/btp_relay.star")
 cosmvm = import_module("github.com/hugobyte/chain-package/services/cosmvm/start_node.star")
-contract = import_module("github.com/hugobyte/chain-package/services/cosmvm/deploy.star")
+cosmvm_contract = import_module("github.com/hugobyte/chain-package/services/cosmvm/deploy.star")
 
 def run(plan,args):
 
@@ -82,8 +82,12 @@ def run_node(plan,node_name,args):
 
         return eth_node.start_eth_node_serivce(plan,args)
 
+    elif node_name == "cosmwasm":
+
+        return cosmwasm(plan,args)
+
     else :
-        plan.print("Unknown Chain Type. Expected ['icon','eth']")
+        plan.print("Unknown Chain Type. Expected ['icon','eth','cosmwasm']")
         return
 
 # Starts btp relay setup
@@ -244,16 +248,18 @@ def run_btp_setup(plan,args):
     
 def cosmwasm(plan, args):
     
-    cosmvm.run(plan,args)
+    cosmvm.start_cosmos_node(plan,args)
 
     plan.exec(service_name="cosmos", recipe=ExecRecipe(command=["/bin/sh","-c", "apk add jq"]))
     message = args.get("message", "message")
     contract_name = args.get("contract_name","contract")
-
-    ibc_core = contract.deploy_core(plan,args)
+   
+    ibc_core = cosm_contract.deploy_core(plan,args)
     plan.print(ibc_core)
     
-    xcall = contract.deploy_xcall(plan,args, ibc_core)
+    xcall = cosm_contract.deploy_xcall(plan,args, ibc_core)
    
-    light_client = contract.deploy_light_client(plan,args)
+    light_client = cosm_contract.deploy_light_client(plan,args)
+
+    return
    
