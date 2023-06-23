@@ -1,5 +1,6 @@
+cosmvm = import_module("github.com/hugobyte/dive/services/cosmvm/start_node.star")
+
 def deploy(plan,args,contract_name, message):
-    plan.print("Deploying the contract")
 
     contract = "../contracts/%s.wasm" % contract_name
 
@@ -28,24 +29,23 @@ def deploy(plan,args,contract_name, message):
 
 def deploy_core(plan,args):
 
-    plan.print("Deploying core")
+    plan.print("Deploying ibc-core contract")
 
     message = '{}'
 
-    contract_address = deploy(plan,args, "cw_ibc_core", message)
+    contract_addr_ibc_core = deploy(plan,args, "cw_ibc_core", message)
 
-    return contract_address
+    return contract_addr_ibc_core
 
-def deploy_xcall(plan,args, contract_address):
+def deploy_xcall(plan,args, contract_addr_ibc_core):
 
     plan.print("Deploying xcall contract")
 
-    message = '{"timeout_height":10 , "ibc_host":"%s"}' % contract_address 
-    plan.print(message)
+    message = '{"timeout_height":10 , "ibc_host":"%s"}' % contract_addr_ibc_core 
 
-    tx_hash1 = deploy(plan,args, "cw_xcall", message)
+    contract_addr_xcall = deploy(plan,args, "cw_xcall", message)
 
-    return tx_hash1
+    return contract_addr_xcall
 
 def deploy_light_client(plan,args):
 
@@ -53,6 +53,21 @@ def deploy_light_client(plan,args):
 
     message = '{}' 
 
-    tx_hash = deploy(plan,args,"cw_icon_light_client", message)
+    contract_addr_light_client = deploy(plan,args,"cw_icon_light_client", message)
 
-    return tx_hash
+    return contract_addr_light_client
+
+def cosmwasm(plan, args):
+    
+    cosmvm.start_cosmos_node(plan,args)
+
+    ibc_core = deploy_core(plan,args)
+    plan.print(ibc_core)
+    
+    xcall = deploy_xcall(plan,args, ibc_core)
+    plan.print(xcall)
+   
+    light_client = deploy_light_client(plan,args)
+    plan.print(light_client)
+
+    return

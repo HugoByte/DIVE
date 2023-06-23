@@ -18,7 +18,6 @@ echo "Add keys"
 (echo $PASSCODE; echo $PASSCODE) | archwayd keys add node1-account
 (echo $PASSCODE; echo $PASSCODE) | archwayd keys add node2 
 
-
 # listing the keys
 (echo $PASSCODE; echo $PASSCODE) | archwayd keys list 
 
@@ -29,6 +28,7 @@ echo "Adding the keys to the genesis account"
 # generate genesis transaction
 echo "Generate transaction"
 (echo $PASSCODE; echo $PASSCODE) | archwayd gentx node1-account 1000000000stake --chain-id my-chain 
+
 # collect geesis transaction
 archwayd collect-gentxs
 

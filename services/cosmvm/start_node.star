@@ -1,6 +1,6 @@
-WALLET = "github.com/hugobyte/chain-package/services/cosmvm/wallet.star"
-START = "github.com/hugobyte/chain-package/services/cosmvm/start.sh"
-DEFAULT_CONTRACT_PATH = "github.com/hugobyte/chain-package/services/cosmvm/static_files/contracts"
+WALLET = "github.com/hugobyte/dive/services/cosmvm/wallet.star"
+START = "github.com/hugobyte/dive/services/cosmvm/start.sh"
+DEFAULT_CONTRACT_PATH = "github.com/hugobyte/dive/services/cosmvm/static_files/contracts"
 SERVICE_NAME = "cosmos"
 IMAGE = "archwaynetwork/archwayd:constantine"
 RPC_PORT_KEY = "rpc"
@@ -36,5 +36,3 @@ def start_cosmos_node(plan,args):
     )
 
     node_service_response = plan.add_service(name=SERVICE_NAME, config= cosmwasm_node_config)
-
-
