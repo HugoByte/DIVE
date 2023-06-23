@@ -1,8 +1,8 @@
 ETH_CONTRACT_DEPLOYMENT_SERVICE_IMAGE = "node:lts-alpine"
-CONTRACT_DEPLOYMENT_STATIC_FILES= "github.com/hugobyte/chain-package/services/evm/eth/static-files/"
+CONTRACT_DEPLOYMENT_STATIC_FILES= "github.com/hugobyte/dive/services/evm/eth/static-files/"
 CONTRACT_DEPLOYMENT_STATIC_FILES_DIR_PATH = "/static-files/"
 SERVICE_NAME = "eth-contract-deployer"
-HARDHAT_CONFIG = "github.com/hugobyte/chain-package/services/evm/eth/static-files/hardhat.config.ts.tmpl"
+HARDHAT_CONFIG = "github.com/hugobyte/dive/services/evm/eth/static-files/hardhat.config.ts.tmpl"
 HARDHAT_CONFIG_DIR = "/static-files/rendered/"
 
 # Starts the eth deploy service

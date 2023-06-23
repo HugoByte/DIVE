@@ -1,10 +1,10 @@
-icon_setup_node = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/node-setup/setup_icon_node.star")
-eth_contract_service = import_module("github.com/hugobyte/chain-package/services/evm/eth/src/node-setup/contract-service.star")
-eth_relay_setup = import_module("github.com/hugobyte/chain-package/services/evm/eth/src/relay-setup/contract_configuration.star")
-eth_node = import_module("github.com/hugobyte/chain-package/services/evm/eth/eth.star")
-icon_relay_setup = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/relay-setup/contract_configuration.star")
-icon_service = import_module("github.com/hugobyte/chain-package/services/jvm/icon/icon.star")
-btp_relay = import_module("github.com/hugobyte/chain-package/services/relay/btp_relay.star")
+icon_setup_node = import_module("github.com/hugobyte/dive/services/jvm/icon/src/node-setup/setup_icon_node.star")
+eth_contract_service = import_module("github.com/hugobyte/dive/services/evm/eth/src/node-setup/contract-service.star")
+eth_relay_setup = import_module("github.com/hugobyte/dive/services/evm/eth/src/relay-setup/contract_configuration.star")
+eth_node = import_module("github.com/hugobyte/dive/services/evm/eth/eth.star")
+icon_relay_setup = import_module("github.com/hugobyte/dive/services/jvm/icon/src/relay-setup/contract_configuration.star")
+icon_service = import_module("github.com/hugobyte/dive/services/jvm/icon/icon.star")
+btp_relay = import_module("github.com/hugobyte/dive/services/relay/btp_relay.star")
 
 
 

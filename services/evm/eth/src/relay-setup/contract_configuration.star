@@ -1,4 +1,4 @@
-eth_contract_deployer_service = import_module("github.com/hugobyte/chain-package/services/evm/eth/src/node-setup/contract-deployer.star")
+eth_contract_deployer_service = import_module("github.com/hugobyte/dive/services/evm/eth/src/node-setup/contract-deployer.star")
 
 # Deploy Bmc contract on ETH and Returns it's address
 def deploy_bmc(plan,args):

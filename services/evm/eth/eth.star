@@ -1,5 +1,5 @@
-eth_node = import_module("github.com/hugobyte/chain-package/services/evm/eth/src/node-setup/start-eth-node.star")
-eth_relay_setup = import_module("github.com/hugobyte/chain-package/services/evm/eth/src/relay-setup/contract_configuration.star")
+eth_node = import_module("github.com/hugobyte/dive/services/evm/eth/src/node-setup/start-eth-node.star")
+eth_relay_setup = import_module("github.com/hugobyte/dive/services/evm/eth/src/relay-setup/contract_configuration.star")
 
 def start_eth_node_serivce(plan,args):
 
