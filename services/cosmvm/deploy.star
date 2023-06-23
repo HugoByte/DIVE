@@ -17,22 +17,14 @@ def deploy(plan,args,contract_name, message):
 
     plan.print("Instantiating the contract")
      
-    exec = ExecRecipe(command=["/bin/sh", "-c", "echo '%s' |  archwayd tx wasm instantiate %s '%s' --from node1-account --label xcall --chain-id my-chain --no-admin --gas auto --gas-adjustment 1.3 -y -b block" % (PASSCODE, CODE_ID["output"], message) ])
+    exec = ExecRecipe(command=["/bin/sh", "-c", "echo '%s' |  archwayd tx wasm instantiate %s '%s' --from node1-account --label xcall --chain-id my-chain --no-admin --gas auto --gas-adjustment 1.3 -y -b block | tr -d '\n\r' " % (PASSCODE, CODE_ID["output"], message) ])
     plan.exec(service_name="cosmos", recipe=exec)
 
     # Getting the contract address
 
-    CONTRACT = plan.exec(service_name="cosmos", recipe=ExecRecipe(command=["/bin/sh", "-c", "echo %s | archwayd query wasm list-contract-by-code %s --output json | jq -r '.contracts[-1]'" % (PASSCODE, CODE_ID["output"])]))
+    CONTRACT = plan.exec(service_name="cosmos", recipe=ExecRecipe(command=["/bin/sh", "-c", "echo %s | archwayd query wasm list-contract-by-code %s --output json | jq -r '.contracts[-1]' | tr -d '\n\r' " % (PASSCODE, CODE_ID["output"])]))
     
     return CONTRACT["output"]
-
-def deploy_xcall(plan,args,timeout_height, ibc_host):
-
-    plan.print("Deploying xcall contract")
-
-    message = '{"timeout_height":"%s", "ibc_host":"%s"}' % (timeout_height, ibc_host)
-
-    tx_hash = deploy(plan,args, "xcall", message)
 
 def deploy_core(plan,args):
 
@@ -40,9 +32,20 @@ def deploy_core(plan,args):
 
     message = '{}'
 
-    tx_hash = deploy(plan,args, "core", message)
+    contract_address = deploy(plan,args, "cw_ibc_core", message)
 
-    return tx_hash
+    return contract_address
+
+def deploy_xcall(plan,args, contract_address):
+
+    plan.print("Deploying xcall contract")
+
+    message = '{"timeout_height":10 , "ibc_host":"%s"}' % contract_address 
+    plan.print(message)
+
+    tx_hash1 = deploy(plan,args, "cw_xcall", message)
+
+    return tx_hash1
 
 def deploy_light_client(plan,args):
 
@@ -50,4 +53,6 @@ def deploy_light_client(plan,args):
 
     message = '{}' 
 
-    tx_hash = deploy(plan,args,"light_client", message)
+    tx_hash = deploy(plan,args,"cw_icon_light_client", message)
+
+    return tx_hash
