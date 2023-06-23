@@ -139,7 +139,6 @@ def run_btp_setup(plan,args):
             "bmv": response.src_bmv,
             "xcall": src_xcall_address,
             "dapp": src_dapp_address,
-            "block_number" : src_block_height
         }
 
         dst_contract_addresses = {
@@ -147,7 +146,6 @@ def run_btp_setup(plan,args):
             "bmv": response.dst_bmv,
             "xcall": dst_xcall_address,
             "dapp": dst_dapp_address,
-            "block_number" : dst_block_height
         }
 
         config_data["chains"][source_chain]["networkTypeId"] = response.src_network_type_id
@@ -157,6 +155,8 @@ def run_btp_setup(plan,args):
 
         config_data["contracts"][source_chain] = src_contract_addresses
         config_data["contracts"][destination_chain] = dst_contract_addresses
+        config_data["chains"][source_chain]["block_number"] = src_block_height
+        config_data["chains"][destination_chain]["block_number"] =  dst_block_height
 
 
 
@@ -207,7 +207,6 @@ def run_btp_setup(plan,args):
             "bmv": src_response.bmvbridge,
             "xcall": src_xcall_address,
             "dapp": src_dapp_address,
-            "block_number" : src_block_height
         }
 
         dst_contract_addresses = {
@@ -217,7 +216,6 @@ def run_btp_setup(plan,args):
             "bmv": dst_bmv_address,
             "xcall": dst_xcall_address,
             "dapp": dst_dapp_address,
-            "block_number" : dst_last_block_height_number
         }
 
 
@@ -225,6 +223,8 @@ def run_btp_setup(plan,args):
         config_data["contracts"][destination_chain] = dst_contract_addresses
         config_data["chains"][source_chain]["networkTypeId"] = src_response.network_type_id
         config_data["chains"][source_chain]["networkId"] = src_response.network_id
+        config_data["chains"][source_chain]["block_number"] = src_block_height
+        config_data["chains"][destination_chain]["block_number"] =  dst_last_block_height_number
 
 
     src_network = config_data["chains"][source_chain]["network"]
