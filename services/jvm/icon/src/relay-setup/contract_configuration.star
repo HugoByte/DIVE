@@ -1,5 +1,5 @@
-contract_deployment_service = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/node-setup/contract_deploy.star")
-node_service = import_module("github.com/hugobyte/chain-package/services/jvm/icon/src/node-setup/setup_icon_node.star")
+contract_deployment_service = import_module("github.com/hugobyte/dive/services/jvm/icon/src/node-setup/contract_deploy.star")
+node_service = import_module("github.com/hugobyte/dive/services/jvm/icon/src/node-setup/setup_icon_node.star")
 
 # Deploys BMC contract on ICON 
 def deploy_bmc(plan,args):
