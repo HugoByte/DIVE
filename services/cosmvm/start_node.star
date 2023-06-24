@@ -25,11 +25,13 @@ def start_cosmos_node(plan,args):
             "grpc" : PortSpec(number=9090),
             "http" : PortSpec(number=9091),
             "tcp" : PortSpec(number=26656),
+            "rpc" : PortSpec(number=26657, application_protocol="http")
         },
         public_ports={
             "grpc" : PortSpec(number=9090 ),
             "http" : PortSpec(number=9091),
             "tcp"  :  PortSpec(number=26656),
+            "rpc" : PortSpec(number=4564, application_protocol="http")
         },
         
         entrypoint=["/bin/sh","-c","cd ../../start-scripts && chmod +x start.sh && ./start.sh"]
