@@ -1,4 +1,4 @@
-ICON_NODE_IMAGE = "iconloop/goloop-icon:v1.3.5"
+ICON_NODE_IMAGE = "iconloop/goloop-icon:v1.3.7"
 ICON_BASE_CONFIG_FILES_PATH = "/goloop/config/"
 ICON_CONTRACT_DIR = "/goloop/contracts/"
 ICON_BASE_CONFIG_FILES_KEY = "config_file_path"

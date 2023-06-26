@@ -52,7 +52,7 @@ def start_hardhat_node(plan):
 			SERVICE_RPC_PORT_KEY : PortSpec(number=SERVICE_RPC_PRIVATE_PORT,transport_protocol="TCP",application_protocol="http")
 		},
 		public_ports = {
-            SERVICE_RPC_PORT_KEY : PortSpec(number=SERVICE_RPC_PUBLIC_PORT,transport_protocol="TCP",application_protocol="http")
+            SERVICE_RPC_PORT_KEY : PortSpec(number=SERVICE_RPC_PRIVATE_PORT,transport_protocol="TCP",application_protocol="http")
         },
 		files={
 			HARDHAT_CONFIG_DIR : "hardhat-config"
@@ -63,7 +63,7 @@ def start_hardhat_node(plan):
 	response = plan.add_service(name=HARDHAT_SERVICE_NAME,config=service_config)
 
 	private_url = get_network_address(response.ip_address,SERVICE_RPC_PRIVATE_PORT)
-	public_url = get_network_address("127.0.0.1",SERVICE_RPC_PUBLIC_PORT)
+	public_url = get_network_address("127.0.0.1",SERVICE_RPC_PRIVATE_PORT)
 	return struct(
           service_name = HARDHAT_SERVICE_NAME,
           network_name= "hardhat",
