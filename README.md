@@ -64,7 +64,7 @@ To run, we have the list of actions, as follows:
 
 ### Testing Demo
 
-* Follow the instruction in [Test Folder](https://github.com/HugoByte/DIVE/tree/main/test)
+* Follow the instruction in [Test Folder](https://github.com/HugoByte/DIVE/tree/main/test#steps-to-run-the-script)
 
 
 ### Contributing
