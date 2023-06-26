@@ -55,7 +55,7 @@ def get_latest_block(plan,current_chain,network_name):
     exec_command = ["/bin/sh","-c","cd static-files &&  params='{0}' npx hardhat --network {1} run scripts/{2}".format(params,network_name,file_name)]
     plan.exec(service_name="eth-contract-deployer",recipe=ExecRecipe(exec_command))
 
-    exec_command = ["/bin/sh","-c","cd static-files && cat deployments.json | jq -r .eth.blockNum | tr -d '\n\r'"]
+    exec_command = ["/bin/sh","-c","cd static-files && cat deployments.json | jq -r .%s.blockNum | tr -d '\n\r'" % current_chain]
     response = plan.exec(service_name="eth-contract-deployer",recipe=ExecRecipe(exec_command))
 
     return response["output"]
