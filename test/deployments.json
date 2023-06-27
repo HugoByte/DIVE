@@ -23,5 +23,8 @@
     },
     "blockNum": 890
   },
-  "link": { "src": "icon0", "dst": "hardhat" }
+  "link": {
+    "src": "icon0",
+    "dst": "hardhat"
+  }
 }

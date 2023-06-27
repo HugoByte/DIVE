@@ -80,7 +80,7 @@ function isIconChain(chain: any) {
 }
 
 function isEVMChain(chain: any) {
-  return chain.network.includes('hardhat') || chain.network.includes('eth2');
+  return chain.network.includes('hardhat') || chain.network.includes('eth');
 }
 
 async function sendMessageFromDApp(src: string, srcChain: any, dstChain: any, msg: string,
