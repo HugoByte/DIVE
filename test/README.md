@@ -14,24 +14,22 @@ To run the demo, the following software needs to be installed.
 
 ## Steps to run the script
 
-* Step 1: Run command `npm install`
+* Step 1: Run the DIVE package that spins ups two chains for sending message using BTP
   
-* Step 2: Run the DIVE package that spins ups two chains for sending message using BTP
-  
-![img1](img/../../img/IMAGE.png)
+  ![img1](img/../../img/img1%202.png)
 
-* Step 3: After you get the contract address from the output, update xCall and dApp address in deployment.json file
+* Step 2: After you get the contract address from the output, update xCall and dApp address in deployment.json file
 
-![img1](img/../../img/Image1.png)
+  ![img1](img/../../img/img2%202.png)
 
-* Step 4: Update network and endpoint in the chain_config.json, deployments.json and hardhat.config.ts files
+* Step 3: Update network and endpoint in the chain_config.json, deployments.json and hardhat.config.ts files
 
-![img1](img/../../img/Image2.png)
+  ![img1](img/../../img/img3%202.png)
 
 
-* Step 5: now run the command 'make run-demo' to execute all scenarios.
+* Step 4: now run the command 'make run-demo' to execute all scenarios.
 
-![img1](img/../../img/Image4.png)
+  ![img1](img/../../img/Image3.png)
 
 
 ## Video
