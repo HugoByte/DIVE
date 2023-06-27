@@ -1,0 +1,27 @@
+{
+  "icon0": {
+    "network": "0x3.icon",
+    "contracts": {
+      "bmc": "cxd4025033fff4ca78396336bcdd5d7db2472ccd93",
+      "bmv": "cxd3d50ecc9fc0c5ca772cadb8bdea065db9c2ef55",
+      "xcall": "cx1b316ad66f3e9fcfdb9e059eba083403cc85e50f",
+      "dapp": "cx6d462648fda7016e179330e686555cd14900f0cd"
+    },
+    "networkTypeId": "0x1",
+    "networkId": "0x1",
+    "blockNum": 1725
+  },
+  "hardhat": {
+    "network": "0x301824.eth",
+    "contracts": {
+      "bmcm": "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318",
+      "bmcs": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+      "bmc": "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82",
+      "bmv": "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
+      "xcall": "0x5911A6541729C227fAda7D5187ee7518B47fB237",
+      "dapp": "0x9bE03fF3E1888A216f9e48c68B587A89c5b94CD6"
+    },
+    "blockNum": 890
+  },
+  "link": { "src": "icon0", "dst": "hardhat" }
+}
