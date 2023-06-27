@@ -2,7 +2,7 @@
   "chains": {
     "icon0": {
       "network": "0x3.icon",
-      "endpoint": "http://localhost:9080/api/v3/icon_dex",
+      "endpoint": "http://127.0.0.1:8090/api/v3/icon_dex",
       "keystore": "./docker/icon/config/keystore.json",
       "keysecret": "./docker/icon/config/keysecret"
     },
@@ -13,10 +13,10 @@
       "keysecret": "./docker/icon/config/keysecret"
     },
     "hardhat": {
-      "network": "0x539.hardhat",
-      "endpoint": "http://localhost:8545",
+      "network": "0x301824.eth",
+      "endpoint": "http://127.0.0.1:56686",
       "keystore": "./docker/hardhat/keystore0.json",
-      "keypass": "hardhat"
+      "keypass": "password"
     }
   },
   "link": {
