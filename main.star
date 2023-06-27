@@ -23,7 +23,7 @@ def parse_input_and_start(plan,args):
 
         node_name = args["node_name"]
 
-        run_node(plan,node_name,args)
+        return run_node(plan,node_name,args)
 
     # Run two different Node
 

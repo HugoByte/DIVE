@@ -10,9 +10,6 @@ CHAIN_ID = "my-chain"
 
 def start_cosmos_node(plan,args):
 
-    service_name=SERVICE_NAME
-    cid = CHAIN_ID
-
     plan.print("Launching " +SERVICE_NAME+  " deployment service")
 
     plan.upload_files(src=START, name="start-script")
@@ -43,6 +40,6 @@ def start_cosmos_node(plan,args):
     node_service_response = plan.add_service(name=SERVICE_NAME, config= cosmwasm_node_config)
 
     return struct(
-        service_name = service_name,
-        cid = cid
+        service_name = SERVICE_NAME,
+        cid = CHAIN_ID
     )

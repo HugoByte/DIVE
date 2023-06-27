@@ -59,7 +59,7 @@ def deploy_light_client(plan,args):
 
 def cosmwasm(plan, args):
     
-    cosmvm.start_cosmos_node(plan,args)
+    value = cosmvm.start_cosmos_node(plan,args)
 
     ibc_core = deploy_core(plan,args)
     plan.print(ibc_core)
@@ -70,4 +70,4 @@ def cosmwasm(plan, args):
     light_client = deploy_light_client(plan,args)
     plan.print(light_client)
 
-    return
+    return value
