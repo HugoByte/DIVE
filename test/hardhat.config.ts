@@ -6,7 +6,7 @@ const config: HardhatUserConfig = {
     sources: "./solidity/contracts",
     tests: "./solidity/test",
     cache: "./solidity/build/cache",
-    artifacts: "./solidity/build/artifacts"
+    artifacts: "./solidity/build/artifacts",
   },
   solidity: {
     version: "0.8.12",
@@ -17,11 +17,6 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  networks:{
-    localnet:{
-      url:"http://127.0.0.1:56686"
-    }
-  }
 };
 
 export default config;
