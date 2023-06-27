@@ -41,26 +41,26 @@ To run, we have the list of actions, as follows:
 - Example for running single chain
 
   ```
-  kurtosis run . '{"action":"start_node","node_name":"icon"}' --enclave btp
+  kurtosis run github.com/hugobyte/dive '{"action":"start_node","node_name":"icon"}' --enclave <Name>
   ```
 
 - Example for running multiple chains
 
   ```
-  kurtosis run . '{"action":"start_nodes","nodes":["icon"]}' --enclave btp
+  kurtosis run github.com/hugobyte/dive '{"action":"start_nodes","nodes":["icon"]}' --enclave <Name>
   ```
 
   ```
-  kurtosis run . '{"action":"start_nodes","nodes":["icon","eth"]}' --enclave btp
+  kurtosis run github.com/hugobyte/dive '{"action":"start_nodes","nodes":["icon","eth"]}' --enclave <Name>
   ```
 
 - Example for running two chains wth relay
 
   ```
-  kurtosis run . '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "eth"},"bridge":"false"}}' --enclave btp
+  kurtosis run github.com/hugobyte/dive '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "eth"},"bridge":"false"}}' --enclave <Name>
   ```
 
-  _Note:_ The `bridge` should be false for Icon to Icon
+  _Note :_ The `bridge` should be false for Icon to Icon
 
 ### Testing Demo
 

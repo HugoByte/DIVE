@@ -3,8 +3,6 @@ eth_relay_setup = import_module("github.com/hugobyte/dive/services/evm/eth/src/r
 
 def start_eth_node_serivce(plan,args,node_type):
 
-    
-
     node_service_data = eth_node.start_node_service(plan,args,node_type)
 
     config_data = {

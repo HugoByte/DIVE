@@ -5,7 +5,7 @@ RELAY_CONFIG_FILES_PATH = "/relay/config/"
 # Starts BTP relayer
 def start_relayer(plan,src_chain,dst_chain,args,src_btp_address,dst_btp_address,bridge):
 
-    plan.print("Starting Relay Service")
+    plan.print("Starting BTP Relay Service")
 
     src_config = args["chains"][src_chain]
     src_service_name = src_config["service_name"]
