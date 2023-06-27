@@ -6,7 +6,7 @@ IMAGE = "archwaynetwork/archwayd:constantine"
 RPC_PORT_KEY = "rpc"
 PATH = "/start-scripts/"
 CONTRACT_PATH = "/root/contracts/"
-
+CHAIN_ID = "my-chain"
 
 def start_cosmos_node(plan,args):
 
@@ -24,14 +24,14 @@ def start_cosmos_node(plan,args):
         ports={
             "grpc" : PortSpec(number=9090),
             "http" : PortSpec(number=9091),
-            "tcp" : PortSpec(number=26656),
-            "rpc" : PortSpec(number=26657)
+            "tcp"  : PortSpec(number=26656),
+            "rpc"  : PortSpec(number=26657)
         },
         public_ports={
-            "grpc" : PortSpec(number=9090 ),
+            "grpc" : PortSpec(number=9090),
             "http" : PortSpec(number=9091),
-            "tcp"  :  PortSpec(number=26656),
-            "rpc" : PortSpec(number=4564)
+            "tcp"  : PortSpec(number=26656),
+            "rpc"  : PortSpec(number=4564)
         },
         
         entrypoint=["/bin/sh","-c","cd ../../start-scripts && chmod +x start.sh && ./start.sh"]
