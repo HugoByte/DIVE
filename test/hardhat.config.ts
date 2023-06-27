@@ -17,6 +17,11 @@ const config: HardhatUserConfig = {
       },
     },
   },
+  networks:{
+    localnet:{
+      url:"http://172.16.1.5:8545"
+    }
+  }
 };
 
 export default config;
