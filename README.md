@@ -56,6 +56,14 @@ To run, we have the list of actions, as follows:
 
 - Example for running two chains wth relay
 
+  With Bridge True
+
+  ```
+  kurtosis run github.com/hugobyte/dive '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "eth"},"bridge":"true"}}' --enclave <Name>
+  ```
+
+  With Bridge False
+
   ```
   kurtosis run github.com/hugobyte/dive '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "eth"},"bridge":"false"}}' --enclave <Name>
   ```
