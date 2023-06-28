@@ -4,7 +4,7 @@ eth_relay_setup = import_module("github.com/hugobyte/dive/services/evm/eth/src/r
 eth_node = import_module("github.com/hugobyte/dive/services/evm/eth/eth.star")
 icon_relay_setup = import_module("github.com/hugobyte/dive/services/jvm/icon/src/relay-setup/contract_configuration.star")
 icon_service = import_module("github.com/hugobyte/dive/services/jvm/icon/icon.star")
-btp_relay = import_module("github.com/hugobyte/dive/services/relay/btp_relay.star")
+btp_bridge = import_module("github.com/hugobyte/dive/services/bridges/btp/src/bridge.star")
 input_parser = import_module("github.com/hugobyte/dive/package_io/input_parser.star")
 
 
@@ -210,7 +210,7 @@ def run_btp_setup(plan,args):
     dst_btp_address = 'btp://{0}/{1}'.format(dst_network,dst_bmc)
 
 
-    btp_relay.start_relayer(plan,args_data.src,args_data.dst,config_data,src_btp_address,dst_btp_address,args_data.bridge)
+    btp_bridge.start_relayer(plan,args_data.src,args_data.dst,config_data,src_btp_address,dst_btp_address,args_data.bridge)
 
 
     return config_data

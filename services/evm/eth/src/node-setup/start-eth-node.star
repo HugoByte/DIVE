@@ -66,6 +66,6 @@ def start_hardhat_node(plan):
           nid = hardhat_constants.network_id,
           endpoint = private_url,
 		  endpoint_public = public_url,
-		  keystore_path = "config/hardhat_keystore.json",
-		  keypassword = "hardhat"
+		  keystore_path = hardhat_constants.keystore_path,
+		  keypassword = hardhat_constants.keypassword
      )

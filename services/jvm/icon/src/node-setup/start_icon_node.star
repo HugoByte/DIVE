@@ -20,6 +20,7 @@ def start_icon_node(plan,service_config,id,start_file_name):
     plan.print("Uploading Files for %s Service" % service_name) 
     plan.upload_files(src=icon_node_constants.config_files_path,name="config-files-{0}".format(id))
     plan.upload_files(src=icon_node_constants.contract_files_path,name="contracts-{0}".format(id))
+    plan.upload_files(src=icon_node_constants.keystore_files_path,name="kesytore-{0}".format(id) )
 
     icon_node_service_config = ServiceConfig(
         image=icon_node_constants.node_image,
@@ -32,6 +33,7 @@ def start_icon_node(plan,service_config,id,start_file_name):
         files={
             icon_node_constants.config_files_directory : "config-files-{0}".format(id),
             icon_node_constants.contracts_directory : "contracts-{0}".format(id),
+            icon_node_constants.keystore_directory : "kesytore-{0}".format(id)
         },
         env_vars={
             "GOLOOP_LOG_LEVEL": "trace",
@@ -62,7 +64,7 @@ def start_icon_node(plan,service_config,id,start_file_name):
         nid = chain_id["output"],
         endpoint = private_url,
         endpoint_public = public_url,
-        keystore_path = "config/keystore.json",
+        keystore_path = "keystores/keystore.json",
         keypassword= "gochain"
     )
 
