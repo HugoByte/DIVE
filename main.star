@@ -5,8 +5,9 @@ eth_node = import_module("github.com/hugobyte/dive/services/evm/eth/eth.star")
 icon_relay_setup = import_module("github.com/hugobyte/dive/services/jvm/icon/src/relay-setup/contract_configuration.star")
 icon_service = import_module("github.com/hugobyte/dive/services/jvm/icon/icon.star")
 btp_relay = import_module("github.com/hugobyte/dive/services/relay/btp_relay.star")
-cosmvm = import_module("github.com/hugobyte/dive/services/cosmvm/start_node.star")
-cosmvm_contract = import_module("github.com/hugobyte/dive/services/cosmvm/deploy.star")
+cosmvm_node = import_module("github.com/hugobyte/dive/services/cosmvm/src/node-setup/start_node.star")
+cosmvm_deploy = import_module("github.com/hugobyte/dive/services/cosmvm/src/node-setup/deploy.star")
+cosmvm_contract = import_module("github.com/hugobyte/dive/services/cosmvm/src/relay-setup/contract-configuration.star")
 
 def run(plan,args):
 
@@ -81,6 +82,10 @@ def run_node(plan,node_name,args):
     elif node_name == "eth":
 
         return eth_node.start_eth_node_serivce(plan,args)
+
+    elif node_name == "cosmwasm":
+
+        return cosmvm_contract.cosmwasm(plan,args)
 
     else :
         plan.print("Unknown Chain Type. Expected ['icon','eth','cosmwasm']")
