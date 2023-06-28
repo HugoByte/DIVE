@@ -254,16 +254,13 @@ def setup_node(plan,service_name,uri,keystorepath,keypassword,nid,prep_address):
 
         set_revision(plan,service_name,uri,BTP_VERSION,keystorepath,keypassword,nid)
 
-    pubKey = get_prep_node_public_key(plan,service_name,prep_address)
+    pub_key = get_prep_node_public_key(plan,service_name,prep_address)
 
-    plan.print(pubKey["body"])
+    plan.print(pub_key["body"])
 
-    pubKey = wallet_config.get_network_wallet_public_key(plan,service_name)
-    plan.print(pubKey)
+    pub_key = wallet_config.get_network_wallet_public_key(plan,service_name)
 
-    register_node_pubkey = register_prep_node_publickey(plan,service_name,prep_address,pubKey,uri,keystorepath,keypassword,nid)
-
-    plan.print(register_node_pubkey)
+    register_node_pubkey = register_prep_node_publickey(plan,service_name,prep_address,pub_key,uri,keystorepath,keypassword,nid)
     
 # Returns Int from Hex value
 def hex_to_int(plan,service_name,hex_number):
@@ -384,9 +381,6 @@ def get_btp_network_info(plan,service_name,network_id):
             "start_height" : '.result.startHeight',
         }
     )
-
-    plan.print(post_request)
-
     result = plan.wait(service_name=service_name,recipe=post_request,field="code",assertion="==",target_value=200)
 
     exec_command = ["python","-c","print(hex(int(%s) + 1))" % result["extract.start_height"]]

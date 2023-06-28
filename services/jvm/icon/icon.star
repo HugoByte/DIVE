@@ -127,7 +127,7 @@ def deploy_bmc_icon(plan,src_chain,dst_chain,args):
 
         return src_bmc_address , dst_bmc_address
 
-    return src_bmc_address , ""
+    return src_bmc_address
 
 # Deploys BMV for ICON to ICON setup
 def deploy_bmv_icon_to_icon(plan,src_chain,dst_chain,src_bmc_address,dst_bmc_address,args):
@@ -228,7 +228,7 @@ def deploy_xcall_icon(plan,src_chain,dst_chain,src_bmc_address,dst_bmc_address,a
         return src_xcall_address, dst_xcall_address
 
 
-    return src_xcall_address,""
+    return src_xcall_address
 
 # Deploys dApp Contract on ICON nodes
 def deploy_dapp_icon(plan,src_chain,dst_chain,src_xcall_address,dst_xcall_address,args):
@@ -244,7 +244,7 @@ def deploy_dapp_icon(plan,src_chain,dst_chain,src_xcall_address,dst_xcall_addres
 
         return src_dapp_address,dst_dapp_address
 
-    return src_dapp_address,""
+    return src_dapp_address
 
 
 # Deploy BMV on ICON Node
