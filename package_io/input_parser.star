@@ -24,6 +24,11 @@ def get_args_data(args):
 
     if destination_chain == "icon":
         destination_chain = "icon-1"
+    
+    if source_chain == "eth" or source_chain == "hardhat":
+        if destination_chain == "icon":
+            destination_chain = source_chain
+            source_chain = "icon" 
 
     bridge = args["bridge"]
 

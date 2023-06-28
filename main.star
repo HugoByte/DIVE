@@ -85,8 +85,7 @@ def run_btp_setup(plan,args):
 
     args_data = input_parser.get_args_data(args)
     
-    config_data = input_parser.generate_config_data(args)    
-
+    config_data = input_parser.generate_config_data(args)
     if args_data.dst == "icon-1":
         data = icon_service.start_node_service_icon_to_icon(plan)
 
