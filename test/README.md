@@ -31,6 +31,8 @@ To run the demo, the following software needs to be installed.
 
   ![img1](img/../../img/Image3.png)
 
+> **Note:**
+> Running the demo script will copy all the dependencies required from the container. We can clean the dependencies by running `make clean-dep` command.
 
 ## Video
 
