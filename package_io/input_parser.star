@@ -22,7 +22,7 @@ def get_args_data(args):
     source_chain = links["src"]
     destination_chain = links["dst"]
 
-    if destination_chain == "icon":
+    if destination_chain == "icon" and source_chain == "icon":
         destination_chain = "icon-1"
     
     if source_chain == "eth" or source_chain == "hardhat":
