@@ -62,7 +62,7 @@ To run, we have the list of actions, as follows:
 
   _Note :_ The `bridge` should be false for Icon to Icon
 
-### Testing Demo
+### Testing
 
 - Follow the instruction in [Test Folder](test/README.md#steps-to-run-the-script)
 
