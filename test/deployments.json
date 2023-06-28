@@ -17,5 +17,8 @@
     },
     "blockNum": 80
   },
-  "link": { "src": "icon0", "dst": "hardhat" }
+  "link": {
+    "src": "icon0",
+    "dst": "hardhat"
+  }
 }
