@@ -31,6 +31,14 @@ library Types {
         bytes data;
     }
 
+    struct ProxyRequest {
+        string from;
+        string to;
+        uint256 sn;
+        bool rollback;
+        bytes32 hash;
+    }
+
     int constant CS_RESP_SUCCESS = 0;
     int constant CS_RESP_FAILURE = -1;
     int constant CS_RESP_BTP_ERROR = -2;
