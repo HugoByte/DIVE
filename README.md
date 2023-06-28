@@ -62,6 +62,11 @@ To run, we have the list of actions, as follows:
 
   _Note:_ The `bridge` should be false for Icon to Icon
 
+### Testing Demo
+
+* Follow the instruction in [Test Folder](https://github.com/HugoByte/DIVE/tree/main/test#steps-to-run-the-script)
+
+
 ### Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
