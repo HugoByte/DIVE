@@ -82,10 +82,6 @@ def run_node(plan,node_name,args):
 
         return eth_node.start_eth_node_serivce(plan,args)
 
-    elif node_name == "cosmwasm":
-
-        return cosmvm_contract.cosmwasm(plan,args)
-
     else :
         plan.print("Unknown Chain Type. Expected ['icon','eth','cosmwasm']")
         return
