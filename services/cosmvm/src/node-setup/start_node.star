@@ -1,3 +1,5 @@
+cosm_wallet = import_module("github.com/hugobyte/dive/services/cosmvm/src/node-setup/wallet.star")
+
 START = "github.com/hugobyte/dive/services/cosmvm/start.sh"
 DEFAULT_CONTRACT_PATH = "github.com/hugobyte/dive/services/cosmvm/static_files/contracts"
 SERVICE_NAME = "cosmos"
@@ -37,6 +39,8 @@ def start_cosmos_node(plan,args):
 
     node_service_response = plan.add_service(name=SERVICE_NAME, config= cosmwasm_node_config)
 
+    balance = cosm_wallet.add_balance(plan,args)
+    
     return struct(
         service_name = SERVICE_NAME,
         cid = CHAIN_ID
