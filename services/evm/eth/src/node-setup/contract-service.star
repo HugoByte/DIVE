@@ -9,7 +9,7 @@ def start_deploy_service(plan,args):
     endpoint = args["endpoint"]
 
     plan.upload_files(src=deployer_constants.static_file_path,name="static-files")
-
+    plan.upload_files(src=deployer_constants.contract_files_path,name="contracts")
     hardhat_config = read_file(deployer_constants.template_file)
     cfg_template_data = {
         "URL": endpoint
@@ -29,8 +29,8 @@ def start_deploy_service(plan,args):
         image=deployer_constants.node_image,
         files={
             deployer_constants.static_files_directory_path : "static-files",
-            deployer_constants.rendered_file_directory : "config"
-
+            deployer_constants.rendered_file_directory : "config",
+            deployer_constants.contract_files_directory_path : "contracts"
 
         },
         entrypoint = ["/bin/sh","-c","mv /static-files/rendered/hardhat.config.ts /static-files/ &&  apk add jq &&  sleep 9999999999"]
