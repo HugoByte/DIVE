@@ -56,6 +56,12 @@ To run, we have the list of actions, as follows:
 
 - Example for running two chains wth relay
 
+  To build contracts for BTP run :
+
+  ```
+  sh build.sh
+  ```
+
   With Bridge True
 
   ```
