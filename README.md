@@ -38,6 +38,11 @@ To run, we have the list of actions, as follows:
 2. **start_nodes**
 3. **setup_relay**
 
+**NOTE:**
+
+1. If you are using macOS, you need to pull the image by running `docker pull ethpandaops/ethereum-genesis-generator:1.3.1 --platform linux/amd64` 
+2. Always run a command `kurtosis clean -a` before running any enclave.
+
 - Example for running single chain
 
   ```
