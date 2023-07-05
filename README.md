@@ -68,7 +68,10 @@ To run, we have the list of actions, as follows:
   kurtosis run github.com/hugobyte/dive '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "eth"},"bridge":"false"}}' --enclave <Name>
   ```
 
-  _Note :_ The `bridge` should be false for Icon to Icon
+  _Note :_ 
+  - The `bridge` should be false for Icon to Icon
+  - If you are using macOS, you need to pull the image by running `docker pull ethpandaops/ethereum-genesis-generator:1.3.1 --platform linux/amd64`
+  - Always run a command `kurtosis clean -a` before running an enclave.
 
 ### Testing
 
