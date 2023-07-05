@@ -89,20 +89,24 @@ interface ICallService {
        @param _to A string representation of the callee address
        @param _sn The serial number of the request from the source
        @param _reqId The request id of the destination chain
+       @param _data The calldata
      */
     event CallMessage(
         string indexed _from,
         string indexed _to,
         uint256 indexed _sn,
-        uint256 _reqId
+        uint256 _reqId,
+        bytes _data
     );
 
     /**
        @notice Executes the requested call message.
        @param _reqId The request id
+       @param _data The calldata
      */
     function executeCall(
-        uint256 _reqId
+        uint256 _reqId,
+        bytes memory _data
     ) external;
 
     /**

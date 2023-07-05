@@ -3,10 +3,10 @@ import "@nomicfoundation/hardhat-toolbox";
 
 const config: HardhatUserConfig = {
   paths: {
-    sources: "./contracts",
-    tests: "./contracts",
-    cache: "./contracts/build/cache",
-    artifacts: "./contracts/build/artifacts",
+    sources: "./solidity/contracts",
+    tests: "./solidity/test",
+    cache: "./solidity/build/cache",
+    artifacts: "./solidity/build/artifacts",
   },
   solidity: {
     version: "0.8.12",
@@ -17,11 +17,11 @@ const config: HardhatUserConfig = {
       },
     },
   },
-  networks: {
-    localnet: {
-      url: "{{.URL}}"
-    },
-  },
+  networks:{
+    localnet:{
+      url:"http://127.0.0.1:8545"
+    }
+  }
 };
 
 export default config;
