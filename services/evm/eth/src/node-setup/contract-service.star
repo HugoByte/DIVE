@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ETH_CONTRACT_DEPLOYMENT_SERVICE_IMAGE = "node:lts-alpine"
 CONTRACT_DEPLOYMENT_STATIC_FILES= "github.com/hugobyte/dive/services/evm/eth/static-files/"
 CONTRACT_DEPLOYMENT_STATIC_FILES_DIR_PATH = "/static-files/"
@@ -8,6 +9,9 @@ HARDHAT_CONFIG_DIR = "/static-files/rendered/"
 =======
 constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
 >>>>>>> main
+=======
+constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
+>>>>>>> origin/development
 
 # Starts the eth deploy service
 def start_deploy_service(plan,args):

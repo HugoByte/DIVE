@@ -5,11 +5,16 @@ eth_node = import_module("github.com/hugobyte/dive/services/evm/eth/eth.star")
 icon_relay_setup = import_module("github.com/hugobyte/dive/services/jvm/icon/src/relay-setup/contract_configuration.star")
 icon_service = import_module("github.com/hugobyte/dive/services/jvm/icon/icon.star")
 <<<<<<< HEAD
+<<<<<<< HEAD
 btp_relay = import_module("github.com/hugobyte/dive/services/relay/btp_relay.star")
 =======
 btp_bridge = import_module("github.com/hugobyte/dive/services/bridges/btp/src/bridge.star")
 input_parser = import_module("github.com/hugobyte/dive/package_io/input_parser.star")
 >>>>>>> main
+=======
+btp_bridge = import_module("github.com/hugobyte/dive/services/bridges/btp/src/bridge.star")
+input_parser = import_module("github.com/hugobyte/dive/package_io/input_parser.star")
+>>>>>>> origin/development
 
 
 
@@ -130,16 +135,22 @@ def run_btp_setup(plan,args):
         config_data["chains"][args_data.dst]["networkId"] = response.dst_network_id
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         config_data["contracts"][source_chain] = src_contract_addresses
         config_data["contracts"][destination_chain] = dst_contract_addresses
         config_data["chains"][source_chain]["block_number"] = src_block_height
         config_data["chains"][destination_chain]["block_number"] =  dst_block_height
 =======
+=======
+>>>>>>> origin/development
         config_data["contracts"][args_data.src] = src_contract_addresses
         config_data["contracts"][args_data.dst] = dst_contract_addresses
         config_data["chains"][args_data.src]["block_number"] = src_block_height
         config_data["chains"][args_data.dst]["block_number"] =  dst_block_height
+<<<<<<< HEAD
 >>>>>>> main
+=======
+>>>>>>> origin/development
 
 
 
@@ -203,6 +214,7 @@ def run_btp_setup(plan,args):
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         config_data["contracts"][source_chain] = src_contract_addresses
         config_data["contracts"][destination_chain] = dst_contract_addresses
         config_data["chains"][source_chain]["networkTypeId"] = src_response.network_type_id
@@ -210,13 +222,18 @@ def run_btp_setup(plan,args):
         config_data["chains"][source_chain]["block_number"] = src_block_height
         config_data["chains"][destination_chain]["block_number"] =  dst_last_block_height_number
 =======
+=======
+>>>>>>> origin/development
         config_data["contracts"][args_data.src] = src_contract_addresses
         config_data["contracts"][args_data.dst] = dst_contract_addresses
         config_data["chains"][args_data.src]["networkTypeId"] = src_response.network_type_id
         config_data["chains"][args_data.src]["networkId"] = src_response.network_id
         config_data["chains"][args_data.src]["block_number"] = src_block_height
         config_data["chains"][args_data.dst]["block_number"] =  dst_last_block_height_number
+<<<<<<< HEAD
 >>>>>>> main
+=======
+>>>>>>> origin/development
 
 
     src_network = config_data["chains"][args_data.src]["network"]

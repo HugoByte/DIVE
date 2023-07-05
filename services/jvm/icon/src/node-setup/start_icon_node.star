@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ICON_NODE_IMAGE = "iconloop/goloop-icon:v1.3.5"
 ICON_BASE_CONFIG_FILES_PATH = "/goloop/config/"
 ICON_CONTRACT_DIR = "/goloop/contracts/"
@@ -13,6 +14,9 @@ ICON_RPC_ENDPOINT_PATH = "api/v3/icon_dex"
 =======
 constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
 >>>>>>> main
+=======
+constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
+>>>>>>> origin/development
 
 # Starts The Icon Node 
 def start_icon_node(plan,service_config,id,start_file_name):
