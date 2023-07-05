@@ -40,7 +40,6 @@ def add_service(plan,bmc_address,xcall_address,args):
     params = '{"_svc":"xcall","_addr":"%s"}' % xcall_address
 
     exec_command = ["./bin/goloop","rpc","sendtx","call","--to",bmc_address,"--method",method,"--params",params,"--uri",uri,"--key_store",keystore_path,"--key_password",keypassword,"--step_limit","50000000000","--nid",nid]
-    plan.print(exec_command)
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
 
     tx_hash = result["output"].replace('"',"")
@@ -90,7 +89,6 @@ def add_verifier(plan,service_name,bmc_address,dst_chain_network,bmv_address,uri
     params = '{"_net":"%s","_addr":"%s"}' % (dst_chain_network,bmv_address)
 
     exec_command = ["./bin/goloop","rpc","sendtx","call","--to",bmc_address,"--method",method,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","50000000000","--nid",nid]
-    plan.print(exec_command)
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
 
     tx_hash = result["output"].replace('"',"")
@@ -107,15 +105,12 @@ def add_btp_link(plan,service_name,bmc_address,dst_bmc_address,src_network_id,ur
     params = '{"_link":"%s","_networkId":"%s"}' %(dst_bmc_address,src_network_id)
 
     exec_command = ["./bin/goloop","rpc","sendtx","call","--to",bmc_address,"--method",method,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","50000000000","--nid",nid]
-
-    plan.print(exec_command)
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
 
     tx_hash = result["output"].replace('"',"")
 
 
     tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
-
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
     return tx_result
@@ -138,23 +133,15 @@ def add_relay(plan,service_name,bmc_address,dst_bmc_address,relay_address,uri,ke
 def setup_link_icon(plan,service_name,bmc_address,dst_chain_network,dst_chain_bmc_address,src_chain_network_id,bmv_address,relay_address,args):
 
     dst_bmc_address = get_btp_address(dst_chain_network,dst_chain_bmc_address)
-    plan.print(dst_bmc_address)
 
     uri = args["endpoint"]
     keystore_path = args["keystore_path"]
     keypassword = args["keypassword"]
     nid = args["nid"]
 
-    response = add_verifier(plan,service_name,bmc_address,dst_chain_network,bmv_address,uri,keystore_path,keypassword,nid)
-    plan.print(response)
-
-    response = add_btp_link(plan,service_name,bmc_address,dst_bmc_address,src_chain_network_id,uri,keystore_path,keypassword,nid)
-    plan.print(response)
-
-
-    response =  add_relay(plan,service_name,bmc_address,dst_bmc_address,relay_address,uri,keystore_path,keypassword,nid)
-    plan.print(response)
-
+    add_verifier(plan,service_name,bmc_address,dst_chain_network,bmv_address,uri,keystore_path,keypassword,nid)
+    add_btp_link(plan,service_name,bmc_address,dst_bmc_address,src_chain_network_id,uri,keystore_path,keypassword,nid)
+    add_relay(plan,service_name,bmc_address,dst_bmc_address,relay_address,uri,keystore_path,keypassword,nid)
 
     plan.print("Icon Link Setup Completed")
 

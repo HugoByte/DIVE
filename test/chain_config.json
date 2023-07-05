@@ -1,0 +1,26 @@
+{
+  "chains": {
+    "icon0": {
+      "network": "0x3.icon",
+      "endpoint": "http://localhost:8090/api/v3/icon_dex",
+      "keystore": "./config/keystore.json",
+      "keysecret": "./config/keysecret"
+    },
+    "icon1": {
+      "network": "0x101.icon",
+      "endpoint": "http://127.0.0.1:8091/api/v3/icon_dex",
+      "keystore": "./config/keystore.json",
+      "keysecret": "./config/keysecret"
+    },
+    "hardhat": {
+      "network": "0x539.hardhat",
+      "endpoint": "http://127.0.0.1:8545",
+      "keystore": "./docker/hardhat/keystore0.json",
+      "keypass": "hardhat"
+    }
+  },
+  "link": {
+    "src": "icon0",
+    "dst": "icon1"
+  }
+}

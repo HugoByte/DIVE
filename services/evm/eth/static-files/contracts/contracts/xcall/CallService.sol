@@ -37,7 +37,7 @@ contract CallService is IBSH, ICallService, IFeeManage, Initializable {
     uint256 private protocolFee;
 
     mapping(uint256 => Types.CallRequest) private requests;
-    mapping(uint256 => Types.CSMessageRequest) private proxyReqs;
+    mapping(uint256 => Types.ProxyRequest) private proxyReqs;
 
     address private owner;
     address private adminAddress;
@@ -101,12 +101,6 @@ contract CallService is IBSH, ICallService, IFeeManage, Initializable {
         delete requests[sn];
     }
 
-    function isNullCallRequest(
-        Types.CallRequest memory req
-    ) internal pure returns (bool) {
-        return req.from == address(0);
-    }
-
     function sendCallMessage(
         string memory _to,
         bytes memory _data,
@@ -148,10 +142,12 @@ contract CallService is IBSH, ICallService, IFeeManage, Initializable {
     }
 
     function executeCall(
-        uint256 _reqId
+        uint256 _reqId,
+        bytes memory _data
     ) external override {
-        Types.CSMessageRequest memory msgReq = proxyReqs[_reqId];
+        Types.ProxyRequest memory msgReq = proxyReqs[_reqId];
         require(bytes(msgReq.from).length > 0, "InvalidRequestId");
+        require(msgReq.hash == keccak256(_data), "DataHashMismatch");
         // cleanup
         delete proxyReqs[_reqId];
 
@@ -162,7 +158,7 @@ contract CallService is IBSH, ICallService, IFeeManage, Initializable {
             address(0),
             msgReq.to,
             msgReq.from,
-            msgReq.data
+            _data
         ) {
             msgRes = Types.CSMessageResponse(msgReq.sn, Types.CS_RESP_SUCCESS, "");
         } catch Error(string memory reason) {
@@ -289,14 +285,14 @@ contract CallService is IBSH, ICallService, IFeeManage, Initializable {
         string memory from = netFrom.btpAddress(req.from);
 
         uint256 reqId = getNextReqId();
-        proxyReqs[reqId] = Types.CSMessageRequest(
+        proxyReqs[reqId] = Types.ProxyRequest(
             from,
             req.to,
             req.sn,
             req.rollback,
-            req.data
+            keccak256(req.data)
         );
-        emit CallMessage(from, req.to, req.sn, reqId);
+        emit CallMessage(from, req.to, req.sn, reqId, req.data);
     }
 
     function handleResponse(
