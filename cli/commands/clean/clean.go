@@ -27,7 +27,7 @@ var CleanCmd = &cobra.Command{
 		if enclaveName == "" {
 			logrus.Errorf("No enclaves running to clean !!")
 		} else {
-			// clean(ctx, kurtosisCtx)
+			clean(ctx, kurtosisCtx)
 		}
 	},
 }
@@ -45,4 +45,19 @@ func getEnclaves(ctx context.Context, kurtosisCtx *kurtosis_context.KurtosisCont
 		}
 	}
 	return ""
+}
+
+// Funstionality to clean the enclaves
+func clean(ctx context.Context, kurtosisCtx *kurtosis_context.KurtosisContext) {
+	logrus.Info("Successfully connected to kurtosis engine...")
+	logrus.Info("Initializing cleaning process...")
+
+	// shouldCleanAll set to true as default for beta release.
+	enclaves, err := kurtosisCtx.Clean(ctx, true)
+	if err != nil {
+		logrus.Errorf("Failed cleaning with error: %v", err)
+	}
+
+	// Assuming only one enclave is running for beta release
+	logrus.Infof("Successfully destroyed and cleaned enclave %s", enclaves[0].Name)
 }
