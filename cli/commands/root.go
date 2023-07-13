@@ -19,8 +19,6 @@ var rootCmd = &cobra.Command{
 	Use:   "dive",
 	Short: "Deployable Infrastructure for Virtually Effortless blockchain integration",
 	Long:  ``,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
 		styles.RenderBanner()
 		cmd.Help()
