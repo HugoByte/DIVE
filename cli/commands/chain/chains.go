@@ -44,6 +44,7 @@ func init() {
 
 	ChainCmd.AddCommand(types.NewIconCmd(ctx, enclaveCtx))
 	ChainCmd.AddCommand(types.NewEthCmd(ctx, enclaveCtx))
+	ChainCmd.AddCommand(types.NewHardhatCmd(ctx, enclaveCtx))
 
 }
 
