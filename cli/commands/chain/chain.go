@@ -12,13 +12,8 @@ import (
 // chainCmd represents the chain command
 var ChainCmd = &cobra.Command{
 	Use:   "chain",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Build, initialize and start a given blockchain node.",
+	Long: `This command will spin up given chains. It will only run a node and developers can upload and test their smart contracts here. Incase if you want to use cross chain communication, please refer to 'bridge' command.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 	},
