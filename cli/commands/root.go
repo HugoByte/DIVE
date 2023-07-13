@@ -10,6 +10,7 @@ import (
 	"github.com/hugobyte/dive/commands/chain"
 	"github.com/hugobyte/dive/commands/clean"
 	"github.com/hugobyte/dive/commands/version"
+	"github.com/hugobyte/dive/styles"
 	"github.com/spf13/cobra"
 )
 
@@ -20,7 +21,10 @@ var rootCmd = &cobra.Command{
 	Long:  ``,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		styles.RenderBanner()
+		cmd.Help()
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -33,11 +37,10 @@ func Execute() {
 }
 
 func init() {
-
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.CompletionOptions.DisableNoDescFlag = true
 
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	rootCmd.AddCommand(version.VersionCmd)
 	rootCmd.AddCommand(chain.ChainCmd)

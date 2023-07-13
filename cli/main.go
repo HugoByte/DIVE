@@ -5,16 +5,14 @@ package main
 
 import (
 	"github.com/hugobyte/dive/commands"
-	"github.com/hugobyte/dive/styles"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
 	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp:             true,
+		FullTimestamp:   true,
 		TimestampFormat: "2006-01-02 15:04:05",
 	})
-	styles.RenderBanner()
 	commands.Execute()
 
 }
