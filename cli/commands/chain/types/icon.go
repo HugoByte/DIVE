@@ -8,6 +8,7 @@ import (
 
 	"os"
 
+	"github.com/hugobyte/dive/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/sirupsen/logrus"
@@ -24,17 +25,6 @@ var (
 	nodeEndpoint     = ""
 	configFilePath   = ""
 )
-
-type IconserviceResponse struct {
-	ServiceName     string `json:"service_name"`
-	PublicEndpoint  string `json:"endpoint_public"`
-	PrivateEndpoint string `json:"endpoint"`
-	KeyPassword     string `json:"keypassword"`
-	KeystorePath    string `json:"keystore_path"`
-	Network         string `json:"network"`
-	NetworkName     string `json:"network_name"`
-	NetworkId       string `json:"nid"`
-}
 
 type IconServiceConfig struct {
 	Id               string `json:"id" default:"0"`
@@ -64,27 +54,10 @@ func (sc *IconServiceConfig) EncodeToString() (string, error) {
 	return string(encodedBytes), nil
 }
 
-func (icon *IconserviceResponse) EncodeToString() (string, error) {
-	encodedBytes, err := json.Marshal(icon)
-	if err != nil {
-		return "", nil
-	}
-
-	return string(encodedBytes), nil
-}
-func (icon *IconserviceResponse) Decode(responseData []byte) (*IconserviceResponse, error) {
-
-	err := json.Unmarshal(responseData, &icon)
-	if err != nil {
-		return nil, err
-	}
-	return icon, nil
-}
-
 func NewIconCmd(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext) *cobra.Command {
 	var iconCmd = &cobra.Command{
 		Use:   "icon",
-		Short: "Runs Icon Chain Node",
+		Short: "Runs Icon Node",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 
@@ -170,7 +143,7 @@ func IconDecentralisationCmd(ctx context.Context, kurtosisEnclaveContext *enclav
 
 }
 
-func runIconNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext, serviceConfig *IconServiceConfig) *IconserviceResponse {
+func runIconNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext, serviceConfig *IconServiceConfig) *common.DiveserviceResponse {
 
 	paramData, err := serviceConfig.EncodeToString()
 	if err != nil {
@@ -183,7 +156,7 @@ func runIconNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveCo
 		fmt.Println(err)
 	}
 
-	responseData := getSerializedData(data)
+	responseData := common.GetSerializedData(data)
 
 	genesis_file_name := filepath.Base(genesis)
 	r, d, err := kurtosisEnclaveContext.UploadFiles(genesis, genesis_file_name)
@@ -201,9 +174,9 @@ func runIconNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveCo
 		fmt.Println(err)
 	}
 
-	response := getSerializedData(icon_data)
+	response := common.GetSerializedData(icon_data)
 
-	iconResponseData := &IconserviceResponse{}
+	iconResponseData := &common.DiveserviceResponse{}
 
 	result, err := iconResponseData.Decode([]byte(response))
 
@@ -221,31 +194,9 @@ func Decentralisation(ctx context.Context, kurtosisEnclaveContext *enclaves.Encl
 		fmt.Println(err)
 	}
 
-	response := getSerializedData(data)
+	response := common.GetSerializedData(data)
 
 	fmt.Println(response)
-
-}
-
-func getSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) string {
-
-	var serializedOutputObj string
-	for executionResponseLine := range response {
-		fmt.Println(executionResponseLine)
-		runFinishedEvent := executionResponseLine.GetRunFinishedEvent()
-		if runFinishedEvent == nil {
-			logrus.Info("Execution in progress...")
-		} else {
-			logrus.Info("Execution finished successfully")
-			if runFinishedEvent.GetIsRunSuccessful() {
-				serializedOutputObj = runFinishedEvent.GetSerializedOutput()
-			} else {
-				panic("Starlark run failed")
-			}
-		}
-	}
-
-	return serializedOutputObj
 
 }
 

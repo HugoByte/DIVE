@@ -21,6 +21,7 @@ var ChainCmd = &cobra.Command{
 	Long:  ``,
 
 	Run: func(cmd *cobra.Command, args []string) {
+		cmd.Help()
 
 	},
 }
@@ -42,6 +43,7 @@ func init() {
 	}
 
 	ChainCmd.AddCommand(types.NewIconCmd(ctx, enclaveCtx))
+	ChainCmd.AddCommand(types.NewEthCmd(ctx, enclaveCtx))
 
 }
 
