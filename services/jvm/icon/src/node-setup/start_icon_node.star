@@ -1,7 +1,7 @@
 constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
 
 # Starts The Icon Node 
-def start_icon_node(plan,service_config,id,start_file_name):
+def start_icon_node(plan,service_config,id,start_file_name,genesis_file_path,genesis_file_name):
 
     icon_node_constants = constants.ICON_NODE_CLIENT
 
@@ -33,7 +33,9 @@ def start_icon_node(plan,service_config,id,start_file_name):
         files={
             icon_node_constants.config_files_directory : "config-files-{0}".format(id),
             icon_node_constants.contracts_directory : "contracts-{0}".format(id),
-            icon_node_constants.keystore_directory : "kesytore-{0}".format(id)
+            icon_node_constants.keystore_directory : "kesytore-{0}".format(id),
+            icon_node_constants.genesis_file_path : genesis_file_path
+
         },
         env_vars={
             "GOLOOP_LOG_LEVEL": "trace",
@@ -42,7 +44,7 @@ def start_icon_node(plan,service_config,id,start_file_name):
             "GOLOOP_P2P": ":%s" % p2p_address,
             "ICON_CONFIG": icon_node_constants.config_files_directory+"icon_config.json"
         },
-        cmd= ["/bin/sh","-c",icon_node_constants.config_files_directory+"%s %s genesis-icon-0.zip" % (start_file_name,cid)]
+        cmd= ["/bin/sh","-c",icon_node_constants.config_files_directory+"%s %s %s" % (start_file_name,cid,genesis_file_name)]
 
     )
 

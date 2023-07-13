@@ -14,7 +14,7 @@ start_chain() {
   CID=${1}
   if [ ! -e ${GOLOOP_NODE_DIR}/${CID} ]; then
     # join chain
-    GENESIS=/goloop/config/${2}
+    GENESIS=/goloop/genesis/${2}
     goloop chain join \
         --platform icon \
         --channel icon_dex \
