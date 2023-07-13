@@ -6,6 +6,7 @@ require github.com/kurtosis-tech/kurtosis/api/golang v0.80.0
 
 require (
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
+	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/dsnet/compress v0.0.1 // indirect
 	github.com/go-yaml/yaml v2.1.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
@@ -14,6 +15,7 @@ require (
 	github.com/kurtosis-tech/kurtosis-portal/api/golang v0.0.0-20230328194643-b4dea3081e25 // indirect
 	github.com/kurtosis-tech/kurtosis/grpc-file-transfer/golang v0.0.0-20230427135111-ee2492059d06 // indirect
 	github.com/kurtosis-tech/stacktrace v0.0.0-20211028211901-1c67a77b5409 // indirect
+	github.com/manifoldco/promptui v0.9.0 // indirect
 	github.com/mholt/archiver v3.1.1+incompatible // indirect
 	github.com/nwaples/rardecode v1.1.3 // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect

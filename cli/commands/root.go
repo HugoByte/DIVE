@@ -8,6 +8,7 @@ import (
 
 	"github.com/hugobyte/dive/commands/bridge"
 	"github.com/hugobyte/dive/commands/chain"
+
 	"github.com/hugobyte/dive/commands/clean"
 	"github.com/hugobyte/dive/commands/version"
 	"github.com/spf13/cobra"
@@ -32,12 +33,26 @@ func Execute() {
 	}
 }
 
+// type DiveContext struct {
+// 	Ctx             context.Context
+// 	KurtosisContext *kurtosis_context.KurtosisContext
+// 	Log             *logrus.Logger
+// }
+
 func init() {
+
+	// kurtosisContext, err := kurtosis_context.NewKurtosisContextFromLocalEngine()
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// diveContext := DiveContext{
+	// 	Ctx:             context.Background(),
+	// 	KurtosisContext: kurtosisContext,
+	// 	Log:             logrus.New(),
+	// }
 
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.CompletionOptions.DisableNoDescFlag = true
-
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	rootCmd.AddCommand(version.VersionCmd)
 	rootCmd.AddCommand(chain.ChainCmd)
