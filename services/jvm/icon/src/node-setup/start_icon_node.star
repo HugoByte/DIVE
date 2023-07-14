@@ -1,7 +1,9 @@
 constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
 
 # Starts The Icon Node 
-def start_icon_node(plan,service_config,id,start_file_name,genesis_file_path,genesis_file_name):
+def start_icon_node(plan,service_config,id,uploaded_genesis,genesis_file_path,genesis_file_name):
+
+    plan.print(uploaded_genesis)
 
     icon_node_constants = constants.ICON_NODE_CLIENT
 
@@ -22,6 +24,16 @@ def start_icon_node(plan,service_config,id,start_file_name,genesis_file_path,gen
     plan.upload_files(src=icon_node_constants.contract_files_path,name="contracts-{0}".format(id))
     plan.upload_files(src=icon_node_constants.keystore_files_path,name="kesytore-{0}".format(id) )
 
+    file_path = ""
+    file_name = ""
+    if len(uploaded_genesis) == 0:
+       plan.upload_files(src=genesis_file_path,name=genesis_file_name)
+       file_path = genesis_file_name
+       file_name = genesis_file_name
+    else:
+        file_path = uploaded_genesis["file_path"]
+        file_name = uploaded_genesis["file_name"]
+
     icon_node_service_config = ServiceConfig(
         image=icon_node_constants.node_image,
         ports={
@@ -34,7 +46,7 @@ def start_icon_node(plan,service_config,id,start_file_name,genesis_file_path,gen
             icon_node_constants.config_files_directory : "config-files-{0}".format(id),
             icon_node_constants.contracts_directory : "contracts-{0}".format(id),
             icon_node_constants.keystore_directory : "kesytore-{0}".format(id),
-            icon_node_constants.genesis_file_path : genesis_file_path
+            icon_node_constants.genesis_file_path : file_path
 
         },
         env_vars={
@@ -44,7 +56,7 @@ def start_icon_node(plan,service_config,id,start_file_name,genesis_file_path,gen
             "GOLOOP_P2P": ":%s" % p2p_address,
             "ICON_CONFIG": icon_node_constants.config_files_directory+"icon_config.json"
         },
-        cmd= ["/bin/sh","-c",icon_node_constants.config_files_directory+"%s %s %s" % (start_file_name,cid,genesis_file_name)]
+        cmd= ["/bin/sh","-c",icon_node_constants.config_files_directory+"start.sh %s %s" % (cid,file_name)]
 
     )
 
@@ -59,6 +71,8 @@ def start_icon_node(plan,service_config,id,start_file_name,genesis_file_path,gen
     network = "{0}.icon".format(chain_id["output"])
     
     
+    
+
     return struct(
         service_name = service_name,
         network_name = network_name,
@@ -86,12 +100,15 @@ def get_service_url(ip_address,ports,path):
 # Retruns Service Config
 def get_service_config(id,private_port,public_port,p2p_listen_address,p2p_address,cid):
 
-    return struct(
-        service_name = "{0}{1}".format(constants.ICON_NODE_CLIENT.service_name,id),
-        private_port = private_port,
-        public_port = public_port,
-        network_name = "icon-{0}".format(id),
-        p2p_listen_address = p2p_listen_address,
-        p2p_address = p2p_address,
-        cid = cid
-    )
+    config = {
+        "service_name" : "{0}{1}".format(constants.ICON_NODE_CLIENT.service_name,id),
+        "private_port" : private_port,
+        "public_port" : public_port,
+        "network_name" : "icon-{0}".format(id),
+        "p2p_listen_address" : p2p_listen_address,
+        "p2p_address" : p2p_address,
+        "cid":cid
+    }
+
+
+    return config
