@@ -1,17 +1,17 @@
 constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
 
 # Starts The Icon Node 
-def start_icon_node(plan,service_config,id,start_file_name):
+def start_icon_node(plan,service_config,id,start_file_name,genesis_file_path,genesis_file_name):
 
     icon_node_constants = constants.ICON_NODE_CLIENT
 
-    service_name = service_config.service_name
-    private_port = service_config.private_port
-    public_port = service_config.public_port
-    network_name = service_config.network_name
-    p2p_listen_address = service_config.p2p_listen_address
-    p2p_address = service_config.p2p_address
-    cid = service_config.cid
+    service_name = service_config["service_name"]
+    private_port = service_config["private_port"]
+    public_port = service_config["public_port"]
+    network_name = service_config["network_name"]
+    p2p_listen_address = service_config["p2p_listen_address"]
+    p2p_address = service_config["p2p_address"]
+    cid = service_config["cid"]
 
 
     plan.print("Launching "+service_name+" Service")
@@ -33,7 +33,9 @@ def start_icon_node(plan,service_config,id,start_file_name):
         files={
             icon_node_constants.config_files_directory : "config-files-{0}".format(id),
             icon_node_constants.contracts_directory : "contracts-{0}".format(id),
-            icon_node_constants.keystore_directory : "kesytore-{0}".format(id)
+            icon_node_constants.keystore_directory : "kesytore-{0}".format(id),
+            icon_node_constants.genesis_file_path : genesis_file_path
+
         },
         env_vars={
             "GOLOOP_LOG_LEVEL": "trace",
@@ -42,7 +44,7 @@ def start_icon_node(plan,service_config,id,start_file_name):
             "GOLOOP_P2P": ":%s" % p2p_address,
             "ICON_CONFIG": icon_node_constants.config_files_directory+"icon_config.json"
         },
-        cmd= ["/bin/sh","-c",icon_node_constants.config_files_directory+"%s" % start_file_name]
+        cmd= ["/bin/sh","-c",icon_node_constants.config_files_directory+"%s %s %s" % (start_file_name,cid,genesis_file_name)]
 
     )
 

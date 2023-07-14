@@ -9,7 +9,8 @@ ICON_NODE_CLIENT = struct(
     port_key = "rpc",
     public_ip_address = "127.0.0.1",
     rpc_endpoint_path = "api/v3/icon_dex",
-    service_name = "icon-node-"
+    service_name = "icon-node-",
+    genesis_file_path = "/goloop/genesis/"
 )
 
 HARDHAT_NODE_CLIENT = struct(
