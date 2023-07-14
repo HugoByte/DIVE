@@ -47,7 +47,7 @@ func getEnclaves(ctx context.Context, kurtosisCtx *kurtosis_context.KurtosisCont
 	return ""
 }
 
-// Functionality to clean the enclaves
+// Funstionality to clean the enclaves
 func clean(ctx context.Context, kurtosisCtx *kurtosis_context.KurtosisContext) {
 	logrus.Info("Successfully connected to kurtosis engine...")
 	logrus.Info("Initializing cleaning process...")

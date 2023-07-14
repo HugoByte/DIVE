@@ -11,6 +11,7 @@ import (
 
 	"github.com/hugobyte/dive/commands/clean"
 	"github.com/hugobyte/dive/commands/version"
+	"github.com/hugobyte/dive/styles"
 	"github.com/spf13/cobra"
 )
 
@@ -19,9 +20,10 @@ var rootCmd = &cobra.Command{
 	Use:   "dive",
 	Short: "Deployable Infrastructure for Virtually Effortless blockchain integration",
 	Long:  ``,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		styles.RenderBanner()
+		cmd.Help()
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -33,24 +35,7 @@ func Execute() {
 	}
 }
 
-// type DiveContext struct {
-// 	Ctx             context.Context
-// 	KurtosisContext *kurtosis_context.KurtosisContext
-// 	Log             *logrus.Logger
-// }
-
 func init() {
-
-	// kurtosisContext, err := kurtosis_context.NewKurtosisContextFromLocalEngine()
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// diveContext := DiveContext{
-	// 	Ctx:             context.Background(),
-	// 	KurtosisContext: kurtosisContext,
-	// 	Log:             logrus.New(),
-	// }
-
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.CompletionOptions.DisableNoDescFlag = true
 

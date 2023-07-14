@@ -12,13 +12,8 @@ import (
 // bridgeCmd represents the bridge command
 var BridgeCmd = &cobra.Command{
 	Use:   "bridge",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Command for cross chain communication between two different chains",
+	Long: `To connect two different chains using any of the supported cross chain communication protocols. This will create an relay to connect two different chains and pass any messages between them.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("bridge called")
 	},
