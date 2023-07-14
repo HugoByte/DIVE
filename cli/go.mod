@@ -12,6 +12,7 @@ require (
 
 require (
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
+	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/dsnet/compress v0.0.1 // indirect
 	github.com/go-yaml/yaml v2.1.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect

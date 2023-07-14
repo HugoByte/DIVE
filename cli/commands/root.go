@@ -8,6 +8,7 @@ import (
 
 	"github.com/hugobyte/dive/commands/bridge"
 	"github.com/hugobyte/dive/commands/chain"
+
 	"github.com/hugobyte/dive/commands/clean"
 	"github.com/hugobyte/dive/commands/version"
 	"github.com/hugobyte/dive/styles"
@@ -37,8 +38,6 @@ func Execute() {
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.CompletionOptions.DisableNoDescFlag = true
-
-	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 	rootCmd.AddCommand(version.VersionCmd)
 	rootCmd.AddCommand(chain.ChainCmd)

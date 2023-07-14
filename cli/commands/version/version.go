@@ -19,7 +19,7 @@ var VersionCmd = &cobra.Command{
 	Short: "Prints the CLI version",
 	Long:  `Prints the current DIVE CLI version and warns if you are using an old version.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		version := color.New(color.Bold).Sprint("CLI version -") + DiveVersion
+		version := color.New(color.Bold).Sprint("CLI version - ") + DiveVersion
 		latestVersion := getLatestVersion()
 		if DiveVersion != latestVersion {
 			logrus.Warnf("Update available '%s'. Get the latest version of our DIVE CLI for bug fixes, performance improvements, and new features.", latestVersion)
