@@ -3,9 +3,24 @@ package common
 import (
 	"encoding/json"
 	"fmt"
+	"os/exec"
+	"runtime"
 
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
+	"github.com/kurtosis-tech/stacktrace"
 	"github.com/sirupsen/logrus"
+)
+
+const (
+	linuxOSName   = "linux"
+	macOSName     = "darwin"
+	windowsOSName = "windows"
+
+	openFileLinuxCommandName   = "xdg-open"
+	openFileMacCommandName     = "open"
+	openFileWindowsCommandName = "rundll32"
+
+	openFileWindowsCommandFirstArgumentDefault = "url.dll,FileProtocolHandler"
 )
 
 type DiveserviceResponse struct {
@@ -56,4 +71,23 @@ func GetSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRun
 
 	return serializedOutputObj
 
+}
+
+func OpenFile(URL string) error {
+	var args []string
+	switch runtime.GOOS {
+	case linuxOSName:
+		args = []string{openFileLinuxCommandName, URL}
+	case macOSName:
+		args = []string{openFileMacCommandName, URL}
+	case windowsOSName:
+		args = []string{openFileWindowsCommandName, openFileWindowsCommandFirstArgumentDefault, URL}
+	default:
+		return stacktrace.NewError("Unsupported operating system")
+	}
+	command := exec.Command(args[0], args[1:]...)
+	if err := command.Start(); err != nil {
+		return stacktrace.Propagate(err, "An error occurred while opening '%v'", URL)
+	}
+	return nil
 }
