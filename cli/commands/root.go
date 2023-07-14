@@ -11,6 +11,7 @@ import (
 
 	"github.com/hugobyte/dive/commands/clean"
 	"github.com/hugobyte/dive/commands/discord"
+	"github.com/hugobyte/dive/commands/tutorial"
 	"github.com/hugobyte/dive/commands/twitter"
 	"github.com/hugobyte/dive/commands/version"
 	"github.com/hugobyte/dive/styles"
@@ -47,4 +48,5 @@ func init() {
 	rootCmd.AddCommand(clean.CleanCmd)
 	rootCmd.AddCommand(discord.DiscordCmd)
 	rootCmd.AddCommand(twitter.TwitterCmd)
+	rootCmd.AddCommand(tutorial.TutorialCmd)
 }
