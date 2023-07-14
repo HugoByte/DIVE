@@ -13,7 +13,7 @@ var banner = `
 
 func RenderBanner() {
 
-	banner := fmt.Sprintf(BANNER_COLOR(banner), TAG_COLOR("Developed by Hugobyte AI Labs and Powered by Kurtosis"))
+	banner := fmt.Sprintf(BANNER_COLOR(banner), TAG_COLOR("Developed by HugoByte and Powered by Kurtosis"))
 
 	fmt.Println(banner)
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/hugobyte/dive/commands/bridge"
 	"github.com/hugobyte/dive/commands/chain"
+	"github.com/hugobyte/dive/common"
 
 	"github.com/hugobyte/dive/commands/clean"
 	"github.com/hugobyte/dive/commands/discord"
@@ -38,12 +39,15 @@ func Execute() {
 }
 
 func init() {
+
+	diveContext := common.NewDiveContext()
+
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.CompletionOptions.DisableNoDescFlag = true
 
 	rootCmd.AddCommand(version.VersionCmd)
-	rootCmd.AddCommand(chain.ChainCmd)
-	rootCmd.AddCommand(bridge.BridgeCmd)
+	rootCmd.AddCommand(chain.NewChainCmd(diveContext))
+	rootCmd.AddCommand(bridge.NewBridgeCmd(diveContext))
 	rootCmd.AddCommand(clean.CleanCmd)
 	rootCmd.AddCommand(discord.DiscordCmd)
 	rootCmd.AddCommand(twitter.TwitterCmd)
