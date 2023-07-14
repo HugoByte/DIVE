@@ -6,11 +6,15 @@ var banner = `
   ___ _____   _____ 
  |   \_ _\ \ / / __|
  | |) | | \ V /| _| 
- |___/___| \_/ |___|                         
+ |___/___| \_/ |___|
+	
+	%s
 `
 
 func RenderBanner() {
 
-	fmt.Println(BANNER_COLOR(banner))
+	banner := fmt.Sprintf(BANNER_COLOR(banner), TAG_COLOR("Developed by Hugobyte AI Labs and Powered by Kurtosis"))
+
+	fmt.Println(banner)
 
 }
