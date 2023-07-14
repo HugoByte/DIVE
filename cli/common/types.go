@@ -1,11 +1,13 @@
 package common
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os/exec"
 	"runtime"
 
+	"github.com/google/go-github/github"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/stacktrace"
 	"github.com/sirupsen/logrus"
@@ -90,4 +92,23 @@ func OpenFile(URL string) error {
 		return stacktrace.Propagate(err, "An error occurred while opening '%v'", URL)
 	}
 	return nil
+}
+
+// This function will fetch the latest version from HugoByte/Dive repo
+func GetLatestVersion() string {
+
+	// Repo Name
+	repo := "DIVE"
+	owner := "HugoByte"
+
+	// Create a new github client
+	client := github.NewClient(nil)
+	release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repo)
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+
+	// Print the release version.
+	return release.GetName()
 }
