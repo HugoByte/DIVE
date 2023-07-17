@@ -1,4 +1,4 @@
-DEFAULT_STEP_LIMIT = "500000000000"
+DEFAULT_STEP_LIMIT = "5000000000000"
 
 """
 Deploys Contract on Icon Chain
@@ -17,6 +17,7 @@ def deploy_contract(plan,contract_name,init_message,args):
 
     execute_command = ["./bin/goloop","rpc","sendtx","deploy","contracts/"+contract,"--content_type","application/java","--params",init_message,"--key_store",keystore_path,"--key_password",keystore_password,"--step_limit",DEFAULT_STEP_LIMIT,"--uri",uri,"--nid",nid]
 
+    plan.print(execute_command)
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=execute_command))
 
     return result["output"]
