@@ -12,3 +12,4 @@ func color(colorString string) func(...interface{}) string {
 
 var ERROR_COLOR = color("\033[0;31m]")
 var BANNER_COLOR = color("\033[1;34m%s\033[0m")
+var TAG_COLOR = color("\033[3;32m%s\033[0m")

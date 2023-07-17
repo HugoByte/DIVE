@@ -1,12 +1,16 @@
 package common
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"os/exec"
 	"runtime"
 
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
+	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
+	"github.com/kurtosis-tech/kurtosis/api/golang/engine/lib/kurtosis_context"
 	"github.com/kurtosis-tech/stacktrace"
 	"github.com/sirupsen/logrus"
 )
@@ -90,4 +94,60 @@ func OpenFile(URL string) error {
 		return stacktrace.Propagate(err, "An error occurred while opening '%v'", URL)
 	}
 	return nil
+}
+
+type DiveContext struct {
+	Ctx             context.Context
+	KurtosisContext *kurtosis_context.KurtosisContext
+}
+
+func NewDiveContext() *DiveContext {
+
+	ctx := context.Background()
+
+	kurtosisContext, err := kurtosis_context.NewKurtosisContextFromLocalEngine()
+	if err != nil {
+		panic(err)
+
+	}
+	return &DiveContext{Ctx: ctx, KurtosisContext: kurtosisContext}
+}
+
+func (diveContext *DiveContext) GetEnclaveContext() (*enclaves.EnclaveContext, error) {
+
+	_, err := diveContext.KurtosisContext.GetEnclave(diveContext.Ctx, DiveEnclave)
+	if err != nil {
+		enclaveCtx, err := diveContext.KurtosisContext.CreateEnclave(diveContext.Ctx, DiveEnclave, false)
+		if err != nil {
+			return nil, err
+
+		}
+		return enclaveCtx, nil
+	}
+	enclaveCtx, err := diveContext.KurtosisContext.GetEnclaveContext(diveContext.Ctx, DiveEnclave)
+
+	if err != nil {
+		return nil, err
+	}
+	return enclaveCtx, nil
+}
+
+func ReadConfigFile(filePath string) ([]byte, error) {
+
+	file, err := os.ReadFile(filePath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return file, nil
+}
+func WriteToFile(data string) {
+	file, err := os.Create("bridge.json")
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	file.WriteString(data)
 }

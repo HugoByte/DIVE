@@ -18,7 +18,7 @@ func NewHardhatCmd(ctx context.Context, kurtosisEnclaveContext *enclaves.Enclave
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			fmt.Println(runHardhatNode(ctx, kurtosisEnclaveContext).EncodeToString())
+			fmt.Println(RunHardhatNode(ctx, kurtosisEnclaveContext).EncodeToString())
 		},
 	}
 
@@ -26,7 +26,7 @@ func NewHardhatCmd(ctx context.Context, kurtosisEnclaveContext *enclaves.Enclave
 
 }
 
-func runHardhatNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext) *common.DiveserviceResponse {
+func RunHardhatNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext) *common.DiveserviceResponse {
 
 	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(ctx, "../", "services/evm/eth/eth.star", "start_eth_node_serivce", `{"args":{},"node_type":"hardhat"}`, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
