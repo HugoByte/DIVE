@@ -1,4 +1,4 @@
-DEFAULT_STEP_LIMIT = "5000000000000"
+DEFAULT_STEP_LIMIT = "500000000000"
 
 """
 Deploys Contract on Icon Chain
