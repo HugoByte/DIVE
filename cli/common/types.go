@@ -16,18 +16,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	linuxOSName   = "linux"
-	macOSName     = "darwin"
-	windowsOSName = "windows"
-
-	openFileLinuxCommandName   = "xdg-open"
-	openFileMacCommandName     = "open"
-	openFileWindowsCommandName = "rundll32"
-
-	openFileWindowsCommandFirstArgumentDefault = "url.dll,FileProtocolHandler"
-)
-
 type DiveserviceResponse struct {
 	ServiceName     string `json:"service_name"`
 	PublicEndpoint  string `json:"endpoint_public"`
@@ -55,21 +43,34 @@ func (dive *DiveserviceResponse) EncodeToString() (string, error) {
 
 	return string(encodedBytes), nil
 }
+func (dive *DiveserviceResponse) WriteDiveResponse(diveContext *DiveContext) {
+
+	serialisedData, err := dive.EncodeToString()
+
+	if err != nil {
+		diveContext.FatalError("Failed To Serialzed Data", err.Error())
+	}
+
+	WriteToFile(serialisedData)
+}
 
 func GetSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) string {
 
 	var serializedOutputObj string
+
 	for executionResponseLine := range response {
-		fmt.Println(executionResponseLine)
+
 		runFinishedEvent := executionResponseLine.GetRunFinishedEvent()
+
 		if runFinishedEvent == nil {
-			logrus.Info("Execution in progress...")
+
 		} else {
-			logrus.Info("Execution finished successfully")
+
 			if runFinishedEvent.GetIsRunSuccessful() {
+
 				serializedOutputObj = runFinishedEvent.GetSerializedOutput()
 			} else {
-				panic("Starlark run failed")
+				logrus.Fatal("Starlark run Fails")
 			}
 		}
 	}
@@ -119,6 +120,7 @@ func GetLatestVersion() string {
 type DiveContext struct {
 	Ctx             context.Context
 	KurtosisContext *kurtosis_context.KurtosisContext
+	log             *logrus.Logger
 }
 
 func NewDiveContext() *DiveContext {
@@ -127,10 +129,15 @@ func NewDiveContext() *DiveContext {
 
 	kurtosisContext, err := kurtosis_context.NewKurtosisContextFromLocalEngine()
 	if err != nil {
-		panic(err)
+		logrus.Fatal("The Kurtosis Engine Server is unavailable and is probably not running; you will need to start it using the Kurtosis CLI before you can create a connection to it")
 
 	}
-	return &DiveContext{Ctx: ctx, KurtosisContext: kurtosisContext}
+	log := logrus.New()
+	log.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp:   true,
+		TimestampFormat: "2006-01-02 15:04:05",
+	})
+	return &DiveContext{Ctx: ctx, KurtosisContext: kurtosisContext, log: logrus.New()}
 }
 
 func (diveContext *DiveContext) GetEnclaveContext() (*enclaves.EnclaveContext, error) {
@@ -163,11 +170,51 @@ func ReadConfigFile(filePath string) ([]byte, error) {
 	return file, nil
 }
 func WriteToFile(data string) {
-	file, err := os.Create("bridge.json")
+	file, err := os.Create("dive.json")
 	if err != nil {
 		return
 	}
 	defer file.Close()
 
 	file.WriteString(data)
+}
+
+// To get names of running enclaves, returns empty string if no enclaves
+func (diveContext *DiveContext) GetEnclaves() string {
+	enclaves, err := diveContext.KurtosisContext.GetEnclaves(diveContext.Ctx)
+	if err != nil {
+		logrus.Errorf("Getting Enclaves failed with error:  %v", err)
+	}
+	enclaveMap := enclaves.GetEnclavesByName()
+	for _, enclaveInfoList := range enclaveMap {
+		for _, enclaveInfo := range enclaveInfoList {
+			return enclaveInfo.GetName()
+		}
+	}
+	return ""
+}
+
+// Funstionality to clean the enclaves
+func (diveContext *DiveContext) Clean() {
+	logrus.Info("Successfully connected to kurtosis engine...")
+	logrus.Info("Initializing cleaning process...")
+
+	// shouldCleanAll set to true as default for beta release.
+	enclaves, err := diveContext.KurtosisContext.Clean(diveContext.Ctx, true)
+	if err != nil {
+		logrus.Errorf("Failed cleaning with error: %v", err)
+	}
+
+	// Assuming only one enclave is running for beta release
+	logrus.Infof("Successfully destroyed and cleaned enclave %s", enclaves[0].Name)
+}
+
+func (diveContext *DiveContext) FatalError(message, err string) {
+
+	diveContext.log.Fatalf("%s : %s", message, err)
+}
+
+func (diveContext *DiveContext) Info(message string) {
+
+	diveContext.log.Info(message)
 }

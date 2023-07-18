@@ -10,8 +10,11 @@ import (
 
 	"github.com/hugobyte/dive/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
+
+const bridgeMainFunction = "run_btp_setup"
 
 var (
 	chainA string
@@ -38,14 +41,14 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
 	var btpbridgeCmd = &cobra.Command{
 		Use:   "btp",
-		Short: "",
-		Long:  `.`,
+		Short: "Starts Bridge BTP between ChainA and Chain B",
+		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 
 			enclaveCtx, err := diveContext.GetEnclaveContext()
-			if err != nil {
-				panic(err)
 
+			if err != nil {
+				logrus.Errorln(err)
 			}
 
 			bridge, _ := cmd.Flags().GetBool("bridge")
@@ -54,7 +57,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
 			if strings.ToLower(chainA) == "icon" && strings.ToLower(chainB) == "icon" {
 
-				data, _, err := enclaveCtx.RunStarlarkPackage(diveContext.Ctx, "../", "main.star", "run_btp_setup", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+				data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 				if err != nil {
 					fmt.Println(err)
@@ -63,7 +66,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
 				common.WriteToFile(response)
 			} else {
-				data, _, err := enclaveCtx.RunStarlarkPackage(diveContext.Ctx, "../", "main.star", "run_btp_setup", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+				data, _, err := enclaveCtx.RunStarlarkPackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 				if err != nil {
 					fmt.Println(err)
@@ -75,9 +78,9 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 		},
 	}
 
-	btpbridgeCmd.Flags().StringVar(&chainA, "chainA", "", "specify chain A")
-	btpbridgeCmd.Flags().StringVar(&chainB, "chainB", "", "specify chain B")
-	btpbridgeCmd.Flags().Bool("bridge", false, "sepcify bridge falg")
+	btpbridgeCmd.Flags().StringVar(&chainA, "chainA", "", "Metion Name of Supported Chain")
+	btpbridgeCmd.Flags().StringVar(&chainB, "chainB", "", "Metion Name of Supported Chain")
+	btpbridgeCmd.Flags().Bool("bridge", false, "Mention Bridge ENV")
 
 	btpbridgeCmd.MarkFlagRequired("chainA")
 	btpbridgeCmd.MarkFlagRequired("chainB")

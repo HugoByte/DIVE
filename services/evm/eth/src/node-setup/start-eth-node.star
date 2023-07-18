@@ -12,8 +12,8 @@ def start_eth_node(plan,args):
           network_name= eth_contstants.network_name,
           network = eth_contstants.network,
           nid = eth_contstants.nid,
-          endpoint = network_address,
-		  endpoint_public = "",
+          endpoint = "http://%s" % network_address,
+		  endpoint_public = "http://",
 		  keystore_path = eth_contstants.keystore_path,
 		  keypassword = eth_contstants.keypassword
 		  )
@@ -64,8 +64,8 @@ def start_hardhat_node(plan):
           network_name= "hardhat",
           network = hardhat_constants.network,
           nid = hardhat_constants.network_id,
-          endpoint = private_url,
-		  endpoint_public = public_url,
+          endpoint = "http://%s" % private_url,
+		  endpoint_public = "http://%s" % public_url,
 		  keystore_path = hardhat_constants.keystore_path,
 		  keypassword = hardhat_constants.keypassword
      )
