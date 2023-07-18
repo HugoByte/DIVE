@@ -38,37 +38,46 @@ To run, we have the list of actions, as follows:
 2. **start_nodes**
 3. **setup_relay**
 
-- Example for running single chain
+### Command Line args
 
-  ```
-  kurtosis run github.com/hugobyte/dive '{"action":"start_node","node_name":"icon"}' --enclave <Name>
-  ```
+Dive-cli is a command line tool that will be used for starting the chain and crosschain communication between two different chains
 
-- Example for running multiple chains
+The available commands are -
 
-  ```
-  kurtosis run github.com/hugobyte/dive '{"action":"start_nodes","nodes":["icon"]}' --enclave <Name>
-  ```
+1. `./dive bridge`: 
+  
+   For connecting the two different chains. This will create an relay to connect two different chains and pass any messages between them
+   
+      subcommands
 
-  ```
-  kurtosis run github.com/hugobyte/dive '{"action":"start_nodes","nodes":["icon","eth"]}' --enclave <Name>
-  ```
+      - `btp` : Starts BTP bridge between Chain A and Chain B
+  
+2. `./dive chain` : 
+   
+   For building, initialising and starting a specified blockchain node. By executing this command the node is launched by enabling the network participation and ledger maintenance within the specified blockchain ecosystem
 
-- Example for running two chains wth relay
+      subcommands
 
-  With Bridge True
+    - `eth` : Build, initialise and start a eth node.
+    - `hardhat`: Build, initialise and start a hardhat node.
+    - `icon`: Build, initialise and start a icon node.
 
-  ```
-  kurtosis run github.com/hugobyte/dive '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "eth"},"bridge":"true"}}' --enclave <Name>
-  ```
 
-  With Bridge False
-
-  ```
-  kurtosis run github.com/hugobyte/dive '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "eth"},"bridge":"false"}}' --enclave <Name>
-  ```
-
-  _Note :_ The `bridge` should be false for Icon to Icon
+3. `./dive clean`: 
+   
+   For cleaning the kurtosis enclave
+   
+4. `./dive discord`:
+   
+    Redirect to the DIVE discord channel
+   
+5. `./dive tutorial`: 
+  
+   Redirect to the DIVE youtube channel
+   
+6. `./dive version`: 
+  
+   For getting the current version of the CLI
 
 ### Testing
 
