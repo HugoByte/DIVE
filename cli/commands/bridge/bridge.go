@@ -18,11 +18,6 @@ var (
 	chainB string
 )
 
-const (
-	genesisIcon0 = "../services/jvm/icon/static-files/config/genesis-icon-0.zip"
-	genesisIcon1 = "../services/jvm/icon/static-files/config/genesis-icon-1.zip"
-)
-
 func NewBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
 	var bridgeCmd = &cobra.Command{

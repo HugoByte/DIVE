@@ -67,8 +67,9 @@ func (sc *IconServiceConfig) EncodeToString() (string, error) {
 func NewIconCmd(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext) *cobra.Command {
 	var iconCmd = &cobra.Command{
 		Use:   "icon",
-		Short: "Runs Icon Node",
-		Long:  ``,
+		Short: "Build, initialize and start a icon node.",
+		Long: `The command starts an Icon node, initiating the process of setting up and launching a local Icon network. It establishes a connection to the Icon
+network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
 			decentralisation, _ := cmd.Flags().GetBool("decentralisation")
@@ -126,8 +127,8 @@ func IconDecentralisationCmd(ctx context.Context, kurtosisEnclaveContext *enclav
 
 	var decentralisationCmd = &cobra.Command{
 		Use:   "decentralize",
-		Short: "Decentralise Icon Node",
-		Long:  ``,
+		Short: "Decentralise already running Icon Node",
+		Long:  `Decentralise Icon Node is necessary if you want to connect your local icon node to BTP network`,
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println("Decentralisation")
 
