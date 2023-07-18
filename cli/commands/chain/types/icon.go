@@ -101,6 +101,7 @@ network and allows the node in executing smart contracts and maintaining the dec
 
 				params := GetDecentralizeParms(nodeResponse.ServiceName, nodeResponse.PrivateEndpoint, nodeResponse.KeystorePath, nodeResponse.KeyPassword, nodeResponse.NetworkId)
 
+				diveContext.SetSpinnerMessage("Starting Decentralisation")
 				response, err := Decentralisation(diveContext, params)
 
 				if err != nil {
@@ -109,17 +110,28 @@ network and allows the node in executing smart contracts and maintaining the dec
 
 				diveContext.Info(response)
 
-				nodeResponse.WriteDiveResponse(diveContext)
+				err = nodeResponse.WriteDiveResponse(diveContext)
+
+				if err != nil {
+					diveContext.FatalError("Failed To Write To File", err.Error())
+				}
+
+				diveContext.StopSpinner("Icon Node Started")
 
 			} else {
 
-				data, err := RunIconNode(diveContext, serviceConfig, genesis)
+				nodeResponse, err := RunIconNode(diveContext, serviceConfig, genesis)
 				if err != nil {
 					diveContext.FatalError("Run Icon Node Failed", err.Error())
 				}
 
-				data.WriteDiveResponse(diveContext)
+				err = nodeResponse.WriteDiveResponse(diveContext)
 
+				if err != nil {
+					diveContext.FatalError("Failed To Write To File", err.Error())
+				}
+
+				diveContext.StopSpinner("Icon Node Started")
 			}
 
 		},
@@ -153,7 +165,7 @@ func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 				diveContext.FatalError("Icon Node Decentralisation Failed", err.Error())
 			}
 
-			diveContext.Info(response)
+			diveContext.StopSpinner(fmt.Sprintln("Decentralisation Completed ", response))
 		},
 	}
 	decentralisationCmd.Flags().StringVarP(&serviceName, "serviceName", "s", "", "service name")
@@ -173,7 +185,7 @@ func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 }
 
 func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConfig, genesisFilePath string) (*common.DiveserviceResponse, error) {
-
+	diveContext.StartSpinner(" Starting Icon Node")
 	paramData, err := serviceConfig.EncodeToString()
 	if err != nil {
 		return nil, err
@@ -191,7 +203,7 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 		return nil, err
 	}
 
-	responseData := common.GetSerializedData(data)
+	responseData := diveContext.GetSerializedData(data)
 	var genesisFile = ""
 	var uploadedFiles = ""
 	var genesisPath = ""
@@ -219,7 +231,9 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 		return nil, err
 	}
 
-	response := common.GetSerializedData(icon_data)
+	diveContext.SetSpinnerMessage("Finailsing Icon Node")
+
+	response := diveContext.GetSerializedData(icon_data)
 
 	iconResponseData := &common.DiveserviceResponse{}
 
@@ -234,6 +248,7 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 
 func Decentralisation(diveContext *common.DiveContext, params string) (string, error) {
 
+	diveContext.StartSpinner(" Starting Icon Node Decentralisation")
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {
@@ -246,7 +261,7 @@ func Decentralisation(diveContext *common.DiveContext, params string) (string, e
 		return "", err
 	}
 
-	response := common.GetSerializedData(data)
+	response := diveContext.GetSerializedData(data)
 
 	return response, nil
 
