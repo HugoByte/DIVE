@@ -1,5 +1,5 @@
 ICON_NODE_CLIENT = struct(
-    node_image = "iconloop/goloop-icon:v1.3.7",
+    node_image = "iconloop/goloop-icon:v1.3.8",
     config_files_directory = "/goloop/config/",
     contracts_directory = "/goloop/contracts/",
     keystore_directory = "/goloop/keystores/",

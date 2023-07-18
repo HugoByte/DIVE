@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"os"
-
 	"github.com/hugobyte/dive/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
@@ -35,7 +33,7 @@ type IconServiceConfig struct {
 	Cid              string `json:"cid"`
 }
 
-func (sc *IconServiceConfig) defaultServiceConfig() {
+func (sc *IconServiceConfig) GetDefaultConfigIconNode0() {
 
 	sc.Id = "0"
 	sc.Port = 9080
@@ -43,6 +41,18 @@ func (sc *IconServiceConfig) defaultServiceConfig() {
 	sc.P2PListenAddress = "7080"
 	sc.P2PAddress = "8080"
 	sc.Cid = "0xacbc4e"
+
+}
+
+func (sc *IconServiceConfig) GetDefaultConfigIconNode1() {
+
+	sc.Id = "1"
+	sc.Port = 9081
+	sc.PublicPort = 8091
+	sc.P2PListenAddress = "7081"
+	sc.P2PAddress = "8081"
+	sc.Cid = "0x42f1f3"
+
 }
 
 func (sc *IconServiceConfig) EncodeToString() (string, error) {
@@ -67,11 +77,11 @@ network and allows the node in executing smart contracts and maintaining the dec
 			serviceConfig := &IconServiceConfig{}
 
 			if configFilePath == "" {
-				serviceConfig.defaultServiceConfig()
+				serviceConfig.GetDefaultConfigIconNode0()
 			} else {
-				data, err := readConfigFile(configFilePath)
+				data, err := common.ReadConfigFile(configFilePath)
 				if err != nil {
-					serviceConfig.defaultServiceConfig()
+					serviceConfig.GetDefaultConfigIconNode0()
 				}
 
 				err = json.Unmarshal(data, serviceConfig)
@@ -84,15 +94,15 @@ network and allows the node in executing smart contracts and maintaining the dec
 
 			if decentralisation {
 
-				data := runIconNode(ctx, kurtosisEnclaveContext, serviceConfig)
+				data := RunIconNode(ctx, kurtosisEnclaveContext, serviceConfig, genesis)
 
-				params := getDecentralizeParms(data.ServiceName, data.PrivateEndpoint, data.KeystorePath, data.KeyPassword, data.NetworkId)
+				params := GetDecentralizeParms(data.ServiceName, data.PrivateEndpoint, data.KeystorePath, data.KeyPassword, data.NetworkId)
 
 				Decentralisation(ctx, kurtosisEnclaveContext, params)
 
 			} else {
 
-				data := runIconNode(ctx, kurtosisEnclaveContext, serviceConfig)
+				data := RunIconNode(ctx, kurtosisEnclaveContext, serviceConfig, genesis)
 
 				fmt.Println(data.EncodeToString())
 
@@ -122,7 +132,7 @@ func IconDecentralisationCmd(ctx context.Context, kurtosisEnclaveContext *enclav
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println("Decentralisation")
 
-			params := getDecentralizeParms(serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID)
+			params := GetDecentralizeParms(serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID)
 
 			Decentralisation(ctx, kurtosisEnclaveContext, params)
 
@@ -144,7 +154,7 @@ func IconDecentralisationCmd(ctx context.Context, kurtosisEnclaveContext *enclav
 
 }
 
-func runIconNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext, serviceConfig *IconServiceConfig) *common.DiveserviceResponse {
+func RunIconNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext, serviceConfig *IconServiceConfig, genesisFilePath string) *common.DiveserviceResponse {
 
 	paramData, err := serviceConfig.EncodeToString()
 	if err != nil {
@@ -159,16 +169,17 @@ func runIconNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveCo
 
 	responseData := common.GetSerializedData(data)
 
-	genesis_file_name := filepath.Base(genesis)
-	r, d, err := kurtosisEnclaveContext.UploadFiles(genesis, genesis_file_name)
+	genesis_file_name := filepath.Base(genesisFilePath)
+	r, d, err := kurtosisEnclaveContext.UploadFiles(genesisFilePath, genesis_file_name)
 
 	if err != nil {
 		panic(err)
 	}
 
 	logrus.Infof("File Uploaded sucessfully : UUID %s", r)
+	uploadedFiles := fmt.Sprintf(`{"file_path":"%s","file_name":"%s"}`, d, genesis_file_name)
 
-	params := fmt.Sprintf(`{"service_config":%s,"id":"%s","start_file_name":"start-icon.sh","genesis_file_path":"%s","genesis_file_name":"%s"}`, responseData, serviceConfig.Id, d, genesis_file_name)
+	params := fmt.Sprintf(`{"service_config":%s,"id":"%s","uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, responseData, serviceConfig.Id, uploadedFiles, "", "")
 	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(ctx, "../", "services/jvm/icon/src/node-setup/start_icon_node.star", "start_icon_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
@@ -201,19 +212,8 @@ func Decentralisation(ctx context.Context, kurtosisEnclaveContext *enclaves.Encl
 
 }
 
-func getDecentralizeParms(serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID string) string {
+func GetDecentralizeParms(serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID string) string {
 
 	return fmt.Sprintf(`{"args":{"service_name":"%s","endpoint":"%s","keystore_path":"%s","keypassword":"%s","nid":"%s"}}`, serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID)
 
-}
-
-func readConfigFile(filePath string) ([]byte, error) {
-
-	file, err := os.ReadFile(filePath)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return file, nil
 }

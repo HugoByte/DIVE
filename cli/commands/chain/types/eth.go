@@ -19,7 +19,7 @@ func NewEthCmd(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveCont
 network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			fmt.Println(runEthNode(ctx, kurtosisEnclaveContext).EncodeToString())
+			fmt.Println(RunEthNode(ctx, kurtosisEnclaveContext).EncodeToString())
 		},
 	}
 
@@ -27,7 +27,7 @@ network and allows the node in executing smart contracts and maintaining the dec
 
 }
 
-func runEthNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext) *common.DiveserviceResponse {
+func RunEthNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext) *common.DiveserviceResponse {
 
 	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(ctx, "../", "services/evm/eth/eth.star", "start_eth_node_serivce", `{"args":{},"node_type":"eth"}`, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
