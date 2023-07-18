@@ -1,16 +1,12 @@
 package types
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/hugobyte/dive/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/spf13/cobra"
 )
 
-func NewEthCmd(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext) *cobra.Command {
+func NewEthCmd(diveContext *common.DiveContext) *cobra.Command {
 
 	var ethCmd = &cobra.Command{
 		Use:   "eth",
@@ -19,7 +15,12 @@ func NewEthCmd(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveCont
 network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			fmt.Println(RunEthNode(ctx, kurtosisEnclaveContext).EncodeToString())
+			data, err := RunEthNode(diveContext)
+
+			if err != nil {
+				diveContext.FatalError("Fail to Start ETH Node", err.Error())
+			}
+			data.WriteDiveResponse(diveContext)
 		},
 	}
 
@@ -27,12 +28,18 @@ network and allows the node in executing smart contracts and maintaining the dec
 
 }
 
-func RunEthNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext) *common.DiveserviceResponse {
+func RunEthNode(diveContext *common.DiveContext) (*common.DiveserviceResponse, error) {
 
-	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(ctx, "../", "services/evm/eth/eth.star", "start_eth_node_serivce", `{"args":{},"node_type":"eth"}`, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
+	}
+
+	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(diveContext.Ctx, "../", "services/evm/eth/src/node-setup/start-eth-node.star", "start_eth_node", `{"args":{}}`, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+
+	if err != nil {
+		return nil, err
 	}
 
 	responseData := common.GetSerializedData(data)
@@ -42,9 +49,9 @@ func RunEthNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveCon
 	result, err := ethResponseData.Decode([]byte(responseData))
 
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 
-	return result
+	return result, nil
 
 }

@@ -24,15 +24,9 @@ processing, and ledger maintenance within the specified blockchain ecosystem.`,
 		},
 	}
 
-	enclaveCtx, err := diveContext.GetEnclaveContext()
-	if err != nil {
-		panic(err)
-
-	}
-
-	chainCmd.AddCommand(types.NewIconCmd(diveContext.Ctx, enclaveCtx))
-	chainCmd.AddCommand(types.NewEthCmd(diveContext.Ctx, enclaveCtx))
-	chainCmd.AddCommand(types.NewHardhatCmd(diveContext.Ctx, enclaveCtx))
+	chainCmd.AddCommand(types.NewIconCmd(diveContext))
+	chainCmd.AddCommand(types.NewEthCmd(diveContext))
+	chainCmd.AddCommand(types.NewHardhatCmd(diveContext))
 
 	return chainCmd
 

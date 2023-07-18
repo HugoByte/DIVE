@@ -10,6 +10,7 @@ import (
 
 	"github.com/hugobyte/dive/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -38,14 +39,14 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
 	var btpbridgeCmd = &cobra.Command{
 		Use:   "btp",
-		Short: "",
+		Short: "Starts Bridge BTP between ChainA and Chain B",
 		Long:  `.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
 			enclaveCtx, err := diveContext.GetEnclaveContext()
-			if err != nil {
-				panic(err)
 
+			if err != nil {
+				logrus.Errorln(err)
 			}
 
 			bridge, _ := cmd.Flags().GetBool("bridge")
@@ -77,7 +78,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
 	btpbridgeCmd.Flags().StringVar(&chainA, "chainA", "", "specify chain A")
 	btpbridgeCmd.Flags().StringVar(&chainB, "chainB", "", "specify chain B")
-	btpbridgeCmd.Flags().Bool("bridge", false, "sepcify bridge falg")
+	btpbridgeCmd.Flags().Bool("bridge", false, "sepcify bridge flag")
 
 	btpbridgeCmd.MarkFlagRequired("chainA")
 	btpbridgeCmd.MarkFlagRequired("chainB")

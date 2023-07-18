@@ -1,17 +1,17 @@
 package types
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"path/filepath"
 
 	"github.com/hugobyte/dive/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
+
+const genesisIcon = "github.com/hugobyte/dive/services/jvm/icon/static-files/config/genesis-icon-0.zip"
 
 var (
 	id               = ""
@@ -64,7 +64,7 @@ func (sc *IconServiceConfig) EncodeToString() (string, error) {
 	return string(encodedBytes), nil
 }
 
-func NewIconCmd(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext) *cobra.Command {
+func NewIconCmd(diveContext *common.DiveContext) *cobra.Command {
 	var iconCmd = &cobra.Command{
 		Use:   "icon",
 		Short: "Build, initialize and start a icon node.",
@@ -94,17 +94,19 @@ network and allows the node in executing smart contracts and maintaining the dec
 
 			if decentralisation {
 
-				data := RunIconNode(ctx, kurtosisEnclaveContext, serviceConfig, genesis)
+				data := RunIconNode(diveContext, serviceConfig, genesis)
 
 				params := GetDecentralizeParms(data.ServiceName, data.PrivateEndpoint, data.KeystorePath, data.KeyPassword, data.NetworkId)
 
-				Decentralisation(ctx, kurtosisEnclaveContext, params)
+				Decentralisation(diveContext, params)
+
+				data.WriteDiveResponse(diveContext)
 
 			} else {
 
-				data := RunIconNode(ctx, kurtosisEnclaveContext, serviceConfig, genesis)
+				data := RunIconNode(diveContext, serviceConfig, genesis)
 
-				fmt.Println(data.EncodeToString())
+				data.WriteDiveResponse(diveContext)
 
 			}
 
@@ -116,14 +118,14 @@ network and allows the node in executing smart contracts and maintaining the dec
 	iconCmd.Flags().StringVarP(&configFilePath, "config", "c", "", "gen file")
 	iconCmd.Flags().BoolP("decentralisation", "d", false, "Decentralise Icon Node")
 
-	decentralisationCmd := IconDecentralisationCmd(ctx, kurtosisEnclaveContext)
+	decentralisationCmd := IconDecentralisationCmd(diveContext)
 
 	iconCmd.AddCommand(decentralisationCmd)
 
 	return iconCmd
 }
 
-func IconDecentralisationCmd(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext) *cobra.Command {
+func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 
 	var decentralisationCmd = &cobra.Command{
 		Use:   "decentralize",
@@ -134,7 +136,7 @@ func IconDecentralisationCmd(ctx context.Context, kurtosisEnclaveContext *enclav
 
 			params := GetDecentralizeParms(serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID)
 
-			Decentralisation(ctx, kurtosisEnclaveContext, params)
+			Decentralisation(diveContext, params)
 
 		},
 	}
@@ -154,33 +156,48 @@ func IconDecentralisationCmd(ctx context.Context, kurtosisEnclaveContext *enclav
 
 }
 
-func RunIconNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext, serviceConfig *IconServiceConfig, genesisFilePath string) *common.DiveserviceResponse {
+func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConfig, genesisFilePath string) *common.DiveserviceResponse {
 
 	paramData, err := serviceConfig.EncodeToString()
 	if err != nil {
 		logrus.Fatalln(err)
 	}
 
-	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(ctx, "../", "services/jvm/icon/src/node-setup/start_icon_node.star", "get_service_config", paramData, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
+
+	if err != nil {
+		logrus.Errorf("Failed to fetch Enclave details :%s", err)
+	}
+
+	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(diveContext.Ctx, "../", "services/jvm/icon/src/node-setup/start_icon_node.star", "get_service_config", paramData, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	responseData := common.GetSerializedData(data)
+	var genesisFile = ""
+	var uploadedFiles = ""
+	var genesisPath = ""
 
-	genesis_file_name := filepath.Base(genesisFilePath)
-	r, d, err := kurtosisEnclaveContext.UploadFiles(genesisFilePath, genesis_file_name)
+	if genesisFilePath != "" {
+		genesisFileName := filepath.Base(genesisFilePath)
+		r, d, err := kurtosisEnclaveContext.UploadFiles(genesisFilePath, genesisFileName)
+		logrus.Infof("File Uploaded sucessfully : UUID %s", r)
+		uploadedFiles = fmt.Sprintf(`{"file_path":"%s","file_name":"%s"}`, d, genesisFileName)
 
-	if err != nil {
-		panic(err)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		genesisFile = filepath.Base(genesisIcon)
+		genesisPath = genesisIcon
+		uploadedFiles = `{}`
+
 	}
 
-	logrus.Infof("File Uploaded sucessfully : UUID %s", r)
-	uploadedFiles := fmt.Sprintf(`{"file_path":"%s","file_name":"%s"}`, d, genesis_file_name)
-
-	params := fmt.Sprintf(`{"service_config":%s,"id":"%s","uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, responseData, serviceConfig.Id, uploadedFiles, "", "")
-	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(ctx, "../", "services/jvm/icon/src/node-setup/start_icon_node.star", "start_icon_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	params := fmt.Sprintf(`{"service_config":%s,"id":"%s","uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, responseData, serviceConfig.Id, uploadedFiles, genesisPath, genesisFile)
+	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(diveContext.Ctx, "../", "services/jvm/icon/src/node-setup/start_icon_node.star", "start_icon_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
 		fmt.Println(err)
@@ -199,8 +216,15 @@ func RunIconNode(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveCo
 	return result
 }
 
-func Decentralisation(ctx context.Context, kurtosisEnclaveContext *enclaves.EnclaveContext, params string) {
-	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(ctx, "../", "services/jvm/icon/src/node-setup/setup_icon_node.star", "configure_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+func Decentralisation(diveContext *common.DiveContext, params string) {
+
+	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
+
+	if err != nil {
+		logrus.Errorf("Failed to fetch Enclave details :%s", err)
+	}
+
+	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(diveContext.Ctx, "../", "services/jvm/icon/src/node-setup/setup_icon_node.star", "configure_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
 		fmt.Println(err)

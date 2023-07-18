@@ -4,6 +4,8 @@ const (
 	DiveEnclave           = "dive"
 	DiveRemotePackagePath = "github.com/hugobyte/dive"
 	DiveLocalPackagePath  = "../"
+	DiveJVMPath           = "services/jvm/"
+	DiveEthPath           = ""
 )
 
 const (

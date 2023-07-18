@@ -45,11 +45,12 @@ func init() {
 
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.CompletionOptions.DisableNoDescFlag = true
+	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
 
-	rootCmd.AddCommand(version.VersionCmd)
 	rootCmd.AddCommand(chain.NewChainCmd(diveContext))
 	rootCmd.AddCommand(bridge.NewBridgeCmd(diveContext))
-	rootCmd.AddCommand(clean.CleanCmd)
+	rootCmd.AddCommand(clean.NewCleanCmd(diveContext))
+	rootCmd.AddCommand(version.VersionCmd)
 	rootCmd.AddCommand(discord.DiscordCmd)
 	rootCmd.AddCommand(twitter.TwitterCmd)
 	rootCmd.AddCommand(tutorial.TutorialCmd)

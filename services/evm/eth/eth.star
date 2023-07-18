@@ -10,8 +10,8 @@ def start_eth_node_serivce(plan,args,node_type):
                 "nid" : node_service_data.nid,
                 "network" : node_service_data.network,
                 "network_name": node_service_data.network_name,
-                "endpoint": "http://%s" % node_service_data.endpoint ,
-                "endpoint_public": "http://%s" % node_service_data.endpoint_public ,
+                "endpoint":  node_service_data.endpoint ,
+                "endpoint_public": node_service_data.endpoint_public ,
                 "keystore_path" : node_service_data.keystore_path,
                 "keypassword": node_service_data.keypassword
             }
