@@ -7,7 +7,9 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/google/go-github/github"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
@@ -43,18 +45,18 @@ func (dive *DiveserviceResponse) EncodeToString() (string, error) {
 
 	return string(encodedBytes), nil
 }
-func (dive *DiveserviceResponse) WriteDiveResponse(diveContext *DiveContext) {
+func (dive *DiveserviceResponse) WriteDiveResponse(diveContext *DiveContext) error {
 
 	serialisedData, err := dive.EncodeToString()
 
 	if err != nil {
-		diveContext.FatalError("Failed To Serialzed Data", err.Error())
+		return err
 	}
 
-	WriteToFile(serialisedData)
+	return WriteToFile(serialisedData)
 }
 
-func GetSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) string {
+func (diveContext *DiveContext) GetSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) string {
 
 	var serializedOutputObj string
 
@@ -63,11 +65,11 @@ func GetSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRun
 		runFinishedEvent := executionResponseLine.GetRunFinishedEvent()
 
 		if runFinishedEvent == nil {
-
+			diveContext.spinner.Color("blue")
+			diveContext.spinner.Suffix = " Execution in Progress"
 		} else {
 
 			if runFinishedEvent.GetIsRunSuccessful() {
-
 				serializedOutputObj = runFinishedEvent.GetSerializedOutput()
 			} else {
 				logrus.Fatal("Starlark run Fails")
@@ -121,23 +123,26 @@ type DiveContext struct {
 	Ctx             context.Context
 	KurtosisContext *kurtosis_context.KurtosisContext
 	log             *logrus.Logger
+	spinner         *spinner.Spinner
 }
 
 func NewDiveContext() *DiveContext {
 
 	ctx := context.Background()
-
-	kurtosisContext, err := kurtosis_context.NewKurtosisContextFromLocalEngine()
-	if err != nil {
-		logrus.Fatal("The Kurtosis Engine Server is unavailable and is probably not running; you will need to start it using the Kurtosis CLI before you can create a connection to it")
-
-	}
 	log := logrus.New()
 	log.SetFormatter(&logrus.TextFormatter{
 		FullTimestamp:   true,
 		TimestampFormat: "2006-01-02 15:04:05",
 	})
-	return &DiveContext{Ctx: ctx, KurtosisContext: kurtosisContext, log: logrus.New()}
+
+	kurtosisContext, err := kurtosis_context.NewKurtosisContextFromLocalEngine()
+	if err != nil {
+		log.Fatal("The Kurtosis Engine Server is unavailable and is probably not running; you will need to start it using the Kurtosis CLI before you can create a connection to it")
+
+	}
+	spinner := spinner.New(spinner.CharSets[80], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
+
+	return &DiveContext{Ctx: ctx, KurtosisContext: kurtosisContext, log: log, spinner: spinner}
 }
 
 func (diveContext *DiveContext) GetEnclaveContext() (*enclaves.EnclaveContext, error) {
@@ -169,14 +174,20 @@ func ReadConfigFile(filePath string) ([]byte, error) {
 
 	return file, nil
 }
-func WriteToFile(data string) {
+func WriteToFile(data string) error {
 	file, err := os.Create("dive.json")
 	if err != nil {
-		return
+		return err
 	}
 	defer file.Close()
 
-	file.WriteString(data)
+	_, err = file.WriteString(data)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // To get names of running enclaves, returns empty string if no enclaves
@@ -196,17 +207,17 @@ func (diveContext *DiveContext) GetEnclaves() string {
 
 // Funstionality to clean the enclaves
 func (diveContext *DiveContext) Clean() {
-	logrus.Info("Successfully connected to kurtosis engine...")
-	logrus.Info("Initializing cleaning process...")
+	diveContext.log.Info("Successfully connected to kurtosis engine...")
+	diveContext.log.Info("Initializing cleaning process...")
 
 	// shouldCleanAll set to true as default for beta release.
 	enclaves, err := diveContext.KurtosisContext.Clean(diveContext.Ctx, true)
 	if err != nil {
-		logrus.Errorf("Failed cleaning with error: %v", err)
+		diveContext.log.Errorf("Failed cleaning with error: %v", err)
 	}
 
 	// Assuming only one enclave is running for beta release
-	logrus.Infof("Successfully destroyed and cleaned enclave %s", enclaves[0].Name)
+	diveContext.log.Infof("Successfully destroyed and cleaned enclave %s", enclaves[0].Name)
 }
 
 func (diveContext *DiveContext) FatalError(message, err string) {
@@ -216,5 +227,26 @@ func (diveContext *DiveContext) FatalError(message, err string) {
 
 func (diveContext *DiveContext) Info(message string) {
 
-	diveContext.log.Info(message)
+	diveContext.log.Infoln(message)
+}
+
+func (diveContext *DiveContext) StartSpinner(message string) {
+
+	diveContext.spinner.Suffix = message
+	diveContext.spinner.Color("green")
+
+	diveContext.spinner.Start()
+}
+
+func (diveContext *DiveContext) SetSpinnerMessage(message string) {
+
+	diveContext.spinner.Suffix = message
+}
+
+func (diveContext *DiveContext) StopSpinner(message string) {
+
+	diveContext.spinner.Color("bgCyan")
+	diveContext.spinner.FinalMSG = fmt.Sprintln(message)
+	diveContext.spinner.Stop()
+
 }
