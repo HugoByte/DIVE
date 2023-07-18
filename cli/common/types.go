@@ -16,18 +16,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	linuxOSName   = "linux"
-	macOSName     = "darwin"
-	windowsOSName = "windows"
-
-	openFileLinuxCommandName   = "xdg-open"
-	openFileMacCommandName     = "open"
-	openFileWindowsCommandName = "rundll32"
-
-	openFileWindowsCommandFirstArgumentDefault = "url.dll,FileProtocolHandler"
-)
-
 type DiveserviceResponse struct {
 	ServiceName     string `json:"service_name"`
 	PublicEndpoint  string `json:"endpoint_public"`
@@ -224,4 +212,9 @@ func (diveContext *DiveContext) Clean() {
 func (diveContext *DiveContext) FatalError(message, err string) {
 
 	diveContext.log.Fatalf("%s : %s", message, err)
+}
+
+func (diveContext *DiveContext) Info(message string) {
+
+	diveContext.log.Info(message)
 }

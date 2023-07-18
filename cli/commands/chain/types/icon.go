@@ -94,17 +94,29 @@ network and allows the node in executing smart contracts and maintaining the dec
 
 			if decentralisation {
 
-				data := RunIconNode(diveContext, serviceConfig, genesis)
+				nodeResponse, err := RunIconNode(diveContext, serviceConfig, genesis)
+				if err != nil {
+					diveContext.FatalError("Run Icon Node Failed", err.Error())
+				}
 
-				params := GetDecentralizeParms(data.ServiceName, data.PrivateEndpoint, data.KeystorePath, data.KeyPassword, data.NetworkId)
+				params := GetDecentralizeParms(nodeResponse.ServiceName, nodeResponse.PrivateEndpoint, nodeResponse.KeystorePath, nodeResponse.KeyPassword, nodeResponse.NetworkId)
 
-				Decentralisation(diveContext, params)
+				response, err := Decentralisation(diveContext, params)
 
-				data.WriteDiveResponse(diveContext)
+				if err != nil {
+					diveContext.FatalError("Icon Node Decentralisation Failed", err.Error())
+				}
+
+				diveContext.Info(response)
+
+				nodeResponse.WriteDiveResponse(diveContext)
 
 			} else {
 
-				data := RunIconNode(diveContext, serviceConfig, genesis)
+				data, err := RunIconNode(diveContext, serviceConfig, genesis)
+				if err != nil {
+					diveContext.FatalError("Run Icon Node Failed", err.Error())
+				}
 
 				data.WriteDiveResponse(diveContext)
 
@@ -132,12 +144,16 @@ func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 		Short: "Decentralise already running Icon Node",
 		Long:  `Decentralise Icon Node is necessary if you want to connect your local icon node to BTP network`,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Decentralisation")
 
 			params := GetDecentralizeParms(serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID)
 
-			Decentralisation(diveContext, params)
+			response, err := Decentralisation(diveContext, params)
 
+			if err != nil {
+				diveContext.FatalError("Icon Node Decentralisation Failed", err.Error())
+			}
+
+			diveContext.Info(response)
 		},
 	}
 	decentralisationCmd.Flags().StringVarP(&serviceName, "serviceName", "s", "", "service name")
@@ -156,23 +172,23 @@ func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 
 }
 
-func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConfig, genesisFilePath string) *common.DiveserviceResponse {
+func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConfig, genesisFilePath string) (*common.DiveserviceResponse, error) {
 
 	paramData, err := serviceConfig.EncodeToString()
 	if err != nil {
-		logrus.Fatalln(err)
+		return nil, err
 	}
 
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {
-		logrus.Errorf("Failed to fetch Enclave details :%s", err)
+		return nil, err
 	}
 
-	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(diveContext.Ctx, "../", "services/jvm/icon/src/node-setup/start_icon_node.star", "get_service_config", paramData, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveIconNodeScript, "get_service_config", paramData, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 
 	responseData := common.GetSerializedData(data)
@@ -187,7 +203,7 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 		uploadedFiles = fmt.Sprintf(`{"file_path":"%s","file_name":"%s"}`, d, genesisFileName)
 
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 	} else {
 		genesisFile = filepath.Base(genesisIcon)
@@ -197,10 +213,10 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 	}
 
 	params := fmt.Sprintf(`{"service_config":%s,"id":"%s","uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, responseData, serviceConfig.Id, uploadedFiles, genesisPath, genesisFile)
-	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(diveContext.Ctx, "../", "services/jvm/icon/src/node-setup/start_icon_node.star", "start_icon_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveIconNodeScript, "start_icon_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 
 	response := common.GetSerializedData(icon_data)
@@ -210,29 +226,29 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 	result, err := iconResponseData.Decode([]byte(response))
 
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 
-	return result
+	return result, nil
 }
 
-func Decentralisation(diveContext *common.DiveContext, params string) {
+func Decentralisation(diveContext *common.DiveContext, params string) (string, error) {
 
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {
-		logrus.Errorf("Failed to fetch Enclave details :%s", err)
+		return "", err
 	}
 
-	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(diveContext.Ctx, "../", "services/jvm/icon/src/node-setup/setup_icon_node.star", "configure_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveIconDecentraliseScript, "configure_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
-		fmt.Println(err)
+		return "", err
 	}
 
 	response := common.GetSerializedData(data)
 
-	fmt.Println(response)
+	return response, nil
 
 }
 

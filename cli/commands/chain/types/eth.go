@@ -36,7 +36,7 @@ func RunEthNode(diveContext *common.DiveContext) (*common.DiveserviceResponse, e
 		return nil, err
 	}
 
-	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(diveContext.Ctx, "../", "services/evm/eth/src/node-setup/start-eth-node.star", "start_eth_node", `{"args":{}}`, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveEthHardhatNodeScript, "start_eth_node", `{"args":{}}`, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
 		return nil, err
