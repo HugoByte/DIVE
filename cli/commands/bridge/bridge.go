@@ -62,16 +62,16 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 				if err != nil {
 					fmt.Println(err)
 				}
-				response := common.GetSerializedData(data)
+				response := diveContext.GetSerializedData(data)
 
 				common.WriteToFile(response)
 			} else {
-				data, _, err := enclaveCtx.RunStarlarkPackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+				data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 				if err != nil {
 					fmt.Println(err)
 				}
-				response := common.GetSerializedData(data)
+				response := diveContext.GetSerializedData(data)
 
 				common.WriteToFile(response)
 			}

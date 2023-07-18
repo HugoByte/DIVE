@@ -20,8 +20,13 @@ network and allows the node in executing smart contracts and maintaining the dec
 			if err != nil {
 				diveContext.FatalError("Fail to Start Hardhat Node", err.Error())
 			}
+			diveContext.SetSpinnerMessage("Execution Completed")
 
-			data.WriteDiveResponse(diveContext)
+			err = data.WriteDiveResponse(diveContext)
+			if err != nil {
+				diveContext.FatalError("Failed To Write To File", err.Error())
+			}
+			diveContext.StopSpinner("Hardhat Node Started")
 		},
 	}
 
@@ -30,6 +35,8 @@ network and allows the node in executing smart contracts and maintaining the dec
 }
 
 func RunHardhatNode(diveContext *common.DiveContext) (*common.DiveserviceResponse, error) {
+
+	diveContext.StartSpinner(" Starting Hardhat Node")
 
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
@@ -43,7 +50,7 @@ func RunHardhatNode(diveContext *common.DiveContext) (*common.DiveserviceRespons
 		return nil, err
 	}
 
-	responseData := common.GetSerializedData(data)
+	responseData := diveContext.GetSerializedData(data)
 
 	hardhatResponseData := &common.DiveserviceResponse{}
 

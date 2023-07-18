@@ -20,7 +20,12 @@ network and allows the node in executing smart contracts and maintaining the dec
 			if err != nil {
 				diveContext.FatalError("Fail to Start ETH Node", err.Error())
 			}
-			data.WriteDiveResponse(diveContext)
+			diveContext.SetSpinnerMessage("Execution Completed")
+			err = data.WriteDiveResponse(diveContext)
+			if err != nil {
+				diveContext.FatalError("Failed To Write To File", err.Error())
+			}
+			diveContext.StopSpinner("Hardhat Node Started")
 		},
 	}
 
@@ -29,7 +34,7 @@ network and allows the node in executing smart contracts and maintaining the dec
 }
 
 func RunEthNode(diveContext *common.DiveContext) (*common.DiveserviceResponse, error) {
-
+	diveContext.StartSpinner(" Starting ETH Node")
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {
@@ -42,7 +47,7 @@ func RunEthNode(diveContext *common.DiveContext) (*common.DiveserviceResponse, e
 		return nil, err
 	}
 
-	responseData := common.GetSerializedData(data)
+	responseData := diveContext.GetSerializedData(data)
 
 	ethResponseData := &common.DiveserviceResponse{}
 
