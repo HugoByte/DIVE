@@ -27,7 +27,7 @@ It establishes a connection to the Ethereum network and allows the node in execu
 			if err != nil {
 				diveContext.FatalError("Failed To Write To File", err.Error())
 			}
-			diveContext.StopSpinner("ETH Node Started")
+			diveContext.StopSpinner("ETH Node Started. Please find service details in current working directory(dive.json)")
 		},
 	}
 
