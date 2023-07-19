@@ -37,44 +37,43 @@ Dive-cli is a command line tool that will be used for starting the chain and cro
 **Installing**
 
 ```
-brew install hugobyte/tap/dive
+brew install hugobyte/tap/dive-cli
 ```
 
 The available commands are -
 
-1. `bridge`: 
-  
-   For connecting the two different chains. This will create an relay to connect two different chains and pass any messages between them
-   
-      subcommands
+1. `bridge`:
 
-      - `btp` : Starts BTP bridge between Chain A and Chain B
-  
-2. `chain` : 
-   
+   For connecting the two different chains. This will create an relay to connect two different chains and pass any messages between them
+
+   subcommands
+
+   - `btp` : Starts BTP bridge between Chain A and Chain B
+
+2. `chain` :
+
    For building, initialising and starting a specified blockchain node. By executing this command the node will be launched by enabling the network participation and ledger maintenance within the specified blockchain ecosystem
 
-      subcommands
+   subcommands
 
-    - `eth` : Build, initialise and start a eth node.
-    - `hardhat`: Build, initialise and start a hardhat node.
-    - `icon`: Build, initialise and start a icon node.
+   - `eth` : Build, initialise and start a eth node.
+   - `hardhat`: Build, initialise and start a hardhat node.
+   - `icon`: Build, initialise and start a icon node.
 
+3. `clean`:
 
-3. `clean`: 
-   
    For cleaning the kurtosis enclave
-   
+
 4. `discord`:
-   
-    Redirect to the DIVE discord channel
-   
-5. `tutorial`: 
-  
+
+   Redirect to the DIVE discord channel
+
+5. `tutorial`:
+
    Redirect to the DIVE youtube channel
-   
-6. `version`: 
-  
+
+6. `version`:
+
    For getting the current version of the CLI
 
 **Example**
@@ -106,7 +105,7 @@ dive clean
 - For running the 2 chains
 
 ```
- dive chain icon -g <path of genesis.json> -c <path of config.json> -i <chain1_name> 
+ dive chain icon -g <path of genesis.json> -c <path of config.json> -i <chain1_name>
 ```
 
 ```
@@ -118,7 +117,7 @@ Find the example genesis here
 - [genesis-icon-0 file](./services/jvm/icon/static-files/config/genesis-icon-0.zip).
 - [genesis-icon-1 file](./services/jvm/icon/static-files/config/genesis-icon-1.zip).
 
-*NOTE :* `cid` will be changed based on the genesis file
+_NOTE :_ `cid` will be changed based on the genesis file
 
 ### Testing
 
