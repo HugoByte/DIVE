@@ -36,7 +36,7 @@ Dive-cli is a command line tool that will be used for starting the chain and cro
 
 The available commands are -
 
-1. `dive-cli bridge`: 
+1. `bridge`: 
   
    For connecting the two different chains. This will create an relay to connect two different chains and pass any messages between them
    
@@ -44,7 +44,7 @@ The available commands are -
 
       - `btp` : Starts BTP bridge between Chain A and Chain B
   
-2. `dive-cli chain` : 
+2. `chain` : 
    
    For building, initialising and starting a specified blockchain node. By executing this command the node will be launched by enabling the network participation and ledger maintenance within the specified blockchain ecosystem
 
@@ -55,19 +55,19 @@ The available commands are -
     - `icon`: Build, initialise and start a icon node.
 
 
-3. `dive-cli clean`: 
+3. `clean`: 
    
    For cleaning the kurtosis enclave
    
-4. `dive-cli discord`:
+4. `discord`:
    
     Redirect to the DIVE discord channel
    
-5. `dive-cli tutorial`: 
+5. `tutorial`: 
   
    Redirect to the DIVE youtube channel
    
-6. `dive-cli version`: 
+6. `version`: 
   
    For getting the current version of the CLI
 
