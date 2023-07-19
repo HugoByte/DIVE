@@ -36,16 +36,8 @@ Dive-cli is a command line tool that will be used for starting the chain and cro
 
 **Installing**
 
-For mac users
-
 ```
 brew install hugobyte/tap/dive
-```
-
-For windows users
-
-```
-wget 
 ```
 
 The available commands are -
