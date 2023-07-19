@@ -46,7 +46,7 @@ The available commands are -
   
 2. `dive chain` : 
    
-   For building, initialising and starting a specified blockchain node. By executing this command the node is launched by enabling the network participation and ledger maintenance within the specified blockchain ecosystem
+   For building, initialising and starting a specified blockchain node. By executing this command the node will be launched by enabling the network participation and ledger maintenance within the specified blockchain ecosystem
 
       subcommands
 
@@ -89,6 +89,12 @@ dive bridge btp --chainA icon --chainB icon
 
 ```
 dive bridge btp --chainA icon --chainB eth
+```
+
+- For cleaning the enclave
+
+```
+dive clean
 ```
 
 ### Testing
