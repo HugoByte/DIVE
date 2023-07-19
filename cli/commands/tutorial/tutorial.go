@@ -19,6 +19,7 @@ var TutorialCmd = &cobra.Command{
 directing users to a curated collection of tutorial videos specifically designed to guide and educate users about DIVE. The playlist 
 offers step-by-step instructions, tips, and demonstrations to help users better understand and utilize the features and functionalities of DIVE.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		common.ValidateCmdArgs(args, cmd.UsageString())
 		logrus.Info("Redirecting to YouTube...")
 		if err := common.OpenFile(tutorialURL); err != nil {
 			logrus.Errorf("Failed to open Dive YouTube chanel with error %v", err)

@@ -260,3 +260,10 @@ func (diveContext *DiveContext) GetSerializedData(response chan *kurtosis_core_r
 	return serializedOutputObj
 
 }
+
+func ValidateCmdArgs(args []string, cmd string) {
+	if len(args) != 0 {
+		logrus.Fatalf("Invalid Usage of command. Find cmd %s", cmd)
+
+	}
+}

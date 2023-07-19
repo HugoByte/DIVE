@@ -72,10 +72,7 @@ func NewIconCmd(diveContext *common.DiveContext) *cobra.Command {
 It establishes a connection to the Icon network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			if len(args) != 0 {
-				diveContext.FatalError("Invalid Usage of command. Find cmd", cmd.UsageString())
-
-			}
+			common.ValidateCmdArgs(args, cmd.UsageString())
 
 			decentralisation, _ := cmd.Flags().GetBool("decentralisation")
 
