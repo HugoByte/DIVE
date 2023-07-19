@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const diveURL = "https://discord.gg/tgbKGsGE"
+const diveURL = "https://discord.gg/2rH5B7Ck9P"
 
 // discordCmd redirects users to DIVE discord channel
 var DiscordCmd = &cobra.Command{
