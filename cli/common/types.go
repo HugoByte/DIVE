@@ -197,7 +197,6 @@ func (diveContext *DiveContext) GetEnclaves() string {
 func (diveContext *DiveContext) Clean() {
 	diveContext.log.Info("Successfully connected to kurtosis engine...")
 	diveContext.log.Info("Initializing cleaning process...")
-
 	// shouldCleanAll set to true as default for beta release.
 	enclaves, err := diveContext.KurtosisContext.Clean(diveContext.Ctx, true)
 	if err != nil {
