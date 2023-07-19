@@ -36,7 +36,7 @@ archives:
 
 brews:
   # creates a brew formula representing the latest version
-  - name: dive-cli
+  - name: dive
     tap:
       owner: hugobyte
       name: homebrew-tap
@@ -54,7 +54,7 @@ brews:
       bin.install "dive"
 
   # creates a versioned brew formula, enabling installation of specific versions of kurtosis cli
-  - name: dive-cli@{{ .Tag }}
+  - name: dive@{{ .Tag }}
     tap:
       owner: hugobyte
       name: homebrew-tap
