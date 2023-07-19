@@ -119,7 +119,7 @@ It establishes a connection to the Icon network and allows the node in executing
 					diveContext.FatalError("Failed To Write To File", err.Error())
 				}
 
-				diveContext.StopSpinner("Icon Node Started")
+				diveContext.StopSpinner("Icon Node Started. Please find service details in current working directory(dive.json) in current working directory")
 
 			} else {
 
@@ -134,7 +134,7 @@ It establishes a connection to the Icon network and allows the node in executing
 					diveContext.FatalError("Failed To Write To File", err.Error())
 				}
 
-				diveContext.StopSpinner("Icon Node Started")
+				diveContext.StopSpinner("Icon Node Started. Please find service details in current working directory(dive.json)")
 			}
 
 		},
@@ -168,7 +168,7 @@ func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 				diveContext.FatalError("Icon Node Decentralisation Failed", err.Error())
 			}
 
-			diveContext.StopSpinner(fmt.Sprintln("Decentralisation Completed ", response))
+			diveContext.StopSpinner(fmt.Sprintln("Decentralisation Completed.Please find service details in dive.json", response))
 		},
 	}
 	decentralisationCmd.Flags().StringVarP(&serviceName, "serviceName", "s", "", "service name")
