@@ -54,6 +54,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 			if err != nil {
 				logrus.Errorln(err)
 			}
+			diveContext.StartSpinner(fmt.Sprintf(" Starting BTP Bridge for %s,%s", chainA, chainB))
 
 			bridge, _ := cmd.Flags().GetBool("bridge")
 
@@ -61,6 +62,8 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
 			if strings.ToLower(chainA) == "icon" && strings.ToLower(chainB) == "icon" {
 
+				diveContext.SetSpinnerMessage("Executing BTP Starlark Package")
+
 				data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 				if err != nil {
@@ -69,7 +72,10 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 				response := diveContext.GetSerializedData(data)
 
 				common.WriteToFile(response)
+
+				diveContext.SetSpinnerMessage(fmt.Sprintf("BTP Bridge Setup Completed between %s and %s", chainA, chainB))
 			} else {
+				diveContext.SetSpinnerMessage("Executing BTP Starlark Package")
 				data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 				if err != nil {
@@ -78,7 +84,10 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 				response := diveContext.GetSerializedData(data)
 
 				common.WriteToFile(response)
+				diveContext.SetSpinnerMessage(fmt.Sprintf("BTP Bridge Setup Completed between %s and %s", chainA, chainB))
 			}
+
+			diveContext.StopSpinner(" Execution Completed")
 		},
 	}
 

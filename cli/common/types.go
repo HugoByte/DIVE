@@ -7,9 +7,11 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/briandowns/spinner"
+	"github.com/fatih/color"
 	"github.com/google/go-github/github"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
@@ -54,35 +56,6 @@ func (dive *DiveserviceResponse) WriteDiveResponse(diveContext *DiveContext) err
 	}
 
 	return WriteToFile(serialisedData)
-}
-
-func (diveContext *DiveContext) GetSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) string {
-
-	var serializedOutputObj string
-
-	for executionResponseLine := range response {
-
-		runFinishedEvent := executionResponseLine.GetRunFinishedEvent()
-
-		if runFinishedEvent == nil {
-
-			diveContext.spinner.Color("blue")
-			diveContext.spinner.Suffix = " Execution in Progress"
-
-		} else {
-
-			if runFinishedEvent.GetIsRunSuccessful() {
-
-				serializedOutputObj = runFinishedEvent.GetSerializedOutput()
-
-			} else {
-				logrus.Fatal("Starlark run Fails")
-			}
-		}
-	}
-
-	return serializedOutputObj
-
 }
 
 func OpenFile(URL string) error {
@@ -248,9 +221,41 @@ func (diveContext *DiveContext) SetSpinnerMessage(message string) {
 }
 
 func (diveContext *DiveContext) StopSpinner(message string) {
-
-	diveContext.spinner.Color("bgCyan")
-	diveContext.spinner.FinalMSG = fmt.Sprintln(message)
+	c := color.New(color.FgCyan).Add(color.Underline)
+	diveContext.spinner.FinalMSG = c.Sprintln(message)
 	diveContext.spinner.Stop()
+
+}
+
+func (diveContext *DiveContext) GetSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) string {
+
+	var serializedOutputObj string
+
+	for executionResponseLine := range response {
+
+		runFinishedEvent := executionResponseLine.GetRunFinishedEvent()
+
+		if runFinishedEvent == nil {
+
+			diveContext.spinner.Color("blue")
+			if executionResponseLine.GetProgressInfo() != nil {
+				c := color.New(color.FgGreen)
+
+				diveContext.spinner.Suffix = c.Sprintf(strings.ReplaceAll(executionResponseLine.GetProgressInfo().String(), "current_step_info:", " "))
+
+			}
+		} else {
+
+			if runFinishedEvent.GetIsRunSuccessful() {
+
+				serializedOutputObj = runFinishedEvent.GetSerializedOutput()
+
+			} else {
+				logrus.Fatal("Starlark run Fails")
+			}
+		}
+	}
+
+	return serializedOutputObj
 
 }
