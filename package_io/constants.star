@@ -36,7 +36,7 @@ CONTRACT_DEPLOYMENT_SERVICE_ETHEREUM = struct(
 )
 
 ETH_NODE_CLIENT = struct(
-          service_name = "el-client-0",
+          service_name = "el-1-geth-lighthouse",
           network_name= "eth",
           network = "0x301824.eth",
           nid = "0x301824",

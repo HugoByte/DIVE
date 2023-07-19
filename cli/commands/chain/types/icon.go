@@ -68,9 +68,11 @@ func NewIconCmd(diveContext *common.DiveContext) *cobra.Command {
 	var iconCmd = &cobra.Command{
 		Use:   "icon",
 		Short: "Build, initialize and start a icon node.",
-		Long: `The command starts an Icon node, initiating the process of setting up and launching a local Icon network. It establishes a connection to the Icon
-network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
+		Long: `The command starts an Icon node, initiating the process of setting up and launching a local Icon network.
+It establishes a connection to the Icon network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
 		Run: func(cmd *cobra.Command, args []string) {
+
+			common.ValidateCmdArgs(args, cmd.UsageString())
 
 			decentralisation, _ := cmd.Flags().GetBool("decentralisation")
 
@@ -96,6 +98,7 @@ network and allows the node in executing smart contracts and maintaining the dec
 
 				nodeResponse, err := RunIconNode(diveContext, serviceConfig, genesis)
 				if err != nil {
+					diveContext.StopSpinner("Failed")
 					diveContext.FatalError("Run Icon Node Failed", err.Error())
 				}
 
@@ -137,10 +140,10 @@ network and allows the node in executing smart contracts and maintaining the dec
 		},
 	}
 
-	iconCmd.Flags().StringVarP(&id, "id", "i", "", "chain id")
-	iconCmd.Flags().StringVarP(&genesis, "genesis", "g", "", "gen file")
-	iconCmd.Flags().StringVarP(&configFilePath, "config", "c", "", "gen file")
-	iconCmd.Flags().BoolP("decentralisation", "d", false, "Decentralise Icon Node")
+	iconCmd.Flags().StringVarP(&id, "id", "i", "", "custom chain id for icon node")
+	iconCmd.Flags().StringVarP(&genesis, "genesis", "g", "", "path to custom genesis file")
+	iconCmd.Flags().StringVarP(&configFilePath, "config", "c", "", "path to custom config json file")
+	iconCmd.Flags().BoolP("decentralisation", "d", false, "decentralise Icon Node")
 
 	decentralisationCmd := IconDecentralisationCmd(diveContext)
 
@@ -211,7 +214,7 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 	if genesisFilePath != "" {
 		genesisFileName := filepath.Base(genesisFilePath)
 		r, d, err := kurtosisEnclaveContext.UploadFiles(genesisFilePath, genesisFileName)
-		logrus.Infof("File Uploaded sucessfully : UUID %s", r)
+		diveContext.SetSpinnerMessage(fmt.Sprintf("File Uploaded sucessfully : UUID %s", r))
 		uploadedFiles = fmt.Sprintf(`{"file_path":"%s","file_name":"%s"}`, d, genesisFileName)
 
 		if err != nil {
