@@ -91,11 +91,6 @@ dive bridge btp --chainA icon --chainB icon
 dive bridge btp --chainA icon --chainB eth
 ```
 
-- For cleaning the enclave
-
-```
-dive clean
-```
 ### Testing
 
 - Follow the instruction in [Test Folder](test/README.md#steps-to-run-the-script)
