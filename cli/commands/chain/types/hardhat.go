@@ -11,8 +11,8 @@ func NewHardhatCmd(diveContext *common.DiveContext) *cobra.Command {
 	var ethCmd = &cobra.Command{
 		Use:   "hardhat",
 		Short: "Build, initialize and start a hardhat node.",
-		Long: `The command starts an hardhat node, initiating the process of setting up and launching a local hardhat network. It establishes a connection to the hardhat
-network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
+		Long: `The command starts an hardhat node, initiating the process of setting up and launching a local hardhat network. 
+It establishes a connection to the hardhat network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
 			if len(args) != 0 {
