@@ -15,7 +15,7 @@ This repository uses [kurtosis package](https://docs.kurtosis.com/concepts-refer
 Before proceeding make sure to have
 
 - [Docker installed and running](https://docs.kurtosis.com/install#i-install--start-docker)
-- [Install the kurtosis cli ](https://docs.kurtosis.com/install#ii-install-the-cli) or [(upgrading to the latest)](https://docs.kurtosis.com/upgrade)
+- [Kurtosis installed and running ](https://docs.kurtosis.com/install#ii-install-the-cli) or [(upgrading to the latest)](https://docs.kurtosis.com/upgrade)
 
 ### Integrating chain
 
@@ -32,43 +32,93 @@ Before proceeding make sure to have
 
 ### Running Dive
 
-To run, we have the list of actions, as follows:
+Dive-cli is a command line tool that will be used for starting the chain and crosschain communication between two different chains
 
-1. **start_node**
-2. **start_nodes**
-3. **setup_relay**
+**Installing**
 
-- Example for running single chain
+```
+brew install hugobyte/tap/dive
+```
 
-  ```
-  kurtosis run github.com/hugobyte/dive '{"action":"start_node","node_name":"icon"}' --enclave <Name>
-  ```
+The available commands are -
 
-- Example for running multiple chains
+1. `bridge`: 
+  
+   For connecting the two different chains. This will create an relay to connect two different chains and pass any messages between them
+   
+      subcommands
 
-  ```
-  kurtosis run github.com/hugobyte/dive '{"action":"start_nodes","nodes":["icon"]}' --enclave <Name>
-  ```
+      - `btp` : Starts BTP bridge between Chain A and Chain B
+  
+2. `chain` : 
+   
+   For building, initialising and starting a specified blockchain node. By executing this command the node will be launched by enabling the network participation and ledger maintenance within the specified blockchain ecosystem
 
-  ```
-  kurtosis run github.com/hugobyte/dive '{"action":"start_nodes","nodes":["icon","eth"]}' --enclave <Name>
-  ```
+      subcommands
 
-- Example for running two chains wth relay
+    - `eth` : Build, initialise and start a eth node.
+    - `hardhat`: Build, initialise and start a hardhat node.
+    - `icon`: Build, initialise and start a icon node.
 
-  With Bridge True
 
-  ```
-  kurtosis run github.com/hugobyte/dive '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "eth"},"bridge":"true"}}' --enclave <Name>
-  ```
+3. `clean`: 
+   
+   For cleaning the kurtosis enclave
+   
+4. `discord`:
+   
+    Redirect to the DIVE discord channel
+   
+5. `tutorial`: 
+  
+   Redirect to the DIVE youtube channel
+   
+6. `version`: 
+  
+   For getting the current version of the CLI
 
-  With Bridge False
+**Example**
 
-  ```
-  kurtosis run github.com/hugobyte/dive '{"action":"setup_relay","relay":{"name":"btp","links": {"src": "icon", "dst": "eth"},"bridge":"false"}}' --enclave <Name>
-  ```
+- For building,initialising and starting the icon chain
 
-  _Note :_ The `bridge` should be false for Icon to Icon
+```
+dive chain icon
+```
+
+- icon-icon cross chain communication
+
+```
+dive bridge btp --chainA icon --chainB icon
+```
+
+- icon-eth cross chain communication
+
+```
+dive bridge btp --chainA icon --chainB eth
+```
+
+- For cleaning the enclave
+
+```
+dive clean
+```
+
+- For running the 2 chains
+
+```
+ dive chain icon -g <path of genesis.json> -c <path of config.json> -i <chain1_name> 
+```
+
+```
+dive chain icon -g <path of genesis.json> -c <path of config.json> -i <chain2_name>
+```
+
+Find the example genesis here
+
+- [genesis-icon-0 file](./services/jvm/icon/static-files/config/genesis-icon-0.zip).
+- [genesis-icon-1 file](./services/jvm/icon/static-files/config/genesis-icon-1.zip).
+
+*NOTE :* `cid` will be changed based on the genesis file
 
 ### Testing
 
