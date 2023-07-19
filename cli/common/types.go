@@ -152,7 +152,18 @@ func ReadConfigFile(filePath string) ([]byte, error) {
 	return file, nil
 }
 func WriteToFile(data string) error {
-	file, err := os.Create("dive.json")
+
+	pwd, err := os.Getwd()
+
+	if err != nil {
+		return err
+	}
+
+	file, err := os.OpenFile(pwd+"/dive.json", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+
 	if err != nil {
 		return err
 	}
