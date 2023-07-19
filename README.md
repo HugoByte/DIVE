@@ -113,6 +113,9 @@ dive clean
 dive chain icon -g <path of genesis.json> -c <path of config.json> -i <chain2_name>
 ```
 
+[genesis-icon-0 file](./services/jvm/icon/static-files/config/genesis-icon-0.zip)
+[genesis-icon-1 file](./services/jvm/icon/static-files/config/genesis-icon-1.zip)
+
 *NOTE :* `cid` will be changed based on the genesis file
 
 ### Testing
