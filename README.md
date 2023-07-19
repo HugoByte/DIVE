@@ -30,21 +30,13 @@ Before proceeding make sure to have
 - [**Evm Util Package**](./evm/) - This package is responsible for Uploading and Interacting with Smart Contracts Deployed on EVM based chains.
 - [**Evm BTP Integration**](./evm/) - This provides setup for Deploying BTP Smart Contracts and Relay Setup
 
-### Running Dive
-
-To run, we have the list of actions, as follows:
-
-1. **start_node**
-2. **start_nodes**
-3. **setup_relay**
-
-### Command Line args
+### Running Dive CLI
 
 Dive-cli is a command line tool that will be used for starting the chain and crosschain communication between two different chains
 
 The available commands are -
 
-1. `./dive bridge`: 
+1. `dive bridge`: 
   
    For connecting the two different chains. This will create an relay to connect two different chains and pass any messages between them
    
@@ -52,7 +44,7 @@ The available commands are -
 
       - `btp` : Starts BTP bridge between Chain A and Chain B
   
-2. `./dive chain` : 
+2. `dive chain` : 
    
    For building, initialising and starting a specified blockchain node. By executing this command the node is launched by enabling the network participation and ledger maintenance within the specified blockchain ecosystem
 
@@ -63,22 +55,47 @@ The available commands are -
     - `icon`: Build, initialise and start a icon node.
 
 
-3. `./dive clean`: 
+3. `dive clean`: 
    
    For cleaning the kurtosis enclave
    
-4. `./dive discord`:
+4. `dive discord`:
    
     Redirect to the DIVE discord channel
    
-5. `./dive tutorial`: 
+5. `dive tutorial`: 
   
    Redirect to the DIVE youtube channel
    
-6. `./dive version`: 
+6. `dive version`: 
   
    For getting the current version of the CLI
 
+**Example**
+
+- For building,initialising and starting the icon chain
+
+```
+dive chain icon
+```
+
+- icon-icon cross chain communication
+
+```
+dive bridge btp --chainA icon --chainB icon
+```
+
+- icon-eth cross chain communication
+
+```
+dive bridge btp --chainA icon --chainB eth
+```
+
+- For cleaning the enclave
+
+```
+dive clean
+```
 ### Testing
 
 - Follow the instruction in [Test Folder](test/README.md#steps-to-run-the-script)
