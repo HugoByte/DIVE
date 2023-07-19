@@ -72,6 +72,11 @@ func NewIconCmd(diveContext *common.DiveContext) *cobra.Command {
 It establishes a connection to the Icon network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
+			if len(args) != 0 {
+				diveContext.FatalError("Invalid Usage of command. Find cmd", cmd.UsageString())
+
+			}
+
 			decentralisation, _ := cmd.Flags().GetBool("decentralisation")
 
 			serviceConfig := &IconServiceConfig{}
@@ -96,6 +101,7 @@ It establishes a connection to the Icon network and allows the node in executing
 
 				nodeResponse, err := RunIconNode(diveContext, serviceConfig, genesis)
 				if err != nil {
+					diveContext.StopSpinner("Failed")
 					diveContext.FatalError("Run Icon Node Failed", err.Error())
 				}
 
@@ -211,7 +217,7 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 	if genesisFilePath != "" {
 		genesisFileName := filepath.Base(genesisFilePath)
 		r, d, err := kurtosisEnclaveContext.UploadFiles(genesisFilePath, genesisFileName)
-		logrus.Infof("File Uploaded sucessfully : UUID %s", r)
+		diveContext.SetSpinnerMessage(fmt.Sprintf("File Uploaded sucessfully : UUID %s", r))
 		uploadedFiles = fmt.Sprintf(`{"file_path":"%s","file_name":"%s"}`, d, genesisFileName)
 
 		if err != nil {

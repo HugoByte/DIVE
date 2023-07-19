@@ -15,6 +15,11 @@ func NewHardhatCmd(diveContext *common.DiveContext) *cobra.Command {
 It establishes a connection to the hardhat network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
+			if len(args) != 0 {
+				diveContext.FatalError("Invalid Usage of command. Find cmd", cmd.UsageString())
+
+			}
+
 			data, err := RunHardhatNode(diveContext)
 
 			if err != nil {
