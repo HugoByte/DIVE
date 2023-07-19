@@ -42,7 +42,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
 	var btpbridgeCmd = &cobra.Command{
 		Use:   "btp",
-		Short: "Starts BTP Bridge between ChainA and Chain B",
+		Short: "Starts BTP Bridge between ChainA and ChainB",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
 
