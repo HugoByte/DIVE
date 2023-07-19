@@ -34,6 +34,20 @@ Before proceeding make sure to have
 
 Dive-cli is a command line tool that will be used for starting the chain and crosschain communication between two different chains
 
+**Installing**
+
+For mac users
+
+```
+brew install hugobyte/tap/dive
+```
+
+For windows users
+
+```
+wget 
+```
+
 The available commands are -
 
 1. `bridge`: 
@@ -76,26 +90,38 @@ The available commands are -
 - For building,initialising and starting the icon chain
 
 ```
-dive-cli chain icon
+dive chain icon
 ```
 
 - icon-icon cross chain communication
 
 ```
-dive-cli bridge btp --chainA icon --chainB icon
+dive bridge btp --chainA icon --chainB icon
 ```
 
 - icon-eth cross chain communication
 
 ```
-dive-cli bridge btp --chainA icon --chainB eth
+dive bridge btp --chainA icon --chainB eth
 ```
 
 - For cleaning the enclave
 
 ```
-dive-cli clean
+dive clean
 ```
+
+- For running the 2 chains
+
+```
+ dive chain icon -g <path of genesis.json> -c <path of config.json> -i <chain1_name> 
+```
+
+```
+dive chain icon -g <path of genesis.json> -c <path of config.json> -i <chain2_name>
+```
+
+*NOTE :* `cid` will be changed based on the genesis file
 
 ### Testing
 
