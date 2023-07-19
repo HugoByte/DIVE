@@ -68,8 +68,8 @@ func NewIconCmd(diveContext *common.DiveContext) *cobra.Command {
 	var iconCmd = &cobra.Command{
 		Use:   "icon",
 		Short: "Build, initialize and start a icon node.",
-		Long: `The command starts an Icon node, initiating the process of setting up and launching a local Icon network. It establishes a connection to the Icon
-network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
+		Long: `The command starts an Icon node, initiating the process of setting up and launching a local Icon network.
+It establishes a connection to the Icon network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
 			decentralisation, _ := cmd.Flags().GetBool("decentralisation")
