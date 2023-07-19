@@ -74,7 +74,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 				common.WriteToFile(response)
 
 				diveContext.SetSpinnerMessage(fmt.Sprintf("BTP Bridge Setup Completed between %s and %s", chainA, chainB))
-			} else {
+			} else if strings.ToLower(chainA) == "icon" && (strings.ToLower(chainB) == "eth" || strings.ToLower(chainB) == "hardhat") {
 				diveContext.SetSpinnerMessage("Executing BTP Starlark Package")
 				data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
@@ -85,6 +85,8 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
 				common.WriteToFile(response)
 				diveContext.SetSpinnerMessage(fmt.Sprintf("BTP Bridge Setup Completed between %s and %s", chainA, chainB))
+			} else {
+				diveContext.FatalError("Chains Not Supported", "Supported Chains [icon,eth,hardhat]")
 			}
 
 			diveContext.StopSpinner(" Execution Completed")
