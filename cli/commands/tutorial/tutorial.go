@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const tutorialURL = "https://www.youtube.com/@hugobyte"
+const tutorialURL = "https://www.youtube.com/playlist?list=PL5Xd9z-fRL1vKtRlOzIlkhROspSSDeGyG"
 
 // tutorilaCmd redirects users to DIVE youtube playlist
 var TutorialCmd = &cobra.Command{

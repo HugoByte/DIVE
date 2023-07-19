@@ -8,6 +8,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/hugobyte/dive/common"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -18,6 +19,12 @@ var VersionCmd = &cobra.Command{
 	Long:  `Prints the current DIVE CLI version and warns if you are using an old version.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		common.ValidateCmdArgs(args, cmd.UsageString())
+
+		// Checks for latest Version
+		latestVersion := common.GetLatestVersion()
+		if common.DiveVersion != latestVersion {
+			logrus.Warnf("Update available '%s'. Get the latest version of our DIVE CLI for bug fixes, performance improvements, and new features.", latestVersion)
+		}
 		version := color.New(color.Bold).Sprintf("CLI version - %s", common.DiveVersion)
 		fmt.Println(version)
 

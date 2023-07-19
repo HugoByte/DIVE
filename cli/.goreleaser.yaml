@@ -46,8 +46,6 @@ brews:
     homepage: "https://hugobyte.com"
     description: "CLI for Dive Package"
     license: "Apache 2.0"
-    dependencies:
-      - name: kurtosis-tech/tap/kurtosis-cli
     # NOTE: Goreleaser *should* automatically detect the binaries packaged inside the archives being installed by the Homebrew formula, but it doesn't due to:
     #  https://github.com/goreleaser/goreleaser/issues/2488
     # When this is fixed, we can remove this section
@@ -65,9 +63,6 @@ brews:
     homepage: "https://www.kurtosistech.com"
     description: "CLI for managing Kurtosis environments."
     license: "Apache 2.0"
-    dependencies:
-      - name: kurtosis-tech/tap/kurtosis-cli
-
     # NOTE: Goreleaser *should* automatically detect the binaries packaged inside the archives being installed by the Homebrew formula, but it doesn't due to:
     #  https://github.com/goreleaser/goreleaser/issues/2488
     # When this is fixed, we can remove this section
@@ -84,7 +79,3 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
-# The lines beneath this are called `modelines`. See `:help modeline`
-# Feel free to remove those if you don't want/use them.
-# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
-# vim: set ts=2 sw=2 tw=0 fo=cnqoj
