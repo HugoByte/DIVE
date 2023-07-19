@@ -137,10 +137,10 @@ It establishes a connection to the Icon network and allows the node in executing
 		},
 	}
 
-	iconCmd.Flags().StringVarP(&id, "id", "i", "", "chain id")
-	iconCmd.Flags().StringVarP(&genesis, "genesis", "g", "", "gen file")
-	iconCmd.Flags().StringVarP(&configFilePath, "config", "c", "", "gen file")
-	iconCmd.Flags().BoolP("decentralisation", "d", false, "Decentralise Icon Node")
+	iconCmd.Flags().StringVarP(&id, "id", "i", "", "custom chain id for icon node")
+	iconCmd.Flags().StringVarP(&genesis, "genesis", "g", "", "path to custom genesis file")
+	iconCmd.Flags().StringVarP(&configFilePath, "config", "c", "", "path to custom config json file")
+	iconCmd.Flags().BoolP("decentralisation", "d", false, "decentralise Icon Node")
 
 	decentralisationCmd := IconDecentralisationCmd(diveContext)
 
