@@ -251,7 +251,8 @@ func (diveContext *DiveContext) GetSerializedData(response chan *kurtosis_core_r
 				serializedOutputObj = runFinishedEvent.GetSerializedOutput()
 
 			} else {
-				logrus.Fatal("Starlark run Fails")
+				diveContext.spinner.Stop()
+				diveContext.log.Fatalln("Starlark Run Failed", executionResponseLine.GetInstructionResult())
 			}
 		}
 	}
