@@ -28,7 +28,7 @@ It establishes a connection to the hardhat network and allows the node in execut
 			if err != nil {
 				diveContext.FatalError("Failed To Write To File", err.Error())
 			}
-			diveContext.StopSpinner("Hardhat Node Started")
+			diveContext.StopSpinner("Hardhat Node Started. Please find service details in current working directory(dive.json)")
 		},
 	}
 

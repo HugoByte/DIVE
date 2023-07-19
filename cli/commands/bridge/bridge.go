@@ -87,7 +87,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 				diveContext.FatalError("Chains Not Supported", "Supported Chains [icon,eth,hardhat]")
 			}
 
-			diveContext.StopSpinner(fmt.Sprintf("BTP Bridge Setup Completed between %s and %s", chainA, chainB))
+			diveContext.StopSpinner(fmt.Sprintf("BTP Bridge Setup Completed between %s and %s. Please find service details in current working directory(dive.json)", chainA, chainB))
 		},
 	}
 
