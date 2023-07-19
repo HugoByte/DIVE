@@ -68,8 +68,8 @@ func NewIconCmd(diveContext *common.DiveContext) *cobra.Command {
 	var iconCmd = &cobra.Command{
 		Use:   "icon",
 		Short: "Build, initialize and start a icon node.",
-		Long: `The command starts an Icon node, initiating the process of setting up and launching a local Icon network. It establishes a connection to the Icon
-network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
+		Long: `The command starts an Icon node, initiating the process of setting up and launching a local Icon network.
+It establishes a connection to the Icon network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
 			if len(args) != 0 {
@@ -143,10 +143,10 @@ network and allows the node in executing smart contracts and maintaining the dec
 		},
 	}
 
-	iconCmd.Flags().StringVarP(&id, "id", "i", "", "chain id")
-	iconCmd.Flags().StringVarP(&genesis, "genesis", "g", "", "gen file")
-	iconCmd.Flags().StringVarP(&configFilePath, "config", "c", "", "gen file")
-	iconCmd.Flags().BoolP("decentralisation", "d", false, "Decentralise Icon Node")
+	iconCmd.Flags().StringVarP(&id, "id", "i", "", "custom chain id for icon node")
+	iconCmd.Flags().StringVarP(&genesis, "genesis", "g", "", "path to custom genesis file")
+	iconCmd.Flags().StringVarP(&configFilePath, "config", "c", "", "path to custom config json file")
+	iconCmd.Flags().BoolP("decentralisation", "d", false, "decentralise Icon Node")
 
 	decentralisationCmd := IconDecentralisationCmd(diveContext)
 

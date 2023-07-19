@@ -11,8 +11,8 @@ func NewEthCmd(diveContext *common.DiveContext) *cobra.Command {
 	var ethCmd = &cobra.Command{
 		Use:   "eth",
 		Short: "Build, initialize and start a eth node.",
-		Long: `The command starts an Ethereum node, initiating the process of setting up and launching a local Ethereum network. It establishes a connection to the Ethereum
-network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
+		Long: `The command starts an Ethereum node, initiating the process of setting up and launching a local Ethereum network. 
+It establishes a connection to the Ethereum network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
 			if len(args) != 0 {
