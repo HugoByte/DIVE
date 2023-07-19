@@ -24,4 +24,4 @@ const (
 )
 
 // !!!!!!!!!!! DO NOT UPDATE! WILL BE UPDATED DURING THE RELEASE PROCESS !!!!!!!!!!!!!!!!!!!!!!
-var DiveVersion = ""
+var DiveVersion = "v0.0.1-beta"
