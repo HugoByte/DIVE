@@ -8,7 +8,7 @@ before:
     - go generate ./...
     - go build
 builds:
-  - binary: "dive-cli"
+  - binary: "dive"
     env:
       - CGO_ENABLED=0
     goos:
@@ -51,7 +51,7 @@ brews:
     #  https://github.com/goreleaser/goreleaser/issues/2488
     # When this is fixed, we can remove this section
     install: |
-      bin.install "dive-cli"
+      bin.install "dive"
 
   # creates a versioned brew formula, enabling installation of specific versions of kurtosis cli
   - name: dive-cli@{{ .Tag }}
@@ -69,7 +69,7 @@ brews:
     #  https://github.com/goreleaser/goreleaser/issues/2488
     # When this is fixed, we can remove this section
     install: |
-      bin.install "dive-cli"
+      bin.install "dive"
 
 checksum:
   name_template: "checksums.txt"
