@@ -252,11 +252,18 @@ func (diveContext *DiveContext) GetSerializedData(response chan *kurtosis_core_r
 
 			} else {
 				diveContext.spinner.Stop()
-				diveContext.log.Fatalln("Starlark Run Failed", executionResponseLine.GetInstructionResult())
+				diveContext.log.Fatalln("Starlark Run Failed")
 			}
 		}
 	}
 
 	return serializedOutputObj
 
+}
+
+func ValidateCmdArgs(args []string, cmd string) {
+	if len(args) != 0 {
+		logrus.Fatalf("Invalid Usage of command. Find cmd %s", cmd)
+
+	}
 }
