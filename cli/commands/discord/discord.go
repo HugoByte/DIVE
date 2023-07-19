@@ -19,6 +19,7 @@ var DiscordCmd = &cobra.Command{
 to access the dedicated DIVE community. It allows users to engage in discussions, seek support, share insights, and 
 collaborate with other members of the DIVE community within the Discord platform.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		common.ValidateCmdArgs(args, cmd.UsageString())
 		logrus.Info("Redirecting to DIVE discord channel...")
 		if err := common.OpenFile(diveURL); err != nil {
 			logrus.Errorf("Failed to open Dive discord channel with error %v", err)

@@ -20,6 +20,7 @@ to the designated Twitter profile of HugoByte, providing access to the latest up
 shared by the official HugoByte Twitter account. Users can stay informed about HugoByte's activities, engage with the 
 community, and follow our social media presence directly from the Twitter homepage.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		common.ValidateCmdArgs(args, cmd.UsageString())
 		logrus.Info("Redirecting to twitter...")
 		if err := common.OpenFile(twitterURL); err != nil {
 			logrus.Errorf("Failed to open HugoByte twitter with error %v", err)
