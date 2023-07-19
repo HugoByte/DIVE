@@ -15,7 +15,7 @@ This repository uses [kurtosis package](https://docs.kurtosis.com/concepts-refer
 Before proceeding make sure to have
 
 - [Docker installed and running](https://docs.kurtosis.com/install#i-install--start-docker)
-- [Install the kurtosis cli ](https://docs.kurtosis.com/install#ii-install-the-cli) or [(upgrading to the latest)](https://docs.kurtosis.com/upgrade)
+- [Kurtosis installed and running ](https://docs.kurtosis.com/install#ii-install-the-cli) or [(upgrading to the latest)](https://docs.kurtosis.com/upgrade)
 
 ### Integrating chain
 
