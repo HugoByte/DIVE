@@ -34,10 +34,6 @@ var rootCmd = &cobra.Command{
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 
-	// latestVersion := common.GetLatestVersion()
-	// if common.DiveVersion != latestVersion {
-	// 	logrus.Warnf("Update available '%s'. Get the latest version of our DIVE CLI for bug fixes, performance improvements, and new features.", latestVersion)
-	// }
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)

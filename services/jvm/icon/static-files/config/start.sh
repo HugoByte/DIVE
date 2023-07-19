@@ -24,6 +24,7 @@ start_chain() {
         --normal_tx_pool 1000 \
         --db_type rocksdb \
         --role 3
+    goloop system config rpcIncludeDebug true
   fi
   goloop chain start ${CID}
 }
