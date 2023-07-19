@@ -15,6 +15,11 @@ func NewEthCmd(diveContext *common.DiveContext) *cobra.Command {
 network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
+			if len(args) != 0 {
+				diveContext.FatalError("Invalid Usage of command. Find cmd", cmd.UsageString())
+
+			}
+
 			data, err := RunEthNode(diveContext)
 
 			if err != nil {
@@ -25,7 +30,7 @@ network and allows the node in executing smart contracts and maintaining the dec
 			if err != nil {
 				diveContext.FatalError("Failed To Write To File", err.Error())
 			}
-			diveContext.StopSpinner("Hardhat Node Started")
+			diveContext.StopSpinner("ETH Node Started")
 		},
 	}
 

@@ -44,6 +44,10 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 		Short: "Starts Bridge BTP between ChainA and Chain B",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
+			if len(args) != 0 {
+				diveContext.FatalError("Invalid Usage of command. Find cmd", cmd.UsageString())
+
+			}
 
 			enclaveCtx, err := diveContext.GetEnclaveContext()
 

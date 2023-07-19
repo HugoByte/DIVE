@@ -65,12 +65,16 @@ func (diveContext *DiveContext) GetSerializedData(response chan *kurtosis_core_r
 		runFinishedEvent := executionResponseLine.GetRunFinishedEvent()
 
 		if runFinishedEvent == nil {
+
 			diveContext.spinner.Color("blue")
 			diveContext.spinner.Suffix = " Execution in Progress"
+
 		} else {
 
 			if runFinishedEvent.GetIsRunSuccessful() {
+
 				serializedOutputObj = runFinishedEvent.GetSerializedOutput()
+
 			} else {
 				logrus.Fatal("Starlark run Fails")
 			}
