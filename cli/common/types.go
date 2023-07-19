@@ -252,7 +252,7 @@ func (diveContext *DiveContext) GetSerializedData(response chan *kurtosis_core_r
 
 			} else {
 				diveContext.spinner.Stop()
-				diveContext.log.Fatalln("Starlark Run Failed", executionResponseLine.GetInstructionResult())
+				diveContext.log.Fatalln("Starlark Run Failed", executionResponseLine.GetRunResponseLine())
 			}
 		}
 	}
