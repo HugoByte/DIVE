@@ -234,7 +234,7 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 		return nil, err
 	}
 
-	diveContext.SetSpinnerMessage("Finailsing Icon Node")
+	diveContext.SetSpinnerMessage("Finalizing Icon Node")
 
 	response := diveContext.GetSerializedData(icon_data)
 
