@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"runtime"
@@ -112,14 +113,9 @@ func NewDiveContext() *DiveContext {
 		TimestampFormat: "2006-01-02 15:04:05",
 	})
 
-	kurtosisContext, err := kurtosis_context.NewKurtosisContextFromLocalEngine()
-	if err != nil {
-		log.Fatal("The Kurtosis Engine Server is unavailable and is probably not running; you will need to start it using the Kurtosis CLI before you can create a connection to it")
-
-	}
 	spinner := spinner.New(spinner.CharSets[80], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
 
-	return &DiveContext{Ctx: ctx, KurtosisContext: kurtosisContext, log: log, spinner: spinner}
+	return &DiveContext{Ctx: ctx, log: log, spinner: spinner}
 }
 
 func (diveContext *DiveContext) GetEnclaveContext() (*enclaves.EnclaveContext, error) {
@@ -276,4 +272,17 @@ func ValidateCmdArgs(args []string, cmd string) {
 		logrus.Fatalf("Invalid Usage of command. Find cmd %s", cmd)
 
 	}
+}
+
+func (diveContext *DiveContext) Error(err string) {
+	diveContext.log.Error(err)
+}
+
+func (diveContext *DiveContext) InitKurtosisContext() {
+	kurtosisContext, err := kurtosis_context.NewKurtosisContextFromLocalEngine()
+	if err != nil {
+		log.Fatal("The Kurtosis Engine Server is unavailable and is probably not running; you will need to start it using the Kurtosis CLI before you can create a connection to it")
+
+	}
+	diveContext.KurtosisContext = kurtosisContext
 }

@@ -189,6 +189,8 @@ func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 
 func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConfig, genesisFilePath string) (*common.DiveserviceResponse, error) {
 	diveContext.StartSpinner(" Starting Icon Node")
+
+	diveContext.InitKurtosisContext()
 	paramData, err := serviceConfig.EncodeToString()
 	if err != nil {
 		return nil, err

@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/hugobyte/dive/common"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -19,6 +18,8 @@ func NewCleanCmd(diveContext *common.DiveContext) *cobra.Command {
 		Long:  `Destroys and removes any running encalves. If no enclaves running to remove it will throw an error`,
 		Run: func(cmd *cobra.Command, args []string) {
 			common.ValidateCmdArgs(args, cmd.UsageString())
+
+			diveContext.InitKurtosisContext()
 			pwd, err := os.Getwd()
 
 			if err != nil {
@@ -33,7 +34,7 @@ func NewCleanCmd(diveContext *common.DiveContext) *cobra.Command {
 
 			enclaveName := diveContext.GetEnclaves()
 			if enclaveName == "" {
-				logrus.Errorf("No enclaves running to clean !!")
+				diveContext.Error("No enclaves running to clean !!")
 			} else {
 				diveContext.Clean()
 			}

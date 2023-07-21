@@ -40,6 +40,8 @@ func RunHardhatNode(diveContext *common.DiveContext) (*common.DiveserviceRespons
 
 	diveContext.StartSpinner(" Starting Hardhat Node")
 
+	diveContext.InitKurtosisContext()
+
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {

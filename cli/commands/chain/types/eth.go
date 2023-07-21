@@ -37,6 +37,8 @@ It establishes a connection to the Ethereum network and allows the node in execu
 
 func RunEthNode(diveContext *common.DiveContext) (*common.DiveserviceResponse, error) {
 	diveContext.StartSpinner(" Starting ETH Node")
+
+	diveContext.InitKurtosisContext()
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {

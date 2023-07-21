@@ -48,6 +48,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			common.ValidateCmdArgs(args, cmd.UsageString())
 
+			diveContext.InitKurtosisContext()
 			enclaveCtx, err := diveContext.GetEnclaveContext()
 
 			if err != nil {
@@ -91,8 +92,8 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 		},
 	}
 
-	btpbridgeCmd.Flags().StringVar(&chainA, "chainA", "", "Metion Name of Supported Chain")
-	btpbridgeCmd.Flags().StringVar(&chainB, "chainB", "", "Metion Name of Supported Chain")
+	btpbridgeCmd.Flags().StringVar(&chainA, "chainA", "", "Mention Name of Supported Chain")
+	btpbridgeCmd.Flags().StringVar(&chainB, "chainB", "", "Mention Name of Supported Chain")
 	btpbridgeCmd.Flags().Bool("bridge", false, "Mention Bridge ENV")
 
 	btpbridgeCmd.MarkFlagRequired("chainA")
