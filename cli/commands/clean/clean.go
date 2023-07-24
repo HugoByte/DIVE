@@ -4,6 +4,7 @@ Copyright © 2023 Hugobyte AI Labs<hello@hugobyte.com>
 package clean
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/hugobyte/dive/common"
@@ -26,16 +27,20 @@ func NewCleanCmd(diveContext *common.DiveContext) *cobra.Command {
 				diveContext.FatalError("Failed cleaning with error: %v", err.Error())
 			}
 
-			_, err = os.Stat(pwd + "/dive.json")
+			diveOutPath := fmt.Sprintf("%s/%s", pwd, common.DiveOutFile)
+
+			_, err = os.Stat(diveOutPath)
 
 			if err == nil {
-				os.Remove(pwd + "/dive.json")
+				os.Remove(diveOutPath)
 			}
-
 			enclaveName := diveContext.GetEnclaves()
 			if enclaveName == "" {
+				diveContext.Log.SetOutput(os.Stderr)
 				diveContext.Error("No enclaves running to clean !!")
+
 			} else {
+				diveContext.Log.SetOutput(os.Stdout)
 				diveContext.Clean()
 			}
 		},

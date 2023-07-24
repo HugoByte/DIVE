@@ -94,3 +94,4 @@ tsconfig.tsbuildinfo
 .cache-loader
 
 dist/
+logs/

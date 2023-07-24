@@ -208,7 +208,14 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 		return nil, err
 	}
 
-	responseData := diveContext.GetSerializedData(data)
+	responseData, skippedInstructions, err := diveContext.GetSerializedData(data)
+
+	if err != nil {
+		diveContext.Error(err.Error())
+	}
+
+	diveContext.CheckInstructionSkipped(skippedInstructions, "Instruction Executed Already")
+
 	var genesisFile = ""
 	var uploadedFiles = ""
 	var genesisPath = ""
@@ -238,7 +245,12 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 
 	diveContext.SetSpinnerMessage("Finalizing Icon Node")
 
-	response := diveContext.GetSerializedData(icon_data)
+	response, skippedInstructions, err := diveContext.GetSerializedData(icon_data)
+
+	if err != nil {
+		diveContext.Error(err.Error())
+	}
+	diveContext.CheckInstructionSkipped(skippedInstructions, common.DiveIconNodeAlreadyRunning)
 
 	iconResponseData := &common.DiveserviceResponse{}
 
@@ -266,8 +278,11 @@ func Decentralisation(diveContext *common.DiveContext, params string) (string, e
 		return "", err
 	}
 
-	response := diveContext.GetSerializedData(data)
-
+	response, skippedInstructions, err := diveContext.GetSerializedData(data)
+	if err != nil {
+		diveContext.Error(err.Error())
+	}
+	diveContext.CheckInstructionSkipped(skippedInstructions, "Decntralization Already Completed")
 	return response, nil
 
 }

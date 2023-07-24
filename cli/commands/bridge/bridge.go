@@ -69,7 +69,12 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 				if err != nil {
 					fmt.Println(err)
 				}
-				response := diveContext.GetSerializedData(data)
+				response, skippedInstructions, err := diveContext.GetSerializedData(data)
+				if err != nil {
+					diveContext.Error(err.Error())
+				}
+
+				diveContext.CheckInstructionSkipped(skippedInstructions, "Bridge Already Running")
 
 				common.WriteToFile(response)
 
@@ -80,8 +85,11 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 				if err != nil {
 					fmt.Println(err)
 				}
-				response := diveContext.GetSerializedData(data)
-
+				response, skippedInstructions, err := diveContext.GetSerializedData(data)
+				if err != nil {
+					diveContext.Error(err.Error())
+				}
+				diveContext.CheckInstructionSkipped(skippedInstructions, "Bridge Already Running")
 				common.WriteToFile(response)
 
 			} else {

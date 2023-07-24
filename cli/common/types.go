@@ -3,7 +3,9 @@ package common
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -14,11 +16,13 @@ import (
 	"github.com/briandowns/spinner"
 	"github.com/fatih/color"
 	"github.com/google/go-github/github"
+
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/kurtosis-tech/kurtosis/api/golang/engine/lib/kurtosis_context"
 	"github.com/kurtosis-tech/stacktrace"
 	"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus/hooks/writer"
 )
 
 type DiveserviceResponse struct {
@@ -100,7 +104,7 @@ func GetLatestVersion() string {
 type DiveContext struct {
 	Ctx             context.Context
 	KurtosisContext *kurtosis_context.KurtosisContext
-	log             *logrus.Logger
+	Log             *logrus.Logger
 	spinner         *spinner.Spinner
 }
 
@@ -108,14 +112,58 @@ func NewDiveContext() *DiveContext {
 
 	ctx := context.Background()
 	log := logrus.New()
-	log.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp:   true,
-		TimestampFormat: "2006-01-02 15:04:05",
+
+	pwd, err := os.Getwd()
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if _, err := os.Stat(pwd + DiveLogDirectory); os.IsNotExist(err) {
+		err := os.Mkdir(pwd+DiveLogDirectory, os.ModePerm)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+
+	diwLogfile, err := os.OpenFile(pwd+DiveLogDirectory+DiveDiwLogFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	errorLogfile, err := os.OpenFile(pwd+DiveLogDirectory+DiveErorLogFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.SetOutput(io.Discard) // Send all logs to nowhere by default
+
+	log.AddHook(&writer.Hook{ // Send logs with level higher than warning to stderr
+		Writer: errorLogfile,
+		LogLevels: []logrus.Level{
+			logrus.PanicLevel,
+			logrus.FatalLevel,
+			logrus.ErrorLevel,
+			logrus.WarnLevel,
+		},
 	})
+	log.AddHook(&writer.Hook{ // Send info and debug logs to stdout
+		Writer: diwLogfile,
+		LogLevels: []logrus.Level{
+			logrus.InfoLevel,
+			logrus.DebugLevel,
+		},
+	})
+	logFormatter := &logrus.JSONFormatter{
+		TimestampFormat: "2006-01-02 15:04:05",
+	}
+	log.SetFormatter(logFormatter)
 
 	spinner := spinner.New(spinner.CharSets[80], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
 
-	return &DiveContext{Ctx: ctx, log: log, spinner: spinner}
+	return &DiveContext{Ctx: ctx, Log: log, spinner: spinner}
 }
 
 func (diveContext *DiveContext) GetEnclaveContext() (*enclaves.EnclaveContext, error) {
@@ -191,26 +239,28 @@ func (diveContext *DiveContext) GetEnclaves() string {
 
 // Funstionality to clean the enclaves
 func (diveContext *DiveContext) Clean() {
-	diveContext.log.Info("Successfully connected to kurtosis engine...")
-	diveContext.log.Info("Initializing cleaning process...")
+	diveContext.Log.SetOutput(os.Stdout)
+	diveContext.Log.Info("Successfully connected to kurtosis engine...")
+	diveContext.Log.Info("Initializing cleaning process...")
 	// shouldCleanAll set to true as default for beta release.
 	enclaves, err := diveContext.KurtosisContext.Clean(diveContext.Ctx, true)
 	if err != nil {
-		diveContext.log.Errorf("Failed cleaning with error: %v", err)
+		diveContext.Log.SetOutput(os.Stderr)
+		diveContext.Log.Errorf("Failed cleaning with error: %v", err)
 	}
 
 	// Assuming only one enclave is running for beta release
-	diveContext.log.Infof("Successfully destroyed and cleaned enclave %s", enclaves[0].Name)
+	diveContext.Log.Infof("Successfully destroyed and cleaned enclave %s", enclaves[0].Name)
 }
 
 func (diveContext *DiveContext) FatalError(message, err string) {
 
-	diveContext.log.Fatalf("%s : %s", message, err)
+	diveContext.Log.Fatalf("%s : %s", message, err)
 }
 
 func (diveContext *DiveContext) Info(message string) {
 
-	diveContext.log.Infoln(message)
+	diveContext.Log.Infoln(message)
 }
 
 func (diveContext *DiveContext) StartSpinner(message string) {
@@ -233,37 +283,50 @@ func (diveContext *DiveContext) StopSpinner(message string) {
 
 }
 
-func (diveContext *DiveContext) GetSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) string {
-
+func (diveContext *DiveContext) GetSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) (string, map[string]bool, error) {
+	if DiveLogs {
+		diveContext.spinner.Stop()
+		diveContext.Log.SetFormatter(&logrus.TextFormatter{})
+		diveContext.Log.SetOutput(os.Stdout)
+	}
 	var serializedOutputObj string
+	skippedInstruction := map[string]bool{}
+	for executionResponse := range response {
 
-	for executionResponseLine := range response {
+		if executionResponse.GetError() != nil {
 
-		runFinishedEvent := executionResponseLine.GetRunFinishedEvent()
+			return "", nil, errors.New(executionResponse.GetError().String())
+		}
 
-		if runFinishedEvent == nil {
+		diveContext.Log.Info(executionResponse.String())
 
-			diveContext.spinner.Color("blue")
-			if executionResponseLine.GetProgressInfo() != nil {
-				c := color.New(color.FgGreen)
+		if executionResponse.GetInstruction().GetIsSkipped() {
+			skippedInstruction[executionResponse.GetInstruction().GetExecutableInstruction()] = executionResponse.GetInstruction().GetIsSkipped()
+		}
 
-				diveContext.spinner.Suffix = c.Sprintf(strings.ReplaceAll(executionResponseLine.GetProgressInfo().String(), "current_step_info:", " "))
+		runFinishedEvent := executionResponse.GetRunFinishedEvent()
 
-			}
-		} else {
+		if runFinishedEvent != nil {
 
 			if runFinishedEvent.GetIsRunSuccessful() {
-
 				serializedOutputObj = runFinishedEvent.GetSerializedOutput()
 
 			} else {
-				diveContext.spinner.Stop()
-				diveContext.log.Fatalln("Starlark Run Failed")
+				return "", nil, errors.New(executionResponse.GetError().String())
+			}
+
+		} else {
+			diveContext.spinner.Color("blue")
+			if executionResponse.GetProgressInfo() != nil {
+				c := color.New(color.FgGreen)
+				diveContext.spinner.Suffix = c.Sprintf(strings.ReplaceAll(executionResponse.GetProgressInfo().String(), "current_step_info:", " "))
+
 			}
 		}
+
 	}
 
-	return serializedOutputObj
+	return serializedOutputObj, skippedInstruction, nil
 
 }
 
@@ -275,7 +338,7 @@ func ValidateCmdArgs(args []string, cmd string) {
 }
 
 func (diveContext *DiveContext) Error(err string) {
-	diveContext.log.Error(err)
+	diveContext.Log.Error(err)
 }
 
 func (diveContext *DiveContext) InitKurtosisContext() {
@@ -285,4 +348,13 @@ func (diveContext *DiveContext) InitKurtosisContext() {
 
 	}
 	diveContext.KurtosisContext = kurtosisContext
+}
+
+func (diveContext *DiveContext) CheckInstructionSkipped(instuctions map[string]bool, message string) {
+
+	if len(instuctions) != 0 {
+
+		diveContext.StopSpinner(message)
+		os.Exit(0)
+	}
 }

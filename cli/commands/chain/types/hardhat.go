@@ -54,8 +54,12 @@ func RunHardhatNode(diveContext *common.DiveContext) (*common.DiveserviceRespons
 		return nil, err
 	}
 
-	responseData := diveContext.GetSerializedData(data)
+	responseData, skippedInstructions, err := diveContext.GetSerializedData(data)
+	if err != nil {
+		diveContext.Error(err.Error())
+	}
 
+	diveContext.CheckInstructionSkipped(skippedInstructions, common.DiveHardhatNodeAlreadyRuning)
 	hardhatResponseData := &common.DiveserviceResponse{}
 
 	result, err := hardhatResponseData.Decode([]byte(responseData))

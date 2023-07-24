@@ -51,8 +51,11 @@ func RunEthNode(diveContext *common.DiveContext) (*common.DiveserviceResponse, e
 		return nil, err
 	}
 
-	responseData := diveContext.GetSerializedData(data)
-
+	responseData, skippedInstructions, err := diveContext.GetSerializedData(data)
+	if err != nil {
+		diveContext.Error(err.Error())
+	}
+	diveContext.CheckInstructionSkipped(skippedInstructions, common.DiveEthNodeAlreadyRunning)
 	ethResponseData := &common.DiveserviceResponse{}
 
 	result, err := ethResponseData.Decode([]byte(responseData))
