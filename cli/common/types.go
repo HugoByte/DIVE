@@ -172,16 +172,16 @@ func setupLogger() *logrus.Logger {
 	}
 
 	// Fork writing into two outputs
-	errormultiWriter := io.MultiWriter(errorLogger)
+	errorWriter := io.MultiWriter(errorLogger)
 
 	log.AddHook(lfshook.NewHook(
 		lfshook.WriterMap{
 			logrus.InfoLevel:  ditWriter,
 			logrus.DebugLevel: ditWriter,
 			logrus.TraceLevel: ditWriter,
-			logrus.ErrorLevel: errormultiWriter,
-			logrus.FatalLevel: errormultiWriter,
-			logrus.WarnLevel:  errormultiWriter,
+			logrus.ErrorLevel: errorWriter,
+			logrus.FatalLevel: errorWriter,
+			logrus.WarnLevel:  errorWriter,
 		},
 		&logrus.JSONFormatter{
 			TimestampFormat: "2006-01-02 15:04:05",

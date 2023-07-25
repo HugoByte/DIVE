@@ -7,7 +7,6 @@ import (
 
 	"github.com/hugobyte/dive/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -89,7 +88,7 @@ It establishes a connection to the Icon network and allows the node in executing
 				err = json.Unmarshal(data, serviceConfig)
 
 				if err != nil {
-					logrus.Fatalln(err)
+					diveContext.FatalError("Failed To Unmarshall", err.Error())
 				}
 
 			}

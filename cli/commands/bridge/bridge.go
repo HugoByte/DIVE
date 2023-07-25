@@ -10,7 +10,6 @@ import (
 
 	"github.com/hugobyte/dive/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -52,7 +51,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 			enclaveCtx, err := diveContext.GetEnclaveContext()
 
 			if err != nil {
-				logrus.Errorln(err)
+				diveContext.Error(err.Error())
 			}
 			diveContext.StartSpinner(fmt.Sprintf(" Starting BTP Bridge for %s,%s", chainA, chainB))
 

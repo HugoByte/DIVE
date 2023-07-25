@@ -1,5 +1,10 @@
 package common
 
+var DiveLogs bool
+
+// !!!!!!!!!!! DO NOT UPDATE! WILL BE UPDATED DURING THE RELEASE PROCESS !!!!!!!!!!!!!!!!!!!!!!
+var DiveVersion = "v0.0.1-beta"
+
 const (
 	DiveEnclave                  = "dive"
 	DiveRemotePackagePath        = "github.com/hugobyte/dive"
@@ -34,8 +39,3 @@ const (
 
 	openFileWindowsCommandFirstArgumentDefault = "url.dll,FileProtocolHandler"
 )
-
-// !!!!!!!!!!! DO NOT UPDATE! WILL BE UPDATED DURING THE RELEASE PROCESS !!!!!!!!!!!!!!!!!!!!!!
-var DiveVersion = "v0.0.1-beta"
-
-var DiveLogs bool
