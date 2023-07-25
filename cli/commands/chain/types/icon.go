@@ -96,24 +96,14 @@ It establishes a connection to the Icon network and allows the node in executing
 
 			if decentralisation {
 
-				nodeResponse, err := RunIconNode(diveContext, serviceConfig, genesis)
-				if err != nil {
-					diveContext.StopSpinner("Failed")
-					diveContext.FatalError("Run Icon Node Failed", err.Error())
-				}
+				nodeResponse := RunIconNode(diveContext, serviceConfig, genesis)
 
 				params := GetDecentralizeParms(nodeResponse.ServiceName, nodeResponse.PrivateEndpoint, nodeResponse.KeystorePath, nodeResponse.KeyPassword, nodeResponse.NetworkId)
 
 				diveContext.SetSpinnerMessage("Starting Decentralisation")
-				response, err := Decentralisation(diveContext, params)
+				Decentralisation(diveContext, params)
 
-				if err != nil {
-					diveContext.FatalError("Icon Node Decentralisation Failed", err.Error())
-				}
-
-				diveContext.Info(response)
-
-				err = nodeResponse.WriteDiveResponse(diveContext)
+				err := nodeResponse.WriteDiveResponse(diveContext)
 
 				if err != nil {
 					diveContext.FatalError("Failed To Write To File", err.Error())
@@ -123,12 +113,9 @@ It establishes a connection to the Icon network and allows the node in executing
 
 			} else {
 
-				nodeResponse, err := RunIconNode(diveContext, serviceConfig, genesis)
-				if err != nil {
-					diveContext.FatalError("Run Icon Node Failed", err.Error())
-				}
+				nodeResponse := RunIconNode(diveContext, serviceConfig, genesis)
 
-				err = nodeResponse.WriteDiveResponse(diveContext)
+				err := nodeResponse.WriteDiveResponse(diveContext)
 
 				if err != nil {
 					diveContext.FatalError("Failed To Write To File", err.Error())
@@ -162,13 +149,9 @@ func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 
 			params := GetDecentralizeParms(serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID)
 
-			response, err := Decentralisation(diveContext, params)
+			Decentralisation(diveContext, params)
 
-			if err != nil {
-				diveContext.FatalError("Icon Node Decentralisation Failed", err.Error())
-			}
-
-			diveContext.StopSpinner(fmt.Sprintln("Decentralisation Completed.Please find service details in dive.json", response))
+			diveContext.StopSpinner(fmt.Sprintln("Decentralisation Completed.Please find service details in dive.json"))
 		},
 	}
 	decentralisationCmd.Flags().StringVarP(&serviceName, "serviceName", "s", "", "service name")
@@ -187,31 +170,33 @@ func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 
 }
 
-func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConfig, genesisFilePath string) (*common.DiveserviceResponse, error) {
+func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConfig, genesisFilePath string) *common.DiveserviceResponse {
 	diveContext.StartSpinner(" Starting Icon Node")
 
 	diveContext.InitKurtosisContext()
 	paramData, err := serviceConfig.EncodeToString()
 	if err != nil {
-		return nil, err
+		diveContext.FatalError("Encoding Failed", err.Error())
 	}
 
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {
-		return nil, err
+		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
 	}
 
 	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveIconNodeScript, "get_service_config", paramData, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
-		return nil, err
+		diveContext.FatalError("Starlark Run Failed", err.Error())
 	}
 
-	responseData, skippedInstructions, err := diveContext.GetSerializedData(data)
+	responseData, services, skippedInstructions, err := diveContext.GetSerializedData(data)
 
 	if err != nil {
-		diveContext.Error(err.Error())
+		diveContext.StopServices(services)
+		diveContext.FatalError("Starlark Run Failed", err.Error())
+
 	}
 
 	diveContext.CheckInstructionSkipped(skippedInstructions, "Instruction Executed Already")
@@ -227,7 +212,7 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 		uploadedFiles = fmt.Sprintf(`{"file_path":"%s","file_name":"%s"}`, d, genesisFileName)
 
 		if err != nil {
-			return nil, err
+			return nil
 		}
 	} else {
 		genesisFile = filepath.Base(genesisIcon)
@@ -240,15 +225,21 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveIconNodeScript, "start_icon_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
-		return nil, err
+
+		diveContext.StopServices(services)
+
+		diveContext.FatalError("Starlark Run Failed", err.Error())
 	}
 
-	diveContext.SetSpinnerMessage("Finalizing Icon Node")
+	diveContext.SetSpinnerMessage(" Finalizing Icon Node")
 
-	response, skippedInstructions, err := diveContext.GetSerializedData(icon_data)
+	response, services, skippedInstructions, err := diveContext.GetSerializedData(icon_data)
 
 	if err != nil {
-		diveContext.Error(err.Error())
+
+		diveContext.StopServices(services)
+		diveContext.FatalError("Starlark Run Failed", err.Error())
+
 	}
 	diveContext.CheckInstructionSkipped(skippedInstructions, common.DiveIconNodeAlreadyRunning)
 
@@ -257,33 +248,38 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 	result, err := iconResponseData.Decode([]byte(response))
 
 	if err != nil {
-		return nil, err
+
+		diveContext.StopServices(services)
+
+		diveContext.FatalError("Failed To Unmarshall", err.Error())
 	}
 
-	return result, nil
+	return result
 }
 
-func Decentralisation(diveContext *common.DiveContext, params string) (string, error) {
+func Decentralisation(diveContext *common.DiveContext, params string) {
 
 	diveContext.StartSpinner(" Starting Icon Node Decentralisation")
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {
-		return "", err
+		diveContext.FatalError("Failed To Retrieve Enclave Context", err.Error())
 	}
 
 	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveIconDecentraliseScript, "configure_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
-		return "", err
+		diveContext.FatalError("Starlark Run Failed", err.Error())
 	}
 
-	response, skippedInstructions, err := diveContext.GetSerializedData(data)
+	_, services, skippedInstructions, err := diveContext.GetSerializedData(data)
 	if err != nil {
-		diveContext.Error(err.Error())
+
+		diveContext.StopServices(services)
+		diveContext.FatalError("Starlark Run Failed", err.Error())
+
 	}
 	diveContext.CheckInstructionSkipped(skippedInstructions, "Decntralization Already Completed")
-	return response, nil
 
 }
 

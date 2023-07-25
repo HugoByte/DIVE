@@ -6,10 +6,16 @@ require (
 	github.com/briandowns/spinner v1.23.0
 	github.com/fatih/color v1.15.0
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/kurtosis-tech/kurtosis/api/golang v0.80.13
+	github.com/kurtosis-tech/kurtosis/api/golang v0.80.14
 	github.com/kurtosis-tech/stacktrace v0.0.0-20211028211901-1c67a77b5409
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
+)
+
+require (
+	github.com/jonboulle/clockwork v0.4.0 // indirect
+	github.com/lestrrat-go/strftime v1.0.6 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 )
 
 require (
@@ -26,11 +32,13 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/kurtosis-tech/kurtosis-portal/api/golang v0.0.0-20230712110324-ce92904bb514 // indirect
 	github.com/kurtosis-tech/kurtosis/grpc-file-transfer/golang v0.0.0-20230427135111-ee2492059d06 // indirect
+	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mholt/archiver/v3 v3.5.1 // indirect
 	github.com/nwaples/rardecode v1.1.3 // indirect
 	github.com/pierrec/lz4/v4 v4.1.2 // indirect
+	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect

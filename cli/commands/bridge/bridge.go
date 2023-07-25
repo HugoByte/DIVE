@@ -67,11 +67,13 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 				data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 				if err != nil {
-					fmt.Println(err)
+					diveContext.FatalError("Starlark Run Failed", err.Error())
 				}
-				response, skippedInstructions, err := diveContext.GetSerializedData(data)
+				response, services, skippedInstructions, err := diveContext.GetSerializedData(data)
 				if err != nil {
-					diveContext.Error(err.Error())
+					diveContext.StopServices(services)
+					diveContext.FatalError("Starlark Run Failed", err.Error())
+
 				}
 
 				diveContext.CheckInstructionSkipped(skippedInstructions, "Bridge Already Running")
@@ -83,11 +85,13 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 				data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 				if err != nil {
-					fmt.Println(err)
+					diveContext.FatalError("Starlark Run Failed", err.Error())
 				}
-				response, skippedInstructions, err := diveContext.GetSerializedData(data)
+				response, services, skippedInstructions, err := diveContext.GetSerializedData(data)
 				if err != nil {
-					diveContext.Error(err.Error())
+					diveContext.StopServices(services)
+					diveContext.FatalError("Starlark Run Failed", err.Error())
+
 				}
 				diveContext.CheckInstructionSkipped(skippedInstructions, "Bridge Already Running")
 				common.WriteToFile(response)

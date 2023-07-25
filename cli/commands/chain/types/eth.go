@@ -17,13 +17,10 @@ It establishes a connection to the Ethereum network and allows the node in execu
 
 			common.ValidateCmdArgs(args, cmd.UsageString())
 
-			data, err := RunEthNode(diveContext)
+			data := RunEthNode(diveContext)
 
-			if err != nil {
-				diveContext.FatalError("Fail to Start ETH Node", err.Error())
-			}
 			diveContext.SetSpinnerMessage("Execution Completed")
-			err = data.WriteDiveResponse(diveContext)
+			err := data.WriteDiveResponse(diveContext)
 			if err != nil {
 				diveContext.FatalError("Failed To Write To File", err.Error())
 			}
@@ -35,25 +32,27 @@ It establishes a connection to the Ethereum network and allows the node in execu
 
 }
 
-func RunEthNode(diveContext *common.DiveContext) (*common.DiveserviceResponse, error) {
+func RunEthNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 	diveContext.StartSpinner(" Starting ETH Node")
 
 	diveContext.InitKurtosisContext()
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {
-		return nil, err
+		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
 	}
 
 	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveEthHardhatNodeScript, "start_eth_node", `{"args":{}}`, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
-		return nil, err
+		diveContext.FatalError("Starlark Run Failed", err.Error())
 	}
 
-	responseData, skippedInstructions, err := diveContext.GetSerializedData(data)
+	responseData, services, skippedInstructions, err := diveContext.GetSerializedData(data)
 	if err != nil {
-		diveContext.Error(err.Error())
+		diveContext.StopServices(services)
+		diveContext.FatalError("Starlark Run Failed", err.Error())
+
 	}
 	diveContext.CheckInstructionSkipped(skippedInstructions, common.DiveEthNodeAlreadyRunning)
 	ethResponseData := &common.DiveserviceResponse{}
@@ -61,9 +60,10 @@ func RunEthNode(diveContext *common.DiveContext) (*common.DiveserviceResponse, e
 	result, err := ethResponseData.Decode([]byte(responseData))
 
 	if err != nil {
-		return nil, err
+		diveContext.StopServices(services)
+		diveContext.FatalError("Fail to Start ETH Node", err.Error())
 	}
 
-	return result, nil
+	return result
 
 }

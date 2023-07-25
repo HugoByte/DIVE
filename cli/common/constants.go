@@ -1,10 +1,5 @@
 package common
 
-import (
-	"fmt"
-	"time"
-)
-
 const (
 	DiveEnclave                  = "dive"
 	DiveRemotePackagePath        = "github.com/hugobyte/dive"
@@ -18,8 +13,14 @@ const (
 	DiveHardhatNodeAlreadyRuning = "Hardhat Node Already Running"
 	DiveIconNodeAlreadyRunning   = "Icon Node Already Running"
 	DiveLogDirectory             = "/logs/"
-
-	DiveOutFile = "dive.json"
+	DiveDiwLogFile               = "divelog.log"
+	DiveErorLogFile              = "error.log"
+	DiveOutFile                  = "dive.json"
+	starlarkScript               = `
+def run(plan, args):
+	plan.stop_service(name=args["service_name"])
+	plan.print(args["uuid"]) # we add this print of a random UUID to make sure the single stop_service above won't get cached
+`
 )
 
 const (
@@ -38,6 +39,3 @@ const (
 var DiveVersion = "v0.0.1-beta"
 
 var DiveLogs bool
-
-var DiveDiwLogFile = fmt.Sprintf("dive-%d.log", time.Now().Unix())
-var DiveErorLogFile = fmt.Sprintf("dive-error-%d.log", time.Now().Unix())
