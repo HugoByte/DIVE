@@ -1,6 +1,9 @@
 package types
 
 import (
+	"os"
+	"strings"
+
 	"github.com/hugobyte/dive/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/spf13/cobra"
@@ -45,16 +48,25 @@ func RunEthNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveEthHardhatNodeScript, "start_eth_node", `{"args":{}}`, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
+
 		diveContext.FatalError("Starlark Run Failed", err.Error())
+
 	}
 
 	responseData, services, skippedInstructions, err := diveContext.GetSerializedData(data)
+
 	if err != nil {
-		diveContext.StopServices(services)
-		diveContext.FatalError("Starlark Run Failed", err.Error())
+		if strings.Contains(err.Error(), "already exists") {
+			diveContext.StopSpinner("Eth Node Already Running")
+			os.Exit(0)
+		} else {
+			diveContext.StopServices(services)
+			diveContext.FatalError("Starlark Run Failed", err.Error())
+		}
 
 	}
 	diveContext.CheckInstructionSkipped(skippedInstructions, common.DiveEthNodeAlreadyRunning)
+
 	ethResponseData := &common.DiveserviceResponse{}
 
 	result, err := ethResponseData.Decode([]byte(responseData))

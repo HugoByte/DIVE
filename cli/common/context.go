@@ -134,15 +134,17 @@ func (diveContext *DiveContext) GetSerializedData(response chan *kurtosis_core_r
 			services[serviceName] = serviceUUID
 		}
 
-		if executionResponse.GetError() != nil {
-
-			return "", services, nil, errors.New(executionResponse.GetError().String())
-		}
-
 		diveContext.Log.Info(executionResponse.String())
 
 		if executionResponse.GetInstruction().GetIsSkipped() {
 			skippedInstruction[executionResponse.GetInstruction().GetExecutableInstruction()] = executionResponse.GetInstruction().GetIsSkipped()
+			break
+		}
+
+		if executionResponse.GetError() != nil {
+
+			return "", services, nil, errors.New(executionResponse.GetError().String())
+
 		}
 
 		runFinishedEvent := executionResponse.GetRunFinishedEvent()
