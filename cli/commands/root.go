@@ -39,10 +39,10 @@ func RootCmd() *cobra.Command {
 	rootCmd.AddCommand(chain.NewChainCmd(diveContext))
 	rootCmd.AddCommand(bridge.NewBridgeCmd(diveContext))
 	rootCmd.AddCommand(clean.NewCleanCmd(diveContext))
-	rootCmd.AddCommand(version.VersionCmd)
-	rootCmd.AddCommand(discord.DiscordCmd)
-	rootCmd.AddCommand(twitter.TwitterCmd)
-	rootCmd.AddCommand(tutorial.TutorialCmd)
+	rootCmd.AddCommand(version.NewVersionCmd(diveContext))
+	rootCmd.AddCommand(discord.NewDiscordCmd(diveContext))
+	rootCmd.AddCommand(twitter.NewtwitterCmd(diveContext))
+	rootCmd.AddCommand(tutorial.NewTutorialCmd(diveContext))
 
 	rootCmd.PersistentFlags().BoolVarP(&common.DiveLogs, "logs", "l", false, "Prints out logs to Stdout")
 
