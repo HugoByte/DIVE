@@ -13,7 +13,7 @@ const (
 	DiveHardhatNodeAlreadyRuning = "Hardhat Node Already Running"
 	DiveIconNodeAlreadyRunning   = "Icon Node Already Running"
 	DiveLogDirectory             = "/logs/"
-	DiveDiwLogFile               = "divelog.log"
+	DiveDitLogFile               = "divelog.log"
 	DiveErorLogFile              = "error.log"
 	DiveOutFile                  = "dive.json"
 	starlarkScript               = `

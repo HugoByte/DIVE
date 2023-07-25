@@ -8,14 +8,13 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
-	"time"
 
 	"github.com/google/go-github/github"
-	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
-	"github.com/rifflock/lfshook"
-
 	"github.com/kurtosis-tech/stacktrace"
+	"github.com/natefinch/lumberjack"
+	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 )
 
@@ -146,53 +145,43 @@ func setupLogger() *logrus.Logger {
 		log.Fatalln(err)
 	}
 
-	if _, err := os.Stat(pwd + DiveLogDirectory); os.IsNotExist(err) {
-		err := os.Mkdir(pwd+DiveLogDirectory, os.ModePerm)
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}
-
 	log := logrus.New()
 
-	diwFilePath := pwd + DiveLogDirectory + DiveDiwLogFile
-	errorFilePath := pwd + DiveLogDirectory + DiveErorLogFile
-
-	log.SetOutput(io.Discard) // Send all logs to nowhere by default
+	log.SetOutput(io.Discard)
 	log.SetFormatter(&logrus.TextFormatter{
 		TimestampFormat: "2006-01-02 15:04:05",
 		FullTimestamp:   true,
 		ForceColors:     true,
 	})
 
-	diwWriter, err := rotatelogs.New(
-		diwFilePath+".%Y%m%d%H%M",
-		rotatelogs.WithLinkName(diwFilePath),
-		rotatelogs.WithMaxAge(time.Duration(86400)*time.Second),
-		rotatelogs.WithRotationTime(time.Duration(604800)*time.Second),
-	)
-	if err != nil {
-		log.Fatalln(err)
+	ditFilePath := pwd + DiveLogDirectory + DiveDitLogFile
+	errorFilePath := pwd + DiveLogDirectory + DiveErorLogFile
+
+	ditLogger := &lumberjack.Logger{
+		// Log file abbsolute path, os agnostic
+		Filename:  filepath.ToSlash(ditFilePath),
+		LocalTime: true,
 	}
 
-	errorWriter, err := rotatelogs.New(
-		errorFilePath+".%Y%m%d%H%M",
-		rotatelogs.WithLinkName(errorFilePath),
-		rotatelogs.WithMaxAge(time.Duration(86400)*time.Second),
-		rotatelogs.WithRotationTime(time.Duration(604800)*time.Second),
-	)
-	if err != nil {
-		log.Fatalln(err)
+	// Fork writing into two outputs
+	ditWriter := io.MultiWriter(ditLogger)
+
+	errorLogger := &lumberjack.Logger{
+		Filename:  filepath.ToSlash(errorFilePath),
+		LocalTime: true,
 	}
+
+	// Fork writing into two outputs
+	errormultiWriter := io.MultiWriter(errorLogger)
 
 	log.AddHook(lfshook.NewHook(
 		lfshook.WriterMap{
-			logrus.InfoLevel:  diwWriter,
-			logrus.DebugLevel: diwWriter,
-			logrus.TraceLevel: diwWriter,
-			logrus.ErrorLevel: errorWriter,
-			logrus.FatalLevel: errorWriter,
-			logrus.WarnLevel:  errorWriter,
+			logrus.InfoLevel:  ditWriter,
+			logrus.DebugLevel: ditWriter,
+			logrus.TraceLevel: ditWriter,
+			logrus.ErrorLevel: errormultiWriter,
+			logrus.FatalLevel: errormultiWriter,
+			logrus.WarnLevel:  errormultiWriter,
 		},
 		&logrus.JSONFormatter{
 			TimestampFormat: "2006-01-02 15:04:05",
