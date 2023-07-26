@@ -3,14 +3,16 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/hugobyte/dive/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
+	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/spf13/cobra"
 )
 
-const genesisIcon = "github.com/hugobyte/dive/services/jvm/icon/static-files/config/genesis-icon-0.zip"
+const DefaultIconGenesisFile = "github.com/hugobyte/dive/services/jvm/icon/static-files/config/genesis-icon-0.zip"
 
 var (
 	id               = ""
@@ -43,17 +45,6 @@ func (sc *IconServiceConfig) GetDefaultConfigIconNode0() {
 
 }
 
-func (sc *IconServiceConfig) GetDefaultConfigIconNode1() {
-
-	sc.Id = "1"
-	sc.Port = 9081
-	sc.PublicPort = 8091
-	sc.P2PListenAddress = "7081"
-	sc.P2PAddress = "8081"
-	sc.Cid = "0x42f1f3"
-
-}
-
 func (sc *IconServiceConfig) EncodeToString() (string, error) {
 	encodedBytes, err := json.Marshal(sc)
 	if err != nil {
@@ -75,27 +66,9 @@ It establishes a connection to the Icon network and allows the node in executing
 
 			decentralisation, _ := cmd.Flags().GetBool("decentralisation")
 
-			serviceConfig := &IconServiceConfig{}
-
-			if configFilePath == "" {
-				serviceConfig.GetDefaultConfigIconNode0()
-			} else {
-				data, err := common.ReadConfigFile(configFilePath)
-				if err != nil {
-					serviceConfig.GetDefaultConfigIconNode0()
-				}
-
-				err = json.Unmarshal(data, serviceConfig)
-
-				if err != nil {
-					diveContext.FatalError("Failed To Unmarshall", err.Error())
-				}
-
-			}
-
 			if decentralisation {
 
-				nodeResponse := RunIconNode(diveContext, serviceConfig, genesis)
+				nodeResponse := RunIconNode(diveContext)
 
 				params := GetDecentralizeParms(nodeResponse.ServiceName, nodeResponse.PrivateEndpoint, nodeResponse.KeystorePath, nodeResponse.KeyPassword, nodeResponse.NetworkId)
 
@@ -112,7 +85,7 @@ It establishes a connection to the Icon network and allows the node in executing
 
 			} else {
 
-				nodeResponse := RunIconNode(diveContext, serviceConfig, genesis)
+				nodeResponse := RunIconNode(diveContext)
 
 				err := nodeResponse.WriteDiveResponse(diveContext)
 
@@ -169,15 +142,23 @@ func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 
 }
 
-func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConfig, genesisFilePath string) *common.DiveserviceResponse {
-	diveContext.StartSpinner(" Starting Icon Node")
+func RunIconNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
+
+	// Initialse Kurtosis Context
 
 	diveContext.InitKurtosisContext()
+
+	serviceConfig, err := getConfig()
+	if err != nil {
+		diveContext.FatalError("Failed To Get Node Service Config", err.Error())
+	}
+
 	paramData, err := serviceConfig.EncodeToString()
 	if err != nil {
 		diveContext.FatalError("Encoding Failed", err.Error())
 	}
 
+	diveContext.StartSpinner(" Starting Icon Node")
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {
@@ -198,29 +179,14 @@ func RunIconNode(diveContext *common.DiveContext, serviceConfig *IconServiceConf
 
 	}
 
-	diveContext.CheckInstructionSkipped(skippedInstructions, "Instruction Executed Already")
-
-	var genesisFile = ""
-	var uploadedFiles = ""
-	var genesisPath = ""
-
-	if genesisFilePath != "" {
-		genesisFileName := filepath.Base(genesisFilePath)
-		r, d, err := kurtosisEnclaveContext.UploadFiles(genesisFilePath, genesisFileName)
-		diveContext.SetSpinnerMessage(fmt.Sprintf("File Uploaded sucessfully : UUID %s", r))
-		uploadedFiles = fmt.Sprintf(`{"file_path":"%s","file_name":"%s"}`, d, genesisFileName)
-
-		if err != nil {
-			return nil
-		}
-	} else {
-		genesisFile = filepath.Base(genesisIcon)
-		genesisPath = genesisIcon
-		uploadedFiles = `{}`
-
+	genesisHandler, err := genesismanager(kurtosisEnclaveContext)
+	if err != nil {
+		diveContext.FatalError("Failed To Get Genesis", err.Error())
 	}
 
-	params := fmt.Sprintf(`{"service_config":%s,"id":"%s","uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, responseData, serviceConfig.Id, uploadedFiles, genesisPath, genesisFile)
+	diveContext.CheckInstructionSkipped(skippedInstructions, "Instruction Executed Already")
+
+	params := fmt.Sprintf(`{"service_config":%s,"id":"%s","uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, responseData, serviceConfig.Id, genesisHandler.uploadedFiles, genesisHandler.genesisPath, genesisHandler.genesisFile)
 	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveIconNodeScript, "start_icon_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
@@ -286,4 +252,62 @@ func GetDecentralizeParms(serviceName, nodeEndpoint, keystorePath, keystorepassw
 
 	return fmt.Sprintf(`{"args":{"service_name":"%s","endpoint":"%s","keystore_path":"%s","keypassword":"%s","nid":"%s"}}`, serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID)
 
+}
+
+func getConfig() (*IconServiceConfig, error) {
+	// Init Icon Node Service Config
+
+	serviceConfig := &IconServiceConfig{}
+
+	if configFilePath == "" {
+		serviceConfig.GetDefaultConfigIconNode0()
+	} else {
+		data, err := common.ReadConfigFile(configFilePath)
+		if err != nil {
+			return nil, err
+		}
+
+		err = json.Unmarshal(data, serviceConfig)
+
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
+	return serviceConfig, nil
+}
+
+type genesisHandler struct {
+	genesisFile   string
+	uploadedFiles string
+	genesisPath   string
+}
+
+func genesismanager(enclaveContext *enclaves.EnclaveContext) (*genesisHandler, error) {
+
+	gm := genesisHandler{}
+
+	var genesisFilePath = genesis
+
+	if genesisFilePath != "" {
+		genesisFileName := filepath.Base(genesisFilePath)
+		if _, err := os.Stat(genesisFilePath); err != nil {
+			return nil, err
+		}
+
+		_, d, err := enclaveContext.UploadFiles(genesisFilePath, genesisFileName)
+		if err != nil {
+			return nil, err
+		}
+
+		gm.uploadedFiles = fmt.Sprintf(`{"file_path":"%s","file_name":"%s"}`, d, genesisFileName)
+	} else {
+		gm.genesisFile = filepath.Base(DefaultIconGenesisFile)
+		gm.genesisPath = DefaultIconGenesisFile
+		gm.uploadedFiles = `{}`
+
+	}
+
+	return &gm, nil
 }

@@ -35,8 +35,6 @@ It establishes a connection to the hardhat network and allows the node in execut
 
 func RunHardhatNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 
-	diveContext.StartSpinner(" Starting Hardhat Node")
-
 	diveContext.InitKurtosisContext()
 
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
@@ -44,7 +42,7 @@ func RunHardhatNode(diveContext *common.DiveContext) *common.DiveserviceResponse
 	if err != nil {
 		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
 	}
-
+	diveContext.StartSpinner(" Starting Hardhat Node")
 	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveEthHardhatNodeScript, "start_hardhat_node", "{}", common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {

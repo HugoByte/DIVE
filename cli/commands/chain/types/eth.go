@@ -36,7 +36,6 @@ It establishes a connection to the Ethereum network and allows the node in execu
 }
 
 func RunEthNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
-	diveContext.StartSpinner(" Starting ETH Node")
 
 	diveContext.InitKurtosisContext()
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
@@ -44,6 +43,7 @@ func RunEthNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 	if err != nil {
 		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
 	}
+	diveContext.StartSpinner(" Starting ETH Node")
 
 	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveEthHardhatNodeScript, "start_eth_node", `{"args":{}}`, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 

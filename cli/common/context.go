@@ -180,7 +180,8 @@ func (diveContext *DiveContext) Error(err string) {
 func (diveContext *DiveContext) InitKurtosisContext() {
 	kurtosisContext, err := kurtosis_context.NewKurtosisContextFromLocalEngine()
 	if err != nil {
-		log.Fatal("The Kurtosis Engine Server is unavailable and is probably not running; you will need to start it using the Kurtosis CLI before you can create a connection to it")
+		diveContext.Log.SetOutput(os.Stderr)
+		diveContext.Log.Fatal("The Kurtosis Engine Server is unavailable and is probably not running; you will need to start it using the Kurtosis CLI before you can create a connection to it")
 
 	}
 	diveContext.KurtosisContext = kurtosisContext
