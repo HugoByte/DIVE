@@ -10,6 +10,7 @@ before:
 builds:
   - id: cli
     binary: "dive"
+    main: .
     env:
       - CGO_ENABLED={{ if eq .Os "windows" }}0{{ else }}1{{ end }}
       # Only override compilers if we are on CI, otherwise use the locally available C/C++ toolchain

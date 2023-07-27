@@ -28,6 +28,6 @@ jobs:
         with:
           distribution: goreleaser
           tag: ${{ env.GITHUB_REF_NAME }}
-          args: release --rm-dist
+          args: release --snapshot --clean  --skip-validate
         env:
           GITHUB_TOKEN: ${{ secrets.PUBLISHER_TOKEN }}
