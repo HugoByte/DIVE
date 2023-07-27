@@ -10,7 +10,6 @@ import (
 
 	"github.com/hugobyte/dive/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -48,10 +47,11 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			common.ValidateCmdArgs(args, cmd.UsageString())
 
+			diveContext.InitKurtosisContext()
 			enclaveCtx, err := diveContext.GetEnclaveContext()
 
 			if err != nil {
-				logrus.Errorln(err)
+				diveContext.Error(err.Error())
 			}
 			diveContext.StartSpinner(fmt.Sprintf(" Starting BTP Bridge for %s,%s", chainA, chainB))
 
@@ -66,9 +66,16 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 				data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 				if err != nil {
-					fmt.Println(err)
+					diveContext.FatalError("Starlark Run Failed", err.Error())
 				}
-				response := diveContext.GetSerializedData(data)
+				response, services, skippedInstructions, err := diveContext.GetSerializedData(data)
+				if err != nil {
+					diveContext.StopServices(services)
+					diveContext.FatalError("Starlark Run Failed", err.Error())
+
+				}
+
+				diveContext.CheckInstructionSkipped(skippedInstructions, "Bridge Already Running")
 
 				common.WriteToFile(response)
 
@@ -77,10 +84,15 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 				data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 				if err != nil {
-					fmt.Println(err)
+					diveContext.FatalError("Starlark Run Failed", err.Error())
 				}
-				response := diveContext.GetSerializedData(data)
+				response, services, skippedInstructions, err := diveContext.GetSerializedData(data)
+				if err != nil {
+					diveContext.StopServices(services)
+					diveContext.FatalError("Starlark Run Failed", err.Error())
 
+				}
+				diveContext.CheckInstructionSkipped(skippedInstructions, "Bridge Already Running")
 				common.WriteToFile(response)
 
 			} else {
@@ -91,8 +103,8 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 		},
 	}
 
-	btpbridgeCmd.Flags().StringVar(&chainA, "chainA", "", "Metion Name of Supported Chain")
-	btpbridgeCmd.Flags().StringVar(&chainB, "chainB", "", "Metion Name of Supported Chain")
+	btpbridgeCmd.Flags().StringVar(&chainA, "chainA", "", "Mention Name of Supported Chain")
+	btpbridgeCmd.Flags().StringVar(&chainB, "chainB", "", "Mention Name of Supported Chain")
 	btpbridgeCmd.Flags().Bool("bridge", false, "Mention Bridge ENV")
 
 	btpbridgeCmd.MarkFlagRequired("chainA")

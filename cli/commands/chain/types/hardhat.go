@@ -17,14 +17,11 @@ It establishes a connection to the hardhat network and allows the node in execut
 
 			common.ValidateCmdArgs(args, cmd.UsageString())
 
-			data, err := RunHardhatNode(diveContext)
+			data := RunHardhatNode(diveContext)
 
-			if err != nil {
-				diveContext.FatalError("Fail to Start Hardhat Node", err.Error())
-			}
 			diveContext.SetSpinnerMessage("Execution Completed")
 
-			err = data.WriteDiveResponse(diveContext)
+			err := data.WriteDiveResponse(diveContext)
 			if err != nil {
 				diveContext.FatalError("Failed To Write To File", err.Error())
 			}
@@ -36,32 +33,38 @@ It establishes a connection to the hardhat network and allows the node in execut
 
 }
 
-func RunHardhatNode(diveContext *common.DiveContext) (*common.DiveserviceResponse, error) {
+func RunHardhatNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 
-	diveContext.StartSpinner(" Starting Hardhat Node")
+	diveContext.InitKurtosisContext()
 
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {
-		return nil, err
+		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
 	}
-
+	diveContext.StartSpinner(" Starting Hardhat Node")
 	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveEthHardhatNodeScript, "start_hardhat_node", "{}", common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
-		return nil, err
+		diveContext.FatalError("Starlark Run Failed", err.Error())
 	}
 
-	responseData := diveContext.GetSerializedData(data)
+	responseData, services, skippedInstructions, err := diveContext.GetSerializedData(data)
+	if err != nil {
+		diveContext.StopServices(services)
+		diveContext.FatalError("Starlark Run Failed", err.Error())
+	}
 
+	diveContext.CheckInstructionSkipped(skippedInstructions, common.DiveHardhatNodeAlreadyRuning)
 	hardhatResponseData := &common.DiveserviceResponse{}
 
 	result, err := hardhatResponseData.Decode([]byte(responseData))
 
 	if err != nil {
-		return nil, err
+		diveContext.StopServices(services)
+		diveContext.FatalError("Failed To Unmarshall Data", err.Error())
 	}
 
-	return result, nil
+	return result
 
 }
