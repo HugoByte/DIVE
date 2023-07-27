@@ -75,7 +75,7 @@ It establishes a connection to the Icon network and allows the node in executing
 				diveContext.SetSpinnerMessage("Starting Decentralisation")
 				Decentralisation(diveContext, params)
 
-				err := nodeResponse.WriteDiveResponse(diveContext)
+				err := nodeResponse.WriteDiveResponse()
 
 				if err != nil {
 					diveContext.FatalError("Failed To Write To File", err.Error())
@@ -87,7 +87,7 @@ It establishes a connection to the Icon network and allows the node in executing
 
 				nodeResponse := RunIconNode(diveContext)
 
-				err := nodeResponse.WriteDiveResponse(diveContext)
+				err := nodeResponse.WriteDiveResponse()
 
 				if err != nil {
 					diveContext.FatalError("Failed To Write To File", err.Error())
@@ -99,7 +99,6 @@ It establishes a connection to the Icon network and allows the node in executing
 		},
 	}
 
-	iconCmd.Flags().StringVarP(&id, "id", "i", "", "custom chain id for icon node")
 	iconCmd.Flags().StringVarP(&genesis, "genesis", "g", "", "path to custom genesis file")
 	iconCmd.Flags().StringVarP(&configFilePath, "config", "c", "", "path to custom config json file")
 	iconCmd.Flags().BoolP("decentralisation", "d", false, "decentralise Icon Node")
@@ -120,7 +119,7 @@ func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 
 			params := GetDecentralizeParms(serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID)
-
+			diveContext.InitKurtosisContext()
 			Decentralisation(diveContext, params)
 
 			diveContext.StopSpinner(fmt.Sprintln("Decentralisation Completed.Please find service details in dive.json"))
