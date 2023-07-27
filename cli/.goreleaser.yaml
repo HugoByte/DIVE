@@ -8,9 +8,32 @@ before:
     - go generate ./...
     - go build
 builds:
-  - binary: "dive"
+  - id: cli
+    binary: "dive"
     env:
-      - CGO_ENABLED=0
+      - CGO_ENABLED={{ if eq .Os "windows" }}0{{ else }}1{{ end }}
+      # Only override compilers if we are on CI, otherwise use the locally available C/C++ toolchain
+      - >-
+        {{- if index .Env "CI" }}
+          {{- if eq .Os "darwin" }}CC=o64h-clang{{- end }}
+          {{- if eq .Os "linux" }}
+            {{- if eq .Arch "amd64"}}CC=x86_64-linux-musl-gcc{{- end }}
+              {{- if eq .Arch "arm64"}}CC=aarch64-linux-musl-gcc{{- end }}
+          {{- end }}
+        {{- end }}
+      - >-
+        {{- if index .Env "CI" }}
+          {{- if eq .Os "darwin" }}CXX=o64h-clang++{{- end }}
+          {{- if eq .Os "linux" }}
+            {{- if eq .Arch "amd64"}}CXX=x86_64-linux-musl-g++{{- end }}
+              {{- if eq .Arch "arm64"}}CXX=aarch64-linux-musl-g++{{- end }}
+          {{- end }}
+        {{- end }}
+    ldflags:
+      - >-
+        {{- if eq .Os "linux" }}-linkmode external -extldflags "-static"{{- end }}
+    tags:
+      - osusergo
     goos:
       - linux
       - windows
@@ -20,23 +43,15 @@ builds:
       - arm64
 
 archives:
-  - format: tar.gz
-    # this name template makes the OS and Arch compatible with the results of uname.
-    name_template: >-
-      {{ tolower .ProjectName }}_
-      {{- tolower .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}_{{ .Tag }}
-    # use zip for windows archives
-    format_overrides:
-      - goos: windows
-        format: zip
-
+  - id: cli
+    builds:
+      - cli
+    name_template: dive-cli_{{ .Tag }}_{{ tolower .Os }}_{{ .Arch }}
 brews:
   # creates a brew formula representing the latest version
   - name: dive-cli
+    ids:
+      - cli
     tap:
       owner: hugobyte
       name: homebrew-tap
@@ -54,14 +69,16 @@ brews:
 
   # creates a versioned brew formula, enabling installation of specific versions of kurtosis cli
   - name: dive-cli@{{ .Tag }}
+    ids:
+      - cli
     tap:
       owner: hugobyte
       name: homebrew-tap
     commit_author:
       name: shreyasbhat0
     commit_msg_template: "Automated formula created for the CLI, version {{ .Tag }}"
-    homepage: "https://www.kurtosistech.com"
-    description: "CLI for managing Kurtosis environments."
+    homepage: "https://hugobyte.com"
+    description: "CLI for Dive Package"
     license: "Apache 2.0"
     # NOTE: Goreleaser *should* automatically detect the binaries packaged inside the archives being installed by the Homebrew formula, but it doesn't due to:
     #  https://github.com/goreleaser/goreleaser/issues/2488

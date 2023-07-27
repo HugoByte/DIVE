@@ -38,6 +38,7 @@ func (dive *DiveserviceResponse) Decode(responseData []byte) (*DiveserviceRespon
 	return dive, nil
 }
 func (dive *DiveserviceResponse) EncodeToString() (string, error) {
+
 	encodedBytes, err := json.Marshal(dive)
 	if err != nil {
 		return "", nil
@@ -45,7 +46,7 @@ func (dive *DiveserviceResponse) EncodeToString() (string, error) {
 
 	return string(encodedBytes), nil
 }
-func (dive *DiveserviceResponse) WriteDiveResponse(diveContext *DiveContext) error {
+func (dive *DiveserviceResponse) WriteDiveResponse() error {
 
 	serialisedData, err := dive.EncodeToString()
 
@@ -105,7 +106,6 @@ func ReadConfigFile(filePath string) ([]byte, error) {
 	return file, nil
 }
 func WriteToFile(data string) error {
-
 	pwd, err := os.Getwd()
 
 	if err != nil {
