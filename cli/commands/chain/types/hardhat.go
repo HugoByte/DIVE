@@ -21,7 +21,7 @@ It establishes a connection to the hardhat network and allows the node in execut
 
 			diveContext.SetSpinnerMessage("Execution Completed")
 
-			err := data.WriteDiveResponse()
+			err := common.WriteToServiceFile(data.NetworkName, *data)
 			if err != nil {
 				diveContext.FatalError("Failed To Write To File", err.Error())
 			}

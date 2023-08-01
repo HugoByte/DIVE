@@ -75,7 +75,7 @@ It establishes a connection to the Icon network and allows the node in executing
 				diveContext.SetSpinnerMessage("Starting Decentralisation")
 				Decentralisation(diveContext, params)
 
-				err := nodeResponse.WriteDiveResponse()
+				err := common.WriteToServiceFile(nodeResponse.NetworkName, *nodeResponse)
 
 				if err != nil {
 					diveContext.FatalError("Failed To Write To File", err.Error())
@@ -87,7 +87,7 @@ It establishes a connection to the Icon network and allows the node in executing
 
 				nodeResponse := RunIconNode(diveContext)
 
-				err := nodeResponse.WriteDiveResponse()
+				err := common.WriteToServiceFile(nodeResponse.NetworkName, *nodeResponse)
 
 				if err != nil {
 					diveContext.FatalError("Failed To Write To File", err.Error())
