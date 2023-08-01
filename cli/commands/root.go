@@ -17,7 +17,7 @@ import (
 
 	"github.com/hugobyte/dive/styles"
 	"github.com/spf13/cobra"
-)
+)   
 
 func RootCmd() *cobra.Command {
 	diveContext := common.NewDiveContext()

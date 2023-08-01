@@ -23,7 +23,7 @@ It establishes a connection to the Ethereum network and allows the node in execu
 			data := RunEthNode(diveContext)
 
 			diveContext.SetSpinnerMessage("Execution Completed")
-			err := data.WriteDiveResponse()
+			err := common.WriteToServiceFile(data.NetworkName, *data)
 			if err != nil {
 				diveContext.FatalError("Failed To Write To File", err.Error())
 			}
