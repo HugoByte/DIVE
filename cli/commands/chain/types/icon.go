@@ -81,7 +81,7 @@ It establishes a connection to the Icon network and allows the node in executing
 					diveContext.FatalError("Failed To Write To File", err.Error())
 				}
 
-				diveContext.StopSpinner("Icon Node Started. Please find service details in current working directory(dive.json) in current working directory")
+				diveContext.StopSpinner("Icon Node Started. Please find service details in current working directory(services.json) in current working directory")
 
 			} else {
 
@@ -93,7 +93,7 @@ It establishes a connection to the Icon network and allows the node in executing
 					diveContext.FatalError("Failed To Write To File", err.Error())
 				}
 
-				diveContext.StopSpinner("Icon Node Started. Please find service details in current working directory(dive.json)")
+				diveContext.StopSpinner("Icon Node Started. Please find service details in current working directory(services.json)")
 			}
 
 		},
