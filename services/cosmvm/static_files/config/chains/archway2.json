@@ -1,0 +1,18 @@
+{
+    "type": "cosmos",
+    "value": {
+      "key": "fd1",
+      "chain-id": "chain-2",
+      "rpc-addr": "http://172.16.1.3:26657",
+      "grpc-addr": "",
+      "account-prefix": "archway",
+      "keyring-backend": "test",
+      "gas-adjustment": 1.5,
+      "gas-prices": "0.0025stake",
+      "debug": true,
+      "timeout": "20s",
+      "output-format": "json",
+      "sign-mode": "direct",
+      "ibc-handler-address":"archway1fde8lfydxgwg6p7xe9ugx5a6ysj37zfvn9m9z5rxt4mqvdcneczsczq2a3"
+    }
+  }
