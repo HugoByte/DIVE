@@ -5,6 +5,7 @@ package bridge
 
 import (
 	"fmt"
+	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"strconv"
 	"strings"
 
@@ -14,6 +15,8 @@ import (
 )
 
 const bridgeMainFunction = "run_btp_setup"
+const runbridgeicon2icon = "start_btp_for_already_running_icon_nodes"
+const runbridgeicon2ethhardhat = "start_btp_icon_to_eth_for_already_running_nodes"
 
 var (
 	chainA string
@@ -57,8 +60,6 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
 			bridge, _ := cmd.Flags().GetBool("bridge")
 
-			params := fmt.Sprintf(`{"args":{"links": {"src": "%s", "dst": "%s"},"bridge":"%s"}}`, chainA, chainB, strconv.FormatBool(bridge))
-
 			if strings.ToLower(chainA) == "icon" && strings.ToLower(chainB) == "icon" {
 
 				serviceConfig, err := common.ReadServiceJsonFile()
@@ -81,52 +82,19 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 						diveContext.FatalError("Failed To read ServiceFile", err.Error())
 					}
 
-					configData := fmt.Sprintf(`{"links": {"src":"%s","dst":"%s"},"chains" : { "%s" : %s,"%s" : %s},"contracts" : {"%s"  : {},"%s" : {}},"bridge" : "%s"}`, srcChain, dstChain, srcChain, srcChainServiceResponse, dstChain, dstChainServiceResponse, srcChain, dstChain, strconv.FormatBool(bridge))
+					srcChainServiceName := serviceConfig["icon-0"].ServiceName
+					dstChainServiceName := serviceConfig["icon-1"].ServiceName
 
-					fmt.Println(configData)
-					params := fmt.Sprintf(`{"src_chain":"%s", "dst_chain":"%s", "config_data":%s, "src_service_name":"%s", "dst_src_name":"%s"}`, "icon", "icon-1", configData, serviceConfig["icon-0"].ServiceName, serviceConfig["icon-1"].ServiceName)
-
-					fmt.Println(params)
-
-					data, _, err := enclaveCtx.RunStarlarkPackage(diveContext.Ctx, "../", common.DiveBridgeScript, "start_btp_bridge_for_already_running_icon_nodes", params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
-
-					if err != nil {
-						diveContext.FatalError("Starlark Run Failed", err.Error())
-					}
-					response, services, skippedInstructions, err := diveContext.GetSerializedData(data)
-					if err != nil {
-						diveContext.StopServices(services)
-						diveContext.FatalError("Starlark Run Failed", err.Error())
-
-					}
-
-					diveContext.CheckInstructionSkipped(skippedInstructions, "Bridge Already Running")
-
-					common.WriteToFile(response)
+					runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2icon, srcChain, dstChain, srcChainServiceName, dstChainServiceName, bridge, srcChainServiceResponse, dstChainServiceResponse)
 
 				} else {
 
-					diveContext.SetSpinnerMessage(" Executing BTP Starlark Package")
+					params := getParams(chainA, chainA, strconv.FormatBool(bridge))
 
-					data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
-
-					if err != nil {
-						diveContext.FatalError("Starlark Run Failed", err.Error())
-					}
-					response, services, skippedInstructions, err := diveContext.GetSerializedData(data)
-					if err != nil {
-						diveContext.StopServices(services)
-						diveContext.FatalError("Starlark Run Failed", err.Error())
-
-					}
-
-					diveContext.CheckInstructionSkipped(skippedInstructions, "Bridge Already Running")
-
-					common.WriteToFile(response)
-
+					runBtpSetupByRunningNodes(diveContext, enclaveCtx, params)
 				}
 
-			} else if strings.ToLower(chainA) == "icon" && (strings.ToLower(chainB) == "eth" || strings.ToLower(chainB) == "hardhat") {
+			} else if (strings.ToLower(chainA) == "icon") && (strings.ToLower(chainB) == "eth" || strings.ToLower(chainB) == "hardhat") {
 
 				serviceConfig, err := common.ReadServiceJsonFile()
 
@@ -148,44 +116,16 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 						diveContext.FatalError("Failed To read ServiceFile", err.Error())
 					}
 
-					configData := fmt.Sprintf(`{"links": {"src":"%s","dst":"%s"},"chains" : { "%s" : %s,"%s" : %s},"contracts" : {"%s"  : {},"%s" : {}},"bridge" : "%s"}`, srcChain, dstChain, srcChain, srcChainServiceResponse, dstChain, dstChainServiceResponse, srcChain, dstChain, strconv.FormatBool(bridge))
+					srcChainServiceName := serviceConfig["icon-0"].ServiceName
+					dstChainServiceName := serviceConfig[dstChain].ServiceName
 
-					fmt.Println(configData)
-					params := fmt.Sprintf(`{"src_chain":"%s", "dst_chain":"%s", "config_data":%s, "src_service_name":"%s", "dst_src_name":"%s"}`, "icon", dstChain, configData, serviceConfig["icon-0"].ServiceName, serviceConfig[dstChain].ServiceName)
+					runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, srcChain, dstChain, srcChainServiceName, dstChainServiceName, bridge, srcChainServiceResponse, dstChainServiceResponse)
 
-					fmt.Println(params)
-
-					data, _, err := enclaveCtx.RunStarlarkPackage(diveContext.Ctx, "../", common.DiveBridgeScript, "start_btp_icon_to_eth_for_already_running_nodes", params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
-
-					if err != nil {
-						diveContext.FatalError("Starlark Run Failed", err.Error())
-					}
-					response, services, skippedInstructions, err := diveContext.GetSerializedData(data)
-					if err != nil {
-						diveContext.StopServices(services)
-						diveContext.FatalError("Starlark Run Failed", err.Error())
-
-					}
-
-					diveContext.CheckInstructionSkipped(skippedInstructions, "Bridge Already Running")
-
-					common.WriteToFile(response)
 				} else {
 
-					diveContext.SetSpinnerMessage(" Executing BTP Starlark Package")
-					data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+					params := getParams(chainA, chainB, strconv.FormatBool(bridge))
 
-					if err != nil {
-						diveContext.FatalError("Starlark Run Failed", err.Error())
-					}
-					response, services, skippedInstructions, err := diveContext.GetSerializedData(data)
-					if err != nil {
-						diveContext.StopServices(services)
-						diveContext.FatalError("Starlark Run Failed", err.Error())
-
-					}
-					diveContext.CheckInstructionSkipped(skippedInstructions, "Bridge Already Running")
-					common.WriteToFile(response)
+					runBtpSetupByRunningNodes(diveContext, enclaveCtx, params)
 				}
 			} else {
 				diveContext.FatalError("Chains Not Supported", "Supported Chains [icon,eth,hardhat]")
@@ -203,4 +143,51 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 	btpbridgeCmd.MarkFlagRequired("chainB")
 
 	return btpbridgeCmd
+}
+
+func runBtpSetupByRunningNodes(diveContext *common.DiveContext, enclaveCtx *enclaves.EnclaveContext, params string) {
+	diveContext.SetSpinnerMessage(" Executing BTP Starlark Package")
+
+	data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+
+	if err != nil {
+		diveContext.FatalError("Starlark Run Failed", err.Error())
+	}
+	response, services, skippedInstructions, err := diveContext.GetSerializedData(data)
+	if err != nil {
+		diveContext.StopServices(services)
+		diveContext.FatalError("Starlark Run Failed", err.Error())
+
+	}
+	diveContext.CheckInstructionSkipped(skippedInstructions, "Bridge Already Running")
+	common.WriteToFile(response)
+
+}
+
+func runBtpSetupForAlreadyRunningNodes(diveContext *common.DiveContext, enclaveCtx *enclaves.EnclaveContext, mainFunctionName string, srcChain string, dstChain string, srcChainServiceName string, dstChainServiceName string, bridge bool, srcChainServiceResponse string, dstChainServiceResponse string) {
+
+	configData := fmt.Sprintf(`{"links": {"src":"%s","dst":"%s"},"chains" : { "%s" : %s,"%s" : %s},"contracts" : {"%s"  : {},"%s" : {}},"bridge" : "%s"}`, srcChain, dstChain, srcChain, srcChainServiceResponse, dstChain, dstChainServiceResponse, srcChain, dstChain, strconv.FormatBool(bridge))
+
+	params := fmt.Sprintf(`{"src_chain":"%s", "dst_chain":"%s", "config_data":%s, "src_service_name":"%s", "dst_src_name":"%s"}`, srcChain, dstChain, configData, srcChainServiceName, dstChainServiceName)
+
+	data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, mainFunctionName, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+
+	if err != nil {
+		diveContext.FatalError("Starlark Run Failed", err.Error())
+	}
+	response, services, skippedInstructions, err := diveContext.GetSerializedData(data)
+	if err != nil {
+		diveContext.StopServices(services)
+		diveContext.FatalError("Starlark Run Failed", err.Error())
+
+	}
+
+	diveContext.CheckInstructionSkipped(skippedInstructions, "Bridge Already Running")
+
+	common.WriteToFile(response)
+
+}
+
+func getParams(chainSrc, chainDst, bridge string) string {
+	return fmt.Sprintf(`{"args":{"links": {"src": "%s", "dst": "%s"},"bridge":"%s"}}`, chainSrc, chainDst, bridge)
 }
