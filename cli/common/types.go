@@ -190,3 +190,96 @@ func setupLogger() *logrus.Logger {
 
 	return log
 }
+
+type Services map[string]*DiveserviceResponse
+
+func WriteToServiceFile(serviceName string, data DiveserviceResponse) error {
+
+	pwd, err := getPwd()
+	if err != nil {
+		return err
+	}
+
+	file, err := os.OpenFile(pwd+"/services.json", os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	jsonDataFromFile, err := ReadServiceJsonFile()
+
+	if err != nil {
+		return err
+	}
+
+	if len(jsonDataFromFile) != 0 {
+		_, ok := jsonDataFromFile[serviceName]
+		if !ok {
+			jsonDataFromFile[serviceName] = &data
+			dataTowrite, err := json.Marshal(jsonDataFromFile)
+			if err != nil {
+				return err
+			}
+
+			_, err = file.WriteAt(dataTowrite, 0)
+
+			if err != nil {
+				return err
+			}
+
+			return nil
+		}
+
+	}
+	newServices := Services{}
+
+	newServices[serviceName] = &data
+
+	dataTowrite, err := json.Marshal(newServices)
+	if err != nil {
+		return err
+	}
+
+	_, err = file.Write(dataTowrite)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func ReadServiceJsonFile() (Services, error) {
+
+	services := Services{}
+
+	pwd, err := getPwd()
+	if err != nil {
+		return nil, err
+	}
+
+	jsonFile, _ := os.ReadFile(pwd + "/services.json")
+
+	if len(jsonFile) == 0 {
+		return nil, nil
+	}
+	json.Unmarshal(jsonFile, &services)
+
+	return services, nil
+
+}
+
+func getPwd() (string, error) {
+	pwd, err := os.Getwd()
+
+	if err != nil {
+		return "", err
+	}
+
+	return pwd, nil
+}
