@@ -38,13 +38,15 @@ Before proceeding make sure to have
 
 ## DIVE CLI
 
-DIVE CLI – a powerful tool designed to streamline the entire process of node setup, network configuration, and BTP bridge creation. 
+<p align='justify'>
+DIVE CLI – a powerful tool designed to streamline the entire process of node setup, network configuration, and BTP bridge creation.
 With DIVE CLI, developers can easily connect and interact with various blockchain networks, paving the way for seamless cross-chain communication and smart contract deployment.
 Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually configuring nodes, allowing developers to effortlessly set up nodes for the BTP network with just a few simple commands. The tool provides a user-friendly interface that makes the process accessible even to those new to blockchain development.
+</p>
 
 ### Installing Dive CLI
 
-- Install using **`brew`**
+- Install on **`MacOS`**
   ```
   brew install hugobyte/tap/dive-cli
   ```
@@ -68,9 +70,13 @@ Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually co
 ### Commands
 
 - **bridge** : For setting up communication between two different chains.This will setup the relayer to connect two different chains and pass messages between them.
-  **Subcommand**: - **btp** : Starts connection between specified chains using [BTP](https://icon.community/assets/btp-litepaper.pdf)
+
+  **Subcommand**:
+
+  - **btp** : Starts connection between specified chains using [BTP](https://icon.community/assets/btp-litepaper.pdf)
 
 - **chain**: For initialising and starting a specified blockchain node. By executing this command the node will be launched by enabling the network participation and ledger maintenance within the specified blockchain ecosystem
+
   **Subcommand**:
 
   - **eth** : Build, initialise and start a eth node.
@@ -86,11 +92,7 @@ Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually co
 
 ### Usage
 
-> Before proceeding, make sure the Kurtosis Engine is running in the background. If it's not already running, start it by executing the following command
-
-    **```
-    kurtosis engine start
-    ```**
+> Before proceeding, make sure the Kurtosis Engine is running in the background. If it's not already running, start it by executing the following command: `kurtosis engine start`
 
 #### Setting up an Node
 
