@@ -34,6 +34,13 @@ func NewCleanCmd(diveContext *common.DiveContext) *cobra.Command {
 			if err == nil {
 				os.Remove(diveOutPath)
 			}
+			servicesOutPath := fmt.Sprintf("%s/%s", pwd, common.ServiceFilePath)
+			_, err = os.Stat(servicesOutPath)
+
+			if err == nil {
+				os.Remove(servicesOutPath)
+			}
+
 			enclaveName := diveContext.GetEnclaves()
 			if enclaveName == "" {
 				diveContext.Log.SetOutput(os.Stderr)

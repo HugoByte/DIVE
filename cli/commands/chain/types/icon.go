@@ -15,7 +15,6 @@ import (
 const DefaultIconGenesisFile = "github.com/hugobyte/dive/services/jvm/icon/static-files/config/genesis-icon-0.zip"
 
 var (
-	id               = ""
 	genesis          = ""
 	serviceName      = ""
 	keystorePath     = ""
@@ -81,7 +80,7 @@ It establishes a connection to the Icon network and allows the node in executing
 					diveContext.FatalError("Failed To Write To File", err.Error())
 				}
 
-				diveContext.StopSpinner("Icon Node Started. Please find service details in current working directory(dive.json) in current working directory")
+				diveContext.StopSpinner("Icon Node Started. Please find service details in current working directory(services.json) in current working directory")
 
 			} else {
 
@@ -93,7 +92,7 @@ It establishes a connection to the Icon network and allows the node in executing
 					diveContext.FatalError("Failed To Write To File", err.Error())
 				}
 
-				diveContext.StopSpinner("Icon Node Started. Please find service details in current working directory(dive.json)")
+				diveContext.StopSpinner("Icon Node Started. Please find service details in current working directory(services.json)")
 			}
 
 		},

@@ -46,16 +46,6 @@ func (dive *DiveserviceResponse) EncodeToString() (string, error) {
 
 	return string(encodedBytes), nil
 }
-func (dive *DiveserviceResponse) WriteDiveResponse() error {
-
-	serialisedData, err := dive.EncodeToString()
-
-	if err != nil {
-		return err
-	}
-
-	return WriteToFile(serialisedData)
-}
 
 func OpenFile(URL string) error {
 	var args []string
@@ -200,7 +190,9 @@ func WriteToServiceFile(serviceName string, data DiveserviceResponse) error {
 		return err
 	}
 
-	file, err := os.OpenFile(pwd+"/services.json", os.O_CREATE|os.O_WRONLY, 0644)
+	serviceFile := fmt.Sprintf("%s/%s", pwd, ServiceFilePath)
+
+	file, err := os.OpenFile(serviceFile, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
@@ -263,7 +255,7 @@ func ReadServiceJsonFile() (Services, error) {
 		return nil, err
 	}
 
-	jsonFile, _ := os.ReadFile(pwd + "/services.json")
+	jsonFile, _ := os.ReadFile(pwd + ServiceFilePath)
 
 	if len(jsonFile) == 0 {
 		return nil, nil

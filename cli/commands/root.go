@@ -17,7 +17,7 @@ import (
 
 	"github.com/hugobyte/dive/styles"
 	"github.com/spf13/cobra"
-)   
+)
 
 func RootCmd() *cobra.Command {
 	diveContext := common.NewDiveContext()
@@ -44,7 +44,7 @@ func RootCmd() *cobra.Command {
 	rootCmd.AddCommand(twitter.NewtwitterCmd(diveContext))
 	rootCmd.AddCommand(tutorial.NewTutorialCmd(diveContext))
 
-	rootCmd.PersistentFlags().BoolVarP(&common.DiveLogs, "logs", "l", false, "Prints out logs to Stdout")
+	rootCmd.PersistentFlags().BoolVar(&common.DiveLogs, "verbose", false, "Prints out logs to Stdout")
 
 	return rootCmd
 
