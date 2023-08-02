@@ -36,9 +36,11 @@ Before proceeding make sure to have
 
 - [**Evm BTP Integration**](./evm/) - This provides setup for Deploying BTP Smart Contracts and Relay Setup
 
-### Running Dive
+## DIVE CLI
 
-Dive-cli is a command line tool that will be used for starting the chain and crosschain communication between two different chains
+DIVE CLI – a powerful tool designed to streamline the entire process of node setup, network configuration, and BTP bridge creation. 
+With DIVE CLI, developers can easily connect and interact with various blockchain networks, paving the way for seamless cross-chain communication and smart contract deployment.
+Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually configuring nodes, allowing developers to effortlessly set up nodes for the BTP network with just a few simple commands. The tool provides a user-friendly interface that makes the process accessible even to those new to blockchain development.
 
 ### Installing Dive CLI
 
