@@ -104,10 +104,9 @@ After running the command, **DIVE CLI** will automatically start the ICON node a
 
 Once the initialization is complete, you can interact with the local ICON chain as needed.**DIVE CLI** sets up the ICON node on your local environment, enabling you to deploy and test smart contracts, explore transactions, and experiment with various ICON blockchain features
 
-> Detailed output during execution can be enabled via Verbose flag
-
-    Example: `dive chain icon --verbose=ture`
-    Anyhow each Dive cli execution will be logged into log files under log folder in current working directory
+> Detailed output during execution can be enabled via Verbose flag.
+> example: `dive chain icon --verbose`
+> Anyhow each Dive cli execution will be logged into log files under log folder in current working directory
 
 After successful execution one can find service details in `services.json` created in current working directory.
 Example `services.json`:
