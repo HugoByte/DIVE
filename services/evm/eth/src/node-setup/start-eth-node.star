@@ -1,19 +1,27 @@
-eth_network_module = import_module("github.com/kurtosis-tech/eth-network-package/main.star")
 constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
+participant_network = import_module("github.com/kurtosis-tech/eth-network-package/src/participant_network.star")
+input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
+static_files = import_module("github.com/kurtosis-tech/eth-network-package/static_files/static_files.star")
+genesis_constants = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/genesis_constants/genesis_constants.star")
 
 # Spins Up the ETH Node
 def start_eth_node(plan,args):
+ 	eth_contstants = constants.ETH_NODE_CLIENT
+ 	args_with_right_defaults = input_parser.parse_input(args)
+ 	num_participants = len(args_with_right_defaults.participants)
+ 	network_params = args_with_right_defaults.network_params
 
-    eth_contstants = constants.ETH_NODE_CLIENT
-    eth_network_participants, cl_genesis_timestamp = eth_network_module.run(plan, args)
-    network_address = get_network_address(eth_network_participants[0].el_client_context.ip_addr,eth_network_participants[0].el_client_context.rpc_port_num)
-    return struct(
-          service_name = eth_contstants.service_name,
+ 	all_participants, cl_genesis_timestamp = participant_network.launch_participant_network(plan, args_with_right_defaults.participants, network_params, args_with_right_defaults.global_client_log_level)
+	
+ 	network_address = get_network_address(all_participants[0].el_client_context.ip_addr,all_participants[0].el_client_context.rpc_port_num)
+
+	return struct(
+          service_name = all_participants[0].el_client_context.service_name,
           network_name= eth_contstants.network_name,
           network = eth_contstants.network,
           nid = eth_contstants.nid,
-          endpoint = network_address,
-		  endpoint_public = "",
+          endpoint = "http://%s" % network_address,
+		  endpoint_public = "http://",
 		  keystore_path = eth_contstants.keystore_path,
 		  keypassword = eth_contstants.keypassword
 		  )
@@ -64,8 +72,8 @@ def start_hardhat_node(plan):
           network_name= "hardhat",
           network = hardhat_constants.network,
           nid = hardhat_constants.network_id,
-          endpoint = private_url,
-		  endpoint_public = public_url,
+          endpoint = "http://%s" % private_url,
+		  endpoint_public = "http://%s" % public_url,
 		  keystore_path = hardhat_constants.keystore_path,
 		  keypassword = hardhat_constants.keypassword
      )

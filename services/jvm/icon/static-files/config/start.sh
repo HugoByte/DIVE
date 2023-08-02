@@ -10,10 +10,11 @@ start_chain() {
   done
   echo $RES
 
-  CID=42f1f3
+  
+  CID=${1}
   if [ ! -e ${GOLOOP_NODE_DIR}/${CID} ]; then
     # join chain
-    GENESIS=/goloop/config/genesis-icon-1.zip
+    GENESIS=/goloop/genesis/${2}
     goloop chain join \
         --platform icon \
         --channel icon_dex \
@@ -23,12 +24,13 @@ start_chain() {
         --normal_tx_pool 1000 \
         --db_type rocksdb \
         --role 3
+    goloop system config rpcIncludeDebug true
   fi
-  goloop chain start 0x${CID}
+  goloop chain start ${CID}
 }
 
 # start chain in backgound
-start_chain &
+start_chain "$1" "$2" &
 
 # start goloop server
 exec goloop server start

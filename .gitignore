@@ -92,3 +92,6 @@ tsconfig.tsbuildinfo
 # Generated files
 .docusaurus
 .cache-loader
+
+dist/
+logs/
