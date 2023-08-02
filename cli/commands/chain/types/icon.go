@@ -15,7 +15,6 @@ import (
 const DefaultIconGenesisFile = "github.com/hugobyte/dive/services/jvm/icon/static-files/config/genesis-icon-0.zip"
 
 var (
-	id               = ""
 	genesis          = ""
 	serviceName      = ""
 	keystorePath     = ""
