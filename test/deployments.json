@@ -1,0 +1,34 @@
+{
+  "icon0": {
+    "network": "0x3.icon",
+    "contracts": {
+      "xcall": "cx2f4e1b544d16144a47dd7d56cd0a2417c9e2d119",
+      "dapp": "cxdaa00f24ec47a6209d7349b4349cdb32cbdf1b26"
+    },
+    "networkTypeId": "0x1",
+    "networkId": "0x1",
+    "blockNum": 236
+  },
+  "icon1": {
+    "network": "0x101.icon",
+    "contracts": {
+      "xcall": "cx97696a26355075d88f927f4956b8fcd94ee28cf1",
+      "dapp": "cxf2febd183534ebfbd182460566879e0c6ef063c1"
+    },
+    "networkTypeId": "0x1",
+    "networkId": "0x1",
+    "blockNum": 234
+  },
+  "hardhat": {
+    "network": "0x539.hardhat",
+    "contracts": {
+      "xcall": "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82",
+      "dapp": "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1"
+    },
+    "blockNum": 160
+  },
+  "link": {
+    "src": "icon0",
+    "dst": "icon1"
+  }
+}

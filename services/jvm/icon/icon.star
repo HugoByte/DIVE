@@ -3,8 +3,8 @@ setup_node = import_module("github.com/hugobyte/dive/services/jvm/icon/src/node-
 icon_node_launcher = import_module("github.com/hugobyte/dive/services/jvm/icon/src/node-setup/start_icon_node.star")
 icon_relay_setup = import_module("github.com/hugobyte/dive/services/jvm/icon/src/relay-setup/contract_configuration.star")
 
-START_FILE_FOR_ICON0 = "start-icon-0.sh"
-START_FILE_FOR_ICON1 = "start-icon-1.sh"
+START_FILE_FOR_ICON0 = "start-icon.sh"
+START_FILE_FOR_ICON1 = "start-icon.sh"
 ICON0_NODE_ID = 0
 ICON1_NODE_ID = 1
 ICON0_NODE_PRIVATE_RPC_PORT = 9080
@@ -17,13 +17,17 @@ ICON1_NODE_P2P_LISTEN_ADDRESS = 7081
 ICON1_NODE_P2P_ADDRESS = 8081
 ICON0_NODE_CID = "0xacbc4e"
 ICON1_NODE_CID = "0x42f1f3"
+ICON0_GENESIS_FILE_PATH = "github.com/hugobyte/dive/services/jvm/icon/static-files/config/genesis-icon-0.zip"
+ICON1_GENESIS_FILE_PATH = "github.com/hugobyte/dive/services/jvm/icon/static-files/config/genesis-icon-1.zip"
+ICON0_GENESIS_FILE_NAME= "genesis-icon-0.zip"
+ICON1_GENESIS_FILE_NAME= "genesis-icon-1.zip"
 
 # Spins up ICON Node ID 0
 def start_icon_node_0(plan,service_config):
 
     plan.print("Starting Icon Node: Id 0")
 
-    node_service = icon_node_launcher.start_icon_node(plan,service_config,ICON0_NODE_ID,START_FILE_FOR_ICON0)
+    node_service = icon_node_launcher.start_icon_node(plan,service_config,ICON0_NODE_ID,{},ICON0_GENESIS_FILE_PATH,ICON0_GENESIS_FILE_NAME)
 
     return node_service
 
@@ -32,7 +36,7 @@ def start_icon_node_1(plan,service_config):
 
     plan.print("Starting Icon Node: Id 1")
 
-    node_service = icon_node_launcher.start_icon_node(plan,service_config,ICON1_NODE_ID,START_FILE_FOR_ICON1)
+    node_service = icon_node_launcher.start_icon_node(plan,service_config,ICON1_NODE_ID,{},ICON1_GENESIS_FILE_PATH,ICON1_GENESIS_FILE_NAME)
 
     return node_service
 
@@ -127,7 +131,7 @@ def deploy_bmc_icon(plan,src_chain,dst_chain,args):
 
         return src_bmc_address , dst_bmc_address
 
-    return src_bmc_address , ""
+    return src_bmc_address
 
 # Deploys BMV for ICON to ICON setup
 def deploy_bmv_icon_to_icon(plan,src_chain,dst_chain,src_bmc_address,dst_bmc_address,args):
@@ -228,7 +232,7 @@ def deploy_xcall_icon(plan,src_chain,dst_chain,src_bmc_address,dst_bmc_address,a
         return src_xcall_address, dst_xcall_address
 
 
-    return src_xcall_address,""
+    return src_xcall_address
 
 # Deploys dApp Contract on ICON nodes
 def deploy_dapp_icon(plan,src_chain,dst_chain,src_xcall_address,dst_xcall_address,args):
@@ -244,7 +248,7 @@ def deploy_dapp_icon(plan,src_chain,dst_chain,src_xcall_address,dst_xcall_addres
 
         return src_dapp_address,dst_dapp_address
 
-    return src_dapp_address,""
+    return src_dapp_address
 
 
 # Deploy BMV on ICON Node
