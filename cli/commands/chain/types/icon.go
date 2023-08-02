@@ -80,7 +80,7 @@ It establishes a connection to the Icon network and allows the node in executing
 					diveContext.FatalError("Failed To Write To File", err.Error())
 				}
 
-				diveContext.StopSpinner("Icon Node Started. Please find service details in current working directory(services.json) in current working directory")
+				diveContext.StopSpinner("Icon Node Started. Please find service details in current working directory(services.json)")
 
 			} else {
 
@@ -121,7 +121,7 @@ func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 			diveContext.InitKurtosisContext()
 			Decentralisation(diveContext, params)
 
-			diveContext.StopSpinner(fmt.Sprintln("Decentralisation Completed.Please find service details in dive.json"))
+			diveContext.StopSpinner(fmt.Sprintln("Decentralisation Completed.Please find service details in services.json"))
 		},
 	}
 	decentralisationCmd.Flags().StringVarP(&serviceName, "serviceName", "s", "", "service name")
