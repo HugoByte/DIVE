@@ -254,8 +254,9 @@ func ReadServiceJsonFile() (Services, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	jsonFile, _ := os.ReadFile(pwd + ServiceFilePath)
+	serviceFile := fmt.Sprintf("%s/%s", pwd, ServiceFilePath)
+	
+	jsonFile, _ := os.ReadFile(serviceFile)
 
 	if len(jsonFile) == 0 {
 		return nil, nil
