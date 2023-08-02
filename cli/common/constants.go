@@ -21,6 +21,7 @@ const (
 	DiveDitLogFile               = "divelog.log"
 	DiveErorLogFile              = "error.log"
 	DiveOutFile                  = "dive.json"
+	ServiceFilePath              = "services.json"
 	starlarkScript               = `
 def run(plan, args):
 	plan.stop_service(name=args["service_name"])
