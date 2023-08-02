@@ -12,7 +12,6 @@
     "debug": true,
     "timeout": "20s",
     "output-format": "json",
-    "sign-mode": "direct",
-    "ibc-handler-address":"archway1fde8lfydxgwg6p7xe9ugx5a6ysj37zfvn9m9z5rxt4mqvdcneczsczq2a4"
+    "sign-mode": "direct"
   }
 }
