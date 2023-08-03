@@ -1,5 +1,3 @@
-cosmvm_node = import_module("github.com/hugobyte/dive/services/cosmvm/src/node-setup/start_node.star")
-
 def deploy(plan,args,contract_name, message):
 
     contract = "../contracts/%s.wasm" % contract_name

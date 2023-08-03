@@ -30,6 +30,9 @@ def get_args_data(args):
             destination_chain = source_chain
             source_chain = "icon" 
 
+    if destination_chain == "cosmwasm" and source_chain == "cosmwasm":
+         destination_chain = "cosmwasm1"
+
     bridge = args["bridge"]
 
     return struct(

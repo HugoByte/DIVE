@@ -1,10 +1,7 @@
 cosmvm_deploy = import_module("github.com/hugobyte/dive/services/cosmvm/src/node-setup/deploy.star")
 cosmvm_node = import_module("github.com/hugobyte/dive/services/cosmvm/src/node-setup/start_node.star")
-cosmvm_setup = import_module("github.com/hugobyte/dive/services/cosmvm/src/node-setup/setup_node.star")
 contract_deployment_service = import_module("github.com/hugobyte/dive/services/jvm/icon/src/node-setup/contract_deploy.star")
 icon_relay_setup = import_module("github.com/hugobyte/dive/services/jvm/icon/src/relay-setup/contract_configuration.star")
-
-ICON_NODE = "http://localhost:9082/api/v3/"
 
 def deploy_core(plan,args):
 
@@ -60,8 +57,6 @@ def ibc_handler(plan,args):
 
     tx_hash = contract_deployment_service.deploy_contract(plan,"ibc-0.1.0-optimized",init_message, args)
 
-    # score_address = contract_deployment_service.get_score_address(plan,"cosmos",tx_hash)
-
     plan.print("deployed ibc handler")
 
     return tx_hash
@@ -83,8 +78,6 @@ def light_client_for_icon(plan,args):
     init_message = '{}' 
 
     tx_hash = contract_deployment_service.deploy_contract(plan, "tendermint-0.1.0-optimized", init_message, args)
-
-    # score_address = contract_deployment_service.get_score_address(plan,"cosmos",tx_hash)
 
     plan.print("deploy light client")
 

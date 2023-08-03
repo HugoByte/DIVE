@@ -1,13 +1,6 @@
 cosmvm_node = import_module("github.com/hugobyte/dive/services/cosmvm/src/node-setup/start_node.star")
-cosmvm_setup = import_module("github.com/hugobyte/dive/services/cosmvm/src/node-setup/setup_node.star")
-
-
-SERVICE_NAME = "cosmos"
-SERVICE_NAME1 = "cosmos1"
-COSMOS_NODE1_CID = "my-chain"
-COSMOS_NODE2_CID = "chain-2"
-
-# spins up the cosmos node1
+setup_node = import_module("github.com/hugobyte/dive/services/jvm/icon/src/node-setup/setup_icon_node.star")
+constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
 
 def start_cosmos_0(plan,args):
 
@@ -28,8 +21,8 @@ def start_cosmos_1(plan,args):
 # spins up the 2 comsos nodes
 def start_node_service_cosmos_to_cosmos(plan):
 
-    src_chain_config = cosmvm_node.get_service_config(SERVICE_NAME, COSMOS_NODE1_CID )
-    dst_chain_config = cosmvm_node.get_service_config_1(SERVICE_NAME1, COSMOS_NODE2_CID )
+    src_chain_config = cosmvm_node.get_service_config(constants.COSMOS_NODE_CLIENT.service_name, constants.COSMOS_NODE_CLIENT.chain_id  )
+    dst_chain_config = cosmvm_node.get_service_config_1(constants.COSMOS_NODE_CLIENT.service_name_1, constants.COSMOS_NODE_CLIENT.chain_id_1 )
 
     source_chain_response = start_cosmos_0(plan,src_chain_config)
     destination_chain_response = start_cosmos_1(plan,dst_chain_config)
@@ -56,7 +49,7 @@ def start_node_service_cosmos_to_cosmos(plan):
 
 def start_node_service(plan,args):
 
-    chain_config = cosmvm_node.get_service_config(SERVICE_NAME, COSMOS_NODE1_CID)
+    chain_config = cosmvm_node.get_service_config(constants.COSMOS_NODE_CLIENT.service_name, constants.COSMOS_NODE_CLIENT.chain_id)
 
     node_service_response = start_cosmos_0(plan,chain_config)
 
@@ -67,12 +60,12 @@ def configure_cosmos_to_cosmos_node(plan,src_chain_config, dst_chain_config):
 
     plan.print("configuring the nodes")
 
-    cosmvm_setup.configure_node(plan,src_chain_config)
-    cosmvm_setup.configure_node(plan,dst_chain_config)
+    setup_node.configure_node(plan,src_chain_config)
+    setup_node.configure_node(plan,dst_chain_config)
 
 # Configures ICON Node setup
 def configure_cosmos_node(plan,chain_config):
 
     plan.print("configure cosmos Node")
 
-    cosmvm_setup.configure_node(plan,chain_config) 
+    setup_node.configure_node(plan,chain_config) 

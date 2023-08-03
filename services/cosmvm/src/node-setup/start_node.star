@@ -1,53 +1,46 @@
-START_COSMOS = "github.com/hugobyte/dive/services/cosmvm/start-cosmos-0.sh"
-START_COSMOS_1 = "github.com/hugobyte/dive/services/cosmvm/start-cosmos-1.sh"
-DEFAULT_CONTRACT_PATH = "github.com/hugobyte/dive/services/cosmvm/static_files/contracts"
-SERVICE_NAME = "cosmos"
-SERVICE_NAME_1 = "cosmos1"
-IMAGE = "archwaynetwork/archwayd:constantine"
-PATH = "/start-scripts/"
-CONTRACT_PATH = "/root/contracts/"
-CHAIN_ID = "my-chain"
-CHAIN_ID_1 = "chain-1"
-PUBLIC_IP_ADDRESS = "127.0.0.1"
+constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
 
 def start_cosmos_node(plan,args):
 
-    plan.print("Launching " +SERVICE_NAME+  " deployment service")
+    cosmos_node_constants = constants.COSMOS_NODE_CLIENT
 
-    plan.upload_files(src=START_COSMOS, name="start-script")
-    plan.upload_files(src=DEFAULT_CONTRACT_PATH, name="contract")
+    plan.print("Launching " +cosmos_node_constants.service_name+  " deployment service")
+
+    plan.upload_files(src=cosmos_node_constants.start_cosmos, name="start-script")
+    plan.upload_files(src=cosmos_node_constants.default_contract_path, name="contract")
 
     cosmwasm_node_config = ServiceConfig(
-        image=IMAGE,
+        image=cosmos_node_constants.image,
         files={ 
-            PATH: "start-script",
-            CONTRACT_PATH: "contract",
+            cosmos_node_constants.path: "start-script",
+            cosmos_node_constants.contract_path: "contract",
         },
         ports={
-            "grpc" : PortSpec(number=9090),
-            "http" : PortSpec(number=9091),
-            "tcp"  : PortSpec(number=26656),
-            "rpc"  : PortSpec(number=26657)
+            cosmos_node_constants.cosmos_grpc_port_key : PortSpec(number=cosmos_node_constants.private_port_1,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constants.cosmos_http_port_key : PortSpec(number=cosmos_node_constants.private_port_2,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constants.cosmos_tcp_port_key : PortSpec(number=cosmos_node_constants.private_port_3,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constants.cosmos_rpc_port_key : PortSpec(number=cosmos_node_constants.private_port_4,transport_protocol="TCP",application_protocol="http"),
         },
         public_ports={
-            "grpc" : PortSpec(number=9090),
-            "http" : PortSpec(number=9091),
-            "tcp"  : PortSpec(number=26656),
-            "rpc"  : PortSpec(number=4564)
+            cosmos_node_constants.cosmos_grpc_port_key: PortSpec(number=cosmos_node_constants.public_port_01,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constants.cosmos_http_port_key : PortSpec(number=cosmos_node_constants.public_port_02,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constants.cosmos_tcp_port_key : PortSpec(number=cosmos_node_constants.public_port_03,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constants.cosmos_rpc_port_key : PortSpec(number=cosmos_node_constants.public_port_04,transport_protocol="TCP",application_protocol="http"),
+           
         },
         
         entrypoint=["/bin/sh","-c","cd ../../start-scripts && chmod +x start-cosmos-0.sh && ./start-cosmos-0.sh"]
     )
 
-    node_service_response = plan.add_service(name=SERVICE_NAME, config= cosmwasm_node_config)
+    node_service_response = plan.add_service(name=cosmos_node_constants.service_name, config= cosmwasm_node_config)
 
     plan.print(node_service_response)
 
-    public_url = get_service_url(PUBLIC_IP_ADDRESS,cosmwasm_node_config.public_ports)
+    public_url = get_service_url(cosmos_node_constants.public_ip_address,cosmwasm_node_config.public_ports)
     private_url = get_service_url(node_service_response.ip_address,node_service_response.ports)
 
     return struct(
-        service_name = SERVICE_NAME,
+        service_name = cosmos_node_constants.service_name,
         endpoint = private_url,
         endpoint_public = public_url
     )
@@ -67,37 +60,39 @@ def get_service_config(service_name, cid):
 
 def start_cosmos_node_1(plan,args):
 
-    plan.upload_files(src=START_COSMOS_1, name="start-script1")
+    cosmos_node_constant = constants.COSMOS_NODE_CLIENT
+
+    plan.upload_files(src=cosmos_node_constant.start_cosmos_1, name="start-script1")
 
     cosmwasm_node_config_1 = ServiceConfig(
-        image=IMAGE,
+        image=constants.COSMOS_NODE_CLIENT.image,
         files={ 
-            PATH: "start-script1",
-            CONTRACT_PATH: "contract",
+            constants.COSMOS_NODE_CLIENT.path: "start-script1",
+            constants.COSMOS_NODE_CLIENT.contract_path: "contract",
         },
         ports={
-            "grpc" : PortSpec(number=9090),
-            "http" : PortSpec(number=9091),
-            "tcp"  : PortSpec(number=26656),
-            "rpc"  : PortSpec(number=26657)
+            cosmos_node_constant.cosmos_grpc_port_key : PortSpec(number=cosmos_node_constant.private_port_1,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constant.cosmos_http_port_key : PortSpec(number=cosmos_node_constant.private_port_2,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constant.cosmos_tcp_port_key : PortSpec(number=cosmos_node_constant.private_port_3,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constant.cosmos_rpc_port_key : PortSpec(number=cosmos_node_constant.private_port_4,transport_protocol="TCP",application_protocol="http"),
         },
         public_ports={
-            "grpc" : PortSpec(number=9080),
-            "http" : PortSpec(number=9092),
-            "tcp"  : PortSpec(number=26658),
-            "rpc"  : PortSpec(number=4566)
+            cosmos_node_constant.cosmos_grpc_port_key : PortSpec(number=cosmos_node_constant.public_port_05,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constant.cosmos_http_port_key : PortSpec(number=cosmos_node_constant.public_port_06,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constant.cosmos_tcp_port_key  : PortSpec(number=cosmos_node_constant.public_port_07,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constant.cosmos_rpc_port_key  : PortSpec(number=cosmos_node_constant.public_port_08,transport_protocol="TCP",application_protocol="http"),
         },
         
         entrypoint=["/bin/sh","-c","cd ../../start-scripts && chmod +x start-cosmos-1.sh && ./start-cosmos-1.sh "]
     )
 
-    node_service_response = plan.add_service(name=SERVICE_NAME_1, config= cosmwasm_node_config_1)
+    node_service_response = plan.add_service(name=cosmos_node_constant.service_name_1, config= cosmwasm_node_config_1)
 
-    public_url = get_service_url_1(PUBLIC_IP_ADDRESS,cosmwasm_node_config_1.public_ports)
+    public_url = get_service_url_1(cosmos_node_constant.public_ip_address,cosmwasm_node_config_1.public_ports)
     private_url = get_service_url_1(node_service_response.ip_address,node_service_response.ports)
 
     return struct(
-        service_name = SERVICE_NAME_1,
+        service_name = cosmos_node_constant.service_name_1,
         endpoint = private_url,
         endpoint_public = public_url
     )

@@ -219,49 +219,13 @@ def start_btp_relayer(plan, src_chain, dst_chain, config_data):
 
     return config_data
 
-def generate_config_data(args):
-
-    data = get_args_data(args)
-    config_data = {
-        "links": data.links,
-        "chains" : {
-            "%s" % data.src : {},
-            "%s" % data.dst : {}
-        },
-        "contracts" : {
-            "%s" % data.src : {},
-            "%s" % data.dst : {}
-        },
-        "bridge" : data.bridge
-    }
-
-    return config_data
-
-def get_args_data(args):
-
-    links = args["links"]
-    source_chain = links["src"]
-    destination_chain = links["dst"]
-
-    if destination_chain == "cosmwasm" and source_chain == "cosmwasm":
-        destination_chain = "cosmwasm1"
-
-    bridge = args["bridge"]
-
-    return struct(
-        links = links,
-        src = source_chain,
-        dst = destination_chain,
-        bridge = bridge
-    )
-
 # starts cosmos relay setup
 
 def run_cosmos_setup(plan,args):
 
-    args_data = get_args_data(args)
+    args_data = input_parser.get_args_data(args)
 
-    config_data = generate_config_data(args)
+    config_data = input_parser.generate_config_data(args)
 
     if args_data.dst == "cosmwasm1":
 
