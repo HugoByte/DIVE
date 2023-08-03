@@ -25,7 +25,7 @@ def start_cosmos_1(plan,args):
 
     return node_service
 
-# spins up the 2 comsos node
+# spins up the 2 comsos nodes
 def start_node_service_cosmos_to_cosmos(plan):
 
     src_chain_config = cosmvm_node.get_service_config(SERVICE_NAME, COSMOS_NODE1_CID )

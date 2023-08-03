@@ -18,7 +18,6 @@ def start_cosmos_relay(plan, args , src, dst):
         },
     
         entrypoint=["/bin/sh"]
-
     )
 
     plan.add_service(name=RELAY_SERVICE_NAME,config=relay_service)

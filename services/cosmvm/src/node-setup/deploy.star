@@ -26,5 +26,3 @@ def deploy(plan,args,contract_name, message):
     contract = plan.exec(service_name="cosmos", recipe=ExecRecipe(command=["/bin/sh", "-c", "echo %s | archwayd query wasm list-contract-by-code %s --output json | jq -r '.contracts[-1]' | tr -d '\n\r' " % (passcode, code_id["output"])]))
     
     return contract["output"]
-
-
