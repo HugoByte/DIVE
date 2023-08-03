@@ -1,0 +1,17 @@
+{
+    "type": "cosmos",
+    "value": {
+      "key": "fd1",
+      "chain-id": "chain-2",
+      "rpc-addr": "",
+      "grpc-addr": "",
+      "account-prefix": "archway",
+      "keyring-backend": "test",
+      "gas-adjustment": 1.5,
+      "gas-prices": "0.0025stake",
+      "debug": true,
+      "timeout": "20s",
+      "output-format": "json",
+      "sign-mode": "direct"
+    }
+  }
