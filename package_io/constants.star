@@ -44,5 +44,39 @@ ETH_NODE_CLIENT = struct(
 		  keypassword = "password"
 )
 
+COSMOS_NODE_CLIENT = struct(
+    start_cosmos = "github.com/hugobyte/dive/services/cosmvm/start-cosmos-0.sh",
+    start_cosmos_1 = "github.com/hugobyte/dive/services/cosmvm/start-cosmos-1.sh",
+    default_contract_path = "github.com/hugobyte/dive/services/cosmvm/static_files/contracts",
+    service_name = "cosmos",
+    service_name_1 = "cosmos1",
+    image = "archwaynetwork/archwayd:constantine",
+    path = "/start-scripts/",
+    contract_path = "/root/contracts/",
+    chain_id = "my-chain",
+    chain_id_1 = "chain-1",
+    public_ip_address = "127.0.0.1",
+    cosmos_grpc_port_key = "grpc",
+    cosmos_rpc_port_key = "rpc",
+    cosmos_http_port_key = "http",
+    cosmos_tcp_port_key = "tcp",
+    private_port_grpc = 9090,
+    private_port_http = 9091,
+    private_port_tcp = 26656,
+    private_port_rpc = 26657,
+    public_port_grpc_node_1 = 9090,
+    public_port_http_node_1 = 9091,
+    public_port_tcp_node_1 = 26656,
+    public_port_rpc_node_1 = 4564,
+    public_port_grpc_node_2 = 9080,
+    public_port_http_node_2 = 9092,
+    public_port_tcp_node_2 = 26658,
+    public_port_rpc_node_2 = 4566,
+    config_files = "github.com/hugobyte/dive/services/cosmvm/static_files/config/",
+    relay_service_name = "cosmos-relay",
+    relay_service_image = "relay1",
+    relay_config_files_path = "/script/",
+)
+
 
  
