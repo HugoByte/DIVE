@@ -16,16 +16,16 @@ def start_cosmos_node(plan,args):
             cosmos_node_constants.contract_path: "contract",
         },
         ports={
-            cosmos_node_constants.cosmos_grpc_port_key : PortSpec(number=cosmos_node_constants.private_port_grpc,transport_protocol="TCP",application_protocol="http"),
-            cosmos_node_constants.cosmos_http_port_key : PortSpec(number=cosmos_node_constants.private_port_http,transport_protocol="TCP",application_protocol="http"),
-            cosmos_node_constants.cosmos_tcp_port_key : PortSpec(number=cosmos_node_constants.private_port_tcp,transport_protocol="TCP",application_protocol="http"),
-            cosmos_node_constants.cosmos_rpc_port_key : PortSpec(number=cosmos_node_constants.private_port_rpc,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constants.cosmos_grpc_port_key : PortSpec(number=cosmos_node_constants.private_port_grpc,transport_protocol=cosmos_node_constants.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constants.cosmos_http_port_key),
+            cosmos_node_constants.cosmos_http_port_key : PortSpec(number=cosmos_node_constants.private_port_http,transport_protocol=cosmos_node_constants.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constants.cosmos_http_port_key),
+            cosmos_node_constants.cosmos_tcp_port_key : PortSpec(number=cosmos_node_constants.private_port_tcp,transport_protocol=cosmos_node_constants.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constants.cosmos_http_port_key),
+            cosmos_node_constants.cosmos_rpc_port_key : PortSpec(number=cosmos_node_constants.private_port_rpc,transport_protocol=cosmos_node_constants.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constants.cosmos_http_port_key),
         },
         public_ports={
-            cosmos_node_constants.cosmos_grpc_port_key: PortSpec(number=cosmos_node_constants.public_port_grpc_node_1,transport_protocol="TCP",application_protocol="http"),
-            cosmos_node_constants.cosmos_http_port_key : PortSpec(number=cosmos_node_constants.public_port_http_node_1,transport_protocol="TCP",application_protocol="http"),
-            cosmos_node_constants.cosmos_tcp_port_key : PortSpec(number=cosmos_node_constants.public_port_tcp_node_1,transport_protocol="TCP",application_protocol="http"),
-            cosmos_node_constants.cosmos_rpc_port_key : PortSpec(number=cosmos_node_constants.public_port_rpc_node_1,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constants.cosmos_grpc_port_key: PortSpec(number=cosmos_node_constants.public_port_grpc_node_1,transport_protocol=cosmos_node_constants.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constants.cosmos_http_port_key),
+            cosmos_node_constants.cosmos_http_port_key : PortSpec(number=cosmos_node_constants.public_port_http_node_1,transport_protocol=cosmos_node_constants.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constants.cosmos_http_port_key),
+            cosmos_node_constants.cosmos_tcp_port_key : PortSpec(number=cosmos_node_constants.public_port_tcp_node_1,transport_protocol=cosmos_node_constants.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constants.cosmos_http_port_key),
+            cosmos_node_constants.cosmos_rpc_port_key : PortSpec(number=cosmos_node_constants.public_port_rpc_node_1,transport_protocol=cosmos_node_constants.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constants.cosmos_http_port_key),
            
         },
         
@@ -71,16 +71,16 @@ def start_cosmos_node_1(plan,args):
             constants.COSMOS_NODE_CLIENT.contract_path: "contract",
         },
         ports={
-            cosmos_node_constant.cosmos_grpc_port_key : PortSpec(number=cosmos_node_constant.private_port_grpc,transport_protocol="TCP",application_protocol="http"),
-            cosmos_node_constant.cosmos_http_port_key : PortSpec(number=cosmos_node_constant.private_port_http,transport_protocol="TCP",application_protocol="http"),
-            cosmos_node_constant.cosmos_tcp_port_key : PortSpec(number=cosmos_node_constant.private_port_tcp,transport_protocol="TCP",application_protocol="http"),
-            cosmos_node_constant.cosmos_rpc_port_key : PortSpec(number=cosmos_node_constant.private_port_rpc,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constant.cosmos_grpc_port_key : PortSpec(number=cosmos_node_constant.private_port_grpc,transport_protocol=cosmos_node_constant.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constant.cosmos_http_port_key),
+            cosmos_node_constant.cosmos_http_port_key : PortSpec(number=cosmos_node_constant.private_port_http,transport_protocol=cosmos_node_constant.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constant.cosmos_http_port_key),
+            cosmos_node_constant.cosmos_tcp_port_key : PortSpec(number=cosmos_node_constant.private_port_tcp,transport_protocol=cosmos_node_constant.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constant.cosmos_http_port_key),
+            cosmos_node_constant.cosmos_rpc_port_key : PortSpec(number=cosmos_node_constant.private_port_rpc,transport_protocol=cosmos_node_constant.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constant.cosmos_http_port_key),
         },
         public_ports={
-            cosmos_node_constant.cosmos_grpc_port_key : PortSpec(number=cosmos_node_constant.public_port_grpc_node_2,transport_protocol="TCP",application_protocol="http"),
-            cosmos_node_constant.cosmos_http_port_key : PortSpec(number=cosmos_node_constant.public_port_http_node_2,transport_protocol="TCP",application_protocol="http"),
-            cosmos_node_constant.cosmos_tcp_port_key  : PortSpec(number=cosmos_node_constant.public_port_tcp_node_2,transport_protocol="TCP",application_protocol="http"),
-            cosmos_node_constant.cosmos_rpc_port_key  : PortSpec(number=cosmos_node_constant.public_port_rpc_node_2,transport_protocol="TCP",application_protocol="http"),
+            cosmos_node_constant.cosmos_grpc_port_key : PortSpec(number=cosmos_node_constant.public_port_grpc_node_2,transport_protocol=cosmos_node_constant.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constant.cosmos_http_port_key),
+            cosmos_node_constant.cosmos_http_port_key : PortSpec(number=cosmos_node_constant.public_port_http_node_2,transport_protocol=cosmos_node_constant.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constant.cosmos_http_port_key),
+            cosmos_node_constant.cosmos_tcp_port_key  : PortSpec(number=cosmos_node_constant.public_port_tcp_node_2,transport_protocol=cosmos_node_constant.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constant.cosmos_http_port_key),
+            cosmos_node_constant.cosmos_rpc_port_key  : PortSpec(number=cosmos_node_constant.public_port_rpc_node_2,transport_protocol=cosmos_node_constant.cosmos_tcp_port_key.upper(),application_protocol=cosmos_node_constant.cosmos_http_port_key),
         },
         
         entrypoint=["/bin/sh","-c","cd ../../start-scripts && chmod +x start-cosmos-1.sh && ./start-cosmos-1.sh "]

@@ -72,7 +72,10 @@ COSMOS_NODE_CLIENT = struct(
     public_port_http_node_2 = 9092,
     public_port_tcp_node_2 = 26658,
     public_port_rpc_node_2 = 4566,
-
+    config_files = "github.com/hugobyte/dive/services/cosmvm/static_files/config/",
+    relay_service_name = "cosmos-relay",
+    relay_service_image = "relay1",
+    relay_config_files_path = "/script/",
 )
 
 

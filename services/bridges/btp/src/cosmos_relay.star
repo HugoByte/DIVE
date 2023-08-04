@@ -1,30 +1,24 @@
-
-cosmvm_cosmos = import_module("github.com/hugobyte/dive/services/cosmvm/cosmos.star")
-ARCHWAY = "github.com/hugobyte/dive/services/cosmvm/static_files/config/"
-RELAY_SERVICE_NAME = "cosmos-relay"
-RELAY_SERVICE_IMAGE = "relay1"
-RELAY_CONFIG_FILES_PATH = "/script/"
+constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
 
 def start_cosmos_relay(plan, args , src, dst):
 
     plan.print("starting cosmos relay")
 
-    plan.upload_files(src=ARCHWAY, name="archway_config")
+    cosmos_node_constants = constants.COSMOS_NODE_CLIENT
+
+    plan.upload_files(src=cosmos_node_constants.config_files, name="archway_config")
 
     relay_service = ServiceConfig(
-        image=RELAY_SERVICE_IMAGE,
+        image=cosmos_node_constants.relay_service_image,
         files={
-            RELAY_CONFIG_FILES_PATH: "archway_config"
+            cosmos_node_constants.relay_config_files_path: "archway_config"
         },
     
         entrypoint=["/bin/sh"]
     )
 
-    plan.add_service(name=RELAY_SERVICE_NAME,config=relay_service)
+    plan.add_service(name=cosmos_node_constants.relay_service_name,config=relay_service)
 
     return struct(
-        service_name = RELAY_SERVICE_NAME
+        service_name = cosmos_node_constants.relay_service_name
     )
-
-
-
