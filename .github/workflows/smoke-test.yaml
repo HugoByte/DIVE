@@ -29,7 +29,7 @@ jobs:
             export DIVE_BINARY_PATH=$PWD/cli/dive
             cd cli
             go mod tidy
-            go build
+            go build -o dive ./dive
             ls
             echo $DIVE_BINARY_PATH
         
