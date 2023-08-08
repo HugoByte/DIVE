@@ -26,11 +26,10 @@ jobs:
         
         - name: Building DIVE binary with latest changes
           run: |
-            echo $PWD
+            export DIVE_BINARY_PATH=$PWD/cli
             cd cli
             go mod tidy
             go build
-            export DIVE_BINARY_PATH=$PWD/cli/dive
             echo $DIVE_BINARY_PATH
         
         - name: Test Version Command
