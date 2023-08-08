@@ -6,19 +6,10 @@ icon_relay_setup = import_module("github.com/hugobyte/dive/services/jvm/icon/src
 icon_service = import_module("github.com/hugobyte/dive/services/jvm/icon/icon.star")
 btp_bridge = import_module("github.com/hugobyte/dive/services/bridges/btp/src/bridge.star")
 input_parser = import_module("github.com/hugobyte/dive/package_io/input_parser.star")
-cosmvm_node = import_module("github.com/hugobyte/dive/services/cosmvm/src/node-setup/start_node.star")
-cosmvm_deploy = import_module("github.com/hugobyte/dive/services/cosmvm/src/node-setup/deploy.star")
-cosmvm_contract = import_module("github.com/hugobyte/dive/services/cosmvm/src/relay-setup/contract-configuration.star")
-cosmvm_service = import_module("github.com/hugobyte/dive/services/cosmvm/cosmos.star")
-icon_node_launcher = import_module("github.com/hugobyte/dive/services/jvm/icon/src/node-setup/start_icon_node.star")
-cosmvm_relay = import_module("github.com/hugobyte/dive/services/bridges/btp/src/cosmos_relay.star") 
-cosmvm_cosmos = import_module("github.com/hugobyte/dive/services/cosmvm/cosmos.star")
-cosmvm_setup_relay_for_cosmos = import_module("github.com/hugobyte/dive/services/cosmvm/src/relay-setup/cosmos-cosmos.star")
-
+cosmvm_node = import_module("github.com/hugobyte/dive/services/cosmvm/cosmos.star")
+cosmvm_relay = import_module("github.com/hugobyte/dive/services/bridges/ibc/src/bridge.star")
 
 def run(plan, args):
-    plan.print("Starting")
-
     return parse_input(plan, args)
 
 def parse_input(plan, args):
@@ -58,7 +49,7 @@ def parse_input(plan, args):
             return data
 
         elif args["relay"]["name"] == "cosmos":
-            data = run_cosmos_setup(plan,args["relay"])
+            data = run_cosmos_setup(plan, args["relay"])
 
             return data
 
@@ -72,8 +63,8 @@ def run_node(plan, node_name, args):
     elif node_name == "eth" or node_name == "hardhat":
         return eth_node.start_eth_node_serivce(plan, args, node_name)
 
-    elif node_name == "cosmwasm":
-        return cosmvm_cosmos.start_node_service(plan,args)
+    elif node_name == "cosmos":
+        return cosmvm_node.start_node_service(plan, args)
 
     else:
         fail("Unknown Chain Type. Expected ['icon','eth','hardhat','cosmwasm']")
@@ -221,31 +212,21 @@ def start_btp_relayer(plan, src_chain, dst_chain, config_data):
 
 # starts cosmos relay setup
 
-def run_cosmos_setup(plan,args):
-
+def run_cosmos_setup(plan, args):
     args_data = input_parser.get_args_data(args)
 
     config_data = input_parser.generate_config_data(args)
 
     if args_data.dst == "cosmwasm1":
+        data, src_service_config, dst_service_config = cosmvm_node.start_node_service_cosmos_to_cosmos(plan)
 
-        data = cosmvm_cosmos.start_node_service_cosmos_to_cosmos(plan)
+        config_data["chains"][args_data.src] = data.src_config
+        config_data["chains"][args_data.dst] = data.dst_config
 
-        config_data["chains"][args_data.src] = data
-        config_data["chains"][args_data.dst] = data
+        plan.print(config_data)
 
-        cosmos = cosmvm_relay.start_cosmos_relay(plan, args, args_data.src, args_data.dst)
+        cosmvm_relay.start_cosmos_relay(plan, src_service_config.key, src_service_config.cid, dst_service_config.key, dst_service_config.cid, data.src_config, data.dst_config)
 
-        plan.exec(service_name=cosmos.service_name, recipe=ExecRecipe(command=["/bin/sh", "-c", "sed -i -e 's|\"rpc-addr\": \"\"|\"rpc-addr\": \"http://'%s'\"|' ../../script/chains/archway1.json" % (data.src_config["endpoint"])]) )
+        # cosmvm_relay.relay(plan, src_service_config.key, src_service_config.cid, dst_service_config.key, dst_service_config.cid, data.src_config, data.dst_config)
 
-        plan.exec(service_name=cosmos.service_name, recipe=ExecRecipe(command=["/bin/sh", "-c", "sed -i -e 's|\"rpc-addr\": \"\"|\"rpc-addr\": \"http://'%s'\"|' ../../script/chains/archway2.json" % (data.dst_config["endpoint"])]) )
-
-        plan.exec(service_name=data.src_config["service_name"], recipe=ExecRecipe(command=["/bin/sh", "-c", "apk add jq"]))
-
-        seed0 = plan.exec(service_name=data.src_config["service_name"], recipe=ExecRecipe(command=["/bin/sh", "-c", "jq -r '.mnemonic' ../../start-scripts/key_seed.json | tr -d '\n\r'"]))
-
-        plan.exec(service_name=data.dst_config["service_name"], recipe=ExecRecipe(command=["/bin/sh", "-c", "apk add jq"]))
-
-        seed1 = plan.exec(service_name=data.dst_config["service_name"], recipe=ExecRecipe(command=["/bin/sh", "-c", "jq -r '.mnemonic' ../../start-scripts/key_seed1.json | tr -d '\n\r'"]))
-
-        cosmvm_setup_relay_for_cosmos.relay(plan,args,seed0,seed1)
+    return config_data
