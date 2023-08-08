@@ -28,6 +28,7 @@ jobs:
           run: |
             echo $PWD
             cd cli
+            go mod tidy
             go build
             export DIVE_BINARY_PATH=$PWD/cli/dive
         
