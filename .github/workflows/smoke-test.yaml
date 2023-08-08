@@ -34,6 +34,6 @@ jobs:
             echo $DIVE_BINARY_PATH
         
         - name: Test Version Command
-          run: dive version
+          run: ./dive version
         
 
