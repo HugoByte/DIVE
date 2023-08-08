@@ -31,6 +31,7 @@ jobs:
             go mod tidy
             go build
             export DIVE_BINARY_PATH=$PWD/cli/dive
+            echo $DIVE_BINARY_PATH
         
         - name: Test Version Command
           run: ${DIVE_BINARY_PATH} version
