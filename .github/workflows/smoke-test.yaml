@@ -1,0 +1,38 @@
+name: Smoke Testing
+
+on:
+  push:
+    branches:
+      - CKIP-120-Create-github-action-for-smoke-test
+
+jobs:
+  test:
+    name: Smoke Testing
+    runs-on: "ubuntu-latest"
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+    
+        - name: Set up Go
+          uses: actions/setup-go@v2
+          with:
+            go-version: 1.20.1
+
+        - name: Installing Kurtosis CLI
+          run: |
+            echo "deb [trusted=yes] https://apt.fury.io/kurtosis-tech/ /" | sudo tee /etc/apt/sources.list.d/kurtosis.list
+            sudo apt update
+            sudo apt install kurtosis-cli
+        
+        - name: Building DIVE binary with latest changes
+          run: |
+            echo $PWD
+        #     cd cli
+        #     go build -o 
+        
+        # - name: Test Version Command
+        #   run: ./dive version
+        
+        # - name: Remove temporary files
+        #   run: |
+        #     rm -rf dive
