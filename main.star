@@ -227,6 +227,4 @@ def run_cosmos_setup(plan, args):
 
         cosmvm_relay.start_cosmos_relay(plan, src_service_config.key, src_service_config.cid, dst_service_config.key, dst_service_config.cid, data.src_config, data.dst_config)
 
-        # cosmvm_relay.relay(plan, src_service_config.key, src_service_config.cid, dst_service_config.key, dst_service_config.cid, data.src_config, data.dst_config)
-
     return config_data
