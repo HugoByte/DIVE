@@ -35,19 +35,20 @@ jobs:
 
         - name: Test bridge between icon and eth
           run: |
-            $DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth 
-          shell: bash -e
+            output=$DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth
+            echo "Build Output: $output"
         
         - name: Test bridge between icon and hardhat with icon bridge set to true
           run: |
             $DIVE_BINARY_PATH clean
-            $DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth --bridge
-          shell: bash -e
+            output=$DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth --bridge
+            echo "Build Output: $output"
 
         - name: Test bridge between icon and icon
           run: |
             $DIVE_BINARY_PATH clean
-            $DIVE_BINARY_PATH bridge btp --chainA icon --chainB icon
-          shell: bash -e
+            output=$DIVE_BINARY_PATH bridge btp --chainA icon --chainB icon
+            echo "Build Output: $output"
+          
         
 
