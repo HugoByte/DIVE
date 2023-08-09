@@ -1,12 +1,12 @@
-name: DIVE CLI
+name: run smoke testcases
 
 on:
-  push:
-    branches:
-      - CKIP-120-Create-github-action-for-smoke-test
+  pull_request:
+    types: [labeled]
 
 jobs:
   test:
+    if: ${{ github.event.label.name == 'test:smoke' }}
     name: Smoke Testing
     runs-on: "ubuntu-latest"
     env:
