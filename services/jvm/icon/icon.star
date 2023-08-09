@@ -89,13 +89,13 @@ def configure_icon_node(plan, chain_config):
     setup_node.configure_node(plan, chain_config)
 
 # Deploys BMC on ICON
-def deploy_bmc_icon(plan, src_chain, dst_chain, args):
-    src_config = args["chains"][src_chain]
+def deploy_bmc_icon(plan, src_chain, dst_chain,src_chain_service_name,dst_chain_service_name, args):
+    src_config = args["chains"][src_chain_service_name]
 
     src_bmc_address = icon_relay_setup.deploy_bmc(plan, src_config)
 
-    if dst_chain == "icon-1":
-        dst_config = args["chains"][dst_chain]
+    if src_chain == "icon" and dst_chain == "icon":
+        dst_config = args["chains"][dst_chain_service_name]
         dst_bmc_address = icon_relay_setup.deploy_bmc(plan, dst_config)
 
         return src_bmc_address, dst_bmc_address
@@ -103,9 +103,9 @@ def deploy_bmc_icon(plan, src_chain, dst_chain, args):
     return src_bmc_address
 
 # Deploys BMV for ICON to ICON setup
-def deploy_bmv_icon_to_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc_address, args):
-    src_chain_config = args["chains"][src_chain]
-    dst_chain_config = args["chains"][dst_chain]
+def deploy_bmv_icon_to_icon(plan,src_chain_service_name,dst_chain_service_name, src_bmc_address, dst_bmc_address, args):
+    src_chain_config = args["chains"][src_chain_service_name]
+    dst_chain_config = args["chains"][dst_chain_service_name]
 
     src_chain_service = src_chain_config["service_name"]
     src_chain_network = src_chain_config["network"]
@@ -176,13 +176,13 @@ def deploy_bmv_icon_to_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc
     )
 
 # Deploys xCall Contract on ICON nodes
-def deploy_xcall_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc_address, args):
-    src_config = args["chains"][src_chain]
-    dst_config = args["chains"][dst_chain]
+def deploy_xcall_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc_address, args,src_chain_service_name,dst_chain_service_name):
+    src_config = args["chains"][src_chain_service_name]
+    dst_config = args["chains"][dst_chain_service_name]
 
     src_xcall_address = icon_relay_setup.deploy_xcall(plan, src_bmc_address, src_config)
 
-    if dst_chain == "icon-1":
+    if src_chain == "icon" and dst_chain == "icon":
         dst_xcall_address = icon_relay_setup.deploy_xcall(plan, dst_bmc_address, dst_config)
 
         return src_xcall_address, dst_xcall_address
@@ -190,13 +190,13 @@ def deploy_xcall_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc_addre
     return src_xcall_address
 
 # Deploys dApp Contract on ICON nodes
-def deploy_dapp_icon(plan, src_chain, dst_chain, src_xcall_address, dst_xcall_address, args):
-    src_config = args["chains"][src_chain]
-    dst_config = args["chains"][dst_chain]
+def deploy_dapp_icon(plan, src_chain, dst_chain, src_xcall_address, dst_xcall_address, args,src_chain_service_name,dst_chain_service_name):
+    src_config = args["chains"][src_chain_service_name]
+    dst_config = args["chains"][dst_chain_service_name]
 
     src_dapp_address = icon_relay_setup.deploy_dapp(plan, src_xcall_address, src_config)
 
-    if dst_chain == "icon-1":
+    if src_chain == "icon" and dst_chain == "icon":
         dst_dapp_address = icon_relay_setup.deploy_dapp(plan, dst_xcall_address, dst_config)
 
         return src_dapp_address, dst_dapp_address
@@ -204,8 +204,8 @@ def deploy_dapp_icon(plan, src_chain, dst_chain, src_xcall_address, dst_xcall_ad
     return src_dapp_address
 
 # Deploy BMV on ICON Node
-def deploy_bmv_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc_address, dst_last_block_height, args):
-    src_chain_config = args["chains"][src_chain]
+def deploy_bmv_icon(plan, src_chain_service_name, dst_chain_service_name, src_bmc_address, dst_bmc_address, dst_last_block_height, args):
+    src_chain_config = args["chains"][src_chain_service_name]
 
     src_chain_service = src_chain_config["service_name"]
     src_chain_network = src_chain_config["network"]
@@ -215,7 +215,7 @@ def deploy_bmv_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc_address
     src_chain_nid = src_chain_config["nid"]
     src_chain_endpoint = src_chain_config["endpoint"]
 
-    dst_chain_config = args["chains"][dst_chain]
+    dst_chain_config = args["chains"][dst_chain_service_name]
 
     dst_chain_service = dst_chain_config["service_name"]
     dst_chain_network = dst_chain_config["network"]
