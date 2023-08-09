@@ -36,20 +36,14 @@ jobs:
       - name: Test bridge between icon and eth
         run: |
           mkdir logs 
-          $DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth > logs/cli_output.log
+          $DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth --verbose
 
       - name: Test bridge between icon and hardhat with icon bridge set to true
         run: |
           $DIVE_BINARY_PATH clean
-          $DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth --bridge > logs/cli_output.log
+          $DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth --bridge --verbose
 
       - name: Test bridge between icon and icon
         run: |
           $DIVE_BINARY_PATH clean
-          $DIVE_BINARY_PATH bridge btp --chainA icon --chainB icon > logs/cli_output.log
-
-      - name: Upload Logs Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: cli-logs
-          path: logs/cli_output.log
+          $DIVE_BINARY_PATH bridge btp --chainA icon --chainB icon --verbose
