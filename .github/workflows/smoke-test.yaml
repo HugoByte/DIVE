@@ -1,4 +1,4 @@
-name: Smoke Testing
+name: DIVE CLI
 
 on:
   push:
@@ -9,6 +9,8 @@ jobs:
   test:
     name: Smoke Testing
     runs-on: "ubuntu-latest"
+    env:
+        DIVE_BINARY_PATH: ${{ github.workspace }}/dive
     steps:
         - name: Checkout code
           uses: actions/checkout@v2
@@ -26,14 +28,21 @@ jobs:
         
         - name: Building DIVE binary with latest changes
           run: |
-            export DIVE_BINARY_PATH=$PWD/cli/dive
-            cd cli
-            go mod tidy
-            go build -o dive ./dive
-            ls
-            echo $DIVE_BINARY_PATH
+            cd cli && go mod tidy
+            go build -o $DIVE_BINARY_PATH
+
+        - name: Test bridge between icon and eth
+          run: |
+            $DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth 
         
-        - name: Test Version Command
-          run: ./dive version
+        - name: Test bridge between icon and hardhat with icon bridge set to true
+          run: |
+            $DIVE_BINARY_PATH clean
+            $DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth --bridge
+
+        - name: Test bridge between icon and icon
+          run: |
+            $DIVE_BINARY_PATH clean
+            $DIVE_BINARY_PATH bridge btp --chainA icon --chainB icon
         
 
