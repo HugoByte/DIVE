@@ -165,7 +165,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 							diveContext.FatalError("Failed To Get Service Data", err.Error())
 						}
 
-					} else {
+					} else if chains.chainBServiceName == "" {
 						response := runChain[chains.chainB](diveContext)
 						chainBServiceName = response.ServiceName
 						chainBServiceResponse, err = response.EncodeToString()
@@ -179,8 +179,13 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 							diveContext.FatalError("Failed To Get Service Data", err.Error())
 						}
 					}
+					if chains.chainB == "icon" {
+						runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, chains.chainB, chains.chainA, chainBServiceName, chainAServiceName, bridge, chainBServiceResponse, chainAServiceResponse)
+					} else {
 
-					runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, chains.chainA, chains.chainB, chainAServiceName, chainBServiceName, bridge, chainAServiceResponse, chainBServiceResponse)
+						runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, chains.chainA, chains.chainB, chainAServiceName, chainBServiceName, bridge, chainAServiceResponse, chainBServiceResponse)
+
+					}
 
 				} else {
 					params := chains.getParams()
