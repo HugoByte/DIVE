@@ -5,9 +5,10 @@ package bridge
 
 import (
 	"fmt"
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"strconv"
 	"strings"
+
+	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 
 	"github.com/hugobyte/dive/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
@@ -19,9 +20,33 @@ const runbridgeicon2icon = "start_btp_for_already_running_icon_nodes"
 const runbridgeicon2ethhardhat = "start_btp_icon_to_eth_for_already_running_nodes"
 
 var (
-	chainA string
-	chainB string
+	chainA   string
+	chainB   string
+	serviceA string
+	serviceB string
 )
+
+type Chains struct {
+	chainA            string
+	chainB            string
+	chainAServiceName string
+	chainBServiceName string
+	bridge            string
+}
+
+func initChains(chainA, chainB, serviceA, serviceB string, bridge bool) *Chains {
+	return &Chains{
+		chainA:            strings.ToLower(chainA),
+		chainB:            strings.ToLower(chainB),
+		chainAServiceName: serviceA,
+		chainBServiceName: serviceB,
+		bridge:            strconv.FormatBool(bridge),
+	}
+}
+
+func (c *Chains) areChainsIcon() bool {
+	return (c.chainA == "icon" && c.chainB == "icon")
+}
 
 func NewBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
@@ -56,79 +81,47 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 			if err != nil {
 				diveContext.Error(err.Error())
 			}
-			diveContext.StartSpinner(fmt.Sprintf(" Starting BTP Bridge for %s,%s", chainA, chainB))
 
 			bridge, _ := cmd.Flags().GetBool("bridge")
 
-			if strings.ToLower(chainA) == "icon" && strings.ToLower(chainB) == "icon" {
+			chains := initChains(chainA, chainB, serviceA, serviceB, bridge)
+			diveContext.StartSpinner(fmt.Sprintf(" Starting BTP Bridge for %s,%s", chains.chainA, chains.chainB))
 
-				serviceConfig, err := common.ReadServiceJsonFile()
+			if chains.areChainsIcon() {
 
-				if err != nil {
-					diveContext.FatalError("Failed To read ServiceFile", err.Error())
-				}
+				if chains.chainAServiceName != "" && chains.chainBServiceName != "" {
 
-				if len(serviceConfig) != 0 {
-					srcChain := "icon"
-					dstChain := "icon-1"
-
-					srcChainServiceResponse, err := serviceConfig["icon-0"].EncodeToString()
-					if err != nil {
-						diveContext.FatalError("Failed To read ServiceFile", err.Error())
-					}
-					dstChainServiceResponse, err := serviceConfig["icon-1"].EncodeToString()
+					srcChainServiceResponse, dstChainServiceResponse, err := chains.getServicesResponse()
 
 					if err != nil {
 						diveContext.FatalError("Failed To read ServiceFile", err.Error())
 					}
 
-					srcChainServiceName := serviceConfig["icon-0"].ServiceName
-					dstChainServiceName := serviceConfig["icon-1"].ServiceName
-
-					runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2icon, srcChain, dstChain, srcChainServiceName, dstChainServiceName, bridge, srcChainServiceResponse, dstChainServiceResponse)
+					runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2icon, chains.chainA, chains.chainB, chains.chainAServiceName, chains.chainBServiceName, bridge, srcChainServiceResponse, dstChainServiceResponse)
 
 				} else {
 
-					params := getParams(chainA, chainA, strconv.FormatBool(bridge))
+					params := chains.getParams()
 
 					runBtpSetupByRunningNodes(diveContext, enclaveCtx, params)
+
 				}
 
-			} else if (strings.ToLower(chainA) == "icon") && (strings.ToLower(chainB) == "eth" || strings.ToLower(chainB) == "hardhat") {
-
-				serviceConfig, err := common.ReadServiceJsonFile()
-
-				if err != nil {
-					diveContext.FatalError("Failed To read ServiceFile", err.Error())
-				}
-
-				if len(serviceConfig) != 0 {
-					srcChain := strings.ToLower(chainA)
-					dstChain := strings.ToLower(chainB)
-
-					srcChainServiceResponse, err := serviceConfig["icon-0"].EncodeToString()
-					if err != nil {
-						diveContext.FatalError("Failed To read ServiceFile", err.Error())
-					}
-					dstChainServiceResponse, err := serviceConfig[dstChain].EncodeToString()
-
-					if err != nil {
-						diveContext.FatalError("Failed To read ServiceFile", err.Error())
-					}
-
-					srcChainServiceName := serviceConfig["icon-0"].ServiceName
-					dstChainServiceName := serviceConfig[dstChain].ServiceName
-
-					runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, srcChain, dstChain, srcChainServiceName, dstChainServiceName, bridge, srcChainServiceResponse, dstChainServiceResponse)
-
-				} else {
-
-					params := getParams(chainA, chainB, strconv.FormatBool(bridge))
-
-					runBtpSetupByRunningNodes(diveContext, enclaveCtx, params)
-				}
 			} else {
-				diveContext.FatalError("Chains Not Supported", "Supported Chains [icon,eth,hardhat]")
+				if chains.chainAServiceName != "" && chains.chainBServiceName != "" {
+
+					srcChainServiceResponse, dstChainServiceResponse, err := chains.getServicesResponse()
+
+					if err != nil {
+						diveContext.FatalError("Failed To read ServiceFile", err.Error())
+					}
+					runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, chains.chainA, chains.chainB, chains.chainAServiceName, chains.chainBServiceName, bridge, srcChainServiceResponse, dstChainServiceResponse)
+				} else {
+					params := chains.getParams()
+
+					runBtpSetupByRunningNodes(diveContext, enclaveCtx, params)
+				}
+
 			}
 
 			diveContext.StopSpinner(fmt.Sprintf("BTP Bridge Setup Completed between %s and %s. Please find service details in current working directory(dive.json)", chainA, chainB))
@@ -139,6 +132,8 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 	btpbridgeCmd.Flags().StringVar(&chainB, "chainB", "", "Mention Name of Supported Chain")
 	btpbridgeCmd.Flags().Bool("bridge", false, "Mention Bridge ENV")
 
+	btpbridgeCmd.Flags().StringVar(&serviceA, "chainAServiceName", "", "Service Name of Chain A from services.json")
+	btpbridgeCmd.Flags().StringVar(&serviceB, "chainBServiceName", "", "Service Name of Chain B from services.json")
 	btpbridgeCmd.MarkFlagRequired("chainA")
 	btpbridgeCmd.MarkFlagRequired("chainB")
 
@@ -166,9 +161,9 @@ func runBtpSetupByRunningNodes(diveContext *common.DiveContext, enclaveCtx *encl
 
 func runBtpSetupForAlreadyRunningNodes(diveContext *common.DiveContext, enclaveCtx *enclaves.EnclaveContext, mainFunctionName string, srcChain string, dstChain string, srcChainServiceName string, dstChainServiceName string, bridge bool, srcChainServiceResponse string, dstChainServiceResponse string) {
 
-	configData := fmt.Sprintf(`{"links": {"src":"%s","dst":"%s"},"chains" : { "%s" : %s,"%s" : %s},"contracts" : {"%s"  : {},"%s" : {}},"bridge" : "%s"}`, srcChain, dstChain, srcChain, srcChainServiceResponse, dstChain, dstChainServiceResponse, srcChain, dstChain, strconv.FormatBool(bridge))
+	configData := fmt.Sprintf(`{"links": {"src":"%s","dst":"%s"},"chains" : { "%s" : %s,"%s" : %s},"contracts" : {"%s"  : {},"%s" : {}},"bridge" : "%s"}`, srcChain, dstChain, srcChainServiceName, srcChainServiceResponse, dstChainServiceName, dstChainServiceResponse, srcChainServiceName, dstChainServiceName, strconv.FormatBool(bridge))
 
-	params := fmt.Sprintf(`{"src_chain":"%s", "dst_chain":"%s", "config_data":%s, "src_service_name":"%s", "dst_src_name":"%s"}`, srcChain, dstChain, configData, srcChainServiceName, dstChainServiceName)
+	params := fmt.Sprintf(`{"src_chain":"%s", "dst_chain":"%s", "config_data":%s, "src_service_name":"%s", "dst_service_name":"%s"}`, srcChain, dstChain, configData, srcChainServiceName, dstChainServiceName)
 
 	data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, mainFunctionName, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
@@ -188,6 +183,27 @@ func runBtpSetupForAlreadyRunningNodes(diveContext *common.DiveContext, enclaveC
 
 }
 
-func getParams(chainSrc, chainDst, bridge string) string {
-	return fmt.Sprintf(`{"args":{"links": {"src": "%s", "dst": "%s"},"bridge":"%s"}}`, chainSrc, chainDst, bridge)
+func (chains *Chains) getParams() string {
+	return fmt.Sprintf(`{"args":{"links": {"src": "%s", "dst": "%s"},"bridge":"%s"}}`, chains.chainA, chains.chainB, chains.bridge)
+}
+
+func (chains *Chains) getServicesResponse() (string, string, error) {
+
+	serviceConfig, err := common.ReadServiceJsonFile()
+
+	if err != nil {
+		return "", "", err
+	}
+
+	srcChainServiceResponse, err := serviceConfig[chains.chainAServiceName].EncodeToString()
+	if err != nil {
+		return "", "", err
+	}
+	dstChainServiceResponse, err := serviceConfig[chains.chainBServiceName].EncodeToString()
+
+	if err != nil {
+		return "", "", err
+	}
+
+	return srcChainServiceResponse, dstChainServiceResponse, nil
 }
