@@ -10,6 +10,7 @@ import (
 
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 
+	"github.com/hugobyte/dive/commands/chain/types"
 	"github.com/hugobyte/dive/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/spf13/cobra"
@@ -25,6 +26,27 @@ var (
 	serviceA string
 	serviceB string
 )
+
+var runChain = map[string]func(diveContext *common.DiveContext) *common.DiveserviceResponse{
+	"icon": func(diveContext *common.DiveContext) *common.DiveserviceResponse {
+		nodeResponse := types.RunIconNode(diveContext)
+		params := types.GetDecentralizeParms(nodeResponse.ServiceName, nodeResponse.PrivateEndpoint, nodeResponse.KeystorePath, nodeResponse.KeyPassword, nodeResponse.NetworkId)
+
+		diveContext.SetSpinnerMessage("Starting Decentralisation")
+		types.Decentralisation(diveContext, params)
+
+		return nodeResponse
+
+	},
+	"eth": func(diveContext *common.DiveContext) *common.DiveserviceResponse {
+		return types.RunEthNode(diveContext)
+
+	},
+	"hardhat": func(diveContext *common.DiveContext) *common.DiveserviceResponse {
+
+		return types.RunHardhatNode(diveContext)
+	},
+}
 
 type Chains struct {
 	chainA            string
@@ -116,6 +138,50 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 						diveContext.FatalError("Failed To read ServiceFile", err.Error())
 					}
 					runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, chains.chainA, chains.chainB, chains.chainAServiceName, chains.chainBServiceName, bridge, srcChainServiceResponse, dstChainServiceResponse)
+				} else if (chains.chainAServiceName == "" && chains.chainBServiceName != "") || (chains.chainAServiceName != "" && chains.chainBServiceName == "") {
+
+					var chainAServiceResponse string
+					var chainBServiceResponse string
+					var chainAServiceName string
+					var chainBServiceName string
+
+					serviceConfig, err := common.ReadServiceJsonFile()
+					if err != nil {
+						diveContext.FatalError("Failed To Get Service Data", err.Error())
+					}
+
+					if chains.chainAServiceName == "" {
+						response := runChain[chains.chainA](diveContext)
+						chainAServiceName = response.ServiceName
+						chainAServiceResponse, err = response.EncodeToString()
+						if err != nil {
+							diveContext.FatalError("Failed To Get Service Data", err.Error())
+						}
+						chainBServiceName = serviceConfig[chains.chainBServiceName].ServiceName
+
+						chainBServiceResponse, err = serviceConfig[chains.chainBServiceName].EncodeToString()
+
+						if err != nil {
+							diveContext.FatalError("Failed To Get Service Data", err.Error())
+						}
+
+					} else {
+						response := runChain[chains.chainB](diveContext)
+						chainBServiceName = response.ServiceName
+						chainBServiceResponse, err = response.EncodeToString()
+						if err != nil {
+							diveContext.FatalError("Failed To Get Service Data", err.Error())
+						}
+						chainAServiceName = serviceConfig[chains.chainBServiceName].ServiceName
+						chainAServiceResponse, err = serviceConfig[chains.chainBServiceName].EncodeToString()
+
+						if err != nil {
+							diveContext.FatalError("Failed To Get Service Data", err.Error())
+						}
+					}
+
+					runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, chains.chainA, chains.chainB, chainAServiceName, chainBServiceName, bridge, chainAServiceResponse, chainBServiceResponse)
+
 				} else {
 					params := chains.getParams()
 
