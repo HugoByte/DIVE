@@ -19,15 +19,15 @@ def start_eth_node_serivce(plan,args,node_type):
     return config_data
 
 
-def deploy_bmv_eth(plan,bridge,data,args,chain_name):
+def deploy_bmv_eth(plan,bridge,data,args,chain_name,service_name):
 
     if bridge == "true":
 
-        address = eth_relay_setup.deploy_bmv_bridge(plan,args,data.block_height,data.bmc,data.network,chain_name)
+        address = eth_relay_setup.deploy_bmv_bridge(plan,args,data.block_height,data.bmc,data.network,chain_name,service_name)
         return address
 
     else :
-        address = eth_relay_setup.deploy_bmv(plan,args,data.block_header,data.bmc,data.network,data.network_type_id,chain_name)
+        address = eth_relay_setup.deploy_bmv(plan,args,data.block_header,data.bmc,data.network,data.network_type_id,chain_name,service_name)
 
         return address
 

@@ -1,9 +1,9 @@
 eth_contract_deployer_service = import_module("github.com/hugobyte/dive/services/evm/eth/src/node-setup/contract-deployer.star")
 
 # Deploy Bmc contract on ETH and Returns it's address
-def deploy_bmc(plan,args,chain_name):
+def deploy_bmc(plan,args,chain_name,service_name):
 
-    eth_config_data = args["chains"][chain_name]
+    eth_config_data = args["chains"][service_name]
 
     network = eth_config_data["network"]
     network_name = eth_config_data["network_name"]
@@ -25,9 +25,9 @@ def deploy_bmc(plan,args,chain_name):
     )
 
 # Deploy xCall Contract and returns it's address
-def deploy_xcall(plan,args,chain_name):
+def deploy_xcall(plan,args,chain_name,service_name):
 
-    eth_config_data = args["chains"][chain_name]
+    eth_config_data = args["chains"][service_name]
     network = eth_config_data["network"]
     network_name = eth_config_data["network_name"]
 
@@ -40,9 +40,9 @@ def deploy_xcall(plan,args,chain_name):
     return xcall_address
 
 # Deploy dapp Contract and returns it's address
-def deploy_dapp(plan,args,chain_name):
+def deploy_dapp(plan,args,chain_name,service_name):
 
-    eth_config_data = args["chains"][chain_name]
+    eth_config_data = args["chains"][service_name]
 
     network = eth_config_data["network"]
     network_name = eth_config_data["network_name"]
@@ -56,9 +56,9 @@ def deploy_dapp(plan,args,chain_name):
     return dapp_address
 
 # Deploy BmvBridge Contract and returns it's address
-def deploy_bmv_bridge(plan,args,lastblock_height,src_bmc_address,srcchain_network,chain_name):
+def deploy_bmv_bridge(plan,args,lastblock_height,src_bmc_address,srcchain_network,chain_name,service_name):
 
-    eth_config_data = args["chains"][chain_name]
+    eth_config_data = args["chains"][service_name]
 
     network = eth_config_data["network"]
     network_name = eth_config_data["network_name"]
@@ -74,9 +74,9 @@ def deploy_bmv_bridge(plan,args,lastblock_height,src_bmc_address,srcchain_networ
     return bmvb
 
 # Deploy Bmv contract and returns it's address
-def deploy_bmv(plan,args,src_first_block_header,src_bmc_address,srcchain_network,srcchain_network_type_id,chain_name):
+def deploy_bmv(plan,args,src_first_block_header,src_bmc_address,srcchain_network,srcchain_network_type_id,chain_name,service_name):
 
-    eth_config_data = args["chains"][chain_name]
+    eth_config_data = args["chains"][service_name]
 
     network = eth_config_data["network"]
     network_name = eth_config_data["network_name"]
