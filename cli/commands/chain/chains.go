@@ -29,6 +29,7 @@ maintenance within the specified blockchain ecosystem.`,
 	chainCmd.AddCommand(types.NewIconCmd(diveContext))
 	chainCmd.AddCommand(types.NewEthCmd(diveContext))
 	chainCmd.AddCommand(types.NewHardhatCmd(diveContext))
+	chainCmd.AddCommand(types.NewCosmosCmd(diveContext))
 
 	return chainCmd
 

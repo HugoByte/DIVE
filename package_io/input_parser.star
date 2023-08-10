@@ -1,37 +1,32 @@
 def generate_config_data(args):
-
     data = get_args_data(args)
     config_data = {
         "links": data.links,
-        "chains" : {
-            "%s" % data.src : {},
-            "%s" % data.dst : {}
+        "chains": {
+            "%s" % data.src: {},
+            "%s" % data.dst: {},
         },
-        "contracts" : {
-            "%s" %  data.src : {},
-            "%s" %  data.dst : {}
+        "contracts": {
+            "%s" % data.src: {},
+            "%s" % data.dst: {},
         },
-        "bridge" : data.bridge
+        "bridge": data.bridge,
     }
 
     return config_data
 
 def get_args_data(args):
-
     links = args["links"]
     source_chain = links["src"]
     destination_chain = links["dst"]
 
-    if destination_chain == "icon" and source_chain == "icon":
-        destination_chain = "icon-1"
-    
     if source_chain == "eth" or source_chain == "hardhat":
         if destination_chain == "icon":
             destination_chain = source_chain
-            source_chain = "icon" 
+            source_chain = "icon"
 
     if destination_chain == "cosmwasm" and source_chain == "cosmwasm":
-         destination_chain = "cosmwasm1"
+        destination_chain = "cosmwasm1"
 
     bridge = args["bridge"]
 
@@ -39,5 +34,21 @@ def get_args_data(args):
         links = links,
         src = source_chain,
         dst = destination_chain,
-        bridge = bridge
+        bridge = bridge,
     )
+
+def generate_new_config_data(links, srcchain_service_name, dst_chain_service_name, bridge):
+    config_data = {
+        "links": links,
+        "chains": {
+            "%s" % srcchain_service_name: {},
+            "%s" % dst_chain_service_name: {},
+        },
+        "contracts": {
+            "%s" % srcchain_service_name: {},
+            "%s" % dst_chain_service_name: {},
+        },
+        "bridge": bridge,
+    }
+
+    return config_data

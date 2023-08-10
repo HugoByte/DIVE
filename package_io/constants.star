@@ -10,7 +10,7 @@ ICON_NODE_CLIENT = struct(
     public_ip_address = "127.0.0.1",
     rpc_endpoint_path = "api/v3/icon_dex",
     service_name = "icon-node-",
-    genesis_file_path = "/goloop/genesis/"
+    genesis_file_path = "/goloop/genesis/",
 )
 
 HARDHAT_NODE_CLIENT = struct(
@@ -23,38 +23,37 @@ HARDHAT_NODE_CLIENT = struct(
     network = "0x539.hardhat",
     network_id = "0x539",
     keystore_path = "keystores/hardhat_keystore.json",
-	keypassword = "hardhat"
+    keypassword = "hardhat",
 )
 
 CONTRACT_DEPLOYMENT_SERVICE_ETHEREUM = struct(
-     node_image = "node:lts-alpine",
-     static_file_path = "github.com/hugobyte/dive/services/evm/eth/static-files/",
-     static_files_directory_path = "/static-files/",
-     service_name = "eth-contract-deployer",
-     template_file = "github.com/hugobyte/dive/services/evm/eth/static-files/hardhat.config.ts.tmpl",
-     rendered_file_directory = "/static-files/rendered/"
+    node_image = "node:lts-alpine",
+    static_file_path = "github.com/hugobyte/dive/services/evm/eth/static-files/",
+    static_files_directory_path = "/static-files/",
+    service_name = "eth-contract-deployer",
+    template_file = "github.com/hugobyte/dive/services/evm/eth/static-files/hardhat.config.ts.tmpl",
+    rendered_file_directory = "/static-files/rendered/",
 )
 
 ETH_NODE_CLIENT = struct(
-          service_name = "el-1-geth-lighthouse",
-          network_name= "eth",
-          network = "0x301824.eth",
-          nid = "0x301824",
-		  keystore_path = "keystores/eth_keystore.json",
-		  keypassword = "password"
+    service_name = "el-1-geth-lighthouse",
+    network_name = "eth",
+    network = "0x301824.eth",
+    nid = "0x301824",
+    keystore_path = "keystores/eth_keystore.json",
+    keypassword = "password",
 )
 
 COSMOS_NODE_CLIENT = struct(
-    start_cosmos = "github.com/hugobyte/dive/services/cosmvm/start-cosmos-0.sh",
-    start_cosmos_1 = "github.com/hugobyte/dive/services/cosmvm/start-cosmos-1.sh",
+    start_script = "github.com/hugobyte/dive/services/cosmvm/static_files/start.sh",
     default_contract_path = "github.com/hugobyte/dive/services/cosmvm/static_files/contracts",
     service_name = "cosmos",
     service_name_1 = "cosmos1",
     image = "archwaynetwork/archwayd:constantine",
     path = "/start-scripts/",
     contract_path = "/root/contracts/",
-    chain_id = "my-chain",
-    chain_id_1 = "chain-1",
+    chain_id = "chain-1",
+    chain_id_1 = "chain-2",
     public_ip_address = "127.0.0.1",
     cosmos_grpc_port_key = "grpc",
     cosmos_rpc_port_key = "rpc",
@@ -64,19 +63,21 @@ COSMOS_NODE_CLIENT = struct(
     private_port_http = 9091,
     private_port_tcp = 26656,
     private_port_rpc = 26657,
-    public_port_grpc_node_1 = 9090,
-    public_port_http_node_1 = 9091,
-    public_port_tcp_node_1 = 26656,
-    public_port_rpc_node_1 = 4564,
-    public_port_grpc_node_2 = 9080,
-    public_port_http_node_2 = 9092,
-    public_port_tcp_node_2 = 26658,
-    public_port_rpc_node_2 = 4566,
+    public_port_grpc = 9090,
+    public_port_http = 9091,
+    public_port_tcp = 26656,
+    public_port_rpc = 4564,
+    public_port_grpc_node = 9080,
+    public_port_http_node = 9092,
+    public_port_tcp_node = 26658,
+    public_port_rpc_node = 4566,
     config_files = "github.com/hugobyte/dive/services/cosmvm/static_files/config/",
+    config_files_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/archwayjson.tpl",
     relay_service_name = "cosmos-relay",
-    relay_service_image = "relay1",
+    relay_service_image = "hugobyte/ibc-relay",
     relay_config_files_path = "/script/",
+    run_file_path = "github.com/hugobyte/dive/services/bridges/ibc/static-files/run.sh",
+    key = "chain-1-key",
+    key1 = "chain-2-key",
+    password = "password",
 )
-
-
- 
