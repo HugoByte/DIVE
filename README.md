@@ -113,16 +113,19 @@ Example `services.json`:
 
 ```javascript
 {
-"icon-0": {
-	"service_name": "icon-node-0",
-	"endpoint_public": "http://127.0.0.1:8090/api/v3/icon_dex",
+"icon-node-0xacbc4e": {
+	"block_number": "206",
 	"endpoint": "http://172.16.0.2:9080/api/v3/icon_dex",
+	"endpoint_public": "http://127.0.0.1:8090/api/v3/icon_dex",
 	"keypassword": "gochain",
 	"keystore_path": "keystores/keystore.json",
 	"network": "0x3.icon",
-	"network_name": "icon-0",
-	"nid": "0x3"
-	}
+	"networkId": "0x1",
+	"networkTypeId": "0x1",
+	"network_name": "icon-0xacbc4e",
+	"nid": "0x3",
+	"service_name": "icon-node-0xacbc4e"
+ }
 }
 ```
 
@@ -138,55 +141,57 @@ Example `dive.json`:
 
 ```javascript
 {
-  "bridge": "false",
-  "chains": {
-    "icon": {
-      "block_number": "235",
-      "endpoint": "http://172.16.0.2:9080/api/v3/icon_dex",
-      "endpoint_public": "http://127.0.0.1:8090/api/v3/icon_dex",
-      "keypassword": "gochain",
-      "keystore_path": "keystores/keystore.json",
-      "network": "0x3.icon",
-      "networkId": "0x1",
-      "networkTypeId": "0x1",
-      "network_name": "icon-0",
-      "nid": "0x3",
-      "service_name": "icon-node-0"
-    },
-    "icon-1": {
-      "block_number": "233",
-      "endpoint": "http://172.16.0.3:9081/api/v3/icon_dex",
-      "endpoint_public": "http://127.0.0.1:8091/api/v3/icon_dex",
-      "keypassword": "gochain",
-      "keystore_path": "keystores/keystore.json",
-      "network": "0x101.icon",
-      "networkId": "0x1",
-      "networkTypeId": "0x1",
-      "network_name": "icon-1",
-      "nid": "0x101",
-      "service_name": "icon-node-1"
-    }
-  },
-  "contracts": {
-    "icon": {
-      "bmc": "cx1755c5fe5012f3f56108a498723532314e003946",
-      "bmv": "cx9a49018d108797f4dfe84cc930d33a3a5770a3a1",
-      "dapp": "cx20053c926cc0218d0c0a607a5cffb96e207dbfe6",
-      "xcall": "cxb895d6c1be173c155b682b4266e52e3165f38163"
-    },
-    "icon-1": {
-      "bmc": "cx36a5fc49d6a77ec62f758577bdc1adb3d76982de",
-      "bmv": "cx49c3d9a48a0606fb07639f5e6b56a039f64368c4",
-      "dapp": "cx4fd6bdd547078398f255a241a14cab3796591028",
-      "xcall": "cx7eab38422d1dedb292243cfed21b16148a42ec09"
-    }
-  },
-  "links": {
-    "dst": "icon",
-    "src": "icon"
-  }
+	"bridge": "true",
+	"chains": {
+		"el-1-geth-lighthouse": {
+			"block_number": "24",
+			"endpoint": "http://172.16.0.7:8545",
+			"endpoint_public": "http://",
+			"keypassword": "password",
+			"keystore_path": "keystores/eth_keystore.json",
+			"network": "0x301824.eth",
+			"network_name": "eth",
+			"nid": "0x301824",
+			"service_name": "el-1-geth-lighthouse"
+		},
+		"icon-node-0xacbc4e": {
+			"block_number": "206",
+			"endpoint": "http://172.16.0.2:9080/api/v3/icon_dex",
+			"endpoint_public": "http://127.0.0.1:8090/api/v3/icon_dex",
+			"keypassword": "gochain",
+			"keystore_path": "keystores/keystore.json",
+			"network": "0x3.icon",
+			"networkId": "0x1",
+			"networkTypeId": "0x1",
+			"network_name": "icon-0xacbc4e",
+			"nid": "0x3",
+			"service_name": "icon-node-0xacbc4e"
+		}
+	},
+	"contracts": {
+		"el-1-geth-lighthouse": {
+			"bmc": "0xB9D7a3554F221B34f49d7d3C61375E603aFb699e",
+			"bmcm": "0xAb2A01BC351770D09611Ac80f1DE076D56E0487d",
+			"bmcs": "0xBFF5cD0aA560e1d1C6B1E2C347860aDAe1bd8235",
+			"bmv": "0x765E6b67C589A4b40184AEd9D9ae7ba40E32F8d4",
+			"dapp": "0x9bE03fF3E1888A216f9e48c68B587A89c5b94CD6",
+			"xcall": "0x5911A6541729C227fAda7D5187ee7518B47fB237"
+		},
+		"icon-node-0xacbc4e": {
+			"bmc": "cx3f9b7aa2a7fa0334a0068a324c9020b9138363f1",
+			"bmv": "cxe308f1f14febfff0f906df89d4bd191ba11b4689",
+			"dapp": "cxfe3cdbe04e78ff3747b076cb7122c4f7ba58cf49",
+			"xcall": "cx4b33b94cb04bf2c179cda1af81c1d1eb639c5e98"
+		}
+	},
+	"links": {
+		"dst": "el-1-geth-lighthouse",
+		"src": "icon-node-0xacbc4e"
+	}
 }
 ```
+* <b>el-1-geth-lighthouse:</b> Service name for eth chain.
+* <b>icon-node-0xacbc4e:</b> Service name for ICON chain.
 
 #### Version
 
