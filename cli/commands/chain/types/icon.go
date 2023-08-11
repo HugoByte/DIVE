@@ -25,7 +25,6 @@ var (
 )
 
 type IconServiceConfig struct {
-	Id               string `json:"id" default:"0"`
 	Port             int    `json:"private_port"`
 	PublicPort       int    `json:"public_port"`
 	P2PListenAddress string `json:"p2p_listen_address"`
@@ -34,8 +33,6 @@ type IconServiceConfig struct {
 }
 
 func (sc *IconServiceConfig) GetDefaultConfigIconNode0() {
-
-	sc.Id = "0"
 	sc.Port = 9080
 	sc.PublicPort = 8090
 	sc.P2PListenAddress = "7080"
@@ -74,7 +71,7 @@ It establishes a connection to the Icon network and allows the node in executing
 				diveContext.SetSpinnerMessage("Starting Decentralisation")
 				Decentralisation(diveContext, params)
 
-				err := common.WriteToServiceFile(nodeResponse.NetworkName, *nodeResponse)
+				err := common.WriteToServiceFile(nodeResponse.ServiceName, *nodeResponse)
 
 				if err != nil {
 					diveContext.FatalError("Failed To Write To File", err.Error())
@@ -86,7 +83,7 @@ It establishes a connection to the Icon network and allows the node in executing
 
 				nodeResponse := RunIconNode(diveContext)
 
-				err := common.WriteToServiceFile(nodeResponse.NetworkName, *nodeResponse)
+				err := common.WriteToServiceFile(nodeResponse.ServiceName, *nodeResponse)
 
 				if err != nil {
 					diveContext.FatalError("Failed To Write To File", err.Error())
@@ -113,8 +110,8 @@ func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 
 	var decentralisationCmd = &cobra.Command{
 		Use:   "decentralize",
-		Short: "Decentralise already running Icon Node",
-		Long:  `Decentralise Icon Node is necessary if you want to connect your local icon node to BTP network`,
+		Short: "Decentralize already running Icon Node",
+		Long:  `Decentralize Icon Node is necessary if you want to connect your local icon node to BTP network`,
 		Run: func(cmd *cobra.Command, args []string) {
 
 			params := GetDecentralizeParms(serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID)
@@ -184,7 +181,7 @@ func RunIconNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 
 	diveContext.CheckInstructionSkipped(skippedInstructions, "Instruction Executed Already")
 
-	params := fmt.Sprintf(`{"service_config":%s,"id":"%s","uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, responseData, serviceConfig.Id, genesisHandler.uploadedFiles, genesisHandler.genesisPath, genesisHandler.genesisFile)
+	params := fmt.Sprintf(`{"service_config":%s,"uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, responseData, genesisHandler.uploadedFiles, genesisHandler.genesisPath, genesisHandler.genesisFile)
 	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveIconNodeScript, "start_icon_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
