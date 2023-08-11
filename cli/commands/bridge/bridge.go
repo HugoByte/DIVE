@@ -104,7 +104,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 				diveContext.Error(err.Error())
 			}
 
-			bridge, _ := cmd.Flags().GetBool("bridge")
+			bridge, _ := cmd.Flags().GetBool("bmvbridge") // To Specify Which Type of BMV to be used in btp setup(if true BMV bridge is used else BMV-BTP Block is used)
 
 			chains := initChains(chainA, chainB, serviceA, serviceB, bridge)
 			diveContext.StartSpinner(fmt.Sprintf(" Starting BTP Bridge for %s,%s", chains.chainA, chains.chainB))
@@ -151,32 +151,47 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 					}
 
 					if chains.chainAServiceName == "" {
+
+						chainBserviceresponse, OK := serviceConfig[chains.chainBServiceName]
+						if !OK {
+							diveContext.FatalError("Failed To Get Service Data", fmt.Sprint("service name not found:", chains.chainBServiceName))
+						}
+						chainBServiceName = chainBserviceresponse.ServiceName
+
+						chainBServiceResponse, err = chainBserviceresponse.EncodeToString()
+
+						if err != nil {
+							diveContext.FatalError("Failed To Get Service Data", err.Error())
+						}
+
 						response := runChain[chains.chainA](diveContext)
 						chainAServiceName = response.ServiceName
 						chainAServiceResponse, err = response.EncodeToString()
 						if err != nil {
 							diveContext.FatalError("Failed To Get Service Data", err.Error())
 						}
-						chainBServiceName = serviceConfig[chains.chainBServiceName].ServiceName
 
-						chainBServiceResponse, err = serviceConfig[chains.chainBServiceName].EncodeToString()
+					} else if chains.chainBServiceName == "" {
+
+						chainAserviceresponse, OK := serviceConfig[chains.chainAServiceName]
+						if !OK {
+							diveContext.FatalError("Failed To Get Service Data", fmt.Sprint("service name not found:", chains.chainAServiceName))
+						}
+
+						chainAServiceName = chainAserviceresponse.ServiceName
+
+						chainAServiceResponse, err = chainAserviceresponse.EncodeToString()
 
 						if err != nil {
 							diveContext.FatalError("Failed To Get Service Data", err.Error())
 						}
 
-					} else if chains.chainBServiceName == "" {
 						response := runChain[chains.chainB](diveContext)
 						chainBServiceName = response.ServiceName
 						chainBServiceResponse, err = response.EncodeToString()
 						if err != nil {
 							diveContext.FatalError("Failed To Get Service Data", err.Error())
-						}
-						chainAServiceName = serviceConfig[chains.chainAServiceName].ServiceName
-						chainAServiceResponse, err = serviceConfig[chains.chainAServiceName].EncodeToString()
 
-						if err != nil {
-							diveContext.FatalError("Failed To Get Service Data", err.Error())
 						}
 					}
 					if chains.chainB == "icon" {
@@ -201,7 +216,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
 	btpbridgeCmd.Flags().StringVar(&chainA, "chainA", "", "Mention Name of Supported Chain")
 	btpbridgeCmd.Flags().StringVar(&chainB, "chainB", "", "Mention Name of Supported Chain")
-	btpbridgeCmd.Flags().Bool("bridge", false, "Mention Bridge ENV")
+	btpbridgeCmd.Flags().BoolP("bmvbridge", "b", false, "To Specify Which Type of BMV to be used in btp setup(if true BMV bridge is used else BMV-BTP Block is used)")
 
 	btpbridgeCmd.Flags().StringVar(&serviceA, "chainAServiceName", "", "Service Name of Chain A from services.json")
 	btpbridgeCmd.Flags().StringVar(&serviceB, "chainBServiceName", "", "Service Name of Chain B from services.json")
@@ -266,11 +281,20 @@ func (chains *Chains) getServicesResponse() (string, string, error) {
 		return "", "", err
 	}
 
-	srcChainServiceResponse, err := serviceConfig[chains.chainAServiceName].EncodeToString()
+	chainAServiceResponse, OK := serviceConfig[chains.chainAServiceName]
+	if !OK {
+		return "", "", fmt.Errorf("service name not found")
+	}
+	chainBServiceResponse, OK := serviceConfig[chains.chainAServiceName]
+	if !OK {
+		return "", "", fmt.Errorf("service name not found")
+	}
+
+	srcChainServiceResponse, err := chainAServiceResponse.EncodeToString()
 	if err != nil {
 		return "", "", err
 	}
-	dstChainServiceResponse, err := serviceConfig[chains.chainBServiceName].EncodeToString()
+	dstChainServiceResponse, err := chainBServiceResponse.EncodeToString()
 
 	if err != nil {
 		return "", "", err
