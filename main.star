@@ -214,8 +214,8 @@ def start_btp_icon_to_eth_for_already_running_nodes(plan, src_chain, dst_chain, 
 
     config_data = start_btp_relayer(plan, src_chain, dst_chain, config_data,src_service_name,dst_service_name)
     
-    config["links"]["src"] = src_service_name
-    config["links"]["dst"] = dst_service_name
+    config_data["links"]["src"] = src_service_name
+    config_data["links"]["dst"] = dst_service_name
 
     return config_data
 
