@@ -1,6 +1,7 @@
 name: run smoke testcases
 
 on:
+  workflow_dispatch:
   pull_request:
     types: [labeled]
 

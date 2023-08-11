@@ -44,7 +44,7 @@ With DIVE CLI, developers can easily connect and interact with various blockchai
 Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually configuring nodes, allowing developers to effortlessly set up nodes for the BTP network with just a few simple commands. The tool provides a user-friendly interface that makes the process accessible even to those new to blockchain development.
 </p>
 
-### Installing Dive CLI
+## Installing Dive CLI
 
 - Install on **`MacOS`**
   ```
@@ -67,7 +67,7 @@ Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually co
   dive.exe
   ```
 
-### Commands
+## Commands
 
 - **bridge** : For setting up communication between two different chains.This will setup the relayer to connect two different chains and pass messages between them.
 
@@ -90,11 +90,11 @@ Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually co
 - **tutorial**: Takes you to Dive tutorials
 - **version**: Returns the current version of the CLI
 
-### Usage
+## Usage
 
 > Before proceeding, make sure the Kurtosis Engine is running in the background. If it's not already running, start it by executing the following command: `kurtosis engine start`
 
-#### Setting up an Node
+### Setting up an Node
 
 ```
 dive chain icon
@@ -129,11 +129,68 @@ Example `services.json`:
 }
 ```
 
-#### Setting Bridge Between Two Chains
+### Setting Up Bridge Between Two Chains Which Is Already Running
+
+- Starting ICON
+
+  ```bash
+  dive chain icon -d #This spins up icon and decentralise for btp
+  ```
+
+- Starting ETH
+
+  ```bash
+  dive chain eth  --verbose=true #This spins up Eth
+  ```
+
+  > `--verbose=true` can be used to see details execution logs
+
+  Once chains are running you can find a services.json file in current working directory. Example services.json can be found below.
+
+  ```javascript
+  {
+  	"el-1-geth-lighthouse": {
+  		"block_number": "24",
+  		"endpoint": "http://172.16.0.7:8545",
+  		"endpoint_public": "http://",
+  		"keypassword": "password",
+  		"keystore_path": "keystores/eth_keystore.json",
+  		"network": "0x301824.eth",
+  		"network_name": "eth",
+  		"nid": "0x301824",
+  		"service_name": "el-1-geth-lighthouse"
+  	},
+  	"icon-node-0xacbc4e": {
+  		"block_number": "206",
+  		"endpoint": "http://172.16.0.2:9080/api/v3/icon_dex",
+  		"endpoint_public": "http://127.0.0.1:8090/api/v3/icon_dex",
+  		"keypassword": "gochain",
+  		"keystore_path": "keystores/keystore.json",
+  		"network": "0x3.icon",
+  		"networkId": "0x1",
+  		"networkTypeId": "0x1",
+  		"network_name": "icon-0xacbc4e",
+  		"nid": "0x3",
+  		"service_name": "icon-node-0xacbc4e"
+  	}
+  }
+  ```
+
+  Now you can start bridge just by running
+
+  ```bash
+  dive bridge btp --chainA icon --chainB eth --chainAServiceName icon-node-0xacbc4e  --chainBServiceName el-1-geth-lighthouse
+  ```
+
+### Setting Bridge Between Two Chains
+
+Run below command to start btp connection between any supported chain
 
 ```bash
-dive bridge btp --chainA icon --chainB eth
+dive bridge btp --chainA icon --chainB eth --bridge
 ```
+
+> `--bridge` flag is used to specify the type of bmv contract to be deployed for btp setup.
 
 This command sets up btp bridge between icon and eth . After running this command **DIVE CLI** will automatically starts the ICON & ETH node , Deploys contract which is used for BTP and starts the realay to constanly exchange message between established connection.
 After successful bridge setup all the neccessary details with respect to bridge will be added to `dive.json` file that will be present in current working directory.
@@ -185,15 +242,13 @@ Example `dive.json`:
 		}
 	},
 	"links": {
-		"dst": "el-1-geth-lighthouse",
-		"src": "icon-node-0xacbc4e"
+		"dst": "el-1-geth-lighthouse", # service name for eth chain
+		"src": "icon-node-0xacbc4e"  # Service name for ICON chain
 	}
 }
 ```
-* <b>el-1-geth-lighthouse:</b> Service name for eth chain.
-* <b>icon-node-0xacbc4e:</b> Service name for ICON chain.
 
-#### Version
+### Version
 
 ```bash
 dive version
@@ -201,7 +256,7 @@ dive version
 
 Prints out the current version of **DIVE CLI**
 
-#### Cleaning
+### Cleaning
 
 ```bash
 dive clean
@@ -211,11 +266,11 @@ Command cleans up the artifacts , services created on the Enclave during **DIVE*
 
 > Checkout More details on how to setup [BTP](https://www.xcall.dev/quickstart/setting-up-a-local-environment-with-dive-cli) bridge
 
-### Testing
+## Testing
 
 - Follow the instruction in [Test Folder](test/README.md#steps-to-run-the-script)
 
-### Contributing
+## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
@@ -235,10 +290,10 @@ If you have a suggestion that would make this better, please fork the repo and c
 
 Special thanks to [Kurtosis-Tech](https://github.com/kurtosis-tech).
 
-### License
+## License
 
 Distributed under the Apache 2.0 License. See [LICENSE](./LICENSE) for more information.
 
-### Feedback
+## Feedback
 
 We would happy to hear your thoughts on our project. Your feedback helps us improve and make it better for everyone. Please submit your valuable feedback [here](https://docs.google.com/forms/d/e/1FAIpQLScnesE-4IWPrFQ-W2FbRXHyQz8i_C0BVjIP_aWaxKe3myTgyw/viewform?usp=sharing)
