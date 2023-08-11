@@ -154,8 +154,8 @@ def start_btp_for_already_running_icon_nodes(plan, src_chain, dst_chain, config_
 
     config_data = start_btp_relayer(plan, src_chain, dst_chain, config_data,src_service_name,dst_service_name)
 
-    config["links"]["src"] = src_service_name
-    config["links"]["dst"] = dst_service_name
+    config_data["links"]["src"] = src_service_name
+    config_data["links"]["dst"] = dst_service_name
 
     return config_data
 
