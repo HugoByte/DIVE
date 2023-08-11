@@ -151,32 +151,47 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 					}
 
 					if chains.chainAServiceName == "" {
+
+						chainBserviceresponse, OK := serviceConfig[chains.chainBServiceName]
+						if !OK {
+							diveContext.FatalError("Failed To Get Service Data", fmt.Sprint("service name not found:", chains.chainBServiceName))
+						}
+						chainBServiceName = chainBserviceresponse.ServiceName
+
+						chainBServiceResponse, err = chainBserviceresponse.EncodeToString()
+
+						if err != nil {
+							diveContext.FatalError("Failed To Get Service Data", err.Error())
+						}
+
 						response := runChain[chains.chainA](diveContext)
 						chainAServiceName = response.ServiceName
 						chainAServiceResponse, err = response.EncodeToString()
 						if err != nil {
 							diveContext.FatalError("Failed To Get Service Data", err.Error())
 						}
-						chainBServiceName = serviceConfig[chains.chainBServiceName].ServiceName
 
-						chainBServiceResponse, err = serviceConfig[chains.chainBServiceName].EncodeToString()
+					} else if chains.chainBServiceName == "" {
+
+						chainAserviceresponse, OK := serviceConfig[chains.chainAServiceName]
+						if !OK {
+							diveContext.FatalError("Failed To Get Service Data", fmt.Sprint("service name not found:", chains.chainAServiceName))
+						}
+
+						chainAServiceName = chainAserviceresponse.ServiceName
+
+						chainAServiceResponse, err = chainAserviceresponse.EncodeToString()
 
 						if err != nil {
 							diveContext.FatalError("Failed To Get Service Data", err.Error())
 						}
 
-					} else if chains.chainBServiceName == "" {
 						response := runChain[chains.chainB](diveContext)
 						chainBServiceName = response.ServiceName
 						chainBServiceResponse, err = response.EncodeToString()
 						if err != nil {
 							diveContext.FatalError("Failed To Get Service Data", err.Error())
-						}
-						chainAServiceName = serviceConfig[chains.chainAServiceName].ServiceName
-						chainAServiceResponse, err = serviceConfig[chains.chainAServiceName].EncodeToString()
 
-						if err != nil {
-							diveContext.FatalError("Failed To Get Service Data", err.Error())
 						}
 					}
 					if chains.chainB == "icon" {
@@ -266,11 +281,20 @@ func (chains *Chains) getServicesResponse() (string, string, error) {
 		return "", "", err
 	}
 
-	srcChainServiceResponse, err := serviceConfig[chains.chainAServiceName].EncodeToString()
+	chainAServiceResponse, OK := serviceConfig[chains.chainAServiceName]
+	if !OK {
+		return "", "", fmt.Errorf("service name not found")
+	}
+	chainBServiceResponse, OK := serviceConfig[chains.chainAServiceName]
+	if !OK {
+		return "", "", fmt.Errorf("service name not found")
+	}
+
+	srcChainServiceResponse, err := chainAServiceResponse.EncodeToString()
 	if err != nil {
 		return "", "", err
 	}
-	dstChainServiceResponse, err := serviceConfig[chains.chainBServiceName].EncodeToString()
+	dstChainServiceResponse, err := chainBServiceResponse.EncodeToString()
 
 	if err != nil {
 		return "", "", err
