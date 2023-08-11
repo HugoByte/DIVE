@@ -1,6 +1,7 @@
 name: run smoke testcases
 
 on:
+  workflow_dispatch:
   pull_request:
     types: [labeled]
 
@@ -41,7 +42,7 @@ jobs:
       - name: Test bridge between icon and hardhat with icon bridge set to true
         run: |
           $DIVE_BINARY_PATH clean
-          $DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth --bridge --verbose
+          $DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth --bmvbridge --verbose
 
       - name: Test bridge between icon and icon
         run: |
