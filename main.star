@@ -88,9 +88,6 @@ def run_btp_setup(plan, args):
 
         config = start_btp_for_already_running_icon_nodes(plan, source_chain, destination_chain, config_data, data.src_config["service_name"], data.dst_config["service_name"])
 
-        config["links"]["src"] = src_chain_service_name
-        config["links"]["dst"] = dst_chain_service_name
-
         return config
     else:
 
@@ -112,9 +109,6 @@ def run_btp_setup(plan, args):
 
             icon_service.configure_icon_node(plan, src_chain_config)
             config = start_btp_icon_to_eth_for_already_running_nodes(plan, source_chain,destination_chain, config_data,  src_chain_service_name, dst_chain_service_name)
-            
-            config["links"]["src"] = src_chain_service_name
-            config["links"]["dst"] = dst_chain_service_name
 
             return config
             
@@ -159,6 +153,9 @@ def start_btp_for_already_running_icon_nodes(plan, src_chain, dst_chain, config_
     config_data["chains"][dst_service_name]["block_number"] = dst_block_height
 
     config_data = start_btp_relayer(plan, src_chain, dst_chain, config_data,src_service_name,dst_service_name)
+
+    config_data["links"]["src"] = src_service_name
+    config_data["links"]["dst"] = dst_service_name
 
     return config_data
 
@@ -216,6 +213,9 @@ def start_btp_icon_to_eth_for_already_running_nodes(plan, src_chain, dst_chain, 
     config_data["chains"][dst_service_name]["block_number"] = dst_last_block_height_number
 
     config_data = start_btp_relayer(plan, src_chain, dst_chain, config_data,src_service_name,dst_service_name)
+    
+    config_data["links"]["src"] = src_service_name
+    config_data["links"]["dst"] = dst_service_name
 
     return config_data
 

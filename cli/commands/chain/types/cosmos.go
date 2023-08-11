@@ -19,3 +19,5 @@ It establishes a connection to the Cosmos network and allows the node in executi
 
 	return cosmosCmd
 }
+
+func RunCosmosNode() {}

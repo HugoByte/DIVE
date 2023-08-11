@@ -9,7 +9,7 @@ async function deploy_xcall_solidity(
 ) {
   var deployments_data = deployments.get(target);
   const CallSvc = await ethers.getContractFactory("CallService");
-  const xcallSol = await CallSvc.deploy();
+  const xcallSol = await CallSvc.deploy({gasPrice: 50000000000});
   await xcallSol.deployed();
   await xcallSol.initialize(bmcAddress);
 
