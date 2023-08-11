@@ -1,8 +1,10 @@
 ![DIVE](img/DIVE.png)
 
-## D.I.V.E.
+# D.I.V.E.
 
-### About
+[![run smoke testcases](https://github.com/HugoByte/DIVE/actions/workflows/smoke-test.yaml/badge.svg)](https://github.com/HugoByte/DIVE/actions/workflows/smoke-test.yaml)
+
+## About
 
 Dive deeply into the world of Blockchain and Web 3.0 using **D.I.V.E.** (Deployable Infrastructure for Virtually Effortless blockchain integration),The Dive package aim to implement its services and API for ICON Blockchain. The kurtosis services and API are designed to simplify the process of deploying various nodes and services for development and testing and enhance the overall user experience. Implementing kurtosis for the ICON blockchain can help ease the developers in the ecosystem to focus more on building the business logic without worrying about the setup which consumes a significant amount of time.
 
@@ -10,7 +12,7 @@ The vision is to making ICON the interoperable hub by easing the setup of BTP an
 
 This repository uses [kurtosis package](https://docs.kurtosis.com/concepts-reference/packages)
 
-### Setup and requirements
+## Setup and requirements
 
 Before proceeding make sure to have
 
@@ -18,7 +20,7 @@ Before proceeding make sure to have
 
 - [Kurtosis installed and running ](https://docs.kurtosis.com/install#ii-install-the-cli) or [(upgrading to the latest)](https://docs.kurtosis.com/upgrade)
 
-### Integrating chain
+## Integrating chain
 
 - ICON
 
@@ -44,7 +46,7 @@ With DIVE CLI, developers can easily connect and interact with various blockchai
 Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually configuring nodes, allowing developers to effortlessly set up nodes for the BTP network with just a few simple commands. The tool provides a user-friendly interface that makes the process accessible even to those new to blockchain development.
 </p>
 
-### Installing Dive CLI
+## Installing Dive CLI
 
 - Install on **`MacOS`**
   ```
@@ -67,7 +69,7 @@ Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually co
   dive.exe
   ```
 
-### Commands
+## Commands
 
 - **bridge** : For setting up communication between two different chains.This will setup the relayer to connect two different chains and pass messages between them.
 
@@ -90,11 +92,11 @@ Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually co
 - **tutorial**: Takes you to Dive tutorials
 - **version**: Returns the current version of the CLI
 
-### Usage
+## Usage
 
 > Before proceeding, make sure the Kurtosis Engine is running in the background. If it's not already running, start it by executing the following command: `kurtosis engine start`
 
-#### Setting up an Node
+### Setting up an Node
 
 ```
 dive chain icon
@@ -113,24 +115,85 @@ Example `services.json`:
 
 ```javascript
 {
-"icon-0": {
-	"service_name": "icon-node-0",
-	"endpoint_public": "http://127.0.0.1:8090/api/v3/icon_dex",
+"icon-node-0xacbc4e": { # this key sepcifies service name
+	"block_number": "206",
 	"endpoint": "http://172.16.0.2:9080/api/v3/icon_dex",
+	"endpoint_public": "http://127.0.0.1:8090/api/v3/icon_dex",
 	"keypassword": "gochain",
 	"keystore_path": "keystores/keystore.json",
 	"network": "0x3.icon",
-	"network_name": "icon-0",
-	"nid": "0x3"
-	}
+	"networkId": "0x1",
+	"networkTypeId": "0x1",
+	"network_name": "icon-0xacbc4e",
+	"nid": "0x3",
+	"service_name": "icon-node-0xacbc4e"
+ }
 }
 ```
 
-#### Setting Bridge Between Two Chains
+### Setting Up Bridge Between Two Chains Which Is Already Running
+
+- Starting ICON
+
+  ```bash
+  dive chain icon -d #This spins up icon and decentralise for btp
+  ```
+
+- Starting ETH
+
+  ```bash
+  dive chain eth  --verbose=true #This spins up Eth
+  ```
+
+  > `--verbose=true` can be used to see details execution logs
+
+  Once chains are running you can find a services.json file in current working directory. Example services.json can be found below.
+
+  ```javascript
+  {
+
+  	"icon-node-0xacbc4e": {
+  		"block_number": "206",
+  		"endpoint": "http://172.16.0.2:9080/api/v3/icon_dex",
+  		"endpoint_public": "http://127.0.0.1:8090/api/v3/icon_dex",
+  		"keypassword": "gochain",
+  		"keystore_path": "keystores/keystore.json",
+  		"network": "0x3.icon",
+  		"networkId": "0x1",
+  		"networkTypeId": "0x1",
+  		"network_name": "icon-0xacbc4e",
+  		"nid": "0x3",
+  		"service_name": "icon-node-0xacbc4e"
+  	},
+  	"el-1-geth-lighthouse": {
+  		"block_number": "24",
+  		"endpoint": "http://172.16.0.7:8545",
+  		"endpoint_public": "http://",
+  		"keypassword": "password",
+  		"keystore_path": "keystores/eth_keystore.json",
+  		"network": "0x301824.eth",
+  		"network_name": "eth",
+  		"nid": "0x301824",
+  		"service_name": "el-1-geth-lighthouse"
+  	}
+  }
+  ```
+
+  Now you can start bridge just by running
+
+  ```bash
+  dive bridge btp --chainA icon --chainB eth --chainAServiceName icon-node-0xacbc4e  --chainBServiceName el-1-geth-lighthouse
+  ```
+
+### Setting Bridge Between Two Chains
+
+Run below command to start btp connection between any supported chain
 
 ```bash
-dive bridge btp --chainA icon --chainB eth
+dive bridge btp --chainA icon --chainB eth -b
 ```
+
+> `-b` flag is used to specify the type of bmv contract to be deployed for btp setup.
 
 This command sets up btp bridge between icon and eth . After running this command **DIVE CLI** will automatically starts the ICON & ETH node , Deploys contract which is used for BTP and starts the realay to constanly exchange message between established connection.
 After successful bridge setup all the neccessary details with respect to bridge will be added to `dive.json` file that will be present in current working directory.
@@ -138,57 +201,57 @@ Example `dive.json`:
 
 ```javascript
 {
-  "bridge": "false",
-  "chains": {
-    "icon": {
-      "block_number": "235",
-      "endpoint": "http://172.16.0.2:9080/api/v3/icon_dex",
-      "endpoint_public": "http://127.0.0.1:8090/api/v3/icon_dex",
-      "keypassword": "gochain",
-      "keystore_path": "keystores/keystore.json",
-      "network": "0x3.icon",
-      "networkId": "0x1",
-      "networkTypeId": "0x1",
-      "network_name": "icon-0",
-      "nid": "0x3",
-      "service_name": "icon-node-0"
-    },
-    "icon-1": {
-      "block_number": "233",
-      "endpoint": "http://172.16.0.3:9081/api/v3/icon_dex",
-      "endpoint_public": "http://127.0.0.1:8091/api/v3/icon_dex",
-      "keypassword": "gochain",
-      "keystore_path": "keystores/keystore.json",
-      "network": "0x101.icon",
-      "networkId": "0x1",
-      "networkTypeId": "0x1",
-      "network_name": "icon-1",
-      "nid": "0x101",
-      "service_name": "icon-node-1"
-    }
-  },
-  "contracts": {
-    "icon": {
-      "bmc": "cx1755c5fe5012f3f56108a498723532314e003946",
-      "bmv": "cx9a49018d108797f4dfe84cc930d33a3a5770a3a1",
-      "dapp": "cx20053c926cc0218d0c0a607a5cffb96e207dbfe6",
-      "xcall": "cxb895d6c1be173c155b682b4266e52e3165f38163"
-    },
-    "icon-1": {
-      "bmc": "cx36a5fc49d6a77ec62f758577bdc1adb3d76982de",
-      "bmv": "cx49c3d9a48a0606fb07639f5e6b56a039f64368c4",
-      "dapp": "cx4fd6bdd547078398f255a241a14cab3796591028",
-      "xcall": "cx7eab38422d1dedb292243cfed21b16148a42ec09"
-    }
-  },
-  "links": {
-    "dst": "icon",
-    "src": "icon"
-  }
+	"bridge": "true",
+	"chains": {
+		"el-1-geth-lighthouse": {
+			"block_number": "24",
+			"endpoint": "http://172.16.0.7:8545",
+			"endpoint_public": "http://",
+			"keypassword": "password",
+			"keystore_path": "keystores/eth_keystore.json",
+			"network": "0x301824.eth",
+			"network_name": "eth",
+			"nid": "0x301824",
+			"service_name": "el-1-geth-lighthouse"
+		},
+		"icon-node-0xacbc4e": {
+			"block_number": "206",
+			"endpoint": "http://172.16.0.2:9080/api/v3/icon_dex",
+			"endpoint_public": "http://127.0.0.1:8090/api/v3/icon_dex",
+			"keypassword": "gochain",
+			"keystore_path": "keystores/keystore.json",
+			"network": "0x3.icon",
+			"networkId": "0x1",
+			"networkTypeId": "0x1",
+			"network_name": "icon-0xacbc4e",
+			"nid": "0x3",
+			"service_name": "icon-node-0xacbc4e"
+		}
+	},
+	"contracts": {
+		"el-1-geth-lighthouse": {
+			"bmc": "0xB9D7a3554F221B34f49d7d3C61375E603aFb699e",
+			"bmcm": "0xAb2A01BC351770D09611Ac80f1DE076D56E0487d",
+			"bmcs": "0xBFF5cD0aA560e1d1C6B1E2C347860aDAe1bd8235",
+			"bmv": "0x765E6b67C589A4b40184AEd9D9ae7ba40E32F8d4",
+			"dapp": "0x9bE03fF3E1888A216f9e48c68B587A89c5b94CD6",
+			"xcall": "0x5911A6541729C227fAda7D5187ee7518B47fB237"
+		},
+		"icon-node-0xacbc4e": {
+			"bmc": "cx3f9b7aa2a7fa0334a0068a324c9020b9138363f1",
+			"bmv": "cxe308f1f14febfff0f906df89d4bd191ba11b4689",
+			"dapp": "cxfe3cdbe04e78ff3747b076cb7122c4f7ba58cf49",
+			"xcall": "cx4b33b94cb04bf2c179cda1af81c1d1eb639c5e98"
+		}
+	},
+	"links": {
+		"dst": "el-1-geth-lighthouse", # service name for eth chain
+		"src": "icon-node-0xacbc4e"  # Service name for ICON chain
+	}
 }
 ```
 
-#### Version
+### Version
 
 ```bash
 dive version
@@ -196,7 +259,7 @@ dive version
 
 Prints out the current version of **DIVE CLI**
 
-#### Cleaning
+### Cleaning
 
 ```bash
 dive clean
@@ -206,11 +269,11 @@ Command cleans up the artifacts , services created on the Enclave during **DIVE*
 
 > Checkout More details on how to setup [BTP](https://www.xcall.dev/quickstart/setting-up-a-local-environment-with-dive-cli) bridge
 
-### Testing
+## Testing
 
 - Follow the instruction in [Test Folder](test/README.md#steps-to-run-the-script)
 
-### Contributing
+## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
@@ -230,10 +293,10 @@ If you have a suggestion that would make this better, please fork the repo and c
 
 Special thanks to [Kurtosis-Tech](https://github.com/kurtosis-tech).
 
-### License
+## License
 
 Distributed under the Apache 2.0 License. See [LICENSE](./LICENSE) for more information.
 
-### Feedback
+## Feedback
 
 We would happy to hear your thoughts on our project. Your feedback helps us improve and make it better for everyone. Please submit your valuable feedback [here](https://docs.google.com/forms/d/e/1FAIpQLScnesE-4IWPrFQ-W2FbRXHyQz8i_C0BVjIP_aWaxKe3myTgyw/viewform?usp=sharing)
