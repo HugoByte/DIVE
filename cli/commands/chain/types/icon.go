@@ -110,8 +110,8 @@ func IconDecentralisationCmd(diveContext *common.DiveContext) *cobra.Command {
 
 	var decentralisationCmd = &cobra.Command{
 		Use:   "decentralize",
-		Short: "Decentralise already running Icon Node",
-		Long:  `Decentralise Icon Node is necessary if you want to connect your local icon node to BTP network`,
+		Short: "Decentralize already running Icon Node",
+		Long:  `Decentralize Icon Node is necessary if you want to connect your local icon node to BTP network`,
 		Run: func(cmd *cobra.Command, args []string) {
 
 			params := GetDecentralizeParms(serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID)
