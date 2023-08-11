@@ -23,11 +23,12 @@ It establishes a connection to the Ethereum network and allows the node in execu
 			data := RunEthNode(diveContext)
 
 			diveContext.SetSpinnerMessage("Execution Completed")
-			err := common.WriteToServiceFile(data.NetworkName, *data)
+			err := common.WriteToServiceFile(data.ServiceName, *data)
 			if err != nil {
 				diveContext.FatalError("Failed To Write To File", err.Error())
 			}
 			diveContext.StopSpinner("ETH Node Started. Please find service details in current working directory(services.json)")
+
 		},
 	}
 
