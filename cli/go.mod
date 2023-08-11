@@ -18,7 +18,6 @@ require (
 	github.com/adrg/xdg v0.4.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/kurtosis-tech/kurtosis v0.68.6 // indirect
 	github.com/kurtosis-tech/kurtosis/contexts-config-store v0.0.0-20230808185538-e8f34ef3d33c // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
