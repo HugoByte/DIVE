@@ -1,8 +1,10 @@
 ![DIVE](img/DIVE.png)
 
-## D.I.V.E.
+# D.I.V.E.
 
-### About
+[![run smoke testcases](https://github.com/HugoByte/DIVE/actions/workflows/smoke-test.yaml/badge.svg)](https://github.com/HugoByte/DIVE/actions/workflows/smoke-test.yaml)
+
+## About
 
 Dive deeply into the world of Blockchain and Web 3.0 using **D.I.V.E.** (Deployable Infrastructure for Virtually Effortless blockchain integration),The Dive package aim to implement its services and API for ICON Blockchain. The kurtosis services and API are designed to simplify the process of deploying various nodes and services for development and testing and enhance the overall user experience. Implementing kurtosis for the ICON blockchain can help ease the developers in the ecosystem to focus more on building the business logic without worrying about the setup which consumes a significant amount of time.
 
@@ -10,7 +12,7 @@ The vision is to making ICON the interoperable hub by easing the setup of BTP an
 
 This repository uses [kurtosis package](https://docs.kurtosis.com/concepts-reference/packages)
 
-### Setup and requirements
+## Setup and requirements
 
 Before proceeding make sure to have
 
@@ -18,7 +20,7 @@ Before proceeding make sure to have
 
 - [Kurtosis installed and running ](https://docs.kurtosis.com/install#ii-install-the-cli) or [(upgrading to the latest)](https://docs.kurtosis.com/upgrade)
 
-### Integrating chain
+## Integrating chain
 
 - ICON
 
@@ -113,7 +115,7 @@ Example `services.json`:
 
 ```javascript
 {
-"icon-node-0xacbc4e": {
+"icon-node-0xacbc4e": { # this key sepcifies service name
 	"block_number": "206",
 	"endpoint": "http://172.16.0.2:9080/api/v3/icon_dex",
 	"endpoint_public": "http://127.0.0.1:8090/api/v3/icon_dex",
@@ -149,17 +151,7 @@ Example `services.json`:
 
   ```javascript
   {
-  	"el-1-geth-lighthouse": {
-  		"block_number": "24",
-  		"endpoint": "http://172.16.0.7:8545",
-  		"endpoint_public": "http://",
-  		"keypassword": "password",
-  		"keystore_path": "keystores/eth_keystore.json",
-  		"network": "0x301824.eth",
-  		"network_name": "eth",
-  		"nid": "0x301824",
-  		"service_name": "el-1-geth-lighthouse"
-  	},
+
   	"icon-node-0xacbc4e": {
   		"block_number": "206",
   		"endpoint": "http://172.16.0.2:9080/api/v3/icon_dex",
@@ -172,6 +164,17 @@ Example `services.json`:
   		"network_name": "icon-0xacbc4e",
   		"nid": "0x3",
   		"service_name": "icon-node-0xacbc4e"
+  	},
+  	"el-1-geth-lighthouse": {
+  		"block_number": "24",
+  		"endpoint": "http://172.16.0.7:8545",
+  		"endpoint_public": "http://",
+  		"keypassword": "password",
+  		"keystore_path": "keystores/eth_keystore.json",
+  		"network": "0x301824.eth",
+  		"network_name": "eth",
+  		"nid": "0x301824",
+  		"service_name": "el-1-geth-lighthouse"
   	}
   }
   ```
@@ -187,10 +190,10 @@ Example `services.json`:
 Run below command to start btp connection between any supported chain
 
 ```bash
-dive bridge btp --chainA icon --chainB eth --bridge
+dive bridge btp --chainA icon --chainB eth -b
 ```
 
-> `--bridge` flag is used to specify the type of bmv contract to be deployed for btp setup.
+> `-b` flag is used to specify the type of bmv contract to be deployed for btp setup.
 
 This command sets up btp bridge between icon and eth . After running this command **DIVE CLI** will automatically starts the ICON & ETH node , Deploys contract which is used for BTP and starts the realay to constanly exchange message between established connection.
 After successful bridge setup all the neccessary details with respect to bridge will be added to `dive.json` file that will be present in current working directory.

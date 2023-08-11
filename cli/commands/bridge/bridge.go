@@ -104,7 +104,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 				diveContext.Error(err.Error())
 			}
 
-			bridge, _ := cmd.Flags().GetBool("bridge")
+			bridge, _ := cmd.Flags().GetBool("bmvbridge") // To Specify Which Type of BMV to be used in btp setup(if true BMV bridge is used else BMV-BTP Block is used)
 
 			chains := initChains(chainA, chainB, serviceA, serviceB, bridge)
 			diveContext.StartSpinner(fmt.Sprintf(" Starting BTP Bridge for %s,%s", chains.chainA, chains.chainB))
@@ -201,7 +201,7 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
 	btpbridgeCmd.Flags().StringVar(&chainA, "chainA", "", "Mention Name of Supported Chain")
 	btpbridgeCmd.Flags().StringVar(&chainB, "chainB", "", "Mention Name of Supported Chain")
-	btpbridgeCmd.Flags().Bool("bridge", false, "Mention Bridge ENV")
+	btpbridgeCmd.Flags().BoolP("bmvbridge", "b", false, "To Specify Which Type of BMV to be used in btp setup(if true BMV bridge is used else BMV-BTP Block is used)")
 
 	btpbridgeCmd.Flags().StringVar(&serviceA, "chainAServiceName", "", "Service Name of Chain A from services.json")
 	btpbridgeCmd.Flags().StringVar(&serviceB, "chainBServiceName", "", "Service Name of Chain B from services.json")
