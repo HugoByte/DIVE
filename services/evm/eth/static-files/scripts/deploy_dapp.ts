@@ -6,7 +6,7 @@ async function deploy_dapp_solidity(target: string, xCallAddress: string) {
   var deployments_data = deployments.get(target);
 
   const DAppSample = await ethers.getContractFactory("DAppProxySample");
-  const dappSol = await DAppSample.deploy();
+  const dappSol = await DAppSample.deploy({gasPrice: 50000000000});
   await dappSol.deployed();
   await dappSol.initialize(xCallAddress);
   console.log(`${target} DApp: deployed to ${dappSol.address}`);
