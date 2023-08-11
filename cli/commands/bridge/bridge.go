@@ -172,8 +172,8 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 						if err != nil {
 							diveContext.FatalError("Failed To Get Service Data", err.Error())
 						}
-						chainAServiceName = serviceConfig[chains.chainBServiceName].ServiceName
-						chainAServiceResponse, err = serviceConfig[chains.chainBServiceName].EncodeToString()
+						chainAServiceName = serviceConfig[chains.chainAServiceName].ServiceName
+						chainAServiceResponse, err = serviceConfig[chains.chainAServiceName].EncodeToString()
 
 						if err != nil {
 							diveContext.FatalError("Failed To Get Service Data", err.Error())
