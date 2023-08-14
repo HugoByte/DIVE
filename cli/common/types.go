@@ -19,14 +19,14 @@ import (
 )
 
 type DiveserviceResponse struct {
-	ServiceName     string `json:"service_name"`
-	PublicEndpoint  string `json:"endpoint_public"`
-	PrivateEndpoint string `json:"endpoint"`
-	KeyPassword     string `json:"keypassword"`
-	KeystorePath    string `json:"keystore_path"`
-	Network         string `json:"network"`
-	NetworkName     string `json:"network_name"`
-	NetworkId       string `json:"nid"`
+	ServiceName     string `json:"service_name,omitempty"`
+	PublicEndpoint  string `json:"endpoint_public,omitempty"`
+	PrivateEndpoint string `json:"endpoint,omitempty"`
+	KeyPassword     string `json:"keypassword,omitempty"`
+	KeystorePath    string `json:"keystore_path,omitempty"`
+	Network         string `json:"network,omitempty"`
+	NetworkName     string `json:"network_name,omitempty"`
+	NetworkId       string `json:"nid,omitempty"`
 }
 
 func (dive *DiveserviceResponse) Decode(responseData []byte) (*DiveserviceResponse, error) {
@@ -255,7 +255,7 @@ func ReadServiceJsonFile() (Services, error) {
 		return nil, err
 	}
 	serviceFile := fmt.Sprintf("%s/%s", pwd, ServiceFilePath)
-	
+
 	jsonFile, _ := os.ReadFile(serviceFile)
 
 	if len(jsonFile) == 0 {
