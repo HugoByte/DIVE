@@ -137,7 +137,14 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 					if err != nil {
 						diveContext.FatalError("Failed To read ServiceFile", err.Error())
 					}
-					runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, chains.chainA, chains.chainB, chains.chainAServiceName, chains.chainBServiceName, bridge, srcChainServiceResponse, dstChainServiceResponse)
+
+					if chains.chainB == "icon" {
+						runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, chains.chainB, chains.chainA, chains.chainBServiceName, chains.chainAServiceName, bridge, dstChainServiceResponse, srcChainServiceResponse)
+					} else {
+
+						runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, chains.chainA, chains.chainB, chains.chainAServiceName, chains.chainBServiceName, bridge, srcChainServiceResponse, dstChainServiceResponse)
+
+					}
 				} else if (chains.chainAServiceName == "" && chains.chainBServiceName != "") || (chains.chainAServiceName != "" && chains.chainBServiceName == "") {
 
 					var chainAServiceResponse string
@@ -285,7 +292,7 @@ func (chains *Chains) getServicesResponse() (string, string, error) {
 	if !OK {
 		return "", "", fmt.Errorf("service name not found")
 	}
-	chainBServiceResponse, OK := serviceConfig[chains.chainAServiceName]
+	chainBServiceResponse, OK := serviceConfig[chains.chainBServiceName]
 	if !OK {
 		return "", "", fmt.Errorf("service name not found")
 	}
