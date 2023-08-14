@@ -4,8 +4,8 @@ node_constants = constants.COSMOS_NODE_CLIENT
 
 # spins up the 2 comsos nodes
 def start_node_service_cosmos_to_cosmos(plan):
-    src_chain_config = cosmvm_node.get_service_config(constants.COSMOS_NODE_CLIENT.service_name, constants.COSMOS_NODE_CLIENT.chain_id, constants.COSMOS_NODE_CLIENT.key, node_constants.private_port_grpc, node_constants.private_port_http, node_constants.private_port_tcp, node_constants.private_port_rpc, node_constants.public_port_grpc, node_constants.public_port_http, node_constants.public_port_tcp, node_constants.public_port_rpc, node_constants.password)
-    dst_chain_config = cosmvm_node.get_service_config(constants.COSMOS_NODE_CLIENT.service_name_1, constants.COSMOS_NODE_CLIENT.chain_id_1, constants.COSMOS_NODE_CLIENT.key1, node_constants.private_port_grpc, node_constants.private_port_http, node_constants.private_port_tcp, node_constants.private_port_rpc, node_constants.public_port_grpc_node, node_constants.public_port_http_node, node_constants.public_port_tcp_node, node_constants.public_port_rpc_node, node_constants.password)
+    src_chain_config = cosmvm_node.get_service_config(constants.COSMOS_NODE_CLIENT.chain_id, constants.COSMOS_NODE_CLIENT.key, node_constants.private_port_grpc, node_constants.private_port_http, node_constants.private_port_tcp, node_constants.private_port_rpc, node_constants.public_port_grpc, node_constants.public_port_http, node_constants.public_port_tcp, node_constants.public_port_rpc, node_constants.password)
+    dst_chain_config = cosmvm_node.get_service_config(constants.COSMOS_NODE_CLIENT.chain_id_1, constants.COSMOS_NODE_CLIENT.key1, node_constants.private_port_grpc, node_constants.private_port_http, node_constants.private_port_tcp, node_constants.private_port_rpc, node_constants.public_port_grpc_node, node_constants.public_port_http_node, node_constants.public_port_tcp_node, node_constants.public_port_rpc_node, node_constants.password)
 
     source_chain_response = cosmvm_node.start_cosmos_node(plan, src_chain_config)
     destination_chain_response = cosmvm_node.start_cosmos_node(plan, dst_chain_config)
@@ -45,8 +45,8 @@ def start_node_service(plan, args):
         public_tcp = data["public_tcp"]
         public_http = data["public_http"]
         public_rpc = data["public_rpc"]
-        chain_config = cosmvm_node.get_service_config(constants.COSMOS_NODE_CLIENT.service_name, constants.COSMOS_NODE_CLIENT.chain_id, constants.COSMOS_NODE_CLIENT.key, private_grpc, private_http, private_tcp, private_rpc, public_grpc, public_http, public_tcp, public_rpc, node_constants.password)
+        chain_config = cosmvm_node.get_service_config(constants.COSMOS_NODE_CLIENT.chain_id, constants.COSMOS_NODE_CLIENT.key, private_grpc, private_http, private_tcp, private_rpc, public_grpc, public_http, public_tcp, public_rpc, node_constants.password)
     else:
-        chain_config = cosmvm_node.get_service_config(constants.COSMOS_NODE_CLIENT.service_name, constants.COSMOS_NODE_CLIENT.chain_id, constants.COSMOS_NODE_CLIENT.key, node_constants.private_port_grpc, node_constants.private_port_http, node_constants.private_port_tcp, node_constants.private_port_rpc, node_constants.public_port_grpc, node_constants.public_port_http, node_constants.public_port_tcp, node_constants.public_port_rpc, node_constants.password)
+        chain_config = cosmvm_node.get_service_config(constants.COSMOS_NODE_CLIENT.chain_id, constants.COSMOS_NODE_CLIENT.key, node_constants.private_port_grpc, node_constants.private_port_http, node_constants.private_port_tcp, node_constants.private_port_rpc, node_constants.public_port_grpc, node_constants.public_port_http, node_constants.public_port_tcp, node_constants.public_port_rpc, node_constants.password)
 
     return cosmvm_node.start_cosmos_node(plan, chain_config)

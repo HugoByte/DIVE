@@ -48,7 +48,6 @@ COSMOS_NODE_CLIENT = struct(
     start_script = "github.com/hugobyte/dive/services/cosmvm/static_files/start.sh",
     default_contract_path = "github.com/hugobyte/dive/services/cosmvm/static_files/contracts",
     service_name = "cosmos",
-    service_name_1 = "cosmos1",
     image = "archwaynetwork/archwayd:constantine",
     path = "/start-scripts/",
     contract_path = "/root/contracts/",
