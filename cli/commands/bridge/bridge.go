@@ -135,9 +135,16 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 					srcChainServiceResponse, dstChainServiceResponse, err := chains.getServicesResponse()
 
 					if err != nil {
-						diveContext.FatalError("Failed To read ServiceFile", err.Error())
+						diveContext.FatalError("failed to get service data", err.Error())
 					}
-					runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, chains.chainA, chains.chainB, chains.chainAServiceName, chains.chainBServiceName, bridge, srcChainServiceResponse, dstChainServiceResponse)
+
+					if chains.chainB == "icon" {
+						runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, chains.chainB, chains.chainA, chains.chainBServiceName, chains.chainAServiceName, bridge, dstChainServiceResponse, srcChainServiceResponse)
+					} else {
+
+						runBtpSetupForAlreadyRunningNodes(diveContext, enclaveCtx, runbridgeicon2ethhardhat, chains.chainA, chains.chainB, chains.chainAServiceName, chains.chainBServiceName, bridge, srcChainServiceResponse, dstChainServiceResponse)
+
+					}
 				} else if (chains.chainAServiceName == "" && chains.chainBServiceName != "") || (chains.chainAServiceName != "" && chains.chainBServiceName == "") {
 
 					var chainAServiceResponse string
@@ -147,35 +154,35 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 
 					serviceConfig, err := common.ReadServiceJsonFile()
 					if err != nil {
-						diveContext.FatalError("Failed To Get Service Data", err.Error())
+						diveContext.FatalError("failed to get service data", err.Error())
 					}
 
 					if chains.chainAServiceName == "" {
 
 						chainBserviceresponse, OK := serviceConfig[chains.chainBServiceName]
 						if !OK {
-							diveContext.FatalError("Failed To Get Service Data", fmt.Sprint("service name not found:", chains.chainBServiceName))
+							diveContext.FatalError("failed to get service data", fmt.Sprint("service name not found:", chains.chainBServiceName))
 						}
 						chainBServiceName = chainBserviceresponse.ServiceName
 
 						chainBServiceResponse, err = chainBserviceresponse.EncodeToString()
 
 						if err != nil {
-							diveContext.FatalError("Failed To Get Service Data", err.Error())
+							diveContext.FatalError("failed to get service data", err.Error())
 						}
 
 						response := runChain[chains.chainA](diveContext)
 						chainAServiceName = response.ServiceName
 						chainAServiceResponse, err = response.EncodeToString()
 						if err != nil {
-							diveContext.FatalError("Failed To Get Service Data", err.Error())
+							diveContext.FatalError("failed to get service data", err.Error())
 						}
 
 					} else if chains.chainBServiceName == "" {
 
 						chainAserviceresponse, OK := serviceConfig[chains.chainAServiceName]
 						if !OK {
-							diveContext.FatalError("Failed To Get Service Data", fmt.Sprint("service name not found:", chains.chainAServiceName))
+							diveContext.FatalError("failed to get service data", fmt.Sprint("service name not found:", chains.chainAServiceName))
 						}
 
 						chainAServiceName = chainAserviceresponse.ServiceName
@@ -183,14 +190,14 @@ func btpBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 						chainAServiceResponse, err = chainAserviceresponse.EncodeToString()
 
 						if err != nil {
-							diveContext.FatalError("Failed To Get Service Data", err.Error())
+							diveContext.FatalError("failed to get service data", err.Error())
 						}
 
 						response := runChain[chains.chainB](diveContext)
 						chainBServiceName = response.ServiceName
 						chainBServiceResponse, err = response.EncodeToString()
 						if err != nil {
-							diveContext.FatalError("Failed To Get Service Data", err.Error())
+							diveContext.FatalError("failed to get service data", err.Error())
 
 						}
 					}
@@ -285,7 +292,7 @@ func (chains *Chains) getServicesResponse() (string, string, error) {
 	if !OK {
 		return "", "", fmt.Errorf("service name not found")
 	}
-	chainBServiceResponse, OK := serviceConfig[chains.chainAServiceName]
+	chainBServiceResponse, OK := serviceConfig[chains.chainBServiceName]
 	if !OK {
 		return "", "", fmt.Errorf("service name not found")
 	}
