@@ -13,13 +13,14 @@ import (
 	"github.com/onsi/gomega"
 )
 
-func TestCLIApp(t *testing.T) {
-	gomega.RegisterFailHandler(ginkgo.Fail)
-	ginkgo.RunSpecs(t, "CLI App Suite")
-}
-
+// To Print cli output to console
 type testWriter struct {
 	buffer bytes.Buffer
+}
+
+func TestCLIApp(t *testing.T) {
+	gomega.RegisterFailHandler(ginkgo.Fail)
+	ginkgo.RunSpecs(t, "DIVE CLI App Suite")
 }
 
 func (w *testWriter) Write(p []byte) (n int, err error) {
@@ -28,16 +29,16 @@ func (w *testWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func GetBinaryPath() string {
+func GetBinaryCommand() *exec.Cmd {
 	workingDir, _ := os.Getwd()
 	binaryPath := filepath.Join(workingDir, "/../../cli/dive")
-	return binaryPath
+	return exec.Command(binaryPath)
 }
 
+// function to test and clean encalve created by DIVE
 func Clean() {
 	var cmd *exec.Cmd
-	binaryPath := GetBinaryPath()
-	cmd = exec.Command(binaryPath)
+	cmd = GetBinaryCommand()
 	cmd.Args = append(cmd.Args, "clean")
 	fmt.Println(cmd)
 	var stdout bytes.Buffer
@@ -49,10 +50,9 @@ func Clean() {
 
 var _ = ginkgo.Describe("DIVE CLI App", func() {
 	var cmd *exec.Cmd
-	binaryPath := GetBinaryPath()
 
 	ginkgo.BeforeEach(func() {
-		cmd = exec.Command(binaryPath)
+		cmd = GetBinaryCommand()
 		cmd.Stdout = &testWriter{}
 		cmd.Stderr = &testWriter{}
 	})
@@ -92,13 +92,14 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			Clean()
 		})
 
 		ginkgo.It("should start bridge icon and hardhat but with icon bridge set to true", func() {
-			Clean()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--bmvbridge")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			Clean()
 		})
 
 		ginkgo.It("should start bridge icon and icon", func() {
@@ -106,6 +107,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			Clean()
 		})
 
 	})
