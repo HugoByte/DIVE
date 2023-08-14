@@ -38,10 +38,10 @@ clean-dep:
 
 run-smoke: BINARY
 	@echo "Running run-smoke"
-	cd $(CURDIR)/functional && ginkgo --focus="Smoke Tests" -v
+	@cd $(CURDIR)/functional && ginkgo --focus="Smoke Tests" -v
 
 BINARY:
-	cd $(CURDIR)/../cli && go build
+	@cd $(CURDIR)/../cli && go build
 
 remove-bin:
 	@cd $(CURDIR)/../cli && rm -rf dive

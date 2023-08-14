@@ -38,10 +38,9 @@ func GetBinaryCommand() *exec.Cmd {
 // function to test and clean encalve created by DIVE
 func Clean() {
 	var cmd *exec.Cmd
+	var stdout bytes.Buffer
 	cmd = GetBinaryCommand()
 	cmd.Args = append(cmd.Args, "clean")
-	fmt.Println(cmd)
-	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
 	err := cmd.Run()
 	fmt.Println(stdout.String())
@@ -50,6 +49,7 @@ func Clean() {
 
 var _ = ginkgo.Describe("DIVE CLI App", func() {
 	var cmd *exec.Cmd
+	var stdout bytes.Buffer
 
 	ginkgo.BeforeEach(func() {
 		cmd = GetBinaryCommand()
@@ -60,9 +60,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 	ginkgo.Describe("Smoke Tests", func() {
 		ginkgo.It("should display the correct version", func() {
 			cmd.Args = append(cmd.Args, "version")
-			var stdout bytes.Buffer
 			cmd.Stdout = &stdout
-
 			err := cmd.Run()
 			fmt.Println(stdout.String())
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -89,25 +87,25 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		})
 
 		ginkgo.It("should start bridge between icon and eth", func() {
+			Clean()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth")
 			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			Clean()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
 		ginkgo.It("should start bridge icon and hardhat but with icon bridge set to true", func() {
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--bmvbridge")
 			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			Clean()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
 		ginkgo.It("should start bridge icon and icon", func() {
-			Clean()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon")
 			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			Clean()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
 	})
