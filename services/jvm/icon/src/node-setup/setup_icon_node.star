@@ -308,7 +308,7 @@ def configure_node(plan,args):
     
     ensure_decentralisation(plan,service_name,prep_address,uri,keystorepath,keypassword,nid)
 
-    plan.wait(service_name,recipe=ExecRecipe(command=["/bin/sh","-c","sleep 200s && echo 'success'"]),field="code",assertion="==",target_value=0,timeout="400s")
+    plan.wait(service_name,recipe=ExecRecipe(command=["/bin/sh","-c","sleep 40s && echo 'success'"]),field="code",assertion="==",target_value=0,timeout="200s")
 
     main_preps = get_main_preps(plan,service_name,uri)
     plan.print(main_preps)
