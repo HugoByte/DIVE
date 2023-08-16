@@ -6,7 +6,14 @@ import (
 
 	"github.com/hugobyte/dive/cli/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
+	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/spf13/cobra"
+)
+
+const (
+	constructServiceConfigFunctionName          = "get_service_config"
+	runArchwayNodeWithCustomServiceFunctionName = "start_cosmos_node"
+	runArchwayNodeWithDefaultConfigFunctionName = "start_node_service"
 )
 
 var (
@@ -36,6 +43,19 @@ func (as *ArchwayServiceConfig) EncodeToString() (string, error) {
 
 	return string(data), nil
 }
+func (as *ArchwayServiceConfig) ReadServiceConfig(path string) error {
+	configData, err := common.ReadConfigFile(config)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(configData, as)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func NewArchwayCmd(diveContext *common.DiveContext) *cobra.Command {
 
@@ -45,7 +65,11 @@ func NewArchwayCmd(diveContext *common.DiveContext) *cobra.Command {
 		Long:  "The command starts the archway network and allows node in executing contracts",
 		Run: func(cmd *cobra.Command, args []string) {
 
-			RunArchwayNode(diveContext)
+			runResponse := RunArchwayNode(diveContext)
+
+			common.WriteToServiceFile(runResponse.ServiceName, *runResponse)
+
+			diveContext.StopSpinner("Archyway Node Started. Please find service details in current working directory(services.json)")
 		},
 	}
 	archwayCmd.Flags().StringVarP(&config, "config", "c", "", "provide config to start archway node ")
@@ -60,60 +84,98 @@ func RunArchwayNode(diveContext *common.DiveContext) *common.DiveserviceResponse
 	if err != nil {
 		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
 	}
+
 	diveContext.StartSpinner(" Starting Archway Node")
 	var serviceConfig = &ArchwayServiceConfig{}
+	var archwayResponse = &common.DiveserviceResponse{}
+	var starlarkExecutionData = ""
 
 	if config != "" {
-		data, err := common.ReadConfigFile(config)
-		if err != nil {
-			diveContext.FatalError("Failed to read service config", err.Error())
-		}
 
-		err = json.Unmarshal(data, serviceConfig)
+		err := serviceConfig.ReadServiceConfig(config)
 
 		if err != nil {
-			diveContext.FatalError("Failed unmarshall service config", err.Error())
+			diveContext.FatalError("Failed read service config", err.Error())
 		}
-
 		encodedServiceConfigDataString, err := serviceConfig.EncodeToString()
 
 		if err != nil {
 			diveContext.FatalError("Failed encode service config", err.Error())
 		}
 
-		response, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveCosmosNodeScript, "get_service_config", encodedServiceConfigDataString, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
-
+		starlarkExecutionData, err = runArchwayWithCustomServiceConfig(diveContext, kurtosisEnclaveContext, encodedServiceConfigDataString)
 		if err != nil {
-
 			diveContext.FatalError("Starlark Run Failed", err.Error())
-
 		}
 
-		responseData, _, _, err := diveContext.GetSerializedData(response)
+	} else {
+		starlarkExecutionData, err = runArchwayWithDefaultServiceConfig(diveContext, kurtosisEnclaveContext)
 		if err != nil {
-
 			diveContext.FatalError("Starlark Run Failed", err.Error())
-
 		}
-		params := fmt.Sprintf(`{"args":%s}`, responseData)
-
-		response, _, err = kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveCosmosNodeScript, "start_cosmos_node", params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
-
-		if err != nil {
-
-			diveContext.FatalError("Starlark Run Failed", err.Error())
-
-		}
-
-		responseData, _, _, err = diveContext.GetSerializedData(response)
-		if err != nil {
-
-			diveContext.FatalError("Starlark Run Failed", err.Error())
-
-		}
-
-		fmt.Println(responseData)
 	}
 
-	return nil
+	err = json.Unmarshal([]byte(starlarkExecutionData), archwayResponse)
+	if err != nil {
+		diveContext.FatalError("Failed to Unmarshall Service Response", err.Error())
+	}
+
+	return archwayResponse
+}
+
+func runArchwayWithCustomServiceConfig(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext, data string) (string, error) {
+
+	serviceExecutionResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveArchwayNodeScript, constructServiceConfigFunctionName, data, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+
+	if err != nil {
+
+		return "", err
+
+	}
+
+	serviceExecutionResponseData, _, _, err := diveContext.GetSerializedData(serviceExecutionResponse)
+	if err != nil {
+
+		return "", err
+
+	}
+	params := fmt.Sprintf(`{"args":%s}`, serviceExecutionResponseData)
+
+	nodeExecutionResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveArchwayNodeScript, runArchwayNodeWithCustomServiceFunctionName, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+
+	if err != nil {
+
+		return "", err
+
+	}
+
+	nodeExecutionResponseData, _, _, err := diveContext.GetSerializedData(nodeExecutionResponse)
+	if err != nil {
+
+		return "", err
+
+	}
+
+	return nodeExecutionResponseData, nil
+}
+
+func runArchwayWithDefaultServiceConfig(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext) (string, error) {
+
+	params := `{"args":{"data":{}}}`
+	nodeServiceResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveArchwayDefaultNodeScript, runArchwayNodeWithDefaultConfigFunctionName, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+
+	if err != nil {
+
+		return "", err
+
+	}
+
+	nodeServiceResponseData, _, _, err := diveContext.GetSerializedData(nodeServiceResponse)
+	if err != nil {
+
+		return "", err
+
+	}
+
+	return nodeServiceResponseData, nil
 }
