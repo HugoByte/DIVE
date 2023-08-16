@@ -6,8 +6,6 @@ ICON_NODE_CLIENT = struct(
     config_files_path = "github.com/hugobyte/dive/services/jvm/icon/static-files/config/",
     contract_files_path = "github.com/hugobyte/dive/services/jvm/icon/static-files/contracts/",
     keystore_files_path = "github.com/hugobyte/dive/services/bridges/btp/static-files/keystores/keystore.json",
-    port_key = "rpc",
-    public_ip_address = "127.0.0.1",
     rpc_endpoint_path = "api/v3/icon_dex",
     service_name = "icon-node-",
     genesis_file_path = "/goloop/genesis/",
@@ -15,7 +13,6 @@ ICON_NODE_CLIENT = struct(
 
 HARDHAT_NODE_CLIENT = struct(
     node_image = "node:lts-alpine",
-    port_key = "rpc",
     port = 8545,
     config_files_path = "github.com/hugobyte/dive/services/evm/eth/static-files/hardhat.config.js",
     config_files_directory = "/config/",
@@ -43,40 +40,55 @@ ETH_NODE_CLIENT = struct(
     keystore_path = "keystores/eth_keystore.json",
     keypassword = "password",
 )
-
-COSMOS_NODE_CLIENT = struct(
-    start_script = "github.com/hugobyte/dive/services/cosmvm/static_files/start.sh",
-    default_contract_path = "github.com/hugobyte/dive/services/cosmvm/static_files/contracts",
-    service_name = "cosmos",
+ARCHWAY_SERVICE_CONFIG = struct(
+    start_script = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/start.sh",
+    default_contract_path = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/contracts",
+    service_name = "node-service",
     image = "archwaynetwork/archwayd:constantine",
     path = "/start-scripts/",
     contract_path = "/root/contracts/",
-    chain_id = "chain-1",
-    chain_id_1 = "chain-2",
-    public_ip_address = "127.0.0.1",
-    cosmos_grpc_port_key = "grpc",
-    cosmos_rpc_port_key = "rpc",
-    cosmos_http_port_key = "http",
-    cosmos_tcp_port_key = "tcp",
-    private_port_grpc = 9090,
-    private_port_http = 9091,
-    private_port_tcp = 26656,
-    private_port_rpc = 26657,
-    public_port_grpc = 9090,
-    public_port_http = 9091,
-    public_port_tcp = 26656,
-    public_port_rpc = 4564,
-    public_port_grpc_node = 9080,
-    public_port_http_node = 9092,
-    public_port_tcp_node = 26658,
-    public_port_rpc_node = 4566,
-    config_files = "github.com/hugobyte/dive/services/cosmvm/static_files/config/",
-    config_files_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/archwayjson.tpl",
-    relay_service_name = "cosmos-relay",
+    config_files = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/config/",
+    password = "password",
+)
+
+IBC_RELAYER_SERVICE = struct(
+    ibc_relay_config_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/archwayjson.tpl",
+    relay_service_name = "cosmos-ibc-relay",
     relay_service_image = "hugobyte/ibc-relay",
     relay_config_files_path = "/script/",
     run_file_path = "github.com/hugobyte/dive/services/bridges/ibc/static-files/run.sh",
-    key = "chain-1-key",
-    key1 = "chain-2-key",
-    password = "password",
+)
+
+NETWORK_PORT_KEYS_AND_IP_ADDRESS = struct(
+    grpc = "grpc",
+    rpc = "rpc",
+    http = "http",
+    tcp = "tcp",
+    public_ip_address = "127.0.0.1",
+)
+
+ARCHAY_NODE0_CONFIG = struct(
+    chain_id = "archway-node-0",
+    grpc = 9090,
+    http = 9091,
+    tcp = 26656,
+    rpc = 4564,
+    key = "archway-node-0-key",
+    
+)
+
+ARCHAY_NODE1_CONFIG = struct(
+    chain_id = "archway-node-1",
+    grpc = 9080,
+    http = 9092,
+    tcp = 26658,
+    rpc = 4566,
+    key = "archway-node-1-key",
+)
+
+COMMON_ARCHWAY_PRIVATE_PORTS = struct(
+    grpc = 9090,
+    http = 9091,
+    tcp = 26656,
+    rpc = 26657,
 )

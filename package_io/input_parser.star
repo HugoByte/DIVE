@@ -52,3 +52,14 @@ def generate_new_config_data(links, srcchain_service_name, dst_chain_service_nam
     }
 
     return config_data
+
+def generate_new_config_data_cosmvm_cosmvm(links, srcchain_service_name, dst_chain_service_name):
+    config_data = {
+        "links": links,
+        "chains": {
+            "%s" % srcchain_service_name: {},
+            "%s" % dst_chain_service_name: {},
+        },
+    }
+
+    return config_data

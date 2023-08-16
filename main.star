@@ -6,7 +6,7 @@ icon_relay_setup = import_module("github.com/hugobyte/dive/services/jvm/icon/src
 icon_service = import_module("github.com/hugobyte/dive/services/jvm/icon/icon.star")
 btp_bridge = import_module("github.com/hugobyte/dive/services/bridges/btp/src/bridge.star")
 input_parser = import_module("github.com/hugobyte/dive/package_io/input_parser.star")
-cosmvm_node = import_module("github.com/hugobyte/dive/services/cosmvm/cosmos.star")
+cosmvm_node = import_module("github.com/hugobyte/dive/services/cosmvm/cosmvm.star")
 cosmvm_relay = import_module("github.com/hugobyte/dive/services/bridges/ibc/src/bridge.star")
 
 def run(plan, args):
@@ -49,7 +49,7 @@ def parse_input(plan, args):
             return data
 
         elif args["relay"]["name"] == "cosmos":
-            data = run_cosmos_setup(plan, args["relay"])
+            data = run_cosmos_ibc_setup(plan, args["relay"])
 
             return data
 
@@ -63,8 +63,8 @@ def run_node(plan, node_name, args):
     elif node_name == "eth" or node_name == "hardhat":
         return eth_node.start_eth_node_serivce(plan, args, node_name)
 
-    elif node_name == "cosmos":
-        return cosmvm_node.start_node_service(plan, args)
+    elif node_name == "archway":
+        return cosmvm_node.start_cosmvm_chains(plan,node_name,args)
 
     else:
         fail("Unknown Chain Type. Expected ['icon','eth','hardhat','cosmwasm']")
@@ -233,21 +233,20 @@ def start_btp_relayer(plan, src_chain, dst_chain, config_data,src_service_name,d
 
     return config_data
 
-# starts cosmos relay setup
+# starts cosmos ibc relay setup
+def run_cosmos_ibc_setup(plan, args):
+    links = args["links"]
+    source_chain = links["src"]
+    destination_chain = links["dst"]
 
-def run_cosmos_setup(plan, args):
-    args_data = input_parser.get_args_data(args)
+    if source_chain == "archway" and destination_chain == "archway":
+        data, src_service_config, dst_service_config = cosmvm_node.start_ibc_between_cosmvm_chains(plan,source_chain,destination_chain)
+        src_chain_service_name = src_service_config["service_name"]
+        dst_chain_service_name = dst_service_config["service_name"]
 
-    config_data = input_parser.generate_config_data(args)
+        config_data = input_parser.generate_new_config_data_cosmvm_cosmvm(links, src_chain_service_name, dst_chain_service_name)
+        config_data["chains"][src_chain_service_name] = data.src_config
+        config_data["chains"][dst_chain_service_name] = data.dst_config
+        cosmvm_relay.start_cosmos_relay(plan, src_service_config["key"], src_service_config["cid"], dst_service_config["key"], dst_service_config["cid"], data.src_config, data.dst_config)
 
-    if args_data.dst == "cosmwasm1":
-        data, src_service_config, dst_service_config = cosmvm_node.start_node_service_cosmos_to_cosmos(plan)
-
-        config_data["chains"][args_data.src] = data.src_config
-        config_data["chains"][args_data.dst] = data.dst_config
-
-        plan.print(config_data)
-
-        cosmvm_relay.start_cosmos_relay(plan, src_service_config.key, src_service_config.cid, dst_service_config.key, dst_service_config.cid, data.src_config, data.dst_config)
-
-    return config_data
+        return config_data

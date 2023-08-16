@@ -1,5 +1,6 @@
 constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
-cosmos_node_constants = constants.COSMOS_NODE_CLIENT
+cosmos_node_constants = constants.ARCHWAY_SERVICE_CONFIG
+network_port_keys_and_ip = constants.NETWORK_PORT_KEYS_AND_IP_ADDRESS
 
 def start_cosmos_node(plan, args):
     chain_id = args["cid"]
@@ -18,16 +19,16 @@ def start_cosmos_node(plan, args):
             cosmos_node_constants.path: start_script_file,
         },
         ports = {
-            cosmos_node_constants.cosmos_grpc_port_key: PortSpec(number = args["private_grpc"], transport_protocol = cosmos_node_constants.cosmos_tcp_port_key.upper(), application_protocol = cosmos_node_constants.cosmos_http_port_key),
-            cosmos_node_constants.cosmos_http_port_key: PortSpec(number = args["private_http"], transport_protocol = cosmos_node_constants.cosmos_tcp_port_key.upper(), application_protocol = cosmos_node_constants.cosmos_http_port_key),
-            cosmos_node_constants.cosmos_tcp_port_key: PortSpec(number = args["private_tcp"], transport_protocol = cosmos_node_constants.cosmos_tcp_port_key.upper(), application_protocol = cosmos_node_constants.cosmos_http_port_key),
-            cosmos_node_constants.cosmos_rpc_port_key: PortSpec(number = args["private_rpc"], transport_protocol = cosmos_node_constants.cosmos_tcp_port_key.upper(), application_protocol = cosmos_node_constants.cosmos_http_port_key),
+           network_port_keys_and_ip.grpc: PortSpec(number = args["private_grpc"], transport_protocol =network_port_keys_and_ip.tcp.upper(), application_protocol =network_port_keys_and_ip.http),
+           network_port_keys_and_ip.http: PortSpec(number = args["private_http"], transport_protocol =network_port_keys_and_ip.tcp.upper(), application_protocol =network_port_keys_and_ip.http),
+           network_port_keys_and_ip.tcp: PortSpec(number = args["private_tcp"], transport_protocol =network_port_keys_and_ip.tcp.upper(), application_protocol =network_port_keys_and_ip.http),
+           network_port_keys_and_ip.rpc: PortSpec(number = args["private_rpc"], transport_protocol =network_port_keys_and_ip.tcp.upper(), application_protocol =network_port_keys_and_ip.http),
         },
         public_ports = {
-            cosmos_node_constants.cosmos_grpc_port_key: PortSpec(number = args["public_grpc"], transport_protocol = cosmos_node_constants.cosmos_tcp_port_key.upper(), application_protocol = cosmos_node_constants.cosmos_http_port_key),
-            cosmos_node_constants.cosmos_http_port_key: PortSpec(number = args["public_http"], transport_protocol = cosmos_node_constants.cosmos_tcp_port_key.upper(), application_protocol = cosmos_node_constants.cosmos_http_port_key),
-            cosmos_node_constants.cosmos_tcp_port_key: PortSpec(number = args["public_tcp"], transport_protocol = cosmos_node_constants.cosmos_tcp_port_key.upper(), application_protocol = cosmos_node_constants.cosmos_http_port_key),
-            cosmos_node_constants.cosmos_rpc_port_key: PortSpec(number = args["public_rpc"], transport_protocol = cosmos_node_constants.cosmos_tcp_port_key.upper(), application_protocol = cosmos_node_constants.cosmos_http_port_key),
+           network_port_keys_and_ip.grpc: PortSpec(number = args["public_grpc"], transport_protocol =network_port_keys_and_ip.tcp.upper(), application_protocol =network_port_keys_and_ip.http),
+           network_port_keys_and_ip.http: PortSpec(number = args["public_http"], transport_protocol =network_port_keys_and_ip.tcp.upper(), application_protocol =network_port_keys_and_ip.http),
+           network_port_keys_and_ip.tcp: PortSpec(number = args["public_tcp"], transport_protocol =network_port_keys_and_ip.tcp.upper(), application_protocol =network_port_keys_and_ip.http),
+           network_port_keys_and_ip.rpc: PortSpec(number = args["public_rpc"], transport_protocol =network_port_keys_and_ip.tcp.upper(), application_protocol =network_port_keys_and_ip.http),
         },
         entrypoint = ["/bin/sh", "-c", "cd ../..%s && chmod +x start.sh && ./start.sh %s %s %s" % (cosmos_node_constants.path, chain_id, key, password)],
     )
@@ -36,7 +37,7 @@ def start_cosmos_node(plan, args):
 
     plan.print(node_service_response)
 
-    public_url = get_service_url(cosmos_node_constants.public_ip_address, cosmwasm_node_config.public_ports)
+    public_url = get_service_url(network_port_keys_and_ip.public_ip_address, cosmwasm_node_config.public_ports)
     private_url = get_service_url(node_service_response.ip_address, node_service_response.ports)
 
     return struct(

@@ -4,6 +4,8 @@ input_parser = import_module("github.com/kurtosis-tech/eth-network-package/packa
 static_files = import_module("github.com/kurtosis-tech/eth-network-package/static_files/static_files.star")
 genesis_constants = import_module("github.com/kurtosis-tech/eth-network-package/src/prelaunch_data_generator/genesis_constants/genesis_constants.star")
 
+network_keys_and_public_address = constants.NETWORK_PORT_KEYS_AND_IP_ADDRESS
+
 # Spins Up the ETH Node
 def start_eth_node(plan,args):
  	eth_contstants = constants.ETH_NODE_CLIENT
@@ -52,10 +54,10 @@ def start_hardhat_node(plan):
 	service_config = ServiceConfig(
 		image=hardhat_constants.node_image,
 		ports={
-			hardhat_constants.port_key : PortSpec(number=hardhat_constants.port,transport_protocol="TCP",application_protocol="http")
+			network_keys_and_public_address.rpc : PortSpec(number=hardhat_constants.port,transport_protocol=network_keys_and_public_address.tcp.upper(),application_protocol=network_keys_and_public_address.http)
 		},
 		public_ports = {
-            hardhat_constants.port_key : PortSpec(number=hardhat_constants.port,transport_protocol="TCP",application_protocol="http")
+            network_keys_and_public_address.rpc : PortSpec(number=hardhat_constants.port,transport_protocol=network_keys_and_public_address.tcp.upper(),application_protocol=network_keys_and_public_address.http)
         },
 		files={
 			hardhat_constants.config_files_directory : "hardhat-config"
@@ -66,7 +68,7 @@ def start_hardhat_node(plan):
 	response = plan.add_service(name=hardhat_constants.service_name,config=service_config)
 
 	private_url = get_network_address(response.ip_address,hardhat_constants.port)
-	public_url = get_network_address("127.0.0.1",hardhat_constants.port)
+	public_url = get_network_address(network_keys_and_public_address.public_ip_address,hardhat_constants.port)
 	return struct(
           service_name = hardhat_constants.service_name,
           network_name= "hardhat",
