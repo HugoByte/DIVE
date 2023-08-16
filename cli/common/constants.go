@@ -11,7 +11,7 @@ const (
 	DiveIconNodeScript           = "services/jvm/icon/src/node-setup/start_icon_node.star"
 	DiveIconDecentraliseScript   = "services/jvm/icon/src/node-setup/setup_icon_node.star"
 	DiveEthHardhatNodeScript     = "services/evm/eth/src/node-setup/start-eth-node.star"
-	DiveCosmosNodeScript         = "services/cosmvm/src/node-setup/start_node.star"
+	DiveCosmosNodeScript         = "services/cosmvm/archway/src/node-setup/start_node.star"
 	DiveBridgeScript             = "main.star"
 	DiveDryRun                   = false
 	DiveDefaultParallelism       = 4

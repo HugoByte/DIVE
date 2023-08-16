@@ -1,8 +1,8 @@
 package types
 
 import (
+	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/hugobyte/dive/cli/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
@@ -12,6 +12,30 @@ import (
 var (
 	config string
 )
+
+type ArchwayServiceConfig struct {
+	Cid             string `json:"cid"`
+	Key             string `json:"key"`
+	PrivateGrpcPort int    `json:"private_grpc"`
+	PrivateHttpPort int    `json:"private_http"`
+	PrivateTcpPort  int    `json:"private_tcp"`
+	PrivateRpcPort  int    `json:"private_rpc"`
+	PublicGrpcPort  int    `json:"public_grpc"`
+	PublicHttpPort  int    `json:"public_http"`
+	PublicTcpPort   int    `json:"public_tcp"`
+	PublicRpcPort   int    `json:"public_rpc"`
+	Password        string `json:"password"`
+}
+
+func (as *ArchwayServiceConfig) EncodeToString() (string, error) {
+
+	data, err := json.Marshal(as)
+	if err != nil {
+		return "", err
+	}
+
+	return string(data), nil
+}
 
 func NewArchwayCmd(diveContext *common.DiveContext) *cobra.Command {
 
@@ -25,7 +49,6 @@ func NewArchwayCmd(diveContext *common.DiveContext) *cobra.Command {
 		},
 	}
 	archwayCmd.Flags().StringVarP(&config, "config", "c", "", "provide config to start archway node ")
-	archwayCmd.MarkFlagRequired("config")
 
 	return archwayCmd
 }
@@ -38,44 +61,59 @@ func RunArchwayNode(diveContext *common.DiveContext) *common.DiveserviceResponse
 		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
 	}
 	diveContext.StartSpinner(" Starting Archway Node")
+	var serviceConfig = &ArchwayServiceConfig{}
 
-	params := `{"cid":"chain-1", "key":"chain-key-1", "private_grpc":9090, "private_http":9091, "private_tcp":26656, "private_rpc":26657, "public_grpc":9090, "public_http":9091, "public_tcp":26656, "public_rpc":4564, "password":"password"}`
+	if config != "" {
+		data, err := common.ReadConfigFile(config)
+		if err != nil {
+			diveContext.FatalError("Failed to read service config", err.Error())
+		}
 
-	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(diveContext.Ctx, "../", common.DiveCosmosNodeScript, "get_service_config", params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+		err = json.Unmarshal(data, serviceConfig)
 
-	if err != nil {
+		if err != nil {
+			diveContext.FatalError("Failed unmarshall service config", err.Error())
+		}
 
-		diveContext.FatalError("Starlark Run Failed", err.Error())
+		encodedServiceConfigDataString, err := serviceConfig.EncodeToString()
 
+		if err != nil {
+			diveContext.FatalError("Failed encode service config", err.Error())
+		}
+
+		response, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveCosmosNodeScript, "get_service_config", encodedServiceConfigDataString, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+
+		if err != nil {
+
+			diveContext.FatalError("Starlark Run Failed", err.Error())
+
+		}
+
+		responseData, _, _, err := diveContext.GetSerializedData(response)
+		if err != nil {
+
+			diveContext.FatalError("Starlark Run Failed", err.Error())
+
+		}
+		params := fmt.Sprintf(`{"args":%s}`, responseData)
+
+		response, _, err = kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveCosmosNodeScript, "start_cosmos_node", params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+
+		if err != nil {
+
+			diveContext.FatalError("Starlark Run Failed", err.Error())
+
+		}
+
+		responseData, _, _, err = diveContext.GetSerializedData(response)
+		if err != nil {
+
+			diveContext.FatalError("Starlark Run Failed", err.Error())
+
+		}
+
+		fmt.Println(responseData)
 	}
-
-	responseData, _, _, err := diveContext.GetSerializedData(data)
-	if err != nil {
-
-		diveContext.FatalError("Starlark Run Failed", err.Error())
-
-	}
-
-	fmt.Println(strings.TrimSpace(responseData))
-
-	params = fmt.Sprintf(`{"args": %s}`, strings.TrimSpace(responseData))
-
-	data, _, err = kurtosisEnclaveContext.RunStarlarkPackage(diveContext.Ctx, "../", common.DiveCosmosNodeScript, "start_cosmos_node", params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
-
-	if err != nil {
-
-		diveContext.FatalError("Starlark Run Failed", err.Error())
-
-	}
-
-	responseData, _, _, err = diveContext.GetSerializedData(data)
-	if err != nil {
-
-		diveContext.FatalError("Starlark Run Failed", err.Error())
-
-	}
-
-	fmt.Println(responseData)
 
 	return nil
 }
