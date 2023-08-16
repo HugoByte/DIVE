@@ -1,4 +1,5 @@
 constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
+network_keys_and_public_address = constants.NETWORK_PORT_KEYS_AND_IP_ADDRESS
 
 # Starts The Icon Node
 def start_icon_node(plan, service_config, uploaded_genesis, genesis_file_path, genesis_file_name):
@@ -34,10 +35,10 @@ def start_icon_node(plan, service_config, uploaded_genesis, genesis_file_path, g
     icon_node_service_config = ServiceConfig(
         image = icon_node_constants.node_image,
         ports = {
-            icon_node_constants.port_key: PortSpec(number = private_port, transport_protocol = "TCP", application_protocol = "http"),
+            network_keys_and_public_address.rpc: PortSpec(number = private_port, transport_protocol = network_keys_and_public_address.tcp.upper(), application_protocol =network_keys_and_public_address.http),
         },
         public_ports = {
-            icon_node_constants.port_key: PortSpec(number = public_port, transport_protocol = "TCP", application_protocol = "http"),
+            network_keys_and_public_address.rpc: PortSpec(number = public_port, transport_protocol = network_keys_and_public_address.tcp.upper(), application_protocol =network_keys_and_public_address.http),
         },
         files = {
             icon_node_constants.config_files_directory: "config-files-{0}".format(cid),
@@ -58,7 +59,7 @@ def start_icon_node(plan, service_config, uploaded_genesis, genesis_file_path, g
     icon_node_service_response = plan.add_service(name = service_name, config = icon_node_service_config)
     plan.exec(service_name = service_name, recipe = ExecRecipe(command = ["/bin/sh", "-c", "apk add jq"]))
 
-    public_url = get_service_url(icon_node_constants.public_ip_address, icon_node_service_config.public_ports, icon_node_constants.rpc_endpoint_path)
+    public_url = get_service_url(network_keys_and_public_address.public_ip_address, icon_node_service_config.public_ports, icon_node_constants.rpc_endpoint_path)
     private_url = get_service_url(icon_node_service_response.ip_address, icon_node_service_response.ports, icon_node_constants.rpc_endpoint_path)
 
     chain_id = plan.exec(service_name = service_name, recipe = ExecRecipe(command = ["/bin/sh", "-c", "./bin/goloop chain inspect %s --format {{.NID}} | tr -d '\n\r'" % cid]))
@@ -84,8 +85,8 @@ Returns URL
 """
 
 def get_service_url(ip_address, ports, path):
-    port_id = ports[constants.ICON_NODE_CLIENT.port_key].number
-    protocol = ports[constants.ICON_NODE_CLIENT.port_key].application_protocol
+    port_id = ports[network_keys_and_public_address.rpc].number
+    protocol = ports[network_keys_and_public_address.rpc].application_protocol
     url = "{0}://{1}:{2}/{3}".format(protocol, ip_address, port_id, path)
     return url
 

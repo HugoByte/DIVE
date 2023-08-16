@@ -1,4 +1,4 @@
-cosmvm_deploy = import_module("github.com/hugobyte/dive/services/cosmvm/src/node-setup/deploy.star")
+cosmvm_deploy = import_module("github.com/hugobyte/dive/services/cosmvm/archway/src/node-setup/deploy.star")
 
 def deploy_core(plan, args):
     plan.print("Deploying ibc-core contract")
