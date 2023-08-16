@@ -58,6 +58,9 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 	})
 
 	ginkgo.Describe("Smoke Tests", func() {
+		// Clean before running tests
+		Clean()
+
 		ginkgo.It("should display the correct version", func() {
 			cmd.Args = append(cmd.Args, "version")
 			cmd.Stdout = &stdout
@@ -87,24 +90,22 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		})
 
 		ginkgo.It("should start bridge between icon and eth", func() {
-			Clean()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth")
 			err := cmd.Run()
-			Clean()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
 		ginkgo.It("should start bridge icon and hardhat but with icon bridge set to true", func() {
+			Clean()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--bmvbridge")
 			err := cmd.Run()
-			Clean()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
 		ginkgo.It("should start bridge icon and icon", func() {
+			Clean()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon")
 			err := cmd.Run()
-			Clean()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
