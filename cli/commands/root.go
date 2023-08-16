@@ -6,16 +6,16 @@ package commands
 import (
 	"os"
 
-	"github.com/hugobyte/dive/commands/bridge"
-	"github.com/hugobyte/dive/commands/chain"
-	"github.com/hugobyte/dive/commands/clean"
-	"github.com/hugobyte/dive/commands/discord"
-	"github.com/hugobyte/dive/commands/tutorial"
-	"github.com/hugobyte/dive/commands/twitter"
-	"github.com/hugobyte/dive/commands/version"
-	"github.com/hugobyte/dive/common"
+	"github.com/hugobyte/dive/cli/commands/bridge"
+	"github.com/hugobyte/dive/cli/commands/chain"
+	"github.com/hugobyte/dive/cli/commands/clean"
+	"github.com/hugobyte/dive/cli/commands/discord"
+	"github.com/hugobyte/dive/cli/commands/tutorial"
+	"github.com/hugobyte/dive/cli/commands/twitter"
+	"github.com/hugobyte/dive/cli/commands/version"
+	"github.com/hugobyte/dive/cli/common"
 
-	"github.com/hugobyte/dive/styles"
+	"github.com/hugobyte/dive/cli/styles"
 	"github.com/spf13/cobra"
 )
 

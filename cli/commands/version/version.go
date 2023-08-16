@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/fatih/color"
-	"github.com/hugobyte/dive/common"
+	"github.com/hugobyte/dive/cli/common"
 	"github.com/spf13/cobra"
 )
 

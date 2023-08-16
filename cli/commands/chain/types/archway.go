@@ -4,34 +4,40 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hugobyte/dive/common"
+	"github.com/hugobyte/dive/cli/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/spf13/cobra"
 )
 
-func NewCosmosCmd(diveContext *common.DiveContext) *cobra.Command {
+var (
+	config string
+)
 
-	cosmosCmd := &cobra.Command{
-		Use:   "cosmos",
-		Short: "Build, initialize and start a cosmos node.",
-		Long: `The command starts an Cosmos node, initiating the process of setting up and launching a local cosmos network. 
-It establishes a connection to the Cosmos network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
+func NewArchwayCmd(diveContext *common.DiveContext) *cobra.Command {
+
+	archwayCmd := &cobra.Command{
+		Use:   "archway",
+		Short: "Build, initialize and start a archway node",
+		Long:  "The command starts the archway network and allows node in executing contracts",
 		Run: func(cmd *cobra.Command, args []string) {
-			RunCosmosNode(diveContext)
+
+			RunArchwayNode(diveContext)
 		},
 	}
+	archwayCmd.Flags().StringVarP(&config, "config", "c", "", "provide config to start archway node ")
+	archwayCmd.MarkFlagRequired("config")
 
-	return cosmosCmd
+	return archwayCmd
 }
 
-func RunCosmosNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
+func RunArchwayNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 	diveContext.InitKurtosisContext()
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {
 		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
 	}
-	diveContext.StartSpinner(" Starting Cosmos Node")
+	diveContext.StartSpinner(" Starting Archway Node")
 
 	params := `{"cid":"chain-1", "key":"chain-key-1", "private_grpc":9090, "private_http":9091, "private_tcp":26656, "private_rpc":26657, "public_grpc":9090, "public_http":9091, "public_tcp":26656, "public_rpc":4564, "password":"password"}`
 
