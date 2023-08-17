@@ -27,6 +27,8 @@ type DiveserviceResponse struct {
 	Network         string `json:"network,omitempty"`
 	NetworkName     string `json:"network_name,omitempty"`
 	NetworkId       string `json:"nid,omitempty"`
+	ChainId         string `json:"chain_id,omitempty"`
+	ChainKey        string `json:"chain_key,omitempty"`
 }
 
 func (dive *DiveserviceResponse) Decode(responseData []byte) (*DiveserviceResponse, error) {

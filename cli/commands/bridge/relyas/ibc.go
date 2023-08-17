@@ -1,6 +1,8 @@
 package relyas
 
 import (
+	"fmt"
+
 	"github.com/hugobyte/dive/cli/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
@@ -22,7 +24,15 @@ func IbcRelayCmd(diveContext *common.DiveContext) *cobra.Command {
 				diveContext.Error(err.Error())
 			}
 
-			stratIbcRelay(diveContext, enclaveCtx)
+			result := stratIbcRelay(diveContext, enclaveCtx)
+
+			err = common.WriteToFile(result)
+
+			if err != nil {
+				diveContext.Error(err.Error())
+			}
+
+			diveContext.StopSpinner(fmt.Sprintf("IBC Setup Completed between %s and %s. Please find service details in current working directory(dive.json)", chainA, chainB))
 		},
 	}
 
@@ -37,20 +47,64 @@ func IbcRelayCmd(diveContext *common.DiveContext) *cobra.Command {
 	return ibcRelayCommand
 }
 
-func stratIbcRelay(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext) {
+func stratIbcRelay(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext) string {
+	diveContext.StartSpinner(" Starting IBC Setup")
 	chains := initChains(chainA, chainB, serviceA, serviceB, false)
-	result, err := startCosmosChainsAndSetupIbcRelay(diveContext, enclaveContext, chains)
+	var starlarkExecutionResponse string
+	var err error
 
-	if err != nil {
-		diveContext.FatalError("Starlark Run Failed", err.Error())
+	if chains.chainAServiceName != "" && chains.chainBServiceName != "" {
+
+		srcChainServiceResponse, dstChainServiceResponse, err := chains.getServicesResponse()
+
+		if err != nil {
+			diveContext.FatalError("Failed To read ServiceFile", err.Error())
+		}
+		starlarkExecutionResponse, err = setupIbcRelayforAlreadyRunningCosmosChain(diveContext, enclaveContext, chains.chainA, chains.chainB, srcChainServiceResponse, dstChainServiceResponse)
+
+		if err != nil {
+			diveContext.FatalError("Starlark Run Failed", err.Error())
+		}
+
+	} else {
+		starlarkExecutionResponse, err = startCosmosChainsAndSetupIbcRelay(diveContext, enclaveContext, chains)
+
+		if err != nil {
+			diveContext.FatalError("Starlark Run Failed", err.Error())
+		}
+
 	}
-	common.WriteToFile(result)
+	return starlarkExecutionResponse
 }
 
 func startCosmosChainsAndSetupIbcRelay(diveContext *common.DiveContext, enclaveCtx *enclaves.EnclaveContext, chains *Chains) (string, error) {
 
 	params := chains.getIbcRelayParams()
-	data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, "run_cosmos_ibc_setup", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+
+	result, err := runStarlarkPackage(diveContext, enclaveCtx, params, "run_cosmos_ibc_setup")
+
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
+}
+
+func setupIbcRelayforAlreadyRunningCosmosChain(diveContext *common.DiveContext, enclaveCtx *enclaves.EnclaveContext, chainA, chainB, chainAServiceResponse, chainBServiceResponse string) (string, error) {
+
+	params := fmt.Sprintf(`{"links":{"src":"%s","dst":"%s"},"src_config":%s,"dst_config":%s}`, chainA, chainB, chainAServiceResponse, chainBServiceResponse)
+
+	result, err := runStarlarkPackage(diveContext, enclaveCtx, params, "run_cosmos_ibc_relay_for_already_running_chains")
+
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
+}
+
+func runStarlarkPackage(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext, params, functionName string) (string, error) {
+	data, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, functionName, params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
 		return "", err
@@ -67,8 +121,4 @@ func startCosmosChainsAndSetupIbcRelay(diveContext *common.DiveContext, enclaveC
 	diveContext.CheckInstructionSkipped(skippedInstructions, "Instruction Executed Already")
 
 	return responseData, nil
-}
-
-func setupIbcRelayforAlreadyRunningCosmosChain(diveContext *common.DiveContext, enclaveCtx *enclaves.EnclaveContext) (string, error) {
-	return "", nil
 }
