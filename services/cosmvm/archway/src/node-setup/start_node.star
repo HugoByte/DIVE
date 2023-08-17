@@ -44,6 +44,8 @@ def start_cosmos_node(plan, args):
         service_name = service_name,
         endpoint = private_url,
         endpoint_public = public_url,
+        chain_id = chain_id,
+        chain_key = key
     )
 
 # returns url
