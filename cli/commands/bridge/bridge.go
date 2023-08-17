@@ -4,9 +4,13 @@ Copyright © 2023 Hugobyte AI Labs <hello@hugobyte.com>
 package bridge
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/hugobyte/dive/cli/commands/bridge/relyas"
 	"github.com/hugobyte/dive/cli/common"
 	"github.com/spf13/cobra"
+	"golang.org/x/exp/slices"
 )
 
 func NewBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
@@ -18,7 +22,20 @@ func NewBridgeCmd(diveContext *common.DiveContext) *cobra.Command {
 This will create an relay to connect two different chains and pass any messages between them.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			cmd.Help()
+			validArgs := cmd.ValidArgs
+			for _, c := range cmd.Commands() {
+				validArgs = append(validArgs, c.Name())
+			}
+			cmd.ValidArgs = validArgs
+
+			if !slices.Contains(cmd.ValidArgs, args[0]) {
+
+				diveContext.Log.SetOutput(os.Stderr)
+				diveContext.Error(fmt.Sprintf("Invalid Subcommand: %v", args))
+
+				cmd.Usage()
+				os.Exit(1)
+			}
 		},
 	}
 

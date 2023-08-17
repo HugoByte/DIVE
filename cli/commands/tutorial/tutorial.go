@@ -23,7 +23,7 @@ directing users to a curated collection of tutorial videos specifically designed
 offers step-by-step instructions, tips, and demonstrations to help users better understand and utilize the features and functionalities of DIVE.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			diveContext.Log.SetOutput(os.Stdout)
-			common.ValidateCmdArgs(args, cmd.UsageString())
+			common.ValidateCmdArgs(diveContext, args, cmd.UsageString())
 			diveContext.Log.Info("Redirecting to YouTube...")
 			if err := common.OpenFile(tutorialURL); err != nil {
 				diveContext.Log.Errorf("Failed to open Dive YouTube chanel with error %v", err)

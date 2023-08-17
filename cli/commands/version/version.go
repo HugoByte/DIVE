@@ -19,7 +19,7 @@ func NewVersionCmd(diveContext *common.DiveContext) *cobra.Command {
 		Short: "Prints the CLI version",
 		Long:  `Prints the current DIVE CLI version and warns if you are using an old version.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			common.ValidateCmdArgs(args, cmd.UsageString())
+			common.ValidateCmdArgs(diveContext, args, cmd.UsageString())
 			diveContext.Log.SetOutput(os.Stdout)
 			// Checks for latest Version
 			latestVersion := common.GetLatestVersion()

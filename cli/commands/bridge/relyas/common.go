@@ -5,8 +5,12 @@ import (
 	"strconv"
 	"strings"
 
+	"slices"
+
 	"github.com/hugobyte/dive/cli/common"
 )
+
+var suppottedChainsForBtp = []string{"icon", "eth", "hardhat"}
 
 type Chains struct {
 	chainA            string
@@ -66,4 +70,14 @@ func (chains *Chains) getServicesResponse() (string, string, error) {
 	}
 
 	return srcChainServiceResponse, dstChainServiceResponse, nil
+}
+
+func (chains *Chains) checkForBtpSupportedChains() error {
+	if !slices.Contains(suppottedChainsForBtp, chains.chainA) {
+		return fmt.Errorf("Invalid Chain %s", chains.chainA)
+	}
+	if !slices.Contains(suppottedChainsForBtp, chains.chainB) {
+		return fmt.Errorf("Invalid Chain %s", chains.chainB)
+	}
+	return nil
 }

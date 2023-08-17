@@ -50,7 +50,7 @@ func BtpRelayCmd(diveContext *common.DiveContext) *cobra.Command {
 		Short: "Starts BTP Bridge between ChainA and ChainB",
 		Long:  ``,
 		Run: func(cmd *cobra.Command, args []string) {
-			common.ValidateCmdArgs(args, cmd.UsageString())
+			common.ValidateCmdArgs(diveContext, args, cmd.UsageString())
 
 			diveContext.InitKurtosisContext()
 			enclaveCtx, err := diveContext.GetEnclaveContext()
@@ -62,6 +62,11 @@ func BtpRelayCmd(diveContext *common.DiveContext) *cobra.Command {
 			bridge, _ := cmd.Flags().GetBool("bmvbridge") // To Specify Which Type of BMV to be used in btp setup(if true BMV bridge is used else BMV-BTP Block is used)
 
 			chains := initChains(chainA, chainB, serviceA, serviceB, bridge)
+
+			if err := chains.checkForBtpSupportedChains(); err != nil {
+				diveContext.FatalError(err.Error(), fmt.Sprintf("Supported Chains for BTP: %v", suppottedChainsForBtp))
+			}
+
 			diveContext.StartSpinner(fmt.Sprintf(" Starting BTP Bridge for %s,%s", chains.chainA, chains.chainB))
 
 			if chains.areChainsIcon() {

@@ -23,7 +23,7 @@ shared by the official HugoByte Twitter account. Users can stay informed about H
 community, and follow our social media presence directly from the Twitter homepage.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			diveContext.Log.SetOutput(os.Stdout)
-			common.ValidateCmdArgs(args, cmd.UsageString())
+			common.ValidateCmdArgs(diveContext, args, cmd.UsageString())
 			diveContext.Log.Info("Redirecting to twitter...")
 			if err := common.OpenFile(twitterURL); err != nil {
 				diveContext.Log.Errorf("Failed to open HugoByte twitter with error %v", err)
