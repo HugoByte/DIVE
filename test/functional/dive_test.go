@@ -33,6 +33,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 	var cmd *exec.Cmd
 	var stdout bytes.Buffer
 
+	// run clean before each test
 	ginkgo.BeforeEach(func() {
 		cmd = dive.GetBinaryCommand()
 		cmd.Stdout = &testWriter{}
@@ -44,9 +45,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 	})
 
 	ginkgo.Describe("Smoke Tests", func() {
-		// Clean before running tests
-		dive.Clean()
-
 		ginkgo.It("should display the correct version", func() {
 			cmd.Args = append(cmd.Args, "version")
 			cmd.Stdout = &stdout
