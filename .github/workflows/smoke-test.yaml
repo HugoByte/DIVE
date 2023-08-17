@@ -20,7 +20,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version-file: ../cli/go.mod
+          go-version: 1.21
+          check-latest: true
 
       - name: Installing Kurtosis CLI and starting the kurtosis engine
         run: |
@@ -48,3 +49,8 @@ jobs:
         run: |
           $DIVE_BINARY_PATH clean
           $DIVE_BINARY_PATH bridge btp --chainA icon --chainB icon --verbose
+
+      - name: Test bridge between archway and archway 
+        run: |
+            $DIVE_BINARY_PATH clean
+            $DIVE_BINARY_PATH bridge ibc --chainA archway --chainB archway --verbose
