@@ -4,8 +4,8 @@ Copyright © 2023 Hugobyte AI Labs<hello@hugobyte.com>
 package chain
 
 import (
-	"github.com/hugobyte/dive/commands/chain/types"
-	"github.com/hugobyte/dive/common"
+	"github.com/hugobyte/dive/cli/commands/chain/types"
+	"github.com/hugobyte/dive/cli/common"
 	"github.com/spf13/cobra"
 )
 
@@ -29,7 +29,7 @@ maintenance within the specified blockchain ecosystem.`,
 	chainCmd.AddCommand(types.NewIconCmd(diveContext))
 	chainCmd.AddCommand(types.NewEthCmd(diveContext))
 	chainCmd.AddCommand(types.NewHardhatCmd(diveContext))
-	chainCmd.AddCommand(types.NewCosmosCmd(diveContext))
+	chainCmd.AddCommand(types.NewArchwayCmd(diveContext))
 
 	return chainCmd
 
