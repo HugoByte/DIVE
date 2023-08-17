@@ -240,13 +240,23 @@ def run_cosmos_ibc_setup(plan, args):
     destination_chain = links["dst"]
 
     if source_chain == "archway" and destination_chain == "archway":
-        data, src_service_config, dst_service_config = cosmvm_node.start_ibc_between_cosmvm_chains(plan,source_chain,destination_chain)
-        src_chain_service_name = src_service_config["service_name"]
-        dst_chain_service_name = dst_service_config["service_name"]
-
-        config_data = input_parser.generate_new_config_data_cosmvm_cosmvm(links, src_chain_service_name, dst_chain_service_name)
-        config_data["chains"][src_chain_service_name] = data.src_config
-        config_data["chains"][dst_chain_service_name] = data.dst_config
-        cosmvm_relay.start_cosmos_relay(plan, src_service_config["key"], src_service_config["cid"], dst_service_config["key"], dst_service_config["cid"], data.src_config, data.dst_config)
-
+        data = cosmvm_node.start_ibc_between_cosmvm_chains(plan,source_chain,destination_chain)
+                
+        config_data = run_cosmos_ibc_relay_for_already_running_chains(plan,links,data.src_config,data.dst_config)
         return config_data
+
+def run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_config,dst_config):
+
+    src_chain_service_name = src_config["service_name"]
+    dst_chain_service_name = dst_config["service_name"]
+    src_chain_id = src_config["chain_id"]
+    src_chain_key = src_config["chain_key"]
+    dst_chain_id = dst_config["chain_id"]
+    dst_chain_key = dst_config["chain_key"]
+
+    config_data = input_parser.generate_new_config_data_cosmvm_cosmvm(links, src_chain_service_name, dst_chain_service_name)
+    config_data["chains"][src_chain_service_name] = src_config
+    config_data["chains"][dst_chain_service_name] = dst_config
+    cosmvm_relay.start_cosmos_relay(plan, src_chain_key, src_chain_id, dst_chain_key, dst_chain_id, src_config, dst_config)
+
+    return config_data
