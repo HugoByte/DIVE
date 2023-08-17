@@ -95,3 +95,6 @@ tsconfig.tsbuildinfo
 
 dist/
 logs/
+
+*.sum
+dive
