@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/hugobyte/dive/common"
+	"github.com/hugobyte/dive/cli/common"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 )
