@@ -81,36 +81,36 @@ func startCosmosChainsAndSetupIbcRelay(diveContext *common.DiveContext, enclaveC
 
 	params := chains.getIbcRelayParams()
 
-	result, err := runStarlarkPackage(diveContext, enclaveCtx, params, "run_cosmos_ibc_setup")
+	executionResult, err := runStarlarkPackage(diveContext, enclaveCtx, params, "run_cosmos_ibc_setup")
 
 	if err != nil {
 		return "", err
 	}
 
-	return result, nil
+	return executionResult, nil
 }
 
 func setupIbcRelayforAlreadyRunningCosmosChain(diveContext *common.DiveContext, enclaveCtx *enclaves.EnclaveContext, chainA, chainB, chainAServiceResponse, chainBServiceResponse string) (string, error) {
 
 	params := fmt.Sprintf(`{"links":{"src":"%s","dst":"%s"},"src_config":%s,"dst_config":%s}`, chainA, chainB, chainAServiceResponse, chainBServiceResponse)
 
-	result, err := runStarlarkPackage(diveContext, enclaveCtx, params, "run_cosmos_ibc_relay_for_already_running_chains")
+	executionResult, err := runStarlarkPackage(diveContext, enclaveCtx, params, "run_cosmos_ibc_relay_for_already_running_chains")
 
 	if err != nil {
 		return "", err
 	}
 
-	return result, nil
+	return executionResult, nil
 }
 
 func runStarlarkPackage(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext, params, functionName string) (string, error) {
-	data, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, functionName, params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	executionData, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, functionName, params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 
 	if err != nil {
 		return "", err
 	}
 
-	responseData, services, skippedInstructions, err := diveContext.GetSerializedData(data)
+	executionSerializedData, services, skippedInstructions, err := diveContext.GetSerializedData(executionData)
 
 	if err != nil {
 		diveContext.StopServices(services)
@@ -120,5 +120,5 @@ func runStarlarkPackage(diveContext *common.DiveContext, enclaveContext *enclave
 
 	diveContext.CheckInstructionSkipped(skippedInstructions, "Instruction Executed Already")
 
-	return responseData, nil
+	return executionSerializedData, nil
 }
