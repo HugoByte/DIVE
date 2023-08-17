@@ -45,7 +45,7 @@ run-functional: BINARY
 	@cd $(CURDIR)/functional && ginkgo --focus="Functional Tests" -v
 
 BINARY: GINKGO
-	@cd $(CURDIR)/../cli && go build
+	@cd $(CURDIR)/../cli && go build -o dive
 
 GINKGO:
 	@if ! command -v ginkgo version; then \

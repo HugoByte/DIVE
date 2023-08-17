@@ -44,9 +44,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 	})
 
 	ginkgo.Describe("Smoke Tests", func() {
-		// Clean before running tests
-		dive.Clean()
-
 		ginkgo.It("should display the correct version", func() {
 			cmd.Args = append(cmd.Args, "version")
 			cmd.Stdout = &stdout
