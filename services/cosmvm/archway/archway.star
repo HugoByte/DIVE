@@ -17,18 +17,22 @@ def start_nodes_services_archway(plan):
         "service_name": source_chain_response.service_name,
         "endpoint": source_chain_response.endpoint,
         "endpoint_public": source_chain_response.endpoint_public,
+        "chain_id": source_chain_response.chain_id,
+        "chain_key": source_chain_response.chain_key
     }
 
     dst_service_config = {
         "service_name": destination_chain_response.service_name,
         "endpoint": destination_chain_response.endpoint,
         "endpoint_public": destination_chain_response.endpoint_public,
+        "chain_id": destination_chain_response.chain_id,
+        "chain_key": destination_chain_response.chain_key
     }
 
     return struct(
         src_config = src_service_config,
         dst_config = dst_service_config,
-    ), src_chain_config, dst_chain_config
+    )
 
 # spins up the single cosmos node
 
