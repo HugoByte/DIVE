@@ -4,6 +4,10 @@ Copyright © 2023 Hugobyte AI Labs<hello@hugobyte.com>
 package chain
 
 import (
+	"fmt"
+	"os"
+	"slices"
+
 	"github.com/hugobyte/dive/cli/commands/chain/types"
 	"github.com/hugobyte/dive/cli/common"
 	"github.com/spf13/cobra"
@@ -21,7 +25,20 @@ By executing this command, the node is launched, enabling network participation,
 maintenance within the specified blockchain ecosystem.`,
 
 		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Help()
+			validArgs := cmd.ValidArgs
+			for _, c := range cmd.Commands() {
+				validArgs = append(validArgs, c.Name())
+			}
+			cmd.ValidArgs = validArgs
+
+			if !slices.Contains(cmd.ValidArgs, args[0]) {
+
+				diveContext.Log.SetOutput(os.Stderr)
+				diveContext.Error(fmt.Sprintf("Invalid Subcommand: %v", args))
+
+				cmd.Usage()
+				os.Exit(1)
+			}
 
 		},
 	}
@@ -33,4 +50,12 @@ maintenance within the specified blockchain ecosystem.`,
 
 	return chainCmd
 
+}
+
+func addSubcommandsToValidArgs(cmd *cobra.Command) {
+	validArgs := cmd.ValidArgs
+	for _, c := range cmd.Commands() {
+		validArgs = append(validArgs, c.Name())
+	}
+	cmd.ValidArgs = validArgs
 }

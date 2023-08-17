@@ -18,7 +18,7 @@ func NewCleanCmd(diveContext *common.DiveContext) *cobra.Command {
 		Short: "Cleans up Kurtosis leftover artifacts",
 		Long:  `Destroys and removes any running encalves. If no enclaves running to remove it will throw an error`,
 		Run: func(cmd *cobra.Command, args []string) {
-			common.ValidateCmdArgs(args, cmd.UsageString())
+			common.ValidateCmdArgs(diveContext, args, cmd.UsageString())
 
 			diveContext.InitKurtosisContext()
 			pwd, err := os.Getwd()
