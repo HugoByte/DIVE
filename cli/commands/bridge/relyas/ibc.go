@@ -16,6 +16,8 @@ func IbcRelayCmd(diveContext *common.DiveContext) *cobra.Command {
 		Short: "Start connection between Cosmos based chainA and ChainB and initiate communication between them",
 		Long:  "",
 		Run: func(cmd *cobra.Command, args []string) {
+
+			common.ValidateCmdArgs(diveContext, args, cmd.UsageString())
 			diveContext.InitKurtosisContext()
 
 			enclaveCtx, err := diveContext.GetEnclaveContext()

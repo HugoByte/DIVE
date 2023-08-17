@@ -123,9 +123,10 @@ func WriteToFile(data string) error {
 	return nil
 }
 
-func ValidateCmdArgs(args []string, cmd string) {
+func ValidateCmdArgs(diveContext *DiveContext, args []string, cmd string) {
 	if len(args) != 0 {
-		logrus.Fatalf("Invalid Usage of command. Find cmd %s", cmd)
+
+		diveContext.FatalError("Invalid Usage of command", cmd)
 
 	}
 }
@@ -144,6 +145,7 @@ func setupLogger() *logrus.Logger {
 		TimestampFormat: "2006-01-02 15:04:05",
 		FullTimestamp:   true,
 		ForceColors:     true,
+		PadLevelText:    true,
 	})
 
 	ditFilePath := pwd + DiveLogDirectory + DiveDitLogFile

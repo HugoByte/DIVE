@@ -22,7 +22,7 @@ to access the dedicated DIVE community. It allows users to engage in discussions
 collaborate with other members of the DIVE community within the Discord platform.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			diveContext.Log.SetOutput(os.Stdout)
-			common.ValidateCmdArgs(args, cmd.UsageString())
+			common.ValidateCmdArgs(diveContext, args, cmd.UsageString())
 			diveContext.Log.Info("Redirecting to DIVE discord channel...")
 			if err := common.OpenFile(diveURL); err != nil {
 				diveContext.Log.Errorf("Failed to open Dive discord channel with error %v", err)

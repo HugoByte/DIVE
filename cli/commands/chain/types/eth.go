@@ -18,7 +18,7 @@ func NewEthCmd(diveContext *common.DiveContext) *cobra.Command {
 It establishes a connection to the Ethereum network and allows the node in executing smart contracts and maintaining the decentralized ledger.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
-			common.ValidateCmdArgs(args, cmd.UsageString())
+			common.ValidateCmdArgs(diveContext, args, cmd.UsageString())
 
 			data := RunEthNode(diveContext)
 

@@ -64,7 +64,7 @@ func NewArchwayCmd(diveContext *common.DiveContext) *cobra.Command {
 		Short: "Build, initialize and start a archway node",
 		Long:  "The command starts the archway network and allows node in executing contracts",
 		Run: func(cmd *cobra.Command, args []string) {
-
+			common.ValidateCmdArgs(diveContext, args, cmd.UsageString())
 			runResponse := RunArchwayNode(diveContext)
 
 			common.WriteToServiceFile(runResponse.ServiceName, *runResponse)
