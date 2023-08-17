@@ -37,17 +37,26 @@ clean-dep:
 
 
 run-smoke: BINARY
+	@echo "Running Smoke test cases"
+	@cd $(CURDIR)/functional && ginkgo --focus="Smoke Tests" -v
+
+run-functional: BINARY
+	@echo "Running all functional test cases"
+	@cd $(CURDIR)/functional && ginkgo --focus="Functional Tests" -v
+
+BINARY: GINKGO
+	@cd $(CURDIR)/../cli && go build
+
+GINKGO:
 	@if ! command -v ginkgo version; then \
 		echo "Installing ginkgo..."; \
 		go install github.com/onsi/ginkgo/v2/ginkgo; \
 	fi
-	@echo "Running run-smoke"
-	@cd $(CURDIR)/functional && ginkgo --focus="Smoke Tests" -v
-
-BINARY:
-	@cd $(CURDIR)/../cli && go build	
 
 remove-bin:
 	@cd $(CURDIR)/../cli && rm -rf dive
+
+
+
 
 
