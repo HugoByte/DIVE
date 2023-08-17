@@ -328,6 +328,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			cmd2 := exec.Command("dive", "clean")
 			err := cmd2.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
+			cmd3 := exec.Command("kurtosis", "engine", "start")
+			cmd3.Run()
 		})
 
 		ginkgo.It("should handle invalid input for bridge command", func() {

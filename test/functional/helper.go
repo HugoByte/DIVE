@@ -111,7 +111,7 @@ func RunCustomIconNode_0() {
 func DecentralizeCustomIconNode_0() {
 	var cmd *exec.Cmd
 	cmd = GetBinaryCommand()
-	cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "hhttp://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e", "--verbose")
+	cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e", "--verbose")
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
