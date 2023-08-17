@@ -1,12 +1,12 @@
-module github.com/hugobyte/dive
+module github.com/hugobyte/dive/cli
 
-go 1.20
+go 1.21
 
 require (
 	github.com/briandowns/spinner v1.23.0
 	github.com/fatih/color v1.15.0
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/kurtosis-tech/kurtosis/api/golang v0.81.5
+	github.com/kurtosis-tech/kurtosis/api/golang v0.81.6
 	github.com/kurtosis-tech/stacktrace v0.0.0-20211028211901-1c67a77b5409
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/sirupsen/logrus v1.9.3
