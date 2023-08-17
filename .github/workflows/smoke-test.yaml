@@ -1,4 +1,4 @@
-name: run smoke testcases
+name: Smoke Test
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  smoke_test:
     if: ${{ github.event.label.name == 'test:smoke' }}
     name: Smoke Testing
     runs-on: "ubuntu-latest"
