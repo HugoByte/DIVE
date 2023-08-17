@@ -11,26 +11,7 @@ builds:
   - id: cli
     binary: "dive"
     env:
-      - CGO_ENABLED={{ if eq .Os "windows" }}0{{ else }}1{{ end }}
-      # Only override compilers if we are on CI, otherwise use the locally available C/C++ toolchain
-      - >-
-        {{- if eq .Os "darwin" }}CC=o64h-clang{{- end }}
-          {{- if eq .Os "linux" }}
-            {{- if eq .Arch "amd64"}}CC=x86_64-linux-musl-gcc{{- end }}
-              {{- if eq .Arch "arm64"}}CC=aarch64-linux-musl-gcc{{- end }}
-        {{- end }}
-
-      - >-
-        {{- if eq .Os "darwin" }}CXX=o64h-clang++{{- end }}
-        {{- if eq .Os "linux" }}
-          {{- if eq .Arch "amd64"}}CXX=x86_64-linux-musl-g++{{- end }}
-            {{- if eq .Arch "arm64"}}CXX=aarch64-linux-musl-g++{{- end }}
-        {{- end }}
-    ldflags:
-      - >-
-        {{- if eq .Os "linux" }}-linkmode external -extldflags "-static"{{- end }}
-    tags:
-      - osusergo
+      - CGO_ENABLED=0
     goos:
       - linux
       - windows
@@ -58,13 +39,8 @@ brews:
     homepage: "https://hugobyte.com"
     description: "CLI for Dive Package"
     license: "Apache 2.0"
-    # NOTE: Goreleaser *should* automatically detect the binaries packaged inside the archives being installed by the Homebrew formula, but it doesn't due to:
-    #  https://github.com/goreleaser/goreleaser/issues/2488
-    # When this is fixed, we can remove this section
     install: |
       bin.install "dive"
-
-  # creates a versioned brew formula, enabling installation of specific versions of kurtosis cli
   - name: dive-cli@{{ .Tag }}
     ids:
       - cli
