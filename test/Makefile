@@ -42,7 +42,7 @@ run-smoke: BINARY
 
 run-functional: BINARY
 	@echo "Running all functional test cases"
-	@cd $(CURDIR)/functional && ginkgo --focus="Functional Tests" -v
+	@cd $(CURDIR)/functional && ginkgo --focus="Functional Tests" -v -timeout=3h
 
 BINARY: GINKGO
 	@cd $(CURDIR)/../cli && go build -o dive

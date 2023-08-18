@@ -255,7 +255,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			dive.RunIconNode()
 			dive.DecentralizeIconNode()
 			dive.RunHardhatNode()
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "el-1-geth-lighthouse")
+			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "hardhat-node")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
