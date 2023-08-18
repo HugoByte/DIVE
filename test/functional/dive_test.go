@@ -319,11 +319,11 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			dive.Clean()
 		})
 
-		ginkgo.It("should handle error when trying to clean if kurtosis engine is not running ", func() {
+		ginkgo.It("should handle error when trying to clean if kurtosis engine is not running", func() {
 			cmd1 := exec.Command("kurtosis", "engine", "stop")
 			cmd1.Run()
-			// to add bin path here
-			cmd2 := exec.Command("dive", "clean")
+			bin := dive.GetBinPath()
+			cmd2 := exec.Command(bin, "clean")
 			err := cmd2.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
 			cmd3 := exec.Command("kurtosis", "engine", "start")
