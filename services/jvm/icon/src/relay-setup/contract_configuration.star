@@ -162,3 +162,90 @@ def deploy_dapp(plan,xcall_address,args):
     return score_address   
 
 
+# Deploy ibc_hndler
+def ibc_handler(plan,args):
+
+    plan.print("IBC handler")
+
+    init_message = '{}' 
+
+    tx_hash = contract_deployment_service.deploy_contract(plan,"ibc-0.1.0-optimized",init_message, args)
+    plan.print(tx_hash)
+    service_name = args["service_name"]
+
+    score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
+
+    plan.print("deployed ibc handler")
+
+    return score_address
+
+# deploy light_client 
+def light_client_for_icon(plan,args, ibc_handler_address):
+
+    plan.print("deploy tendermint lightclient")
+
+    init_message = '{"ibcHandler":"%s"}' % ibc_handler_address
+
+    tx_hash = contract_deployment_service.deploy_contract(plan, "tendermint-0.1.0-optimized", init_message, args)
+    service_name = args["service_name"]
+    score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
+
+    plan.print("deployed light client")
+
+    return score_address
+
+def xcall_connection(plan,args,xcall_address,ibc_address):
+
+    plan.print("deploy xcall connection")
+    plan.print(xcall_address)
+    
+    init_message= '{"_xCall": "%s","_ibc": "%s","port": "xcall"}' % (xcall_address,ibc_address)
+
+   
+    tx_hash = contract_deployment_service.deploy_contract(plan, "xcall-connection-0.1.0-optimized", init_message, args)
+
+    service_name = args["service_name"]
+    score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
+
+    return score_address
+
+
+def deploy_xcall_for_ibc(plan,network_id,args):
+
+    plan.print("Deploying xCall Contract for IBC")
+    init_message = '{"networkId":"%s"}' % network_id
+
+    tx_hash = contract_deployment_service.deploy_contract(plan,"xcall-0.1.0-optimized",init_message,args)
+    service_name = args["service_name"]
+
+    score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
+    
+    return score_address  
+
+def deploy_xcall_dapp(plan,xcall_address):
+    
+    plan.print("Deploying Xcall Dapp Contract")
+
+    params = '{"_callService":"%s"}' % (xcall_address)
+
+def configure_xcall_dapp(plan,xcall_dapp_address,network_id,java_xcall_connection_address,xcall_connection_address):
+
+    plan.print("Configure dapp connection")
+    method = "addConnection"
+    params = '{"nid":"%s","source":"%s","destination":"%s"}' % (network_id,java_xcall_connection_address,xcall_connection_address)
+
+    #execute 
+
+def configure_xcall_connection(plan):
+
+    plan.print("Configure Xcall Connection")
+
+    method = "configureConnection"
+    params = '{"connectionId":"%s","counterpartyPortId":"%s","counterpartyNid":"%s","clientId":"%s","timeoutHeight":1000000}'
+
+
+def set_default_connection_xcall(plan):
+
+     plan.print("Setting Up  Xcall Default connection")
+     method = "setDefaultConnection"
+     params = '{"nid":"%s","connection":"%s"}'
