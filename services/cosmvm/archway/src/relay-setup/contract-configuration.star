@@ -146,9 +146,9 @@ def setup_contracts_for_ibc_wasm(plan,service_name,chain_id,chain_key,network_id
 
     ibc_core_address = deploy_core(plan,service_name,chain_id,chain_key)
 
-    xcall_address = deploy_xcall(plan,service_name,chain_id,chain_key,network_id,denom)
-
     light_client_address = deploy_light_client(plan,service_name,chain_id,chain_key,ibc_core_address)
+
+    xcall_address = deploy_xcall(plan,service_name,chain_id,chain_key,network_id,denom)
 
     xcall_connection_address = deploy_xcall_connection(plan,service_name,chain_id,chain_key,xcall_address,ibc_core_address,port_id,denom)
 

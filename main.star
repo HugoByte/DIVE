@@ -262,9 +262,9 @@ def run_cosmos_ibc_setup(plan, args):
 
         deploy_icon_contracts = icon_relay_setup.setup_contracts_for_ibc_java(plan,src_chain_config)
 
-        icon_register_client = icon_relay_setup.registerClient(plan,src_chain_service_name,args,deploy_icon_contracts["light_client"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"],src_chain_config["endpoint"],deploy_icon_contracts["ibc_core"])
+        icon_register_client = icon_relay_setup.registerClient(plan,src_chain_service_name,deploy_icon_contracts["light_client"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"],src_chain_config["endpoint"],deploy_icon_contracts["ibc_core"])
 
-        icon_bind_port = icon_relay_setup.bindPort(plan,src_chain_service_name,args,deploy_icon_contracts["xcall_connection"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"],src_chain_config["endpoint"],deploy_icon_contracts["ibc_core"],"xcall")
+        icon_bind_port = icon_relay_setup.bindPort(plan,src_chain_service_name,deploy_icon_contracts["xcall_connection"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"],src_chain_config["endpoint"],deploy_icon_contracts["ibc_core"],"xcall")
 
         icon_setup_node.configure_node(plan,src_chain_config)
 
@@ -279,7 +279,7 @@ def run_cosmos_ibc_setup(plan, args):
             "owner" : deploy_icon_contracts["ibc_core"] 
         }
 
-        icon_setup_node.open_btp_network(plan,src_chain_service_name,src_data,src_chain_config["endpoint"],src_chain_config["keystore_path"], "gochain",src_chain_config["nid"])
+        icon_setup_node.open_btp_network(plan,src_chain_service_name,src_data,src_chain_config["endpoint"],src_chain_config["keystore_path"], src_chain_config["keypassword"],src_chain_config["nid"])
 
         deploy_archway_contracts = cosmvm_relay_setup.setup_contracts_for_ibc_wasm(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,dst_chain_config.chain_id,"stake","xcall")
 

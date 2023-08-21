@@ -327,7 +327,7 @@ def deploy_and_configure_dapp_java(plan,args,xcall_address,wasm_network_id,java_
 
     return result
 
-def registerClient(plan,service_name, args, light_client_address, keystorepath,keystore_password ,nid, uri,ibc_core_address ):
+def registerClient(plan,service_name, light_client_address, keystorepath,keystore_password ,nid, uri,ibc_core_address ):
 
     plan.print("registering the client")
 
@@ -346,7 +346,7 @@ def registerClient(plan,service_name, args, light_client_address, keystorepath,k
 
     return tx_hash
 
-def bindPort(plan,service_name,args,xcall_conn_address,keystorepath,keystore_password,nid,uri,ibc_core_address,port_id):
+def bindPort(plan,service_name,xcall_conn_address,keystorepath,keystore_password,nid,uri,ibc_core_address,port_id):
 
     plan.print("Bind Port")
 
