@@ -6,9 +6,9 @@
 
 ## About
 
-Dive deeply into the world of Blockchain and Web 3.0 using **D.I.V.E.** (Deployable Infrastructure for Virtually Effortless blockchain integration),The Dive package aim to implement its services and API for ICON Blockchain. The kurtosis services and API are designed to simplify the process of deploying various nodes and services for development and testing and enhance the overall user experience. Implementing kurtosis for the ICON blockchain can help ease the developers in the ecosystem to focus more on building the business logic without worrying about the setup which consumes a significant amount of time.
+Dive deeply into the world of Blockchain and Web 3.0 using **D.I.V.E.** (Deployable Infrastructure for Virtually Effortless blockchain integration), The Dive package aims to implement its services and API for ICON Blockchain. The kurtosis services and API are designed to simplify the process of deploying various nodes and services for development and testing and enhance the overall user experience. Implementing kurtosis for the ICON blockchain can help ease the developers in the ecosystem to focus more on building the business logic without worrying about the setup which consumes a significant amount of time.
 
-The vision is to making ICON the interoperable hub by easing the setup of BTP and IBC for ICON and the connecting chains.
+The vision is to make ICON the interoperable hub by easing the setup of BTP and IBC for ICON and the connecting chains.
 
 This repository uses [kurtosis package](https://docs.kurtosis.com/concepts-reference/packages)
 
@@ -96,7 +96,7 @@ Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually co
 
 > Before proceeding, make sure the Kurtosis Engine is running in the background. If it's not already running, start it by executing the following command: `kurtosis engine start`
 
-### Setting up an Node
+### Setting up a Node
 
 ```
 dive chain icon
@@ -115,7 +115,7 @@ Example `services.json`:
 
 ```javascript
 {
-"icon-node-0xacbc4e": { # this key sepcifies service name
+"icon-node-0xacbc4e": { # this key specifies service name
 	"block_number": "206",
 	"endpoint": "http://172.16.0.2:9080/api/v3/icon_dex",
 	"endpoint_public": "http://127.0.0.1:8090/api/v3/icon_dex",
@@ -195,8 +195,8 @@ dive bridge btp --chainA icon --chainB eth -b
 
 > `-b` flag is used to specify the type of bmv contract to be deployed for btp setup.
 
-This command sets up btp bridge between icon and eth . After running this command **DIVE CLI** will automatically starts the ICON & ETH node , Deploys contract which is used for BTP and starts the realay to constanly exchange message between established connection.
-After successful bridge setup all the neccessary details with respect to bridge will be added to `dive.json` file that will be present in current working directory.
+This command sets up btp bridge between icon and eth . After running this command **DIVE CLI** will automatically starts the ICON & ETH node , Deploys contract which is used for BTP and starts the relay to constantly exchange message between established connection.
+After successful bridge setup all the necessary details with respect to bridge will be added to `dive.json` file that will be present in current working directory.
 Example `dive.json`:
 
 ```javascript
@@ -265,7 +265,7 @@ Prints out the current version of **DIVE CLI**
 dive clean
 ```
 
-Command cleans up the artifacts , services created on the Enclave during **DIVE** package execution
+Command cleans up the artifacts, services created on the Enclave during **DIVE** package execution
 
 > Checkout More details on how to setup [BTP](https://www.xcall.dev/quickstart/setting-up-a-local-environment-with-dive-cli) bridge
 
@@ -299,4 +299,4 @@ Distributed under the Apache 2.0 License. See [LICENSE](./LICENSE) for more info
 
 ## Feedback
 
-We would happy to hear your thoughts on our project. Your feedback helps us improve and make it better for everyone. Please submit your valuable feedback [here](https://docs.google.com/forms/d/e/1FAIpQLScnesE-4IWPrFQ-W2FbRXHyQz8i_C0BVjIP_aWaxKe3myTgyw/viewform?usp=sharing)
+We would be happy to hear your thoughts on our project. Your feedback helps us improve and make it better for everyone. Please submit your valuable feedback [here](https://docs.google.com/forms/d/e/1FAIpQLScnesE-4IWPrFQ-W2FbRXHyQz8i_C0BVjIP_aWaxKe3myTgyw/viewform?usp=sharing)
