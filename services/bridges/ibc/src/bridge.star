@@ -60,16 +60,55 @@ def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_c
         service_name = ibc_relay_config.relay_service_name,
     )
 
-def start_cosmos_relay_for_icon_to_cosmos(plan,args):
+def start_cosmos_relay_for_icon_to_cosmos(plan,src_chain_config,dst_chain_config):
 
     plan.print("starting the cosmos relay for icon to cosmos")
 
     plan.upload_files(src=ibc_relay_config.config_file_path, name="archway_config")
 
+    wasm_config = read_file(ibc_relay_config.ibc_relay_wasm_file_template)
+    java_config = read_file(ibc_relay_config.ibc_relay_java_file_template)
+
+    cfg_template_data_wasm = {
+        "KEY": dst_chain_config["key"],
+        "CHAINID": dst_chain_config["chain_id"],
+        "RPCADDRESS":dst_chain_config["rpc_address"],
+        "IBCADDRESS":dst_chain_config["ibc_address"],
+    }
+
+    cfg_template_data_java = {
+        "CHAINID": src_chain_config["chain_id"],
+        "RPCADDRESS":src_chain_config["rpc_address"],
+        "IBCADDRESS":src_chain_config["ibc_address"],
+    }
+
+    plan.render_templates(
+        config = {
+            "ibc-icon.json": struct(
+                template = java_config,
+                data = cfg_template_data_java,
+            ),
+        },
+        name = "config-icon",
+    )
+
+    plan.render_templates(
+        config = {
+            "ibc-cosmos.json": struct(
+                template = wasm_config,
+                data = cfg_template_data_wasm,
+            ),
+        },
+        name = "config-wasm",
+    )
+
+
+
     relay_service = ServiceConfig(
         image= ibc_relay_config.relay_service_image_icon_to_cosmos,
         files= {
-            ibc_relay_config.relay_config_files_path: "archway_config"
+            ibc_relay_config.relay_config_files_path + "icon": "config-icon",
+            ibc_relay_config.relay_config_files_path + "wasm": "config-wasm"
         },
         entrypoint=["/bin/sh"]
     )
@@ -78,45 +117,51 @@ def start_cosmos_relay_for_icon_to_cosmos(plan,args):
 
     plan.add_service(name = ibc_relay_config.relay_service_name_icon_to_cosmos, config = relay_service)
 
+    
+
     return struct(
         service_name = ibc_relay_config.relay_service_name_icon_to_cosmos,
     )
 
-def setup_relay(plan,args,SEED0):
+def setup_relay(plan,src_chain_config,dst_chain_config):
 
+    src_chain_id = src_chain_config["chain_id"]
+    src_password = src_chain_config["password"]
+
+    dst_chain_id = dst_chain_config["chain_id"]
+    dst_chain_key = dst_chain_config["key"]
+    dst_chain_service_name = dst_chain_config["service_name"]
+
+
+    seed = plan.exec(service_name=dst_chain_service_name, recipe=ExecRecipe(command=["/bin/sh", "-c", "jq -r '.mnemonic' ../../start-scripts/key_seed.json | tr -d '\n\r'"]))
     plan.print("starting the relay")
 
     plan.exec(service_name= ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly config init"]))
 
     plan.print("Adding the chain1")
 
-    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly chains add --file ../script/archway1.json my-chain"]))
+    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly chains add --file ../script/wasm/ibc-cosmos.json %s" % dst_chain_id]))
 
     plan.print("Adding the chain2")
 
-    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly chains add --file ../script/icon.json 0xacbc4e "]))
+    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly chains add --file ../script/icon/ibc-icon.json %s" % src_chain_id]))
 
 
     plan.print("Adding the keys")
 
-    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly keys restore my-chain fd '%s' " % (SEED0["output"])]))
+    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly keys restore %s %s '%s' " % (dst_chain_id,dst_chain_key,seed["output"])]))
 
-    # plan.exec(service_name="cosmos-relay", recipe=ExecRecipe(command=["/bin/sh", "-c", "rly keys restore chain-2 default '%s' " % (SEED1["output"])]))
-    # plan.exec(service_name="cosmos-relay", recipe=ExecRecipe(command=["/bin/sh", "-c", "rly keys add 0xacbc4e keystore --password gochain"]))
+    
+    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly keys add %s keystore --password %s" % (src_chain_id,src_password)]))
 
-    # plan.exec(service_name="cosmos-relay", recipe=ExecRecipe(command=["/bin/sh", "-c", "rly keys add 0xacbc4e keystore --password password"]))
 
     plan.print("Adding the paths")
 
-    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly paths new 0xacbc4e my-chain demo"]))
+    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly paths new %s %s icon-cosmos" % (src_chain_id,dst_chain_id)]))
    
-    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly tx clients demo --client-tp 10000000m "]))
+    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly tx clients icon-cosmos --client-tp 2000000m -d"]))
 
-    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly tx connection demo"]))
-
-    # plan.exec(service_name="cosmos-relay",recipe=ExecRecipe(command=["/bin/sh", "-c", "rly start &"]))
-
-    # plan.exec(service_name="cosmos-relay",recipe=ExecRecipe(command=["/bin/sh", "-c", "rly tx channel demo --dst-port our-port --order ordered"]))
+    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly tx connection icon-cosmos"]))
 
 
 

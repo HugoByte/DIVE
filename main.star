@@ -287,27 +287,32 @@ def run_cosmos_ibc_setup(plan, args):
 
         cosmvm_relay_setup.bindPort(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["ibc_core"],deploy_archway_contracts["xcall_connection"])
 
-        src_contract_address = {
-            "contracts" : deploy_icon_contracts,
+        config_data["contracts"][src_chain_service_name] = deploy_icon_contracts
+        config_data["contracts"][dst_chain_service_name] = deploy_archway_contracts
+
+        src_chain_data = {
+            "chain_id": "0xacbc4e",
+            "rpc_address": src_chain_config["endpoint"],
+            "ibc_address": deploy_icon_contracts["ibc_core"],
+            "password" : src_chain_config["keypassword"]
         }
-
-        dst_contract_address = {
-            "contracts_archway" : deploy_archway_contracts,
+        dst_chain_data = {
+            "chain_id": dst_chain_config.chain_id,
+            "key": dst_chain_config.chain_key,
+            "rpc_address": dst_chain_config.endpoint,
+            "ibc_address": deploy_archway_contracts["ibc_core"],
+            "service_name": dst_chain_config.service_name
         }
+        cosmos = cosmvm_relay.start_cosmos_relay_for_icon_to_cosmos(plan,src_chain_data,dst_chain_data)
 
-        config_data["contracts"][src_chain_service_name] = src_contract_address
-        config_data["contracts"][dst_chain_service_name] = dst_contract_address
+        
 
-        cosmos = cosmvm_relay.start_cosmos_relay_for_icon_to_cosmos(plan,args)
+        # plan.exec(service_name="ibc-relayer", recipe=ExecRecipe(command=["/bin/sh", "-c", "sed -i -e 's|\"ibc-handler-address\":\"\"|\"ibc-handler-address\": \"'%s'\"|' ../script/icon.json" % (deploy_icon_contracts["ibc_core"])]))
 
-        SEED0 = plan.exec(service_name=dst_chain_service_name, recipe=ExecRecipe(command=["/bin/sh", "-c", "jq -r '.mnemonic' ../../start-scripts/key_seed.json | tr -d '\n\r'"]))
-
-        plan.exec(service_name="ibc-relayer", recipe=ExecRecipe(command=["/bin/sh", "-c", "sed -i -e 's|\"ibc-handler-address\":\"\"|\"ibc-handler-address\": \"'%s'\"|' ../script/icon.json" % (deploy_icon_contracts["ibc_core"])]))
-
-        plan.exec(service_name="ibc-relayer", recipe=ExecRecipe(command=["/bin/sh", "-c", "sed -i -e 's|\"ibc-handler-address\":\"\"|\"ibc-handler-address\": \"'%s'\"|' ../script/archway1.json" % (deploy_archway_contracts["ibc_core"])]))
+        # plan.exec(service_name="ibc-relayer", recipe=ExecRecipe(command=["/bin/sh", "-c", "sed -i -e 's|\"ibc-handler-address\":\"\"|\"ibc-handler-address\": \"'%s'\"|' ../script/archway1.json" % (deploy_archway_contracts["ibc_core"])]))
 
         #  plan.exec(service_name="cosmos-relay", recipe=ExecRecipe(command=["/bin/sh", "-c", "sed -i -e 's|\"rpc-addr\": \"\"|\"rpc-addr\": \"http://'%s'\"|' ../script/chains/archway1.json" % (["endpoint"])]) )
-        cosmvm_relay.setup_relay(plan,args,SEED0)
+        cosmvm_relay.setup_relay(plan,src_chain_data,dst_chain_data)
 
 
         # config_data = run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_chain_config,dst_chain_config)
