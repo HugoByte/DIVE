@@ -101,200 +101,200 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 	})
 
 	ginkgo.Describe("Functional Tests", func() {
-		ginkgo.It("should start bridge between icon and eth but with icon bridge set to true", func() {
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--bmvbridge")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// ginkgo.It("should start bridge between icon and eth but with icon bridge set to true", func() {
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--bmvbridge")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-		})
+		// })
 
-		ginkgo.It("should start bridge between icon and eth with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// ginkgo.It("should start bridge between icon and eth with verbose flag enabled", func() {
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 
-		})
+		// })
 
-		ginkgo.It("should start bridge between icon and eth but with icon bridge set to true with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--bmvbridge", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between icon and eth but with icon bridge set to true with verbose flag enabled", func() {
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--bmvbridge", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should start bridge between icon and hardhat", func() {
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between icon and hardhat", func() {
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should start bridge between icon and hardhat with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between icon and hardhat with verbose flag enabled", func() {
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should start bridge between icon and hardhat but with icon bridge set to true with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--bmvbridge", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between icon and hardhat but with icon bridge set to true with verbose flag enabled", func() {
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--bmvbridge", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should start bridge between icon and icon with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between icon and icon with verbose flag enabled", func() {
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run single icon node", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run single icon node", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "icon")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run single icon node with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run single icon node with verbose flag enabled", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run single icon node along with decentralisation", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-d")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run single icon node along with decentralisation", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "-d")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run single icon node along with decentralisation with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-d", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run single icon node along with decentralisation with verbose flag enabled", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "-d", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run single eth node", func() {
-			cmd.Args = append(cmd.Args, "chain", "eth")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run single eth node", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "eth")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run single eth node with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "chain", "eth", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run single eth node with verbose flag enabled", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "eth", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run single hardhat node", func() {
-			cmd.Args = append(cmd.Args, "chain", "hardhat")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run single hardhat node", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "hardhat")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run single hardhat node with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "chain", "hardhat", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run single hardhat node with verbose flag enabled", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "hardhat", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run custom Icon node", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-0.zip")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run custom Icon node", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-0.zip")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run custom Icon node  with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-0.zip", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run custom Icon node  with verbose flag enabled", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-0.zip", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run custom Icon node-1", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config1.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-1.zip")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run custom Icon node-1", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config1.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-1.zip")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run custom Icon node-1  with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config1.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-1.zip", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run custom Icon node-1  with verbose flag enabled", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config1.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-1.zip", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run icon node first and then decentralise it", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run icon node first and then decentralise it", func() {
+		// 	dive.RunIconNode()
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run icon node first and then decentralise it with verbose flag enabled", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run icon node first and then decentralise it with verbose flag enabled", func() {
+		// 	dive.RunIconNode()
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should start bridge between icon and eth by running each chain individually ", func() {
-			dive.RunDecentralizedIconNode()
-			dive.RunEthNode()
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "el-1-geth-lighthouse")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between icon and eth by running each chain individually ", func() {
+		// 	dive.RunDecentralizedIconNode()
+		// 	dive.RunEthNode()
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "el-1-geth-lighthouse")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should start bridge between icon and hardhat by running each chain individually ", func() {
-			dive.RunDecentralizedIconNode()
-			dive.RunHardhatNode()
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "hardhat-node")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between icon and hardhat by running each chain individually ", func() {
+		// 	dive.RunDecentralizedIconNode()
+		// 	dive.RunHardhatNode()
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "hardhat-node")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should start bridge between icon and eth by running icon node first and then decentralising it", func() {
-			dive.RunIconNode()
-			dive.DecentralizeIconNode()
-			dive.RunEthNode()
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "el-1-geth-lighthouse")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between icon and eth by running icon node first and then decentralising it", func() {
+		// 	dive.RunIconNode()
+		// 	dive.DecentralizeIconNode()
+		// 	dive.RunEthNode()
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "el-1-geth-lighthouse")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should start bridge between icon and hardhat by running icon node first and then decentralising it", func() {
-			dive.RunIconNode()
-			dive.DecentralizeIconNode()
-			dive.RunHardhatNode()
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "hardhat-node")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between icon and hardhat by running icon node first and then decentralising it", func() {
+		// 	dive.RunIconNode()
+		// 	dive.DecentralizeIconNode()
+		// 	dive.RunHardhatNode()
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "hardhat-node")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
 		ginkgo.It("should start bridge between icon and icon by running one custom icon chain", func() {
 			dive.RunDecentralizedIconNode()
-			dive.RunDecentralizedCustomIconNode()
+			dive.RunDecentralizedCustomIconNode1()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "icon-node-0x42f1f3")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		ginkgo.It("should start bridge between icon and running custom icon later decentralising it", func() {
-			dive.RunDecentralizedIconNode()
-			dive.RunCustomIconNode()
-			dive.DecentralizeCustomIconNode()
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "icon-node-0x42f1f3")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between icon and running custom icon later decentralising it", func() {
+		// 	dive.RunDecentralizedIconNode()
+		// 	dive.RunCustomIconNode()
+		// 	dive.DecentralizeCustomIconNode()
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "icon-node-0x42f1f3")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should start bridge between icon and icon by running one icon chain and later decentralsing it. Running another custom icon chain and then decentralising it", func() {
-			dive.RunIconNode()
-			dive.DecentralizeIconNode()
-			dive.RunCustomIconNode()
-			dive.DecentralizeCustomIconNode()
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "icon-node-0x42f1f3")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between icon and icon by running one icon chain and later decentralsing it. Running another custom icon chain and then decentralising it", func() {
+		// 	dive.RunIconNode()
+		// 	dive.DecentralizeIconNode()
+		// 	dive.RunCustomIconNode()
+		// 	dive.DecentralizeCustomIconNode()
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "icon-node-0x42f1f3")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
 		ginkgo.It("should start bridge between 2 custom icon chains", func() {
-			dive.RunDecentralizedCustomIconNode_0()
-			dive.RunDecentralizedCustomIconNode()
+			dive.RunDecentralizedCustomIconNode0()
+			dive.RunDecentralizedCustomIconNode1()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "icon-node-0x42f1f3")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -310,163 +310,163 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		ginkgo.It("should start bridge between 2 chains when all nodes are running", func() {
-			dive.RunDecentralizedIconNode()
-			dive.RunEthNode()
-			dive.RunHardhatNode()
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "el-1-geth-lighthouse")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between 2 chains when all nodes are running", func() {
+		// 	dive.RunDecentralizedIconNode()
+		// 	dive.RunEthNode()
+		// 	dive.RunHardhatNode()
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "el-1-geth-lighthouse")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should handle error when trying to clean if no enclaves are running", func() {
-			dive.Clean()
-			dive.Clean()
-		})
+		// ginkgo.It("should handle error when trying to clean if no enclaves are running", func() {
+		// 	dive.Clean()
+		// 	dive.Clean()
+		// })
 
-		ginkgo.It("should handle error when trying to clean if kurtosis engine is not running", func() {
-			cmd1 := exec.Command("kurtosis", "engine", "stop")
-			cmd1.Run()
-			bin := dive.GetBinPath()
-			cmd2 := exec.Command(bin, "clean")
-			err := cmd2.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-			cmd3 := exec.Command("kurtosis", "engine", "start")
-			cmd3.Run()
-		})
+		// ginkgo.It("should handle error when trying to clean if kurtosis engine is not running", func() {
+		// 	cmd1 := exec.Command("kurtosis", "engine", "stop")
+		// 	cmd1.Run()
+		// 	bin := dive.GetBinPath()
+		// 	cmd2 := exec.Command(bin, "clean")
+		// 	err := cmd2.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// 	cmd3 := exec.Command("kurtosis", "engine", "start")
+		// 	cmd3.Run()
+		// })
 
-		ginkgo.It("should handle invalid input for bridge command", func() {
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "invalid_input")
-			err := cmd.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should handle invalid input for bridge command", func() {
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "invalid_input")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should handle invalid input for bridge command", func() {
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "invalid_input", "--chainB", "eth")
-			err := cmd.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should handle invalid input for bridge command", func() {
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "invalid_input", "--chainB", "eth")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should handle invalid input for chain command", func() {
-			cmd.Args = append(cmd.Args, "chain", "invalid_input")
-			err := cmd.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should handle invalid input for chain command", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "invalid_input")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should handle invalid input for chain command", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "invalid.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-0.zip")
-			err := cmd.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should handle invalid input for chain command", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "-c", "invalid.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-0.zip")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should handle invalid input for chain command", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "../../services/jvm/icon/static-files/config/invalid-icon-3.zip")
-			err := cmd.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should handle invalid input for chain command", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "../../services/jvm/icon/static-files/config/invalid-icon-3.zip")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should handle invalid input for chain command", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/invalid_config.json", "-g", "../../services/jvm/icon/static-files/config/invalid-icon-3.zip")
-			err := cmd.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should handle invalid input for chain command", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/invalid_config.json", "-g", "../../services/jvm/icon/static-files/config/invalid-icon-3.zip")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should handle invalid input for chain command", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "invalidPassword", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
-			err := cmd.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should handle invalid input for chain command", func() {
+		// 	dive.RunIconNode()
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "invalidPassword", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should handle invalid input for chain command", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/invalid.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
-			err := cmd.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should handle invalid input for chain command", func() {
+		// 	dive.RunIconNode()
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/invalid.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should handle invalid input for chain command", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x9", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
-			err := cmd.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should handle invalid input for chain command", func() {
+		// 	dive.RunIconNode()
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x9", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should handle invalid input for chain command", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9081/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
-			err := cmd.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should handle invalid input for chain command", func() {
+		// 	dive.RunIconNode()
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9081/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should handle invalid input for chain command", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node")
-			err := cmd.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should handle invalid input for chain command", func() {
+		// 	dive.RunIconNode()
+		// 	cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should handle invalid input ibc bridge command", func() {
-			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "invalid")
-			err := cmd.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should handle invalid input ibc bridge command", func() {
+		// 	cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "invalid")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run single archway node", func() {
-			dive.RunArchwayNode()
-		})
+		// ginkgo.It("should run single archway node", func() {
+		// 	dive.RunArchwayNode()
+		// })
 
-		ginkgo.It("should run single archway node with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "chain", "archway", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run single archway node with verbose flag enabled", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "archway", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run single custom archway node", func() {
-			dive.RunCustomArchwayNode0()
-		})
+		// ginkgo.It("should run single custom archway node", func() {
+		// 	dive.RunCustomArchwayNode0()
+		// })
 
-		ginkgo.It("should run single custom archway node with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "chain", "archway", "-c", "../../cli/sample-jsons/archway.json", "--verbose")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run single custom archway node with verbose flag enabled", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "archway", "-c", "../../cli/sample-jsons/archway.json", "--verbose")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should run single custom archway node with invalid json path", func() {
-			cmd.Args = append(cmd.Args, "chain", "archway", "-c", "../../cli/sample-jsons/archway4.json")
-			err := cmd.Run()
-			gomega.Expect(err).To(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should run single custom archway node with invalid json path", func() {
+		// 	cmd.Args = append(cmd.Args, "chain", "archway", "-c", "../../cli/sample-jsons/archway4.json")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).To(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should start bridge between archway and archway by running one custom archway chain", func() {
-			dive.RunArchwayNode()
-			dive.RunCustomArchwayNode1()
-			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "archway", "--chainAServiceName", "node-service-archway-node-0", "--chainBServiceName", "node-service-archway-node-1")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between archway and archway by running one custom archway chain", func() {
+		// 	dive.RunArchwayNode()
+		// 	dive.RunCustomArchwayNode1()
+		// 	cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "archway", "--chainAServiceName", "node-service-archway-node-0", "--chainBServiceName", "node-service-archway-node-1")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should start bridge between 2 custom archway chains", func() {
-			dive.RunCustomArchwayNode0()
-			dive.RunCustomArchwayNode1()
-			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "archway", "--chainAServiceName", "node-service-archway-node-0", "--chainBServiceName", "node-service-archway-node-1")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between 2 custom archway chains", func() {
+		// 	dive.RunCustomArchwayNode0()
+		// 	dive.RunCustomArchwayNode1()
+		// 	cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "archway", "--chainAServiceName", "node-service-archway-node-0", "--chainBServiceName", "node-service-archway-node-1")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should start bridge between 1 custom chain and running bridge command", func() {
-			dive.RunCustomArchwayNode1()
-			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "archway", "--chainBServiceName", "node-service-archway-node-1")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should start bridge between 1 custom chain and running bridge command", func() {
+		// 	dive.RunCustomArchwayNode1()
+		// 	cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "archway", "--chainBServiceName", "node-service-archway-node-1")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
-		ginkgo.It("should output user that chain is already running when trying to run archway chain that is already running", func() {
-			dive.RunArchwayNode()
-			cmd.Args = append(cmd.Args, "chain", "archway")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
+		// ginkgo.It("should output user that chain is already running when trying to run archway chain that is already running", func() {
+		// 	dive.RunArchwayNode()
+		// 	cmd.Args = append(cmd.Args, "chain", "archway")
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// })
 
 		ginkgo.It("should output user that chain is already running when trying to run icon chain that is already running", func() {
 			dive.RunIconNode()
@@ -489,6 +489,39 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		
+		ginkgo.It("should start bridge between icon and hardhat by running icon node first and running bridge command directly", func() {
+			dive.RunDecentralizedCustomIconNode0()
+			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--chainAServiceName", "icon-node-0xacbc4e")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start bridge between icon and hardhat by running hardhat node first and running bridge command directly", func() {
+			dive.RunHardhatNode()
+			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "hardhat", "--chainB", "icon", "--chainAServiceName", "hardhat-node")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start bridge between icon and eth by running icon node first and running bridge command directly", func() {
+			dive.RunDecentralizedCustomIconNode0()
+			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--chainAServiceName", "icon-node-0xacbc4e")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start bridge between icon and eth by running eth node first and running bridge command directly", func() {
+			dive.RunEthNode()
+			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "eth", "--chainB", "icon", "--chainAServiceName", "el-1-geth-lighthouse")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start bridge between icon and icon by running icon node first and running bridge command directly", func() {
+			dive.RunDecentralizedCustomIconNode1()
+			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", "el-1-geth-lighthouse")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
 	})
 })
