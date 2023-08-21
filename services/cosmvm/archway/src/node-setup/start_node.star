@@ -11,12 +11,16 @@ def start_cosmos_node(plan, args):
     plan.print("Launching " + service_name + " deployment service")
 
     start_script_file = "start-script-%s" % chain_id
+    contract_files = "contract-%s" % chain_id
     plan.upload_files(src = cosmos_node_constants.start_script, name = start_script_file)
+    plan.upload_files(src=cosmos_node_constants.default_contract_path, name=contract_files)
+    
 
     cosmwasm_node_config = ServiceConfig(
         image = cosmos_node_constants.image,
         files = {
             cosmos_node_constants.path: start_script_file,
+            cosmos_node_constants.contract_path: contract_files
         },
         ports = {
            network_port_keys_and_ip.grpc: PortSpec(number = args["private_grpc"], transport_protocol =network_port_keys_and_ip.tcp.upper(), application_protocol =network_port_keys_and_ip.http),

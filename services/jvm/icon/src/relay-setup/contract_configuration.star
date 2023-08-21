@@ -293,12 +293,14 @@ def setup_contracts_for_ibc_java(plan,args):
 
     xcall_connection_address = deploy_xcall_connection(plan,args,xcall_address,ibc_core_address)
 
-    config = {
+    contracts = {
         "ibc_core": ibc_core_address,
         "xcall" : xcall_address,
         "light_client" : light_client_address,
         "xcall_connection" : xcall_connection_address
     }
+
+    return contracts
 
 def configure_connection_for_java(plan,args,xcall_address,xcall_connection_address,wasm_network_id,connection_id,counterparty_port_id, counterparty_nid, client_id, service_name, uri, keystorepath, keypassword, nid):
 
@@ -325,3 +327,40 @@ def deploy_and_configure_dapp_java(plan,args,xcall_address,wasm_network_id,java_
 
     return result
 
+def registerClient(plan,service_name, args, light_client_address, keystorepath,keystore_password ,nid, uri,ibc_core_address ):
+
+    plan.print("registering the client")
+
+    method = "registerClient"
+    params = '{"clientType":"07-tendermint","client":"%s"}' % (light_client_address)
+
+    exec_command = ["./bin/goloop", "rpc", "sendtx", "call", "--uri", uri, "--nid", nid, "--step_limit", "5000000000", "--to", ibc_core_address, "--method", method, "--params", params, "--key_store", keystorepath, "--key_password", keystore_password ]
+    plan.print(exec_command)
+    result = plan.exec(service_name=service_name, recipe=ExecRecipe(command = exec_command))
+
+    tx_hash = result["output"]
+    # tx_result = get_tx_result(plan,tx_hash,service_name,)
+    tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
+
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+
+    return tx_hash
+
+def bindPort(plan,service_name,args,xcall_conn_address,keystorepath,keystore_password,nid,uri,ibc_core_address,port_id):
+
+    plan.print("Bind Port")
+
+    password = "gochain"
+    method = "bindPort"
+    params = '{"portId":"%s", "moduleAddress":"%s"}' % (port_id,xcall_conn_address)
+
+    exec_command = ["./bin/goloop", "rpc", "sendtx", "call", "--uri", uri, "--nid", nid, "--step_limit", "5000000000", "--to", ibc_core_address, "--method", method, "--params", params, "--key_store", keystorepath, "--key_password", keystore_password ]
+    
+    result = plan.exec(service_name=service_name, recipe=ExecRecipe(command = exec_command))
+
+    tx_hash = result["output"]
+    tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
+
+    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+
+    return tx_hash
