@@ -57,6 +57,9 @@ IBC_RELAYER_SERVICE = struct(
     relay_service_image = "hugobyte/ibc-relay",
     relay_config_files_path = "/script/",
     run_file_path = "github.com/hugobyte/dive/services/bridges/ibc/static-files/run.sh",
+    relay_service_image_icon_to_cosmos = "hugobyte/icon-ibc-relay",
+    relay_service_name_icon_to_cosmos = "ibc-relayer",
+    config_file_path = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config",
 )
 
 NETWORK_PORT_KEYS_AND_IP_ADDRESS = struct(

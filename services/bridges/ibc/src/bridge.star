@@ -59,3 +59,66 @@ def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_c
     return struct(
         service_name = ibc_relay_config.relay_service_name,
     )
+
+def start_cosmos_relay_for_icon_to_cosmos(plan,args):
+
+    plan.print("starting the cosmos relay for icon to cosmos")
+
+    plan.upload_files(src=ibc_relay_config.config_file_path, name="archway_config")
+
+    relay_service = ServiceConfig(
+        image= ibc_relay_config.relay_service_image_icon_to_cosmos,
+        files= {
+            ibc_relay_config.relay_config_files_path: "archway_config"
+        },
+        entrypoint=["/bin/sh"]
+    )
+
+    plan.print(relay_service)
+
+    plan.add_service(name = ibc_relay_config.relay_service_name_icon_to_cosmos, config = relay_service)
+
+    return struct(
+        service_name = ibc_relay_config.relay_service_name_icon_to_cosmos,
+    )
+
+def setup_relay(plan,args,SEED0):
+
+    plan.print("starting the relay")
+
+    plan.exec(service_name= ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly config init"]))
+
+    plan.print("Adding the chain1")
+
+    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly chains add --file ../script/archway1.json my-chain"]))
+
+    plan.print("Adding the chain2")
+
+    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly chains add --file ../script/icon.json 0xacbc4e "]))
+
+
+    plan.print("Adding the keys")
+
+    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly keys restore my-chain fd '%s' " % (SEED0["output"])]))
+
+    # plan.exec(service_name="cosmos-relay", recipe=ExecRecipe(command=["/bin/sh", "-c", "rly keys restore chain-2 default '%s' " % (SEED1["output"])]))
+    # plan.exec(service_name="cosmos-relay", recipe=ExecRecipe(command=["/bin/sh", "-c", "rly keys add 0xacbc4e keystore --password gochain"]))
+
+    # plan.exec(service_name="cosmos-relay", recipe=ExecRecipe(command=["/bin/sh", "-c", "rly keys add 0xacbc4e keystore --password password"]))
+
+    plan.print("Adding the paths")
+
+    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly paths new 0xacbc4e my-chain demo"]))
+   
+    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly tx clients demo --client-tp 10000000m "]))
+
+    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly tx connection demo"]))
+
+    # plan.exec(service_name="cosmos-relay",recipe=ExecRecipe(command=["/bin/sh", "-c", "rly start &"]))
+
+    # plan.exec(service_name="cosmos-relay",recipe=ExecRecipe(command=["/bin/sh", "-c", "rly tx channel demo --dst-port our-port --order ordered"]))
+
+
+
+
+
