@@ -461,11 +461,34 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		ginkgo.It("should output user that chain is already running when trying to run chain that is already running", func() {
+		ginkgo.It("should output user that chain is already running when trying to run archway chain that is already running", func() {
 			dive.RunArchwayNode()
 			cmd.Args = append(cmd.Args, "chain", "archway")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
+
+		ginkgo.It("should output user that chain is already running when trying to run icon chain that is already running", func() {
+			dive.RunIconNode()
+			cmd.Args = append(cmd.Args, "chain", "icon")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should output user that chain is already running when trying to run eth chain that is already running", func() {
+			dive.RunEthNode()
+			cmd.Args = append(cmd.Args, "chain", "eth")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should output user that chain is already running when trying to run hardhat chain that is already running", func() {
+			dive.RunHardhatNode()
+			cmd.Args = append(cmd.Args, "chain", "hardhat")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		
 	})
 })
