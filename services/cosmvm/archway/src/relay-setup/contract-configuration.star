@@ -100,20 +100,20 @@ def configure_xcall_connection(plan,args,xcall_connection_address,connection_id,
 
     exec_cmd = ["/bin/sh", "-c","echo '%s'| archwayd tx wasm execute %s %s --from fd --chain-id my-chain --output json -y" % (PASSCODE,xcall_connection_address,params)]
 
-    result = plan.exec(service_name=args["service_name"], recipe=exec)
+    result = plan.exec(service_name=args["service_name"], recipe=ExecRecipe(command=exec_cmd))
 
     tx_result = check_tx_result(params,result["output"],args["service_name"])
 
     tx_hash = result["output"]
 
 
-def set_default_connection_xcall(paln,args,network_id,xcall_connection_address,xcall_address):
+def set_default_connection_xcall(plan,args,network_id,xcall_connection_address,xcall_address):
     plan.print("Set Xcall default connection ")  
     params = '{"set_default_connection":{"nid":"%s","address":"%s"}}' % (network_id,xcall_connection_address)
 
     exec_cmd = ["/bin/sh", "-c","echo '%s'| archwayd tx wasm execute %s %s --from fd --chain-id my-chain --output json -y" % (PASSCODE,xcall_address,params)]
 
-    result = plan.exec(service_name=args["service_name"], recipe=exec)
+    result = plan.exec(service_name=args["service_name"], recipe=ExecRecipe(command=exec_cmd))
 
     tx_result = check_tx_result(params,result["output"],args["service_name"])
 

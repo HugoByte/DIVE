@@ -297,10 +297,10 @@ def run_cosmos_ibc_setup(plan, args):
         config_data["contracts"][src_chain_config["service_name"]] = src_contract_address
         config_data["contracts"][dst_chain_config["service_name"]] = dst_contract_address
 
-        cosmvm_relay.start_cosmos_relay(plan, args, args_data.src, args_data.dst)
+        config_data = run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_chain_config,dst_chain_config)
+        return config_data
 
-
-
+        
 def run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_config,dst_config):
 
     src_chain_service_name = src_config["service_name"]
