@@ -39,6 +39,13 @@ func RunIconNode() {
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
+func RunArchwayNode() {
+	cmd := GetBinaryCommand()
+	cmd.Args = append(cmd.Args, "chain", "archway")
+	err := cmd.Run()
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+}
+
 func RunDecentralizedIconNode() {
 	cmd := GetBinaryCommand()
 	cmd.Args = append(cmd.Args, "chain", "icon", "-d")
@@ -56,6 +63,20 @@ func RunDecentralizedCustomIconNode() {
 func RunCustomIconNode() {
 	cmd := GetBinaryCommand()
 	cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config1.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-1.zip")
+	err := cmd.Run()
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+}
+
+func RunCustomArchwayNode1() {
+	cmd := GetBinaryCommand()
+	cmd.Args = append(cmd.Args, "chain", "archway", "-c", "../../cli/sample-jsons/archway1.json")
+	err := cmd.Run()
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+}
+
+func RunCustomArchwayNode0() {
+	cmd := GetBinaryCommand()
+	cmd.Args = append(cmd.Args, "chain", "archway", "-c", "../../cli/sample-jsons/archway.json")
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }

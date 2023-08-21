@@ -405,5 +405,67 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
+
+		ginkgo.It("should handle invalid input ibc bridge command", func() {
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "invalid")
+			err := cmd.Run()
+			gomega.Expect(err).To(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should run single archway node", func() {
+			dive.RunArchwayNode()
+		})
+
+		ginkgo.It("should run single archway node with verbose flag enabled", func() {
+			cmd.Args = append(cmd.Args, "chain", "archway", "--verbose")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should run single custom archway node", func() {
+			dive.RunCustomArchwayNode0()
+		})
+
+		ginkgo.It("should run single custom archway node with verbose flag enabled", func() {
+			cmd.Args = append(cmd.Args, "chain", "archway", "-c", "../../cli/sample-jsons/archway.json", "--verbose")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should run single custom archway node with invalid json path", func() {
+			cmd.Args = append(cmd.Args, "chain", "archway", "-c", "../../cli/sample-jsons/archway4.json")
+			err := cmd.Run()
+			gomega.Expect(err).To(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start bridge between archway and archway by running one custom archway chain", func() {
+			dive.RunArchwayNode()
+			dive.RunCustomArchwayNode1()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "archway", "--chainAServiceName", "node-service-archway-node-0", "--chainBServiceName", "node-service-archway-node-1")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start bridge between 2 custom archway chains", func() {
+			dive.RunCustomArchwayNode0()
+			dive.RunCustomArchwayNode1()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "archway", "--chainAServiceName", "node-service-archway-node-0", "--chainBServiceName", "node-service-archway-node-1")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start bridge between 1 custom chain and running bridge command", func() {
+			dive.RunCustomArchwayNode1()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "archway", "--chainBServiceName", "node-service-archway-node-1")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should output user that chain is already running when trying to run chain that is already running", func() {
+			dive.RunArchwayNode()
+			cmd.Args = append(cmd.Args, "chain", "archway")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
 	})
 })
