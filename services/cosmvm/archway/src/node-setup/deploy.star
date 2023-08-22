@@ -3,7 +3,7 @@ def deploy(plan, chain_id,chain_key, contract_name, message,service_name,passwor
 
     passcode = password
 
-    plan.exec(service_name = service_name, recipe = ExecRecipe(command = ["/bin/sh", "-c", "echo '%s' | archwayd tx wasm store  %s --from  %s --keyring-backend test --chain-id %s --gas auto --gas-adjustment 1.3 -y --output json -b block | jq -r '.logs[0].events[-1].attributes[0].value' > code_id.json " % (passcode, contract, chain_key,chain_id)]))
+    plan.exec(service_name = service_name, recipe = ExecRecipe(command = ["/bin/sh", "-c", "echo '%s' | archwayd tx wasm store  %s --from  %s --keyring-backend test --chain-id %s --gas auto --gas-adjustment 1.3 -y --output json -b block | jq -r '.logs[0].events[-1].attributes[1].value' > code_id.json " % (passcode, contract, chain_key,chain_id)]))
 
     # Getting the code id
 
