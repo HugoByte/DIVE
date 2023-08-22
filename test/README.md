@@ -14,7 +14,7 @@ To run the demo, the following software needs to be installed.
 
 ## Steps to run the script
 
-- Step 1: Run the DIVE package that spins ups two chains for sending message using BTP
+- Step 1: Run the DIVE command that spins ups two chains for sending message using BTP
 
   ![img1](img/../../img/img1%202.png)
 
@@ -32,6 +32,18 @@ To run the demo, the following software needs to be installed.
 
 > **Note:**
 > Running the demo script will copy all the dependencies required from the container. We can clean the dependencies by running `make clean-dep` command.
+
+# End-to-End archway - archway Demo
+
+## Steps to run the demo
+
+- Step 1: Run the dive command that spins ups two archway chain for sending message using IBC. Wait for the setup to be completed
+
+  ![img1](img/../../img/img4.png)
+
+- Step 2: now run the command `make run-cosmos` to execute e2e demo which transfers token from one archway chain to another.
+
+  ![img1](img/../../img/img5.png)
 
 ## Video
 
