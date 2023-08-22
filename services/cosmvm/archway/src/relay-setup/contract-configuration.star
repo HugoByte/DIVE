@@ -76,7 +76,7 @@ def deploy_xcall_dapp(plan,service_name,chain_id,chain_key,xcall_address):
 
     message = '{"address":"%s"}' % (xcall_address)
 
-    xcall_dapp_address = cosmvm_deploy.deploy(plan,chain_id,chain_key,"cw_xcall_ibc_connection", message,service_name)
+    xcall_dapp_address = cosmvm_deploy.deploy(plan,chain_id,chain_key,"cw_mock_dapp_multi", message,service_name,password)
     
     return xcall_dapp_address
 
@@ -86,7 +86,7 @@ def add_connection_xcall_dapp(plan,service_name,chain_id,chain_key,xcall_dapp_ad
 
     params = '{"add_connection":{"src_endpoint":"%s","dest_endpoint":"%s","network_id":"%s"}}' % (wasm_xcall_connection_address,xcall_connection_address,java_network_id)
 
-    exec = ExecRecipe(command=["/bin/sh", "-c", "echo '%s' | archwayd tx wasm execute \"%s\" %s --from %s --keyring-backend test --chain-id %s --output json -y" % (PASSCODE,xcall_dapp_address,params,chain_key,chain_id)])
+    exec = ExecRecipe(command=["/bin/sh", "-c", "echo '%s' | archwayd tx wasm execute %s '%s' --from %s --keyring-backend test --chain-id %s --output json -y" % (PASSCODE,xcall_dapp_address,params,chain_key,chain_id)])
     result = plan.exec(service_name=service_name, recipe=exec)
 
     tx_hash = result["output"]
@@ -99,26 +99,26 @@ def configure_xcall_connection(plan,service_name,chain_id,chain_key,xcall_connec
 
     params = '{"configure_connection":{"connection_id":"%s","counterparty_port_id":"%s","counterparty_nid":"%s","client_id":"%s","timeout_height":30000}}' % (connection_id,counterparty_port_id,counterparty_nid,client_id)
 
-    exec_cmd = ["/bin/sh", "-c","echo '%s'| archwayd tx wasm execute %s %s --from %s --keyring-backend test --chain-id %s --output json -y" % (PASSCODE,xcall_connection_address,params,chain_key,chain_id)]
+    exec_cmd = ["/bin/sh", "-c","echo '%s'| archwayd tx wasm execute %s '%s' --from %s --keyring-backend test --chain-id %s --output json -y" % (PASSCODE,xcall_connection_address,params,chain_key,chain_id)]
 
     result = plan.exec(service_name=service_name, recipe=ExecRecipe(command=exec_cmd))
 
-    tx_result = check_tx_result(params,result["output"],service_name)
+    # tx_result = check_tx_result(plan,result["output"],service_name)
 
-    tx_hash = result["output"]
+    # tx_hash = result["output"]
 
 
 def set_default_connection_xcall(plan,service_name,chain_id,chain_key,network_id,xcall_connection_address,xcall_address):
     plan.print("Set Xcall default connection ")  
     params = '{"set_default_connection":{"nid":"%s","address":"%s"}}' % (network_id,xcall_connection_address)
 
-    exec_cmd = ["/bin/sh", "-c","echo '%s'| archwayd tx wasm execute %s %s --from %s --keyring-backend test --chain-id %s --output json -y" % (PASSCODE,xcall_address,params,chain_key,chain_id)]
+    exec_cmd = ["/bin/sh", "-c","echo '%s'| archwayd tx wasm execute %s '%s' --from %s --keyring-backend test --chain-id %s --output json -y" % (PASSCODE,xcall_address,params,chain_key,chain_id)]
 
     result = plan.exec(service_name=service_name, recipe=ExecRecipe(command=exec_cmd))
 
-    tx_result = check_tx_result(params,result["output"],service_name)
+    # tx_result = check_tx_result(plan,result["output"],service_name)
 
-    tx_hash = result["output"]
+    # tx_hash = result["output"]
 
 
 def check_tx_result(plan,tx_hash,service_name):
@@ -161,15 +161,19 @@ def setup_contracts_for_ibc_wasm(plan,service_name,chain_id,chain_key,network_id
 
     return contracts
 
-def configure_connection_for_wasm(plan,service_name,chain_id,chain_key,xcall_connection_address,connection_id,counterparty_port_id, counterparty_nid, client_id,network_id,xcall_address):
+def configure_connection_for_wasm(plan,service_name,chain_id,chain_key,xcall_connection_address,connection_id,counterparty_port_id, counterparty_nid, client_id,xcall_address):
 
     plan.print("Configure Connection for Channel Steup IBC")
+
+    plan.wait(service_name,recipe=ExecRecipe(command=["/bin/sh","-c","sleep 40s && echo 'success'"]),field="code",assertion="==",target_value=0,timeout="200s")
 
     configure_xcall_connection_result  = configure_xcall_connection(plan,service_name,chain_id,chain_key,xcall_connection_address,connection_id,counterparty_port_id,counterparty_nid,client_id)
 
     plan.print(configure_xcall_connection_result)
 
-    configure_xcall_result = set_default_connection_xcall(plan,service_name,chain_id,chain_key,network_id,xcall_connection_address,xcall_address)
+    plan.wait(service_name,recipe=ExecRecipe(command=["/bin/sh","-c","sleep 40s && echo 'success'"]),field="code",assertion="==",target_value=0,timeout="200s")
+
+    configure_xcall_result = set_default_connection_xcall(plan,service_name,chain_id,chain_key,counterparty_nid,xcall_connection_address,xcall_address)
 
     plan.print(configure_xcall_result)
 

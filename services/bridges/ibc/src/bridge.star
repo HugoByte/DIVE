@@ -112,8 +112,7 @@ def start_cosmos_relay_for_icon_to_cosmos(plan,src_chain_config,dst_chain_config
             ibc_relay_config.relay_config_files_path + "wasm": "config-wasm",
             ibc_relay_config.relay_keystore_path + src_chain_config["chain_id"] : "icon-keystore"
         },
-        entrypoint=["/bin/sh"],
-        cmd=["/bin/sh","-c","apk add yq"]
+        entrypoint=["/bin/sh"]
     )
 
     plan.print(relay_service)
@@ -135,6 +134,7 @@ def setup_relay(plan,src_chain_config,dst_chain_config):
     dst_chain_key = dst_chain_config["key"]
     dst_chain_service_name = dst_chain_config["service_name"]
 
+    plan.exec(service_name= ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "apk add yq"]))
 
     seed = plan.exec(service_name=dst_chain_service_name, recipe=ExecRecipe(command=["/bin/sh", "-c", "jq -r '.mnemonic' ../../start-scripts/key_seed.json | tr -d '\n\r'"]))
     plan.print("starting the relay")

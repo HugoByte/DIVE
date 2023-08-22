@@ -255,9 +255,10 @@ def configure_xcall_connection(plan,xcall_connection_address,connection_id,count
     plan.print("Configure Xcall Connection")
 
     method = "configureConnection"
-    params = '{"connectionId":"%s","counterpartyPortId":"%s","counterpartyNid":"%s","clientId":"%s","timeoutHeight":1000000}' % (connection_id,counterparty_port_id,counterparty_nid,client_id)
+    params = '{"connectionId":"%s","counterpartyPortId":"%s","counterpartyNid":"%s","clientId":"%s","timeoutHeight":"1000000"}' % (connection_id,counterparty_port_id,counterparty_nid,client_id)
     
     exec_command = ["./bin/goloop","rpc","sendtx","call","--to",xcall_connection_address,"--method",method,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","500000000000","--nid",nid]
+    plan.print(params)
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
 
     tx_hash = result["output"].replace('"',"")
@@ -275,7 +276,7 @@ def set_default_connection_xcall(plan,xcall_address,wasm_network_id,xcall_connec
 
     exec_command = ["./bin/goloop","rpc","sendtx","call","--to",xcall_address,"--method",method,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","500000000000","--nid",nid]
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
-
+    plan.print(params)
     tx_hash = result["output"].replace('"',"")
     tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
     plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
@@ -302,7 +303,7 @@ def setup_contracts_for_ibc_java(plan,args):
 
     return contracts
 
-def configure_connection_for_java(plan,args,xcall_address,xcall_connection_address,wasm_network_id,connection_id,counterparty_port_id, counterparty_nid, client_id, service_name, uri, keystorepath, keypassword, nid):
+def configure_connection_for_java(plan,xcall_address,xcall_connection_address,wasm_network_id,connection_id,counterparty_port_id, counterparty_nid, client_id, service_name, uri, keystorepath, keypassword, nid):
 
     plan.print("configure conection fopr channel")
 

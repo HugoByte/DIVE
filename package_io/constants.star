@@ -1,5 +1,5 @@
 ICON_NODE_CLIENT = struct(
-    node_image = "iconloop/goloop-icon:v1.3.8",
+    node_image = "iconloop/goloop-icon:v1.3.9",
     config_files_directory = "/goloop/config/",
     contracts_directory = "/goloop/contracts/",
     keystore_directory = "/goloop/keystores/",
@@ -44,7 +44,7 @@ ARCHWAY_SERVICE_CONFIG = struct(
     start_script = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/start.sh",
     default_contract_path = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/contracts",
     service_name = "node-service",
-    image = "archwaynetwork/archwayd:constantine",
+    image = "archwaynetwork/archwayd:v0.3.0",
     path = "/start-scripts/",
     contract_path = "/root/contracts/",
     config_files = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/config/",
