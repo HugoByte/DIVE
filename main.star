@@ -324,7 +324,7 @@ def run_cosmos_ibc_setup(plan, args):
         config_data["contracts"][src_chain_service_name]["dapp"] = dapp_result_java["xcall_dapp"]
         config_data["contracts"][dst_chain_service_name]["dapp"] = dapp_result_wasm["xcall_dapp"]
 
-        plan.exec(service_name=relay_service_response.service_name,recipe=ExecRecipe(command=["/bin/sh","-c","rly tx start &"]))
+        plan.exec(service_name=relay_service_response.service_name,recipe=ExecRecipe(command=["/bin/sh","-c","rly start &"]))
 
         return config_data
 
