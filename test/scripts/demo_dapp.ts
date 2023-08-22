@@ -538,11 +538,11 @@ const DST = deployments.getDst();
 
 show_banner()
   .then(() => sendCallMessage(SRC, DST))
-  // .then(() => sendCallMessage(DST, SRC))
-  // .then(() => sendCallMessage(SRC, DST, "checkSuccessResponse", true))
-  // .then(() => sendCallMessage(DST, SRC, "checkSuccessResponse", true))
-  // .then(() => sendCallMessage(SRC, DST, "revertMessage", true))
-  // .then(() => sendCallMessage(DST, SRC, "revertMessage", true))
+  .then(() => sendCallMessage(DST, SRC))
+  .then(() => sendCallMessage(SRC, DST, "checkSuccessResponse", true))
+  .then(() => sendCallMessage(DST, SRC, "checkSuccessResponse", true))
+  .then(() => sendCallMessage(SRC, DST, "revertMessage", true))
+  .then(() => sendCallMessage(DST, SRC, "revertMessage", true))
   .catch((error) => {
     console.error(error);
     process.exitCode = 1;
