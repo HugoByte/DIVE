@@ -278,9 +278,9 @@ def run_cosmos_ibc_setup(plan, args):
 
         icon_setup_node.open_btp_network(plan,src_chain_service_name,src_data,src_chain_config["endpoint"],src_chain_config["keystore_path"], src_chain_config["keypassword"],src_chain_config["nid"])
 
-
-        
         icon_bind_port = icon_relay_setup.bindPort(plan,src_chain_service_name,deploy_icon_contracts["xcall_connection"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"],src_chain_config["endpoint"],deploy_icon_contracts["ibc_core"],"xcall")
+
+        icon_relay_setup.deploy_and_configure_dapp_java(plan,args,deploy_icon_contracts["xcall"],dst_chain_config.chain_id,deploy_icon_contracts["xcall_connection"],deploy_archway_contracts["xcall_connection"],src_chain_service_name,src_chain_config["endpoint"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"])
 
         
         deploy_archway_contracts = cosmvm_relay_setup.setup_contracts_for_ibc_wasm(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,dst_chain_config.chain_id,"stake","xcall")
@@ -288,6 +288,10 @@ def run_cosmos_ibc_setup(plan, args):
         cosmvm_relay_setup.registerClient(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["ibc_core"],deploy_archway_contracts["light_client"])
 
         cosmvm_relay_setup.bindPort(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["ibc_core"],deploy_archway_contracts["xcall_connection"])
+
+        cosmvm_relay_setup.deploy_and_configure_xcall_dapp(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_icon_contracts["xcall"],deploy_archway_contracts["xcall_connection"],deploy_icon_contracts["xcall_connection"],dst_chain_config.chain_id)
+
+        cosmvm_relay_setup.configure_connection_for_wasm(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["xcall_connection"],)
 
         config_data["contracts"][src_chain_service_name] = deploy_icon_contracts
         config_data["contracts"][dst_chain_service_name] = deploy_archway_contracts
@@ -309,6 +313,8 @@ def run_cosmos_ibc_setup(plan, args):
         cosmvm_relay.setup_relay(plan,src_chain_data,dst_chain_data)
 
         relay_data = get_relay_path_data(plan,relay_service_response.service_name)
+
+        c
 
         
 
