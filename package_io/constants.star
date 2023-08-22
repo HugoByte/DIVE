@@ -61,7 +61,9 @@ IBC_RELAYER_SERVICE = struct(
     relay_service_name_icon_to_cosmos = "ibc-relayer",
     config_file_path = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config",
     ibc_relay_wasm_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/archwayibc.json.tpl",
-    ibc_relay_java_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/icon.json.tpl"
+    ibc_relay_java_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/icon.json.tpl",
+    icon_keystore_file = "github.com/hugobyte/dive/services/bridges/btp/static-files/keystores/keystore.json",
+    relay_keystore_path = "/root/.relayer/keys/"
 )
 
 NETWORK_PORT_KEYS_AND_IP_ADDRESS = struct(

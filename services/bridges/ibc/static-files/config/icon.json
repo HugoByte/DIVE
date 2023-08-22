@@ -1,18 +1,18 @@
 {
-    "type": "icon",
-    "value": {
-      "key-directory": "/root/.relayer/keys",
-      "chain-id": "0xacbc4e",
-      "rpc-addr": "http://172.16.0.3:9080/api/v3/icon_dex",
-      "timeout": "30s",
-      "keystore": "keystore",
-      "password": "gochain",
-      "icon-network-id": 3,
-      "btp-network-id": 1,
-      "btp-network-type-id": 1,
-      "start-height": 0,
-      "ibc-handler-address":"",
-      "first-retry-block-after": 0,
-      "block-interval": 2000
-    }
+  "type": "icon",
+  "value": {
+    "key-directory": "/root/.relayer/keys",
+    "chain-id": "0xacbc4e",
+    "rpc-addr": "http://172.16.0.3:9080/api/v3/icon_dex",
+    "timeout": "30s",
+    "keystore": "keystore",
+    "password": "gochain",
+    "icon-network-id": 3,
+    "btp-network-id": 1,
+    "btp-network-type-id": 1,
+    "start-height": 0,
+    "ibc-handler-address": "",
+    "first-retry-block-after": 0,
+    "block-interval": 2000
   }
+}

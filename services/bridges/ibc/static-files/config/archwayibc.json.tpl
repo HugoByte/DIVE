@@ -21,6 +21,6 @@
 "ibc-handler-address":"{{.IBCADDRESS}}",
 "first-retry-block-after": 0,
 "start-height": 0,
-"block-interval": 3000
+"block-interval": 6000
 }
 }

@@ -13,6 +13,6 @@
 "start-height": 0,
 "ibc-handler-address":"{{.IBCADDRESS}}",
 "first-retry-block-after": 0,
-"block-interval": 2000
+"block-interval": 1000
 }
 }

@@ -261,10 +261,7 @@ def run_cosmos_ibc_setup(plan, args):
         config_data["chains"][dst_chain_service_name] = dst_chain_config
 
         deploy_icon_contracts = icon_relay_setup.setup_contracts_for_ibc_java(plan,src_chain_config)
-
         icon_register_client = icon_relay_setup.registerClient(plan,src_chain_service_name,deploy_icon_contracts["light_client"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"],src_chain_config["endpoint"],deploy_icon_contracts["ibc_core"])
-
-        icon_bind_port = icon_relay_setup.bindPort(plan,src_chain_service_name,deploy_icon_contracts["xcall_connection"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"],src_chain_config["endpoint"],deploy_icon_contracts["ibc_core"],"xcall")
 
         icon_setup_node.configure_node(plan,src_chain_config)
 
@@ -281,6 +278,11 @@ def run_cosmos_ibc_setup(plan, args):
 
         icon_setup_node.open_btp_network(plan,src_chain_service_name,src_data,src_chain_config["endpoint"],src_chain_config["keystore_path"], src_chain_config["keypassword"],src_chain_config["nid"])
 
+
+        
+        icon_bind_port = icon_relay_setup.bindPort(plan,src_chain_service_name,deploy_icon_contracts["xcall_connection"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"],src_chain_config["endpoint"],deploy_icon_contracts["ibc_core"],"xcall")
+
+        
         deploy_archway_contracts = cosmvm_relay_setup.setup_contracts_for_ibc_wasm(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,dst_chain_config.chain_id,"stake","xcall")
 
         cosmvm_relay_setup.registerClient(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["ibc_core"],deploy_archway_contracts["light_client"])
@@ -303,19 +305,16 @@ def run_cosmos_ibc_setup(plan, args):
             "ibc_address": deploy_archway_contracts["ibc_core"],
             "service_name": dst_chain_config.service_name
         }
-        cosmos = cosmvm_relay.start_cosmos_relay_for_icon_to_cosmos(plan,src_chain_data,dst_chain_data)
+        relay_service_response = cosmos = cosmvm_relay.start_cosmos_relay_for_icon_to_cosmos(plan,src_chain_data,dst_chain_data)
+        cosmvm_relay.setup_relay(plan,src_chain_data,dst_chain_data)
+
+        relay_data = get_relay_path_data(plan,relay_service_response.service_name)
 
         
 
-        # plan.exec(service_name="ibc-relayer", recipe=ExecRecipe(command=["/bin/sh", "-c", "sed -i -e 's|\"ibc-handler-address\":\"\"|\"ibc-handler-address\": \"'%s'\"|' ../script/icon.json" % (deploy_icon_contracts["ibc_core"])]))
-
-        # plan.exec(service_name="ibc-relayer", recipe=ExecRecipe(command=["/bin/sh", "-c", "sed -i -e 's|\"ibc-handler-address\":\"\"|\"ibc-handler-address\": \"'%s'\"|' ../script/archway1.json" % (deploy_archway_contracts["ibc_core"])]))
-
-        #  plan.exec(service_name="cosmos-relay", recipe=ExecRecipe(command=["/bin/sh", "-c", "sed -i -e 's|\"rpc-addr\": \"\"|\"rpc-addr\": \"http://'%s'\"|' ../script/chains/archway1.json" % (["endpoint"])]) )
-        cosmvm_relay.setup_relay(plan,src_chain_data,dst_chain_data)
 
 
-        # config_data = run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_chain_config,dst_chain_config)
+       
         return config_data
 
     
@@ -335,3 +334,41 @@ def run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_config,dst_co
     cosmvm_relay.start_cosmos_relay(plan, src_chain_key, src_chain_id, dst_chain_key, dst_chain_id, src_config, dst_config)
 
     return config_data
+
+def get_relay_path_data(plan,service_name):
+
+    src_chain_id_response = plan.exec(service_name=service_name,recipe=ExecRecipe(command=["/bin/sh","-c","cat /root/.relayer/config/config.yaml | yq '.paths.icon-cosmos.src.chain_id' | tr -d "]))
+    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % src_chain_id_response["output"] ])
+    src_chain_id = plan.exec(service_name=service_name,recipe=execute_cmd)
+    
+    src_client_id_response = plan.exec(service_name=service_name,recipe=ExecRecipe(command=["/bin/sh","-c","cat /root/.relayer/config/config.yaml | yq '.paths.icon-cosmos.src.client_id' | tr -d "]))
+    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % src_client_id_response["output"] ])
+    src_client_id = plan.exec(service_name=service_name,recipe=execute_cmd)
+
+    src_connection_id_response = plan.exec(service_name=service_name,recipe=ExecRecipe(command=["/bin/sh","-c","cat /root/.relayer/config/config.yaml | yq '.paths.icon-cosmos.src.connection-id' | tr -d "]))
+    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % src_connection_id_response["output"] ])
+    src_connection_id = plan.exec(service_name=service_name,recipe=execute_cmd)
+
+
+    dst_chain_id_response = plan.exec(service_name=service_name,recipe=ExecRecipe(command=["/bin/sh","-c","cat /root/.relayer/config/config.yaml | yq '.paths.icon-cosmos.dst.chain_id' | tr -d "]))
+    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % dst_chain_id_response["output"] ])
+    dst_chain_id = plan.exec(service_name=service_name,recipe=execute_cmd)
+    
+    dst_client_id_response = plan.exec(service_name=relay_service_response.service_name,recipe=ExecRecipe(command=["/bin/sh","-c","cat /root/.relayer/config/config.yaml | yq '.paths.icon-cosmos.dst.client_id' | tr -d "]))
+    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % dst_client_id_response["output"] ])
+    dst_client_id = plan.exec(service_name=relay_service_response.service_name,recipe=execute_cmd)
+
+    dst_connection_id_response = plan.exec(service_name=relay_service_response.service_name,recipe=ExecRecipe(command=["/bin/sh","-c","cat /root/.relayer/config/config.yaml | yq '.paths.icon-cosmos.dst.connection-id' | tr -d "]))
+    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % dst_connection_id_response["output"] ])
+    dst_connection_id = plan.exec(service_name=relay_service_response.service_name,recipe=execute_cmd)
+
+    config = struct(
+        src_chain_id = src_chain_id["output"],
+        src_client_id = src_client_id["output"],
+        src_connection_id = src_connection_id["output"],
+        dst_chain_id = dst_chain_id["output"]
+        dst_client_id = dst_client_id["output"]
+        dst_connection_id = dst_connection_id["output"]
+    )
+
+    return config

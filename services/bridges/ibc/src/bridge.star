@@ -65,6 +65,7 @@ def start_cosmos_relay_for_icon_to_cosmos(plan,src_chain_config,dst_chain_config
     plan.print("starting the cosmos relay for icon to cosmos")
 
     plan.upload_files(src=ibc_relay_config.config_file_path, name="archway_config")
+    plan.upload_files(src=ibc_relay_config.icon_keystore_file,name="icon-keystore")
 
     wasm_config = read_file(ibc_relay_config.ibc_relay_wasm_file_template)
     java_config = read_file(ibc_relay_config.ibc_relay_java_file_template)
@@ -108,9 +109,11 @@ def start_cosmos_relay_for_icon_to_cosmos(plan,src_chain_config,dst_chain_config
         image= ibc_relay_config.relay_service_image_icon_to_cosmos,
         files= {
             ibc_relay_config.relay_config_files_path + "icon": "config-icon",
-            ibc_relay_config.relay_config_files_path + "wasm": "config-wasm"
+            ibc_relay_config.relay_config_files_path + "wasm": "config-wasm",
+            ibc_relay_config.relay_keystore_path + src_chain_config["chain_id"] : "icon-keystore"
         },
-        entrypoint=["/bin/sh"]
+        entrypoint=["/bin/sh"],
+        cmd=["/bin/sh","-c","apk add yq"]
     )
 
     plan.print(relay_service)
@@ -152,7 +155,7 @@ def setup_relay(plan,src_chain_config,dst_chain_config):
     plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly keys restore %s %s '%s' " % (dst_chain_id,dst_chain_key,seed["output"])]))
 
     
-    plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly keys add %s keystore --password %s" % (src_chain_id,src_password)]))
+    # plan.exec(service_name=ibc_relay_config.relay_service_name_icon_to_cosmos, recipe=ExecRecipe(command=["/bin/sh", "-c", "rly keys add %s keystore --password %s" % (src_chain_id,src_password)]))
 
 
     plan.print("Adding the paths")
