@@ -53,7 +53,7 @@ func RunDecentralizedIconNode() {
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
-func RunDecentralizedCustomIconNode() {
+func RunDecentralizedCustomIconNode1() {
 	cmd := GetBinaryCommand()
 	cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config1.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-1.zip", "-d")
 	err := cmd.Run()
@@ -109,7 +109,7 @@ func RunHardhatNode() {
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
-func RunDecentralizedCustomIconNode_0() {
+func RunDecentralizedCustomIconNode0() {
 	cmd := GetBinaryCommand()
 	cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-0.zip", "-d")
 	err := cmd.Run()
