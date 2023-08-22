@@ -54,7 +54,8 @@ ARCHWAY_SERVICE_CONFIG = struct(
 IBC_RELAYER_SERVICE = struct(
     ibc_relay_config_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/archwayjson.tpl",
     relay_service_name = "cosmos-ibc-relay",
-    relay_service_image = "hugobyte/ibc-relay",
+    # updated the ibc relay image
+    relay_service_image = "hugobyte/ibc-relay:v0.1",
     relay_config_files_path = "/script/",
     run_file_path = "github.com/hugobyte/dive/services/bridges/ibc/static-files/run.sh",
 )
