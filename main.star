@@ -312,7 +312,7 @@ def run_cosmos_ibc_setup(plan, args):
 
         dapp_result_java = icon_relay_setup.deploy_and_configure_dapp_java(plan,src_chain_config,deploy_icon_contracts["xcall"],dst_chain_config.chain_id,deploy_icon_contracts["xcall_connection"],deploy_archway_contracts["xcall_connection"],src_chain_service_name,src_chain_config["endpoint"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"])
 
-        dapp_result_wasm = cosmvm_relay_setup.deploy_and_configure_xcall_dapp(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_icon_contracts["xcall"],deploy_archway_contracts["xcall_connection"],deploy_icon_contracts["xcall_connection"],src_chain_config["network"])
+        dapp_result_wasm = cosmvm_relay_setup.deploy_and_configure_xcall_dapp(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["xcall"],deploy_archway_contracts["xcall_connection"],deploy_icon_contracts["xcall_connection"],src_chain_config["network"])
 
 
         cosmvm_relay_setup.configure_connection_for_wasm(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["xcall_connection"],relay_data.dst_connection_id,"xcall",src_chain_config["network"],relay_data.dst_client_id,deploy_archway_contracts["xcall"])
@@ -324,7 +324,7 @@ def run_cosmos_ibc_setup(plan, args):
         config_data["contracts"][src_chain_service_name]["dapp"] = dapp_result_java["xcall_dapp"]
         config_data["contracts"][dst_chain_service_name]["dapp"] = dapp_result_wasm["xcall_dapp"]
 
-        plan.exec(service_name=relay_service_response.service_name,recipe=ExecRecipe(command=["/bin/sh","-c","rly start &"]))
+        # plan.exec(service_name=relay_service_response.service_name,recipe=ExecRecipe(command=["/bin/sh","-c","rly start &"]))
 
         return config_data
 

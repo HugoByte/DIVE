@@ -44,7 +44,7 @@ ARCHWAY_SERVICE_CONFIG = struct(
     start_script = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/start.sh",
     default_contract_path = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/contracts",
     service_name = "node-service",
-    image = "archwaynetwork/archwayd:v0.3.0",
+    image = "archwaynetwork/archwayd:v2.0.0",
     path = "/start-scripts/",
     contract_path = "/root/contracts/",
     config_files = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/config/",
@@ -75,12 +75,12 @@ NETWORK_PORT_KEYS_AND_IP_ADDRESS = struct(
 )
 
 ARCHAY_NODE0_CONFIG = struct(
-    chain_id = "archway-node-0",
+    chain_id = "constantine-3",
     grpc = 9090,
     http = 9091,
     tcp = 26656,
     rpc = 4564,
-    key = "archway-node-0-key",
+    key = "constantine-3-key",
     
 )
 
