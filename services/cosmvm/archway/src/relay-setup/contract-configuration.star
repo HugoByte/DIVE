@@ -52,7 +52,6 @@ def bindPort(plan,service_name,chain_id,chain_key,ibc_address,conn_address):
     plan.print("bind mock app to the port")
 
     exec = ExecRecipe(command=["/bin/sh", "-c", "echo '%s' | archwayd tx wasm execute %s '{\"bind_port\":{\"address\":\"%s\", \"port_id\":\"xcall\"}}' --from %s --keyring-backend test --chain-id %s --output json -y" % (PASSCODE,ibc_address, conn_address,chain_key,chain_id)])
-    plan.print(exec)
     result = plan.exec(service_name=service_name, recipe=exec)
    
     tx_hash = result["output"] 
@@ -65,7 +64,6 @@ def registerClient(plan,service_name,chain_id,chain_key,ibc_address,client_addre
 
     exec = ExecRecipe(command=["/bin/sh", "-c", "echo '%s' | archwayd tx wasm execute \"%s\" '{\"register_client\":{\"client_type\":\"iconclient\",\"client_address\":\"%s\"}}' --from %s --keyring-backend test --chain-id %s --output json -y" % (PASSCODE,ibc_address,client_address,chain_key,chain_id)])
     result = plan.exec(service_name=service_name, recipe=exec)
-    plan.print(exec)
     tx_hash = result["output"]
 
     return tx_hash
@@ -88,8 +86,6 @@ def add_connection_xcall_dapp(plan,service_name,chain_id,chain_key,xcall_dapp_ad
 
     exec = ExecRecipe(command=["/bin/sh", "-c", "echo '%s' | archwayd tx wasm execute %s '%s' --from %s --keyring-backend test --chain-id %s --output json -y" % (PASSCODE,xcall_dapp_address,params,chain_key,chain_id)])
     result = plan.exec(service_name=service_name, recipe=exec)
-
-    plan.print(exec)
     
     tx_hash = result["output"]
 
@@ -103,7 +99,6 @@ def configure_xcall_connection(plan,service_name,chain_id,chain_key,xcall_connec
 
     exec_cmd = ["/bin/sh", "-c","echo '%s'| archwayd tx wasm execute %s '%s' --from %s --keyring-backend test --chain-id %s --output json -y" % (PASSCODE,xcall_connection_address,params,chain_key,chain_id)]
 
-    plan.print(exec_cmd)
     result = plan.exec(service_name=service_name, recipe=ExecRecipe(command=exec_cmd))
 
     # tx_result = check_tx_result(plan,result["output"],service_name)
@@ -117,7 +112,6 @@ def set_default_connection_xcall(plan,service_name,chain_id,chain_key,network_id
 
     exec_cmd = ["/bin/sh", "-c","echo '%s'| archwayd tx wasm execute %s '%s' --from %s --keyring-backend test --chain-id %s --output json -y" % (PASSCODE,xcall_address,params,chain_key,chain_id)]
 
-    plan.print(exec_cmd)
     result = plan.exec(service_name=service_name, recipe=ExecRecipe(command=exec_cmd))
 
     # tx_result = check_tx_result(plan,result["output"],service_name)
