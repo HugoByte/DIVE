@@ -8,7 +8,7 @@ import {
   getStake,
   getTestAccountWithStake,
 } from "./helper";
-import { GasPrice, calculateFee } from "@cosmjs/stargate";
+import { fromTendermintEvent, GasPrice, calculateFee } from "@cosmjs/stargate";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import IconService from "icon-sdk-js";
 
@@ -53,8 +53,9 @@ async function main() {
     await getStake(testAddress!, accountAddress);
   }
   await new Promise((f) => setTimeout(f, 5000));
-  const data = GetDataInBytes()
-  sendMessageFromDapp(accountAddress, signingClient, data);
+  const data = GetDataInBytes();
+  const receipt = await sendMessageFromDapp(accountAddress, signingClient, data);
+  verifyCallMessageSentEvent(signingClient, receipt);
 }
 
 async function sendMessageFromDapp(
@@ -62,11 +63,11 @@ async function sendMessageFromDapp(
   signingClient: SigningCosmWasmClient,
   data: number[]
 ) {
-  const dapp = await GetCosmosContracts('dapp');
-  const iconDappAddress = await GetIconContracts('dapp')
+  const dapp = await GetCosmosContracts("dapp");
+  const iconDappAddress = await GetIconContracts("dapp");
   const execMsg = {
     send_call_message: {
-      to: "0x3.icon/" +iconDappAddress,
+      to: "0x3.icon/" + iconDappAddress,
       data: data,
     },
   };
@@ -79,7 +80,21 @@ async function sendMessageFromDapp(
     execMsg,
     defaultExecuteFee
   );
-  console.log(exeResult);
+  return exeResult;
+}
+
+async function verifyCallMessageSentEvent(
+  signingClient: SigningCosmWasmClient,
+  exeResult: any
+) {
+  const txResult = await signingClient.getTx(exeResult.transactionHash);
+  const events = txResult?.events;
+  for (const event of events!) {
+    if (event.type === 'wasm-CallMessageSent'){
+      const decodedEvent = fromTendermintEvent(event);
+      console.log(decodedEvent);
+    }
+  }
 }
 
 main();
