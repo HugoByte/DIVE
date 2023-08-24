@@ -55,7 +55,7 @@ async function main() {
   await new Promise((f) => setTimeout(f, 5000));
   const data = GetDataInBytes();
   const receipt = await sendMessageFromDapp(accountAddress, signingClient, data);
-  // verifyCallMessageEvent(signingClient, receipt);
+  verifyCallMessageSentEvent(signingClient, receipt);
 }
 
 async function sendMessageFromDapp(
@@ -83,6 +83,18 @@ async function sendMessageFromDapp(
   return exeResult;
 }
 
-
+async function verifyCallMessageSentEvent(
+  signingClient: SigningCosmWasmClient,
+  exeResult: any
+) {
+  const txResult = await signingClient.getTx(exeResult.transactionHash);
+  const events = txResult?.events;
+  for (const event of events!) {
+    if (event.type === 'wasm-CallMessageSent'){
+      const decodedEvent = fromTendermintEvent(event);
+      console.log(decodedEvent);
+    }
+  }
+}
 
 main();
