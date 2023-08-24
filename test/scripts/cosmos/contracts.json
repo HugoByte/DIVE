@@ -1,0 +1,21 @@
+{
+  "node-service-constantine-3": {
+    "contracts": {
+      "dapp": "archway1eyfccmjm6732k7wp4p6gdjwhxjwsvje44j0hfx8nkgrm8fs7vqfshgatxw",
+      "ibc_core": "archway14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sy85n2u",
+      "light_client": "archway1nc5tatafv6eyq7llkr2gv50ff9e22mnf70qgjlv737ktmt4eswrqgj33g6",
+      "xcall": "archway17p9rzwnnfxcjp32un9ug7yhhzgtkhvl9jfksztgw5uh69wac2pgssf05p7",
+      "xcall_connection": "archway1ghd753shjuwexxywmgs4xz7x2q732vcnkm6h2pyv9s6ah3hylvrqvlzdpl"
+    }
+  },
+  "icon-node-0xacbc4e": {
+    "network": "0x3.icon",
+    "contracts": {
+      "dapp": "cxb4124c501d738577ce25157a298b9e9da4cb8ebe",
+      "ibc_core": "cx1b0b737806279f789dd0d4fd6bfb59b25940a79a",
+      "light_client": "cx5b9a92fb5c76a6ac36e0a7f2278402012d4ebdd2",
+      "xcall": "cx84abe5ee4574027f26655662c0cbdb7a48869ef8",
+      "xcall_connection": "cx626b15094b38b6f7056161b09aee517778b67708"
+    }
+  }
+}
