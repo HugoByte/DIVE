@@ -2,6 +2,7 @@ import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { GasPrice } from "@cosmjs/stargate";
 import { exec } from "child_process";
+import fs from "fs";
 
 const defaultGasPrice = GasPrice.fromString("0stake");
 
@@ -44,7 +45,7 @@ export async function getStake(testaddress: string, destaddress: string) {
   console.log(dockerID);
 
   const commando = `docker exec ${dockerID} archwayd tx bank send ${testaddress} ${destaddress} 9000000stake --keyring-backend test \
-    --chain-id archway-node-0 -y`;
+    --chain-id constantine-3 -y`;
 
   exec(commando, (error, stdout, stderr) => {
     if (error) {
@@ -74,7 +75,7 @@ export async function getTestAccountWithStake(): Promise<string> {
 }
 
 export async function getContainerIdByPartialName(): Promise<string> {
-  const command = 'docker ps -aqf "name=archway-node-0"';
+  const command = 'docker ps -aqf "name=constantine-3"';
 
   return new Promise<string>((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
@@ -89,7 +90,31 @@ export async function getContainerIdByPartialName(): Promise<string> {
   });
 }
 
-export async function getBalance(client: SigningCosmWasmClient, address: string){
-    const balance = await client.getBalance(address, "stake");
-    return balance.amount
+export async function getBalance(
+  client: SigningCosmWasmClient,
+  address: string
+) {
+  const balance = await client.getBalance(address, "stake");
+  return balance.amount;
+}
+
+export async function GetCosmosContracts(contract: string) {
+  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"));
+  return dataArray["node-service-constantine-3"]["contracts"][contract];
+}
+
+export async function GetIconContracts(contract: string) {
+  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"));
+  return dataArray["icon-node-0xacbc4e"]["contracts"][contract];
+}
+
+export function GetDataInBytes() {
+  const msg = "Sending message from Cosmos to Icon0";
+  const bytes: number[] = [];
+
+  for (let i = 0; i < msg.length; i++) {
+    const charCode = msg.charCodeAt(i);
+    bytes.push(charCode);
+  }
+  return bytes;
 }
