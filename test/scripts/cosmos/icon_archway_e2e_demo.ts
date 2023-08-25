@@ -10,9 +10,6 @@ import {
 } from "./helper";
 import { fromTendermintEvent, GasPrice, calculateFee } from "@cosmjs/stargate";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import IconService from "icon-sdk-js";
-
-const { IconConverter } = IconService;
 
 // configure dotenv
 dotenv.config();
@@ -54,8 +51,13 @@ async function main() {
   }
   await new Promise((f) => setTimeout(f, 5000));
   const data = GetDataInBytes();
-  const receipt = await sendMessageFromDapp(accountAddress, signingClient, data);
-  verifyCallMessageSentEvent(signingClient, receipt);
+  const receipt = await sendMessageFromDapp(
+    accountAddress,
+    signingClient,
+    data
+  );
+  // verifyCallMessageSentEvent(signingClient, receipt);
+  verifyCallMessageEvent(signingClient);
 }
 
 async function sendMessageFromDapp(
@@ -90,9 +92,45 @@ async function verifyCallMessageSentEvent(
   const txResult = await signingClient.getTx(exeResult.transactionHash);
   const events = txResult?.events;
   for (const event of events!) {
-    if (event.type === 'wasm-CallMessageSent'){
+    if (event.type === "wasm-CallMessageSent") {
       const decodedEvent = fromTendermintEvent(event);
       console.log(decodedEvent);
+    }
+  }
+}
+
+function sleep(millis: number) {
+  return new Promise((resolve) => setTimeout(resolve, millis));
+}
+
+async function verifyCallMessageEvent(signingClient: SigningCosmWasmClient) {
+  waitForEvent(signingClient,"wasm-CallMessage")
+  
+}
+
+async function waitForEvent(signingClient: SigningCosmWasmClient, eventName: string) {
+  let height = await signingClient.getHeight();
+  let flag = false
+  while (!flag) {
+    console.log(height)
+    let tmp = height;
+    const query = `tx.height=` + height;
+    await sleep(5000);
+    const txs = await signingClient.searchTx(query);
+    if (txs.length > 0) {
+      for (const tx of txs) {
+        const events = tx.events;
+        for (const event of events) {
+          if (event.type === eventName) {
+            const decodedEvent = fromTendermintEvent(event);
+            console.log(decodedEvent);
+            flag = true
+          }
+        }
+      }
+    }
+    while (height < tmp + 1) {
+      height = await signingClient.getHeight();
     }
   }
 }
