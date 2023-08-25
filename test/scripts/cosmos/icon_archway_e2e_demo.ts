@@ -52,12 +52,12 @@ async function main() {
   }
   await new Promise((f) => setTimeout(f, 5000));
   const data = GetDataInBytes();
-  // const receipt = await sendMessageFromDapp(
-  //   accountAddress,
-  //   signingClient,
-  //   data
-  // );
-  // verifyCallMessageSentEvent(signingClient, receipt);
+  const receipt = await sendMessageFromDapp(
+    accountAddress,
+    signingClient,
+    data
+  );
+  verifyCallMessageSentEvent(signingClient, receipt);
   const [reqId, dataObject] = await verifyCallMessageEvent(signingClient);
   executeCall(signingClient, reqId, dataObject, accountAddress);
 }
@@ -152,7 +152,6 @@ async function executeCall(
   accountAddress: string
 ) {
   const xcall = await GetCosmosContracts("xcall");
-  // const dataInString = String(data);
   const execMsg = {
     execute_call: {
       request_id: reqId.toString(),
