@@ -10,6 +10,7 @@ import {
 } from "./helper";
 import { fromTendermintEvent, GasPrice, calculateFee } from "@cosmjs/stargate";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { sign } from "crypto";
 
 // configure dotenv
 dotenv.config();
@@ -51,13 +52,14 @@ async function main() {
   }
   await new Promise((f) => setTimeout(f, 5000));
   const data = GetDataInBytes();
-  const receipt = await sendMessageFromDapp(
-    accountAddress,
-    signingClient,
-    data
-  );
-  verifyCallMessageSentEvent(signingClient, receipt);
-  verifyCallMessageEvent(signingClient);
+  // const receipt = await sendMessageFromDapp(
+  //   accountAddress,
+  //   signingClient,
+  //   data
+  // );
+  // verifyCallMessageSentEvent(signingClient, receipt);
+  const [reqId, dataObject] = await verifyCallMessageEvent(signingClient);
+  executeCall(signingClient, reqId, dataObject, accountAddress);
 }
 
 async function sendMessageFromDapp(
@@ -104,15 +106,22 @@ function sleep(millis: number) {
 }
 
 async function verifyCallMessageEvent(signingClient: SigningCosmWasmClient) {
-  waitForEvent(signingClient,"wasm-CallMessage")
-  
+  const event = await waitForEvent(signingClient, "wasm-CallMessage");
+  console.log("*****");
+  console.log(event?.attributes);
+  const reqIdObject = event?.attributes.find((item) => item.key === "reqId");
+  const dataObject = event?.attributes.find((item) => item.key === "data");
+  return [reqIdObject?.value, dataObject?.value];
 }
 
-async function waitForEvent(signingClient: SigningCosmWasmClient, eventName: string) {
+async function waitForEvent(
+  signingClient: SigningCosmWasmClient,
+  eventName: string
+) {
   let height = await signingClient.getHeight();
-  let flag = false
+  let flag = false;
   while (!flag) {
-    console.log(height)
+    console.log(height);
     let tmp = height;
     const query = `tx.height=` + height;
     await sleep(5000);
@@ -123,8 +132,9 @@ async function waitForEvent(signingClient: SigningCosmWasmClient, eventName: str
         for (const event of events) {
           if (event.type === eventName) {
             const decodedEvent = fromTendermintEvent(event);
-            console.log(decodedEvent);
-            flag = true
+            flag = true;
+            // console.log(decodedEvent);
+            return decodedEvent;
           }
         }
       }
@@ -133,6 +143,35 @@ async function waitForEvent(signingClient: SigningCosmWasmClient, eventName: str
       height = await signingClient.getHeight();
     }
   }
+}
+
+async function executeCall(
+  signingClient: SigningCosmWasmClient,
+  reqId: any,
+  data: any,
+  accountAddress: string
+) {
+  const xcall = await GetCosmosContracts("xcall");
+  // const dataInString = String(data);
+  const execMsg = {
+    execute_call: {
+      request_id: reqId.toString(),
+      data: JSON.parse(data)
+    },
+  };
+
+  console.log(execMsg);
+
+  // To Execute Contract
+  const defaultExecuteFee = calculateFee(1_500_000, defaultGasPrice);
+  const exeResult = await signingClient.execute(
+    accountAddress,
+    xcall,
+    execMsg,
+    defaultExecuteFee
+  );
+  console.log(exeResult)
+  return exeResult;
 }
 
 main();
