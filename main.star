@@ -306,9 +306,9 @@ def run_cosmos_ibc_setup(plan, args):
             "service_name": dst_chain_config.service_name
         }
         relay_service_response = cosmvm_relay.start_cosmos_relay_for_icon_to_cosmos(plan,src_chain_data,dst_chain_data)
-        cosmvm_relay.setup_relay(plan,src_chain_data,dst_chain_data)
+        path_name = cosmvm_relay.setup_relay(plan,src_chain_data,dst_chain_data)
 
-        relay_data = get_relay_path_data(plan,relay_service_response.service_name)
+        relay_data = cosmvm_relay.get_relay_path_data(plan,relay_service_response.service_name,path_name)
 
         dapp_result_java = icon_relay_setup.deploy_and_configure_dapp_java(plan,src_chain_config,deploy_icon_contracts["xcall"],dst_chain_config.chain_id,deploy_icon_contracts["xcall_connection"],deploy_archway_contracts["xcall_connection"],src_chain_service_name,src_chain_config["endpoint"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"])
 
@@ -319,12 +319,13 @@ def run_cosmos_ibc_setup(plan, args):
 
         icon_relay_setup.configure_connection_for_java(plan,deploy_icon_contracts["xcall"],deploy_icon_contracts["xcall_connection"],dst_chain_config.chain_id,relay_data.src_connection_id,"xcall",dst_chain_config.chain_id,relay_data.src_client_id,src_chain_service_name,src_chain_config["endpoint"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"])
 
-        plan.exec(service_name=relay_service_response.service_name,recipe=ExecRecipe(command=["/bin/sh","-c","rly tx chan icon-cosmos --src-port=xcall --dst-port=xcall"]))
 
         config_data["contracts"][src_chain_service_name]["dapp"] = dapp_result_java["xcall_dapp"]
         config_data["contracts"][dst_chain_service_name]["dapp"] = dapp_result_wasm["xcall_dapp"]
 
-        # plan.exec(service_name=relay_service_response.service_name,recipe=ExecRecipe(command=["/bin/sh","-c","rly start &"]))
+        cosmvm_relay.start_channel(plan,relay_service_response.service_name,path_name,"xcall","xcall")
+
+        cosmvm_relay.start_relay(plan,relay_service_response.service_name)
 
         return config_data
 
@@ -345,41 +346,3 @@ def run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_config,dst_co
     cosmvm_relay.start_cosmos_relay(plan, src_chain_key, src_chain_id, dst_chain_key, dst_chain_id, src_config, dst_config)
 
     return config_data
-
-def get_relay_path_data(plan,service_name):
-
-    src_chain_id_response = plan.exec(service_name=service_name,recipe=ExecRecipe(command=["/bin/sh","-c","cat /root/.relayer/config/config.yaml | yq '.paths.icon-cosmos.src.chain-id'"]))
-    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % src_chain_id_response["output"] ])
-    src_chain_id = plan.exec(service_name=service_name,recipe=execute_cmd)
-    
-    src_client_id_response = plan.exec(service_name=service_name,recipe=ExecRecipe(command=["/bin/sh","-c","cat /root/.relayer/config/config.yaml | yq '.paths.icon-cosmos.src.client-id'"]))
-    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % src_client_id_response["output"] ])
-    src_client_id = plan.exec(service_name=service_name,recipe=execute_cmd)
-
-    src_connection_id_response = plan.exec(service_name=service_name,recipe=ExecRecipe(command=["/bin/sh","-c","cat /root/.relayer/config/config.yaml | yq '.paths.icon-cosmos.src.connection-id'"]))
-    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % src_connection_id_response["output"] ])
-    src_connection_id = plan.exec(service_name=service_name,recipe=execute_cmd)
-
-
-    dst_chain_id_response = plan.exec(service_name=service_name,recipe=ExecRecipe(command=["/bin/sh","-c","cat /root/.relayer/config/config.yaml | yq '.paths.icon-cosmos.dst.chain-id'"]))
-    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % dst_chain_id_response["output"] ])
-    dst_chain_id = plan.exec(service_name=service_name,recipe=execute_cmd)
-    
-    dst_client_id_response = plan.exec(service_name=service_name,recipe=ExecRecipe(command=["/bin/sh","-c","cat /root/.relayer/config/config.yaml | yq '.paths.icon-cosmos.dst.client-id'"]))
-    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % dst_client_id_response["output"] ])
-    dst_client_id = plan.exec(service_name=service_name,recipe=execute_cmd)
-
-    dst_connection_id_response = plan.exec(service_name=service_name,recipe=ExecRecipe(command=["/bin/sh","-c","cat /root/.relayer/config/config.yaml | yq '.paths.icon-cosmos.dst.connection-id'"]))
-    execute_cmd = ExecRecipe(command=["/bin/sh", "-c","echo \"%s\" | tr -d '\n\r'" % dst_connection_id_response["output"] ])
-    dst_connection_id = plan.exec(service_name=service_name,recipe=execute_cmd)
-
-    config = struct(
-        src_chain_id = src_chain_id["output"],
-        src_client_id = src_client_id["output"],
-        src_connection_id = src_connection_id["output"],
-        dst_chain_id = dst_chain_id["output"],
-        dst_client_id = dst_client_id["output"],
-        dst_connection_id = dst_connection_id["output"]
-    )
-
-    return config
