@@ -56,7 +56,7 @@ async function main() {
     signingClient,
     data
   );
-  // verifyCallMessageSentEvent(signingClient, receipt);
+  verifyCallMessageSentEvent(signingClient, receipt);
   verifyCallMessageEvent(signingClient);
 }
 
