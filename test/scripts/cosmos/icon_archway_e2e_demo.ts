@@ -60,11 +60,11 @@ async function main() {
     rbData
   );
   verifyCallMessageSentEvent(signingClient, receipt);
-  // const [reqId, dataObject] = await verifyCallMessageEvent(signingClient);
-  // await executeCall(signingClient, reqId, dataObject, accountAddress);
-  // await verifyCallExecutedEvent(signingClient)
+  const [reqId, dataObject] = await verifyCallMessageEvent(signingClient);
+  await executeCall(signingClient, reqId, dataObject, accountAddress);
+  await verifyCallExecutedEvent(signingClient)
   const seqNo = await verifyResponseMessageEvent(signingClient)
-  // await verifyRollbackMessageEvent(signingClient)
+  await verifyRollbackMessageEvent(signingClient)
   await executeRollback(signingClient,accountAddress, seqNo)
   await rollbackExecutedEvent(signingClient)
 }
