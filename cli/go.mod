@@ -6,7 +6,7 @@ require (
 	github.com/briandowns/spinner v1.23.0
 	github.com/fatih/color v1.15.0
 	github.com/google/go-github v17.0.0+incompatible
-	github.com/kurtosis-tech/kurtosis/api/golang v0.81.6
+	github.com/kurtosis-tech/kurtosis/api/golang v0.82.5
 	github.com/kurtosis-tech/stacktrace v0.0.0-20211028211901-1c67a77b5409
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/sirupsen/logrus v1.9.3
@@ -19,7 +19,7 @@ require (
 	github.com/adrg/xdg v0.4.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/kurtosis-tech/kurtosis/contexts-config-store v0.0.0-20230808185538-e8f34ef3d33c // indirect
+	github.com/kurtosis-tech/kurtosis/contexts-config-store v0.0.0-20230818184218-f4e3e773463b // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/stretchr/testify v1.8.3 // indirect
@@ -37,7 +37,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/klauspost/compress v1.11.4 // indirect
 	github.com/klauspost/pgzip v1.2.5 // indirect
-	github.com/kurtosis-tech/kurtosis-portal/api/golang v0.0.0-20230712110324-ce92904bb514 // indirect
+	github.com/kurtosis-tech/kurtosis-portal/api/golang v0.0.0-20230818182330-1a86869414d2 // indirect
 	github.com/kurtosis-tech/kurtosis/grpc-file-transfer/golang v0.0.0-20230803130419-099ee7a4e3dc // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect

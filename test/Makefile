@@ -56,6 +56,11 @@ GINKGO:
 remove-bin:
 	@cd $(CURDIR)/../cli && rm -rf dive
 
+run-cosmos:
+	@echo "Running e2e demo cosmos"
+	@cd $(CURDIR)/scripts/cosmos && npx ts-node archway_e2e_demo.ts
+
+
 
 
 
