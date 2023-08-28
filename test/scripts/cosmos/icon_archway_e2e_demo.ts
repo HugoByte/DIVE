@@ -63,8 +63,9 @@ async function main() {
   const [reqId, dataObject] = await verifyCallMessageEvent(signingClient);
   await executeCall(signingClient, reqId, dataObject, accountAddress);
   await verifyCallExecutedEvent(signingClient)
-  await verifyResponseMessageEvent(signingClient)
+  const seqNo = await verifyResponseMessageEvent(signingClient)
   await verifyRollbackMessageEvent(signingClient)
+  await executeRollback(signingClient,accountAddress, seqNo)
 }
 
 async function sendMessageFromDapp(
@@ -167,8 +168,6 @@ async function executeCall(
     },
   };
 
-  console.log(execMsg);
-
   // To Execute Contract
   const defaultExecuteFee = calculateFee(1_500_000, defaultGasPrice);
   const exeResult = await signingClient.execute(
@@ -182,19 +181,47 @@ async function executeCall(
 }
 
 async function verifyCallExecutedEvent(signingClient: SigningCosmWasmClient) {
-  const event = await waitForEvent(signingClient, "wasm-RollbackMessage");
+  const event = await waitForEvent(signingClient, "wasm-CallExecuted");
   console.log(event);
 }
 
 async function verifyResponseMessageEvent(signingClient: SigningCosmWasmClient) {
+  console.log("************ ResponseMEssage Event*****************")
   const event = await waitForEvent(signingClient, "wasm-ResponseMessage");
   console.log(event);
+  const seqNo = event?.attributes.find((item) => item.key === "sn");
+  return seqNo?.value
+
 }
 
 async function verifyRollbackMessageEvent(signingClient: SigningCosmWasmClient) {
+  console.log("************ RollbackMEssage Event*****************")
   const event = await waitForEvent(signingClient, "wasm-RollbackMessage");
   console.log(event);
 }
 
+async function executeRollback(signingClient: SigningCosmWasmClient, accountAddress:string, seqNo: any) {
+  console.log("************ Execute rollback message*****************")
+  const xcall = await GetCosmosContracts("xcall");
+  const execMsg = {
+    execute_rollback: {
+      sequence_no: seqNo.toString(),
+    },
+  };
+
+  // To Execute Contract
+  const defaultExecuteFee = calculateFee(1_500_000, defaultGasPrice);
+  const exeResult = await signingClient.execute(
+    accountAddress,
+    xcall,
+    execMsg,
+    defaultExecuteFee
+  );
+  console.log("executeRollback transactioin Hash: " +exeResult.transactionHash)
+  return exeResult;
+}
+
+
 main();
+
 
