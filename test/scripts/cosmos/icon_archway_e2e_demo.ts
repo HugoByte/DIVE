@@ -50,22 +50,27 @@ async function main() {
     await getStake(testAddress!, accountAddress);
   }
   await new Promise((f) => setTimeout(f, 5000));
-  const data = GetDataInBytes();
+  const data = GetDataInBytes("Sending message from Cosmos to Icon0");
+  const rbData = GetDataInBytes("RollBack Data")
+  console.log(data);
   const receipt = await sendMessageFromDapp(
     accountAddress,
     signingClient,
-    data
+    data,
+    rbData
   );
   verifyCallMessageSentEvent(signingClient, receipt);
   const [reqId, dataObject] = await verifyCallMessageEvent(signingClient);
   await executeCall(signingClient, reqId, dataObject, accountAddress);
   await verifyCallExecutedEvent(signingClient)
+  await verifyResponseMessageEvent(signingClient)
 }
 
 async function sendMessageFromDapp(
   accountAddress: string,
   signingClient: SigningCosmWasmClient,
-  data: number[]
+  data: number[],
+  rbData: number[]
 ) {
   const dapp = await GetCosmosContracts("dapp");
   const iconDappAddress = await GetIconContracts("dapp");
@@ -73,6 +78,7 @@ async function sendMessageFromDapp(
     send_call_message: {
       to: "0x3.icon/" + iconDappAddress,
       data: data,
+      rollback: rbData
     },
   };
 
@@ -129,6 +135,7 @@ async function waitForEvent(
     if (txs.length > 0) {
       for (const tx of txs) {
         const events = tx.events;
+        console.log(events)
         for (const event of events) {
           if (event.type === eventName) {
             const decodedEvent = fromTendermintEvent(event);
@@ -174,10 +181,15 @@ async function executeCall(
 }
 
 async function verifyCallExecutedEvent(signingClient: SigningCosmWasmClient) {
-  const event = await waitForEvent(signingClient, "wasm-CallExecuted");
+  const event = await waitForEvent(signingClient, "wasm-RollbackMessage");
   console.log(event);
 }
 
 main();
 
+
+async function verifyResponseMessageEvent(signingClient: SigningCosmWasmClient) {
+  const event = await waitForEvent(signingClient, "wasm-ResponseMessage");
+  console.log(event);
+}
 
