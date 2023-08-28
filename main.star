@@ -8,6 +8,7 @@ btp_bridge = import_module("github.com/hugobyte/dive/services/bridges/btp/src/br
 input_parser = import_module("github.com/hugobyte/dive/package_io/input_parser.star")
 cosmvm_node = import_module("github.com/hugobyte/dive/services/cosmvm/cosmvm.star")
 cosmvm_relay = import_module("github.com/hugobyte/dive/services/bridges/ibc/src/bridge.star")
+cosmvm_relay_setup = import_module("github.com/hugobyte/dive/services/cosmvm/archway/src/relay-setup/contract-configuration.star")
 
 def run(plan, args):
     return parse_input(plan, args)
@@ -48,13 +49,17 @@ def parse_input(plan, args):
 
             return data
 
-        elif args["relay"]["name"] == "cosmos":
+        elif args["relay"]["name"] == "ibc":
             data = run_cosmos_ibc_setup(plan, args["relay"])
 
             return data
 
         else:
             fail("More Relay Support will be added soon")
+    if args["action"] == "start_relay":
+        if args["relay"]["name"] == "ibc":
+            service_name = args["relay"]["service"]
+            cosmvm_relay.start_relay(plan,service_name)
 
 def run_node(plan, node_name, args):
     if node_name == "icon":
@@ -245,6 +250,90 @@ def run_cosmos_ibc_setup(plan, args):
         config_data = run_cosmos_ibc_relay_for_already_running_chains(plan,links,data.src_config,data.dst_config)
         return config_data
 
+    if destination_chain == "archway":
+
+        src_chain_config = icon_service.start_node_service(plan)
+        data = {"data":{}}
+        dst_chain_config = cosmvm_node.start_cosmvm_chains(plan, destination_chain,data) 
+
+        src_chain_service_name = src_chain_config["service_name"]
+        dst_chain_service_name = dst_chain_config.service_name
+
+        config_data = input_parser.generate_new_config_data(links, src_chain_service_name, dst_chain_service_name,"")
+
+        config_data["chains"][src_chain_service_name] = src_chain_config
+        config_data["chains"][dst_chain_service_name] = dst_chain_config
+
+        deploy_icon_contracts = icon_relay_setup.setup_contracts_for_ibc_java(plan,src_chain_config)
+        icon_register_client = icon_relay_setup.registerClient(plan,src_chain_service_name,deploy_icon_contracts["light_client"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"],src_chain_config["endpoint"],deploy_icon_contracts["ibc_core"])
+
+        icon_setup_node.configure_node(plan,src_chain_config)
+
+        src_chain_last_block_height = icon_setup_node.get_last_block(plan,src_chain_service_name)
+
+        plan.print("source block height %s" % src_chain_last_block_height)
+
+        network_name = "{0}-{1}".format("dst_chain_network_name",src_chain_last_block_height)
+
+        src_data = {
+            "name"  : network_name,
+            "owner" : deploy_icon_contracts["ibc_core"] 
+        }
+
+        icon_setup_node.open_btp_network(plan,src_chain_service_name,src_data,src_chain_config["endpoint"],src_chain_config["keystore_path"], src_chain_config["keypassword"],src_chain_config["nid"])
+
+        icon_bind_port = icon_relay_setup.bindPort(plan,src_chain_service_name,deploy_icon_contracts["xcall_connection"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"],src_chain_config["endpoint"],deploy_icon_contracts["ibc_core"],"xcall")
+
+        deploy_archway_contracts = cosmvm_relay_setup.setup_contracts_for_ibc_wasm(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,dst_chain_config.chain_id,"stake","xcall")
+
+        cosmvm_relay_setup.registerClient(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["ibc_core"],deploy_archway_contracts["light_client"])
+
+        plan.wait(service_name=dst_chain_service_name,recipe=ExecRecipe(command=["/bin/sh","-c","sleep 10s && echo 'success'"]),field="code",assertion="==",target_value=0,timeout="200s")
+
+        cosmvm_relay_setup.bindPort(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["ibc_core"],deploy_archway_contracts["xcall_connection"])
+
+
+        config_data["contracts"][src_chain_service_name] = deploy_icon_contracts
+        config_data["contracts"][dst_chain_service_name] = deploy_archway_contracts
+
+        src_chain_data = {
+            "chain_id": "0xacbc4e",
+            "rpc_address": src_chain_config["endpoint"],
+            "ibc_address": deploy_icon_contracts["ibc_core"],
+            "password" : src_chain_config["keypassword"]
+        }
+        dst_chain_data = {
+            "chain_id": dst_chain_config.chain_id,
+            "key": dst_chain_config.chain_key,
+            "rpc_address": dst_chain_config.endpoint,
+            "ibc_address": deploy_archway_contracts["ibc_core"],
+            "service_name": dst_chain_config.service_name
+        }
+        relay_service_response = cosmvm_relay.start_cosmos_relay_for_icon_to_cosmos(plan,src_chain_data,dst_chain_data)
+        path_name = cosmvm_relay.setup_relay(plan,src_chain_data,dst_chain_data)
+
+        relay_data = cosmvm_relay.get_relay_path_data(plan,relay_service_response.service_name,path_name)
+
+        dapp_result_java = icon_relay_setup.deploy_and_configure_dapp_java(plan,src_chain_config,deploy_icon_contracts["xcall"],dst_chain_config.chain_id,deploy_icon_contracts["xcall_connection"],deploy_archway_contracts["xcall_connection"],src_chain_service_name,src_chain_config["endpoint"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"])
+
+        dapp_result_wasm = cosmvm_relay_setup.deploy_and_configure_xcall_dapp(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["xcall"],deploy_archway_contracts["xcall_connection"],deploy_icon_contracts["xcall_connection"],src_chain_config["network"])
+
+
+        cosmvm_relay_setup.configure_connection_for_wasm(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["xcall_connection"],relay_data.dst_connection_id,"xcall",src_chain_config["network"],relay_data.dst_client_id,deploy_archway_contracts["xcall"])
+
+        icon_relay_setup.configure_connection_for_java(plan,deploy_icon_contracts["xcall"],deploy_icon_contracts["xcall_connection"],dst_chain_config.chain_id,relay_data.src_connection_id,"xcall",dst_chain_config.chain_id,relay_data.src_client_id,src_chain_service_name,src_chain_config["endpoint"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"])
+
+
+        config_data["contracts"][src_chain_service_name]["dapp"] = dapp_result_java["xcall_dapp"]
+        config_data["contracts"][dst_chain_service_name]["dapp"] = dapp_result_wasm["xcall_dapp"]
+
+        cosmvm_relay.start_channel(plan,relay_service_response.service_name,path_name,"xcall","xcall")
+
+
+        return config_data
+
+    
+        
 def run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_config,dst_config):
 
     src_chain_service_name = src_config["service_name"]
@@ -260,3 +349,4 @@ def run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_config,dst_co
     cosmvm_relay.start_cosmos_relay(plan, src_chain_key, src_chain_id, dst_chain_key, dst_chain_id, src_config, dst_config)
 
     return config_data
+    

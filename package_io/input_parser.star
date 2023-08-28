@@ -38,7 +38,9 @@ def get_args_data(args):
     )
 
 def generate_new_config_data(links, srcchain_service_name, dst_chain_service_name, bridge):
-    config_data = {
+    config_data = "" 
+    if bridge == "":
+        config_data = {
         "links": links,
         "chains": {
             "%s" % srcchain_service_name: {},
@@ -48,8 +50,21 @@ def generate_new_config_data(links, srcchain_service_name, dst_chain_service_nam
             "%s" % srcchain_service_name: {},
             "%s" % dst_chain_service_name: {},
         },
+        }
+    else:
+
+        config_data = {
+         "links": links,
+        "chains": {
+            "%s" % srcchain_service_name: {},
+            "%s" % dst_chain_service_name: {},
+        },
+        "contracts": {
+            "%s" % srcchain_service_name: {},
+            "%s" % dst_chain_service_name: {},
+        },
         "bridge": bridge,
-    }
+        }
 
     return config_data
 

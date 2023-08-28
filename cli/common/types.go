@@ -212,42 +212,28 @@ func WriteToServiceFile(serviceName string, data DiveserviceResponse) error {
 		return err
 	}
 
-	if len(jsonDataFromFile) != 0 {
-		_, ok := jsonDataFromFile[serviceName]
-		if !ok {
-			jsonDataFromFile[serviceName] = &data
-			dataTowrite, err := json.Marshal(jsonDataFromFile)
-			if err != nil {
-				return err
-			}
+	if len(jsonDataFromFile) == 0 {
+		jsonDataFromFile = Services{}
+	}
 
-			_, err = file.WriteAt(dataTowrite, 0)
+	var dataToWrite []byte
 
-			if err != nil {
-				return err
-			}
-
-			return nil
+	_, ok := jsonDataFromFile[serviceName]
+	if !ok {
+		jsonDataFromFile[serviceName] = &data
+		dataToWrite, err = json.Marshal(jsonDataFromFile)
+		if err != nil {
+			return err
 		}
-
-	}
-	newServices := Services{}
-
-	newServices[serviceName] = &data
-
-	dataTowrite, err := json.Marshal(newServices)
-	if err != nil {
-		return err
 	}
 
-	_, err = file.Write(dataTowrite)
+	_, err = file.Write(dataToWrite)
 
 	if err != nil {
 		return err
 	}
 
 	return nil
-
 }
 
 func ReadServiceJsonFile() (Services, error) {
