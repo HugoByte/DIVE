@@ -72,7 +72,7 @@ func NewArchwayCmd(diveContext *common.DiveContext) *cobra.Command {
 			diveContext.StopSpinner("Archdiveway Node Started. Please find service details in current working directory(services.json)")
 		},
 	}
-	archwayCmd.Flags().StringVarP(&config, "config", "c", "", "provide config to start archway node ")
+	archwayCmd.Flags().StringVarP(&config, "config", "c", "", "path to custom config json file to start archway node ")
 
 	return archwayCmd
 }
