@@ -59,7 +59,8 @@ async function main() {
   );
   verifyCallMessageSentEvent(signingClient, receipt);
   const [reqId, dataObject] = await verifyCallMessageEvent(signingClient);
-  executeCall(signingClient, reqId, dataObject, accountAddress);
+  await executeCall(signingClient, reqId, dataObject, accountAddress);
+  await verifyCallExecutedEvent(signingClient)
 }
 
 async function sendMessageFromDapp(
@@ -169,8 +170,15 @@ async function executeCall(
     execMsg,
     defaultExecuteFee
   );
-  console.log(exeResult)
+  console.log("executeCall transactioin Hash: " +exeResult.transactionHash)
   return exeResult;
 }
 
+async function verifyCallExecutedEvent(signingClient: SigningCosmWasmClient) {
+  const event = await waitForEvent(signingClient, "wasm-CallExecuted");
+  console.log(event);
+}
+
 main();
+
+
