@@ -64,6 +64,7 @@ async function main() {
   await executeCall(signingClient, reqId, dataObject, accountAddress);
   await verifyCallExecutedEvent(signingClient)
   await verifyResponseMessageEvent(signingClient)
+  
 }
 
 async function sendMessageFromDapp(
@@ -185,11 +186,15 @@ async function verifyCallExecutedEvent(signingClient: SigningCosmWasmClient) {
   console.log(event);
 }
 
-main();
-
-
 async function verifyResponseMessageEvent(signingClient: SigningCosmWasmClient) {
   const event = await waitForEvent(signingClient, "wasm-ResponseMessage");
   console.log(event);
 }
+
+async function verifyRollbackMessageEvent(signingClient: SigningCosmWasmClient) {
+  const event = await waitForEvent(signingClient, "wasm-RollbackMessage");
+  console.log(event);
+}
+
+main();
 
