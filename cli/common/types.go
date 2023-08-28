@@ -227,8 +227,6 @@ func WriteToServiceFile(serviceName string, data DiveserviceResponse) error {
 		}
 	}
 
-	fmt.Println(string(dataToWrite))
-
 	_, err = file.Write(dataToWrite)
 
 	if err != nil {
