@@ -66,6 +66,7 @@ async function main() {
   const seqNo = await verifyResponseMessageEvent(signingClient)
   await verifyRollbackMessageEvent(signingClient)
   await executeRollback(signingClient,accountAddress, seqNo)
+  await rollbackExecutedEvent(signingClient)
 }
 
 async function sendMessageFromDapp(
@@ -221,7 +222,12 @@ async function executeRollback(signingClient: SigningCosmWasmClient, accountAddr
   return exeResult;
 }
 
+async function rollbackExecutedEvent(signingClient: SigningCosmWasmClient) {
+  console.log("************ RollbackMEssage Event*****************")
+  const event = await waitForEvent(signingClient, "wasm-RollbackExecuted");
+  console.log(event);
+}
+
 
 main();
-
 
