@@ -55,6 +55,11 @@ func stratIbcRelay(diveContext *common.DiveContext, enclaveContext *enclaves.Enc
 	var starlarkExecutionResponse string
 	var err error
 
+	err = chains.checkForIbcSupportedChains()
+	if err != nil {
+		diveContext.FatalError(err.Error(), fmt.Sprintf("Supported chains are %v", supportedChainsForIbc))
+	}
+
 	if chains.chainAServiceName != "" && chains.chainBServiceName != "" {
 
 		srcChainServiceResponse, dstChainServiceResponse, err := chains.getServicesResponse()
