@@ -75,20 +75,20 @@ func (chains *Chains) getServicesResponse() (string, string, error) {
 
 func (chains *Chains) checkForBtpSupportedChains() error {
 	if !slices.Contains(suppottedChainsForBtp, chains.chainA) {
-		return fmt.Errorf("invalid Chain %s", chains.chainA)
+		return fmt.Errorf("invalid Chain: %s", chains.chainA)
 	}
 	if !slices.Contains(suppottedChainsForBtp, chains.chainB) {
-		return fmt.Errorf("invalid Chain %s", chains.chainB)
+		return fmt.Errorf("invalid Chain: %s", chains.chainB)
 	}
 	return nil
 }
 
 func (chains *Chains) checkForIbcSupportedChains() error {
 	if !slices.Contains(supportedChainsForIbc, chains.chainA) {
-		return fmt.Errorf("invalid Chain %s", chains.chainA)
+		return fmt.Errorf("invalid Chain: %s", chains.chainA)
 	}
 	if !slices.Contains(supportedChainsForIbc, chains.chainB) {
-		return fmt.Errorf("invalid Chain %s", chains.chainB)
+		return fmt.Errorf("invalid Chain: %s", chains.chainB)
 	}
 	return nil
 }
