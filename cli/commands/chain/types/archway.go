@@ -69,7 +69,7 @@ func NewArchwayCmd(diveContext *common.DiveContext) *cobra.Command {
 
 			common.WriteToServiceFile(runResponse.ServiceName, *runResponse)
 
-			diveContext.StopSpinner("Archyway Node Started. Please find service details in current working directory(services.json)")
+			diveContext.StopSpinner("Archdiveway Node Started. Please find service details in current working directory(services.json)")
 		},
 	}
 	archwayCmd.Flags().StringVarP(&config, "config", "c", "", "provide config to start archway node ")
@@ -170,12 +170,14 @@ func runArchwayWithDefaultServiceConfig(diveContext *common.DiveContext, enclave
 
 	}
 
-	nodeServiceResponseData, _, _, err := diveContext.GetSerializedData(nodeServiceResponse)
+	nodeServiceResponseData, services, skippedInstructions, err := diveContext.GetSerializedData(nodeServiceResponse)
 	if err != nil {
 
-		return "", err
+		diveContext.StopServices(services)
+		diveContext.FatalError("Starlark Run Failed", err.Error())
 
 	}
+	diveContext.CheckInstructionSkipped(skippedInstructions, "Archway Node Already Running")
 
 	return nodeServiceResponseData, nil
 }
