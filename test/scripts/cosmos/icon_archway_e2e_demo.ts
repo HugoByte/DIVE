@@ -64,7 +64,7 @@ async function main() {
   await executeCall(signingClient, reqId, dataObject, accountAddress);
   await verifyCallExecutedEvent(signingClient)
   await verifyResponseMessageEvent(signingClient)
-  
+  await verifyRollbackMessageEvent(signingClient)
 }
 
 async function sendMessageFromDapp(
