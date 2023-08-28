@@ -50,7 +50,6 @@ def generate_new_config_data(links, srcchain_service_name, dst_chain_service_nam
             "%s" % srcchain_service_name: {},
             "%s" % dst_chain_service_name: {},
         },
-        "bridge": bridge,
         }
     else:
 

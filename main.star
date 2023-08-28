@@ -56,6 +56,10 @@ def parse_input(plan, args):
 
         else:
             fail("More Relay Support will be added soon")
+    if args["action"] == "start_relay":
+        if args["relay"]["name"] == "ibc":
+            service_name = args["relay"]["service"]
+            cosmvm_relay.start_relay(plan,service_name)
 
 def run_node(plan, node_name, args):
     if node_name == "icon":
@@ -325,7 +329,6 @@ def run_cosmos_ibc_setup(plan, args):
 
         cosmvm_relay.start_channel(plan,relay_service_response.service_name,path_name,"xcall","xcall")
 
-        cosmvm_relay.start_relay(plan,relay_service_response.service_name)
 
         return config_data
 
@@ -346,3 +349,4 @@ def run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_config,dst_co
     cosmvm_relay.start_cosmos_relay(plan, src_chain_key, src_chain_id, dst_chain_key, dst_chain_id, src_config, dst_config)
 
     return config_data
+    

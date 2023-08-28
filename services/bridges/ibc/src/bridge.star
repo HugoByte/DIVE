@@ -215,5 +215,5 @@ def start_channel(plan,service_name,path_name,src_port,dst_port):
 
 def start_relay(plan,service_name):
 
-    plan.print("Starting Relay")    
-    plan.exec(service_name=service_name,recipe=ExecRecipe(command=["/bin/sh","-c","ln -sf /proc/1/fd/1 /root/.relayer/relay.log && nohup rly start 1>&2 &"]))
+    plan.print("Starting Relay")   
+    plan.exec(service_name=service_name,recipe=ExecRecipe(command=["/bin/sh","-c","ln -sf /proc/1/fd/1 /root/.relayer/relay.log && rly start 1>&2"]))
