@@ -69,7 +69,7 @@ func NewArchwayCmd(diveContext *common.DiveContext) *cobra.Command {
 
 			common.WriteToServiceFile(runResponse.ServiceName, *runResponse)
 
-			diveContext.StopSpinner("Archdiveway Node Started. Please find service details in current working directory(services.json)")
+			diveContext.StopSpinner("Archway Node Started. Please find service details in current working directory(services.json)")
 		},
 	}
 	archwayCmd.Flags().StringVarP(&config, "config", "c", "", "path to custom config json file to start archway node ")
