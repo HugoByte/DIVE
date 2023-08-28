@@ -108,8 +108,7 @@ export async function GetIconContracts(contract: string) {
   return dataArray["icon-node-0xacbc4e"]["contracts"][contract];
 }
 
-export function GetDataInBytes() {
-  const msg = "Sending message from Cosmos to Icon0";
+export function GetDataInBytes(msg: string) {
   const bytes: number[] = [];
 
   for (let i = 0; i < msg.length; i++) {

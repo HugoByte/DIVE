@@ -518,8 +518,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		})
 
 		ginkgo.It("should start bridge between icon and icon by running icon node first and running bridge command directly", func() {
-			dive.RunDecentralizedCustomIconNode1()
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", "el-1-geth-lighthouse")
+			dive.RunDecentralizedCustomIconNode0()
+			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", "icon-node-0xacbc4e")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
