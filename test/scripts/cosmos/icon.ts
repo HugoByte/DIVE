@@ -146,7 +146,6 @@ function parseCallMessageSentEvent(event: any) {
 export async function waitEvent(sig: string, contract_address: string) {
   let latest = await ICON_SERVICE.getLastBlock().execute();
   let height = latest.height - 1;
-  // console.log(latest);
   const heights = BigNumber.isBigNumber(height)
     ? height
     : new BigNumber(height as number);
@@ -278,16 +277,11 @@ async function verifyRollbackMessageEventIcon(){
     ICON_XCALL
   );
   if (events.length > 0) {
-    // const indexed = events[0].indexed || [];
-    // const data = events[0].data || [];
-    // const event = {
-    //   _sn: IconConverter.toNumber(indexed[1]),
-    //   _code: IconConverter.toNumber(data[0]),
-    // }
+    const indexed = events[0].indexed || [];
+    const event = {
+      _sn: IconConverter.toNumber(indexed[1]),
+    }
     console.log(events);
-    // return {
-    //   _sn: event._sn,
-    // };
   }
 
 }
@@ -319,6 +313,23 @@ async function executeRollback(seqNo: number) {
   }
 }
 
+async function verifyRollbackExecutedEventIcon(){
+  let events = await waitEvent(
+    "RollbackExecuted(int)",
+    ICON_XCALL
+  );
+  if (events.length > 0) {
+    const indexed = events[0].indexed || [];
+    const event = {
+      _sn: IconConverter.toNumber(indexed[1]),
+    }
+    console.log(events);
+    return {
+      _sn: event._sn,
+    };
+  }
+}
+
 async function main() {
   const _to = `${NETWORK_LABEL_DESTINATION}/${DESTINATION_DAPP}`;
   const _data = strToHex("rollback");
@@ -338,20 +349,20 @@ async function main() {
   console.log("parsedEvent", parsedEvent);
 
   // // Verify CallMessage event
-  // const callMsgEvent = await verifyCallMessageEventIcon();
-  // const request_id = callMsgEvent!._reqId;
-  // const Data = callMsgEvent!._data;
+  const callMsgEvent = await verifyCallMessageEventIcon();
+  const request_id = callMsgEvent!._reqId;
+  const Data = callMsgEvent!._data;
 
   // // Execute Call
-  // const execReceipt = await executeCall(request_id, Data);
-  // await sleep(5000);
-  // const execResult = await ICON_SERVICE.getTransactionResult(
-  //   execReceipt
-  // ).execute();
-  // console.log(execResult);
+  const execReceipt = await executeCall(request_id, Data);
+  await sleep(5000);
+  const execResult = await ICON_SERVICE.getTransactionResult(
+    execReceipt
+  ).execute();
+  console.log(execResult);
 
   // // verify Call Executed Event
-  // await verifyCallExecutedEventIcon(execResult.eventLogs);
+  await verifyCallExecutedEventIcon(execResult.eventLogs);
 
   // verify Response Message Event
   const seqNo = await verifyResponseMessageEventIcon()
@@ -363,6 +374,9 @@ async function main() {
   // Execute Rollback
   const execRollback = await executeRollback(seqNo?._sn!)
   console.log(execRollback);
+
+  //verify rollbackExecuted event 
+  await verifyRollbackExecutedEventIcon()
 }
 
 main();
