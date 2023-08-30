@@ -212,6 +212,35 @@ async function verifyCallMessageEventIcon(){
   }
 }
 
+async function executeCall(reqId: number,data: string){
+  try {
+    const fee = await getFee();
+
+    const params = {
+      _reqId: `${reqId.toString()}`,
+      _data: data,
+    };
+    const txObj = new CallTransactionBuilder()
+      .from(ICON_WALLET.getAddress())
+      .to(ICON_XCALL)
+      .method("executeCall")
+      .params(params)
+      .stepLimit(IconConverter.toBigNumber(5000000000))
+      .nid(IconConverter.toBigNumber(NID))
+      .nonce(IconConverter.toBigNumber(1))
+      .version(IconConverter.toBigNumber(3))
+      .timestamp(new Date().getTime() * 1000)
+      .value(fee)
+      .build();
+
+    const signedTx = new SignedTransaction(txObj, ICON_WALLET);
+    return await ICON_SERVICE.sendTransaction(signedTx).execute();
+  } catch (e) {
+    console.log(e);
+    throw new Error("Error calling contract method");
+  }
+}
+
 async function main() {
   const _to = `${NETWORK_LABEL_DESTINATION}/${DESTINATION_DAPP}`;
   const _data = strToHex("Hello World from Icon");
@@ -231,7 +260,14 @@ async function main() {
 
   // Verify CallMessage event 
   const callMsgEvent= await verifyCallMessageEventIcon()
-  console.log(callMsgEvent?._reqId)
+  const request_id = callMsgEvent!._reqId
+  const Data = callMsgEvent!._data
+
+  // Execute Call
+  const execReceipt = await executeCall(request_id, Data)
+  await sleep(5000);
+  const execResult = await ICON_SERVICE.getTransactionResult(execReceipt).execute();
+  console.log(execResult)
 
 }
 
