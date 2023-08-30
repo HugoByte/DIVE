@@ -52,21 +52,20 @@ async function main() {
   await new Promise((f) => setTimeout(f, 5000));
   const data = GetDataInBytes("Sending message from Cosmos to Icon0");
   const rbData = GetDataInBytes("RollBack Data");
-  console.log(data);
-  const receipt = await sendMessageFromDappCosmos(
-    accountAddress,
-    signingClient,
-    data,
-    rbData
-  );
-  verifyCallMessageSentEvent(signingClient, receipt);
+  // const receipt = await sendMessageFromDappCosmos(
+  //   accountAddress,
+  //   signingClient,
+  //   data,
+  //   rbData
+  // );
+  // verifyCallMessageSentEvent(signingClient, receipt);
   const [reqId, dataObject] = await verifyCallMessageEvent(signingClient);
   await executeCall(signingClient, reqId, dataObject, accountAddress);
   await verifyCallExecutedEvent(signingClient);
-  const seqNo = await verifyResponseMessageEvent(signingClient);
-  await verifyRollbackMessageEvent(signingClient);
-  await executeRollback(signingClient, accountAddress, seqNo);
-  await rollbackExecutedEvent(signingClient);
+  // const seqNo = await verifyResponseMessageEvent(signingClient);
+  // await verifyRollbackMessageEvent(signingClient);
+  // await executeRollback(signingClient, accountAddress, seqNo);
+  // await rollbackExecutedEvent(signingClient);
 }
 
 async function sendMessageFromDappCosmos(

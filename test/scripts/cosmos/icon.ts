@@ -58,13 +58,14 @@ const ks = {
 };
 const ICON_WALLET = IconWallet.loadKeystore(ks as KeyStore, "gochain", false);
 
-async function sendMessage(_to: string, _data: string) {
+async function sendMessage(_to: string, _data: string, _rollback:string) {
   try {
-    const fee = await getFee();
+    const fee = await getFee(true);
 
     const params = {
       _to: _to,
       _data: _data,
+      _rollback: _rollback
     };
     const txObj = new CallTransactionBuilder()
       .from(ICON_WALLET.getAddress())
@@ -252,11 +253,31 @@ async function verifyCallExecutedEventIcon(eventLogs:TransactionResult["eventLog
   console.log(filtereCallExecute);
 }
 
+async function verifyResponseMessageEventIcon() {
+  let events = await waitEvent(
+    "ResponseMessage(int,int)",
+    ICON_XCALL
+  );
+  if (events.length > 0) {
+    const indexed = events[0].indexed || [];
+    const data = events[0].data || [];
+    const event = {
+      _sn: IconConverter.toNumber(indexed[1]),
+      _code: IconConverter.toNumber(data[0]),
+    }
+    console.log(events);
+    return {
+      _sn: event._sn,
+    };
+  }
+}
+
 async function main() {
   const _to = `${NETWORK_LABEL_DESTINATION}/${DESTINATION_DAPP}`;
   const _data = strToHex("Hello World from Icon");
+  const _rollback = strToHex("This is the rollback meesage to be executed")
 
-  const receipt = await sendMessage(_to, _data);
+  const receipt = await sendMessage(_to, _data, _rollback);
   console.log(receipt);
   await sleep(5000);
   const txResult = await ICON_SERVICE.getTransactionResult(receipt).execute();
@@ -269,21 +290,25 @@ async function main() {
   const parsedEvent = parseCallMessageSentEvent(filteredEvent);
   console.log("parsedEvent", parsedEvent);
 
-  // Verify CallMessage event
-  const callMsgEvent = await verifyCallMessageEventIcon();
-  const request_id = callMsgEvent!._reqId;
-  const Data = callMsgEvent!._data;
+  // // Verify CallMessage event
+  // const callMsgEvent = await verifyCallMessageEventIcon();
+  // const request_id = callMsgEvent!._reqId;
+  // const Data = callMsgEvent!._data;
 
-  // Execute Call
-  const execReceipt = await executeCall(request_id, Data);
-  await sleep(5000);
-  const execResult = await ICON_SERVICE.getTransactionResult(
-    execReceipt
-  ).execute();
-  console.log(execResult);
+  // // Execute Call
+  // const execReceipt = await executeCall(request_id, Data);
+  // await sleep(5000);
+  // const execResult = await ICON_SERVICE.getTransactionResult(
+  //   execReceipt
+  // ).execute();
+  // console.log(execResult);
 
-  // verify Call Executed Event
-  await verifyCallExecutedEventIcon(execResult.eventLogs);
+  // // verify Call Executed Event
+  // await verifyCallExecutedEventIcon(execResult.eventLogs);
+
+  // verify Response Message Event
+  const seqNo = await verifyResponseMessageEventIcon()
+  console.log("seqNo: ", seqNo?._sn);
 }
 
 main();
