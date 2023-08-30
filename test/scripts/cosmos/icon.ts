@@ -272,9 +272,56 @@ async function verifyResponseMessageEventIcon() {
   }
 }
 
+async function verifyRollbackMessageEventIcon(){
+  let events = await waitEvent(
+    "RollbackMessage(int)",
+    ICON_XCALL
+  );
+  if (events.length > 0) {
+    // const indexed = events[0].indexed || [];
+    // const data = events[0].data || [];
+    // const event = {
+    //   _sn: IconConverter.toNumber(indexed[1]),
+    //   _code: IconConverter.toNumber(data[0]),
+    // }
+    console.log(events);
+    // return {
+    //   _sn: event._sn,
+    // };
+  }
+
+}
+
+async function executeRollback(seqNo: number) {
+  try {
+    const fee = await getFee();
+    const params = {
+      _sn: `${seqNo.toString()}`,
+    };
+    const txObj = new CallTransactionBuilder()
+      .from(ICON_WALLET.getAddress())
+      .to(ICON_XCALL)
+      .method("executeRollback")
+      .params(params)
+      .stepLimit(IconConverter.toBigNumber(5000000000))
+      .nid(IconConverter.toBigNumber(NID))
+      .nonce(IconConverter.toBigNumber(1))
+      .version(IconConverter.toBigNumber(3))
+      .timestamp(new Date().getTime() * 1000)
+      .value(fee)
+      .build();
+
+    const signedTx = new SignedTransaction(txObj, ICON_WALLET);
+    return await ICON_SERVICE.sendTransaction(signedTx).execute();
+  } catch (e) {
+    console.log(e);
+    throw new Error("Error calling contract method");
+  }
+}
+
 async function main() {
   const _to = `${NETWORK_LABEL_DESTINATION}/${DESTINATION_DAPP}`;
-  const _data = strToHex("Hello World from Icon");
+  const _data = strToHex("rollback");
   const _rollback = strToHex("This is the rollback meesage to be executed")
 
   const receipt = await sendMessage(_to, _data, _rollback);
@@ -309,6 +356,13 @@ async function main() {
   // verify Response Message Event
   const seqNo = await verifyResponseMessageEventIcon()
   console.log("seqNo: ", seqNo?._sn);
+
+  // verify Rollback Message Event
+  await verifyRollbackMessageEventIcon()
+
+  // Execute Rollback
+  const execRollback = await executeRollback(seqNo?._sn!)
+  console.log(execRollback);
 }
 
 main();
