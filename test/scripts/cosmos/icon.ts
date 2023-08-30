@@ -69,7 +69,7 @@ async function sendMessage(_to: string, _data: string) {
     };
     const txObj = new CallTransactionBuilder()
       .from(ICON_WALLET.getAddress())
-      .to(DESTINATION_DAPP)
+      .to(ICON_DAPP)
       .method("sendMessage")
       .params(params)
       .stepLimit(IconConverter.toBigNumber(5000000000))
@@ -192,6 +192,26 @@ async function filterEventFromBlock(
   });
 }
 
+async function verifyCallMessageEventIcon(){
+  let events = await waitEvent("CallMessage(str,str,int,int,bytes)", ICON_XCALL);
+  if (events.length > 0) {
+    const indexed = events[0].indexed || [];
+    const data = events[0].data || [];
+    const event = {
+      _from: indexed[1],
+      _to: indexed[2],
+      _sn: IconConverter.toNumber(indexed[3]),
+      _reqId: IconConverter.toNumber(data[0]),
+      _data: data[1],
+    };
+    console.log(event)
+    return {
+      _reqId: event._reqId,
+      _data: event._data
+    };
+  }
+}
+
 async function main() {
   const _to = `${NETWORK_LABEL_DESTINATION}/${DESTINATION_DAPP}`;
   const _data = strToHex("Hello World from Icon");
@@ -208,20 +228,11 @@ async function main() {
   // parsing the CallMessageSent event logs
   const parsedEvent = parseCallMessageSentEvent(filteredEvent);
   console.log("parsedEvent", parsedEvent);
-  let events = await waitEvent("CallMessage(str,str,int,int,bytes)", ICON_XCALL);
-  if (events.length > 0) {
-    const indexed = events[0].indexed || [];
-    const data = events[0].data || [];
-    const event = {
-      _from: indexed[1],
-      _to: indexed[2],
-      _sn: IconConverter.toNumber(indexed[3]),
-      _reqId: IconConverter.toNumber(data[0]),
-      _data: data[1],
-    };
-    console.log("_reqId: " + event._reqId);
-    console.log("_data: " + event._data);
-  }
+
+  // Verify CallMessage event 
+  const callMsgEvent= await verifyCallMessageEventIcon()
+  console.log(callMsgEvent?._reqId)
+
 }
 
 main();
