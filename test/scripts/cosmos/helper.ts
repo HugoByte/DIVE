@@ -98,12 +98,12 @@ export async function getBalance(
   return balance.amount;
 }
 
-export async function GetCosmosContracts(contract: string) {
+export function GetCosmosContracts(contract: string) {
   var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"));
   return dataArray["node-service-constantine-3"]["contracts"][contract];
 }
 
-export async function GetIconContracts(contract: string) {
+export function GetIconContracts(contract: string) {
   var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"));
   return dataArray["icon-node-0xacbc4e"]["contracts"][contract];
 }

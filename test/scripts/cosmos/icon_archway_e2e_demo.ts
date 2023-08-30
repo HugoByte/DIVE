@@ -51,9 +51,9 @@ async function main() {
   }
   await new Promise((f) => setTimeout(f, 5000));
   const data = GetDataInBytes("Sending message from Cosmos to Icon0");
-  const rbData = GetDataInBytes("RollBack Data")
+  const rbData = GetDataInBytes("RollBack Data");
   console.log(data);
-  const receipt = await sendMessageFromDapp(
+  const receipt = await sendMessageFromDappCosmos(
     accountAddress,
     signingClient,
     data,
@@ -62,14 +62,14 @@ async function main() {
   verifyCallMessageSentEvent(signingClient, receipt);
   const [reqId, dataObject] = await verifyCallMessageEvent(signingClient);
   await executeCall(signingClient, reqId, dataObject, accountAddress);
-  await verifyCallExecutedEvent(signingClient)
-  const seqNo = await verifyResponseMessageEvent(signingClient)
-  await verifyRollbackMessageEvent(signingClient)
-  await executeRollback(signingClient,accountAddress, seqNo)
-  await rollbackExecutedEvent(signingClient)
+  await verifyCallExecutedEvent(signingClient);
+  const seqNo = await verifyResponseMessageEvent(signingClient);
+  await verifyRollbackMessageEvent(signingClient);
+  await executeRollback(signingClient, accountAddress, seqNo);
+  await rollbackExecutedEvent(signingClient);
 }
 
-async function sendMessageFromDapp(
+async function sendMessageFromDappCosmos(
   accountAddress: string,
   signingClient: SigningCosmWasmClient,
   data: number[],
@@ -81,7 +81,7 @@ async function sendMessageFromDapp(
     send_call_message: {
       to: "0x3.icon/" + iconDappAddress,
       data: data,
-      rollback: rbData
+      rollback: rbData,
     },
   };
 
@@ -138,12 +138,11 @@ async function waitForEvent(
     if (txs.length > 0) {
       for (const tx of txs) {
         const events = tx.events;
-        console.log(events)
+        console.log(events);
         for (const event of events) {
           if (event.type === eventName) {
             const decodedEvent = fromTendermintEvent(event);
             flag = true;
-            // console.log(decodedEvent);
             return decodedEvent;
           }
         }
@@ -165,7 +164,7 @@ async function executeCall(
   const execMsg = {
     execute_call: {
       request_id: reqId.toString(),
-      data: JSON.parse(data)
+      data: JSON.parse(data),
     },
   };
 
@@ -177,7 +176,7 @@ async function executeCall(
     execMsg,
     defaultExecuteFee
   );
-  console.log("executeCall transactioin Hash: " +exeResult.transactionHash)
+  console.log("executeCall transactioin Hash: " + exeResult.transactionHash);
   return exeResult;
 }
 
@@ -186,23 +185,30 @@ async function verifyCallExecutedEvent(signingClient: SigningCosmWasmClient) {
   console.log(event);
 }
 
-async function verifyResponseMessageEvent(signingClient: SigningCosmWasmClient) {
-  console.log("************ ResponseMEssage Event*****************")
+async function verifyResponseMessageEvent(
+  signingClient: SigningCosmWasmClient
+) {
+  console.log("************ ResponseMEssage Event*****************");
   const event = await waitForEvent(signingClient, "wasm-ResponseMessage");
   console.log(event);
   const seqNo = event?.attributes.find((item) => item.key === "sn");
-  return seqNo?.value
-
+  return seqNo?.value;
 }
 
-async function verifyRollbackMessageEvent(signingClient: SigningCosmWasmClient) {
-  console.log("************ RollbackMEssage Event*****************")
+async function verifyRollbackMessageEvent(
+  signingClient: SigningCosmWasmClient
+) {
+  console.log("************ RollbackMEssage Event*****************");
   const event = await waitForEvent(signingClient, "wasm-RollbackMessage");
   console.log(event);
 }
 
-async function executeRollback(signingClient: SigningCosmWasmClient, accountAddress:string, seqNo: any) {
-  console.log("************ Execute rollback message*****************")
+async function executeRollback(
+  signingClient: SigningCosmWasmClient,
+  accountAddress: string,
+  seqNo: any
+) {
+  console.log("************ Execute rollback message*****************");
   const xcall = await GetCosmosContracts("xcall");
   const execMsg = {
     execute_rollback: {
@@ -218,16 +224,16 @@ async function executeRollback(signingClient: SigningCosmWasmClient, accountAddr
     execMsg,
     defaultExecuteFee
   );
-  console.log("executeRollback transactioin Hash: " +exeResult.transactionHash)
+  console.log(
+    "executeRollback transactioin Hash: " + exeResult.transactionHash
+  );
   return exeResult;
 }
 
 async function rollbackExecutedEvent(signingClient: SigningCosmWasmClient) {
-  console.log("************ RollbackMEssage Event*****************")
+  console.log("************ RollbackMEssage Event*****************");
   const event = await waitForEvent(signingClient, "wasm-RollbackExecuted");
   console.log(event);
 }
 
-
 main();
-
