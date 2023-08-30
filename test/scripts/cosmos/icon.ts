@@ -23,13 +23,12 @@ export class EventLog {
 
 const { CallTransactionBuilder, CallBuilder } = IconBuilder;
 
-
 const ICON_RPC_URL = "http://localhost:8090/api/v3/icon_dex";
 const NID = "0x3";
-const ICON_XCALL = GetIconContracts('xcall')
-const ICON_DAPP = GetIconContracts('dapp');
+const ICON_XCALL = GetIconContracts("xcall");
+const ICON_DAPP = GetIconContracts("dapp");
 const NETWORK_LABEL_DESTINATION = "constantine-3";
-const DESTINATION_DAPP = GetCosmosContracts('dapp')
+const DESTINATION_DAPP = GetCosmosContracts("dapp");
 const callMessageSentSignature = "CallMessageSent(Address,str,int)";
 
 const HTTP_PROVIDER = new HttpProvider(ICON_RPC_URL);
@@ -192,8 +191,11 @@ async function filterEventFromBlock(
   });
 }
 
-async function verifyCallMessageEventIcon(){
-  let events = await waitEvent("CallMessage(str,str,int,int,bytes)", ICON_XCALL);
+async function verifyCallMessageEventIcon() {
+  let events = await waitEvent(
+    "CallMessage(str,str,int,int,bytes)",
+    ICON_XCALL
+  );
   if (events.length > 0) {
     const indexed = events[0].indexed || [];
     const data = events[0].data || [];
@@ -204,15 +206,15 @@ async function verifyCallMessageEventIcon(){
       _reqId: IconConverter.toNumber(data[0]),
       _data: data[1],
     };
-    console.log(event)
+    console.log(event);
     return {
       _reqId: event._reqId,
-      _data: event._data
+      _data: event._data,
     };
   }
 }
 
-async function executeCall(reqId: number,data: string){
+async function executeCall(reqId: number, data: string) {
   try {
     const fee = await getFee();
 
@@ -241,6 +243,15 @@ async function executeCall(reqId: number,data: string){
   }
 }
 
+async function verifyCallExecutedEventIcon(eventLogs:TransactionResult["eventLogs"]) {
+  const filtereCallExecute = filterEvent(
+    eventLogs,
+    "CallExecuted(int,int,str)",
+    ICON_XCALL
+  );  
+  console.log(filtereCallExecute);
+}
+
 async function main() {
   const _to = `${NETWORK_LABEL_DESTINATION}/${DESTINATION_DAPP}`;
   const _data = strToHex("Hello World from Icon");
@@ -258,17 +269,21 @@ async function main() {
   const parsedEvent = parseCallMessageSentEvent(filteredEvent);
   console.log("parsedEvent", parsedEvent);
 
-  // Verify CallMessage event 
-  const callMsgEvent= await verifyCallMessageEventIcon()
-  const request_id = callMsgEvent!._reqId
-  const Data = callMsgEvent!._data
+  // Verify CallMessage event
+  const callMsgEvent = await verifyCallMessageEventIcon();
+  const request_id = callMsgEvent!._reqId;
+  const Data = callMsgEvent!._data;
 
   // Execute Call
-  const execReceipt = await executeCall(request_id, Data)
+  const execReceipt = await executeCall(request_id, Data);
   await sleep(5000);
-  const execResult = await ICON_SERVICE.getTransactionResult(execReceipt).execute();
-  console.log(execResult)
+  const execResult = await ICON_SERVICE.getTransactionResult(
+    execReceipt
+  ).execute();
+  console.log(execResult);
 
+  // verify Call Executed Event
+  await verifyCallExecutedEventIcon(execResult.eventLogs);
 }
 
 main();
