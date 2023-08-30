@@ -11,11 +11,11 @@
   "icon-node-0xacbc4e": {
     "network": "0x3.icon",
     "contracts": {
-      "dapp": "cxb4124c501d738577ce25157a298b9e9da4cb8ebe",
-      "ibc_core": "cx1b0b737806279f789dd0d4fd6bfb59b25940a79a",
-      "light_client": "cx5b9a92fb5c76a6ac36e0a7f2278402012d4ebdd2",
-      "xcall": "cx84abe5ee4574027f26655662c0cbdb7a48869ef8",
-      "xcall_connection": "cx626b15094b38b6f7056161b09aee517778b67708"
+      "dapp": "cx5daa87ca057b824c0771b68391e6b4767ee4a928",
+      "ibc_core": "cxb5ba9824fbac0d8559504804d5224d9dc9c9ffe9",
+      "light_client": "cx55b3d7ae642ab8db9614946d0b83953e1a26b02d",
+      "xcall": "cx54a4b1d02be781ce7e3c8b1df6f294ba656d98e8",
+      "xcall_connection": "cx9eb3f276557b8057e3bb44f378b5cf8bf6c71b6f"
     }
   }
 }
