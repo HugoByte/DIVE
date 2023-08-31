@@ -5,7 +5,7 @@ import IconService, {
   KeyStore,
   TransactionResult,
 } from "icon-sdk-js";
-import { GetArchwayChainInfo, GetCosmosContracts, GetIconChainInfo, GetIconContracts } from "./helper";
+import { GetArchwayChainInfo, GetCosmosContracts, GetIconChainInfo, GetIconContracts, strToHex } from "./helper";
 
 const {
   IconBuilder,
@@ -64,20 +64,19 @@ const ks = {
 };
 const ICON_WALLET = IconWallet.loadKeystore(ks as KeyStore, "gochain", false);
 
-async function sendMessage(_to: string, _data: string, _rollback:string) {
+async function sendMessage(_to: string, _data: string, _rollback?: string, isRollback?: boolean) {
   try {
-    const fee = await getFee(true);
-
-    const params = {
-      _to: _to,
-      _data: _data,
-      _rollback: _rollback
-    };
+    const fee = await getFee(isRollback);
+    const rollbackData = isRollback ? `ThisIsRollbackMessage_Icon` : true;
+    const _params = _rollback
+      ? {_to: _to, _data: _data, _rollback: IconConverter.toHex(_rollback)}
+      : {_to: _to, _data: _data}
+    console.log("params: \n", _params)
     const txObj = new CallTransactionBuilder()
       .from(ICON_WALLET.getAddress())
       .to(ICON_DAPP)
       .method("sendMessage")
-      .params(params)
+      .params(_params)
       .stepLimit(IconConverter.toBigNumber(5000000000))
       .nid(IconConverter.toBigNumber(NID))
       .nonce(IconConverter.toBigNumber(1))
@@ -114,13 +113,7 @@ async function getFee(useRollback = false) {
   }
 }
 
-function strToHex(str: string) {
-  let hex = "";
-  for (let i = 0; i < str.length; i++) {
-    hex += "" + str.charCodeAt(i).toString(16);
-  }
-  return hex;
-}
+
 
 function sleep(millis: number) {
   return new Promise((resolve) => setTimeout(resolve, millis));
@@ -336,6 +329,13 @@ async function verifyRollbackExecutedEventIcon(){
   }
 }
 
+export async function sendMessageFromDAppIcon(data: string, rollbackData?:string, isRollback?: boolean){
+  const _to = `${NETWORK_LABEL_DESTINATION}/${DESTINATION_DAPP}`;
+  return await sendMessage(_to, data, rollbackData, isRollback);
+}
+
+
+
 async function main() {
   const _to = `${NETWORK_LABEL_DESTINATION}/${DESTINATION_DAPP}`;
   const _data = strToHex("rollback");
@@ -384,5 +384,3 @@ async function main() {
   //verify rollbackExecuted event 
   await verifyRollbackExecutedEventIcon()
 }
-
-main();

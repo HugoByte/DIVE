@@ -18,6 +18,39 @@ dotenv.config();
 
 const defaultGasPrice = GasPrice.fromString("0stake");
 
+async function Setup(): Promise<[SigningCosmWasmClient, string]>{
+   // Chain Constants, modify as required
+   const chain1 = {
+    chainId: GetArchwayChainInfo("chainId"),
+    endpoint: GetArchwayChainInfo("endpoint"),
+    prefix: GetArchwayChainInfo("prefix")
+  };
+
+  // Create signing client and account address
+  const mnemonic1 = process.env.MNEMONIC1 as string;;
+  const [signingClient, accountAddress] = await CreateSigningClient(
+    mnemonic1,
+    chain1.prefix,
+    chain1.endpoint
+  );
+
+  // Get Test Account with stake
+  const testAccount = await getTestAccountWithStake();
+  const testAddress = testAccount.substring(8, testAccount.length).trim();
+
+  // To Get balance of given account address and transfer balance if 0
+  const bal = await signingClient.getBalance(accountAddress, "stake");
+  if (bal.amount == "0") {
+    console.log(
+      "No Balance in Signer account, Transferring balance to Signer account"
+    );
+    await getStake(testAddress!, accountAddress);
+  }
+  await new Promise((f) => setTimeout(f, 5000));
+  return [signingClient, accountAddress]
+
+}
+
 async function main() {
   // Chain Constants, modify as required
   const chain1 = {
@@ -54,11 +87,11 @@ async function main() {
   await new Promise((f) => setTimeout(f, 5000));
   const data = GetDataInBytes("Sending message from Cosmos to Icon0");
   const rbData = GetDataInBytes("RollBack Data");
-  const receipt = await sendMessageFromDappCosmos(
+  const receipt = await sendMessageFromDapp(
     accountAddress,
     signingClient,
     data,
-    rbData
+    "RollBack Data"
   );
   verifyCallMessageSentEvent(signingClient, receipt);
   const [reqId, dataObject] = await verifyCallMessageEvent(signingClient);
@@ -70,22 +103,31 @@ async function main() {
   await rollbackExecutedEvent(signingClient);
 }
 
-async function sendMessageFromDappCosmos(
+export async function sendMessageFromDAppCosmos(data: number[], rollbackData?: string){
+  const [signingClient, accountAddress] = await Setup()
+  return await sendMessageFromDapp(accountAddress, signingClient, data, rollbackData)
+}
+
+async function sendMessageFromDapp(
   accountAddress: string,
   signingClient: SigningCosmWasmClient,
   data: number[],
-  rbData: number[]
+  rbData?: string
 ) {
   const dapp = await GetCosmosContracts("dapp");
   const iconDappAddress = await GetIconContracts("dapp");
   const DestNetwork = GetIconChainInfo("network")
-  const execMsg = {
-    send_call_message: {
-      to: DestNetwork +"/" + iconDappAddress,
-      data: data,
-      rollback: rbData,
-    },
-  };
+  const execMsg = rbData
+  ? {send_call_message: {to: DestNetwork +"/" + iconDappAddress, data: data, rollback: GetDataInBytes(rbData)}}
+  : {send_call_message: {to: DestNetwork +"/" + iconDappAddress, data: data}}
+  // const execMsg = {
+  //   send_call_message: {
+  //     to: DestNetwork +"/" + iconDappAddress,
+  //     data: data,
+  //     rollback: rbData,
+  //   },
+  // };
+  console.log(execMsg)
 
   // To Execute Contract
   const defaultExecuteFee = calculateFee(1_500_000, defaultGasPrice);
@@ -237,5 +279,3 @@ async function rollbackExecutedEvent(signingClient: SigningCosmWasmClient) {
   const event = await waitForEvent(signingClient, "wasm-RollbackExecuted");
   console.log(event);
 }
-
-main();
