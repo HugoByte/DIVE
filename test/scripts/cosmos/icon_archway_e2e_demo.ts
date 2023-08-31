@@ -1,6 +1,6 @@
-import { sendMessageFromDAppCosmos } from "./archway";
+import { sendMessageFromDAppCosmos, verifyCallMessageSentEventArchway } from "./archway";
 import { GetDataInBytes, GetDest, GetSrc, strToHex } from "./helper";
-import { sendMessageFromDAppIcon } from "./icon";
+import { sendMessageFromDAppIcon, verifyCallMessageSentEventIcon } from "./icon";
 
 async function show_banner() {
   const banner = `
@@ -20,7 +20,7 @@ show_banner()
 //   .then(() => sendCallMessage(SRC, DST))
 //   .then(() => sendCallMessage(DST, SRC))
 //   .then(() => sendCallMessage(SRC, DST, "checkSuccessResponse", true))
-//   .then(() => sendCallMessage(DST, SRC, "checkSuccessResponse", true))
+  .then(() => sendCallMessage(DST, SRC, "checkSuccessResponse", true))
 //   .then(() => sendCallMessage(SRC, DST, "rollback", true))
 //   .then(() => sendCallMessage(DST, SRC, "rollback", true))
   .catch((error) => {
@@ -43,18 +43,29 @@ async function sendCallMessage(
   let step = 1;
 
   console.log(`[${step++}] send message from DApp`);
-  const sendMessageReceipt = await sendMessageFromDApp(src, msgData, rollbackData);
+  const sendMessageReceipt:any = await sendMessageFromDApp(src, msgData, rollbackData);
+  const sn = await verifyCallMessageSent(src, sendMessageReceipt!);
 }
 async function sendMessageFromDApp(src: string, msg: string, rollback?: string) {
     const isRollback = rollback ? true : false;
     if (src === "icon") {
         const hexMsg = strToHex(msg)
-        const receipt = await sendMessageFromDAppIcon(hexMsg, rollback, isRollback);
-        return receipt
+        return sendMessageFromDAppIcon(hexMsg, rollback, isRollback)
+        
     } else if (src === "archway") {
         const bytesData = GetDataInBytes(msg);
-        const receipt = await sendMessageFromDAppCosmos(bytesData,rollback)
-        console.log(receipt)
+        return await sendMessageFromDAppCosmos(bytesData,rollback)
+    } else {
+        throw new Error(`unknown source chain: ${src}`);
+    }
+}
+
+async function verifyCallMessageSent(src: string, sendMessageReceipt: string) {
+    console.log("**** Verify CallMessageSent Event ****")
+    if (src === "icon") {
+        await verifyCallMessageSentEventIcon(sendMessageReceipt)
+    } else if (src === "archway") {
+        await verifyCallMessageSentEventArchway(sendMessageReceipt)
     }
 }
 

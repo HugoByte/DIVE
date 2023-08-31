@@ -331,7 +331,18 @@ async function verifyRollbackExecutedEventIcon(){
 
 export async function sendMessageFromDAppIcon(data: string, rollbackData?:string, isRollback?: boolean){
   const _to = `${NETWORK_LABEL_DESTINATION}/${DESTINATION_DAPP}`;
-  return await sendMessage(_to, data, rollbackData, isRollback);
+  return await sendMessage(_to, data, rollbackData, isRollback)
+}
+
+export async function verifyCallMessageSentEventIcon(receipt:string){
+  await sleep(5000);
+  const txResult = await ICON_SERVICE.getTransactionResult(receipt).execute();
+  const filteredEvent = filterEvent(
+    txResult.eventLogs,
+    callMessageSentSignature,
+    ICON_XCALL
+  );
+  console.log(filteredEvent)
 }
 
 

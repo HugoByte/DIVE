@@ -17,18 +17,20 @@ import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 dotenv.config();
 
 const defaultGasPrice = GasPrice.fromString("0stake");
+let signingClient: SigningCosmWasmClient;
+let accountAddress: string;
 
-async function Setup(): Promise<[SigningCosmWasmClient, string]>{
-   // Chain Constants, modify as required
-   const chain1 = {
+async function Setup(): Promise<[SigningCosmWasmClient, string]> {
+  // Chain Constants, modify as required
+  const chain1 = {
     chainId: GetArchwayChainInfo("chainId"),
     endpoint: GetArchwayChainInfo("endpoint"),
-    prefix: GetArchwayChainInfo("prefix")
+    prefix: GetArchwayChainInfo("prefix"),
   };
 
   // Create signing client and account address
-  const mnemonic1 = process.env.MNEMONIC1 as string;;
-  const [signingClient, accountAddress] = await CreateSigningClient(
+  const mnemonic1 = process.env.MNEMONIC1 as string;
+  [signingClient, accountAddress] = await CreateSigningClient(
     mnemonic1,
     chain1.prefix,
     chain1.endpoint
@@ -47,8 +49,7 @@ async function Setup(): Promise<[SigningCosmWasmClient, string]>{
     await getStake(testAddress!, accountAddress);
   }
   await new Promise((f) => setTimeout(f, 5000));
-  return [signingClient, accountAddress]
-
+  return [signingClient, accountAddress];
 }
 
 async function main() {
@@ -56,7 +57,7 @@ async function main() {
   const chain1 = {
     chainId: GetArchwayChainInfo("chainId"),
     endpoint: GetArchwayChainInfo("endpoint"),
-    prefix: GetArchwayChainInfo("prefix")
+    prefix: GetArchwayChainInfo("prefix"),
   };
 
   // Create signing client and account address
@@ -103,9 +104,21 @@ async function main() {
   await rollbackExecutedEvent(signingClient);
 }
 
-export async function sendMessageFromDAppCosmos(data: number[], rollbackData?: string){
-  const [signingClient, accountAddress] = await Setup()
-  return await sendMessageFromDapp(accountAddress, signingClient, data, rollbackData)
+export async function sendMessageFromDAppCosmos(
+  data: number[],
+  rollbackData?: string
+) {
+  [signingClient, accountAddress] = await Setup();
+  return await sendMessageFromDapp(
+    accountAddress,
+    signingClient,
+    data,
+    rollbackData
+  );
+}
+
+export async function verifyCallMessageSentEventArchway(receipt: string) {
+  await verifyCallMessageSentEvent(signingClient, receipt);
 }
 
 async function sendMessageFromDapp(
@@ -116,18 +129,22 @@ async function sendMessageFromDapp(
 ) {
   const dapp = await GetCosmosContracts("dapp");
   const iconDappAddress = await GetIconContracts("dapp");
-  const DestNetwork = GetIconChainInfo("network")
+  const DestNetwork = GetIconChainInfo("network");
   const execMsg = rbData
-  ? {send_call_message: {to: DestNetwork +"/" + iconDappAddress, data: data, rollback: GetDataInBytes(rbData)}}
-  : {send_call_message: {to: DestNetwork +"/" + iconDappAddress, data: data}}
-  // const execMsg = {
-  //   send_call_message: {
-  //     to: DestNetwork +"/" + iconDappAddress,
-  //     data: data,
-  //     rollback: rbData,
-  //   },
-  // };
-  console.log(execMsg)
+    ? {
+        send_call_message: {
+          to: DestNetwork + "/" + iconDappAddress,
+          data: data,
+          rollback: GetDataInBytes(rbData),
+        },
+      }
+    : {
+        send_call_message: {
+          to: DestNetwork + "/" + iconDappAddress,
+          data: data,
+        },
+      };
+  console.log("params: ", execMsg);
 
   // To Execute Contract
   const defaultExecuteFee = calculateFee(1_500_000, defaultGasPrice);
