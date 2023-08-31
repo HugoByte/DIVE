@@ -190,7 +190,7 @@ async function filterEventFromBlock(
   });
 }
 
-async function verifyCallMessageEventIcon() {
+export async function verifyCallMessageEventIcon() {
   let events = await waitEvent(
     callMessageSignature,
     ICON_XCALL
@@ -213,7 +213,7 @@ async function verifyCallMessageEventIcon() {
   }
 }
 
-async function executeCall(reqId: number, data: string) {
+export async function executeCallIcon(reqId: number, data: string) {
   try {
     const fee = await getFee();
 
@@ -371,7 +371,7 @@ async function main() {
   const Data = callMsgEvent!._data;
 
   // // Execute Call
-  const execReceipt = await executeCall(request_id, Data);
+  const execReceipt = await executeCallIcon(request_id, Data);
   await sleep(5000);
   const execResult = await ICON_SERVICE.getTransactionResult(
     execReceipt

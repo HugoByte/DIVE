@@ -1,6 +1,16 @@
-import { sendMessageFromDAppCosmos, verifyCallMessageSentEventArchway } from "./archway";
+import {
+    executeCallCosmos,
+  sendMessageFromDAppCosmos,
+  verifyCallMessageEventCosmos,
+  verifyCallMessageSentEventArchway,
+} from "./archway";
 import { GetDataInBytes, GetDest, GetSrc, strToHex } from "./helper";
-import { sendMessageFromDAppIcon, verifyCallMessageSentEventIcon } from "./icon";
+import {
+    executeCallIcon,
+  sendMessageFromDAppIcon,
+  verifyCallMessageEventIcon,
+  verifyCallMessageSentEventIcon,
+} from "./icon";
 
 async function show_banner() {
   const banner = `
@@ -18,11 +28,11 @@ const DST = GetDest();
 
 show_banner()
 //   .then(() => sendCallMessage(SRC, DST))
-//   .then(() => sendCallMessage(DST, SRC))
-//   .then(() => sendCallMessage(SRC, DST, "checkSuccessResponse", true))
-  .then(() => sendCallMessage(DST, SRC, "checkSuccessResponse", true))
-//   .then(() => sendCallMessage(SRC, DST, "rollback", true))
-//   .then(() => sendCallMessage(DST, SRC, "rollback", true))
+    .then(() => sendCallMessage(DST, SRC))
+  //   .then(() => sendCallMessage(SRC, DST, "checkSuccessResponse", true))
+  //   .then(() => sendCallMessage(DST, SRC, "checkSuccessResponse", true))
+  //   .then(() => sendCallMessage(SRC, DST, "rollback", true))
+  //   .then(() => sendCallMessage(DST, SRC, "rollback", true))
   .catch((error) => {
     console.error(error);
     process.exitCode = 1;
@@ -33,39 +43,82 @@ async function sendCallMessage(
   dst: string,
   msgData?: string,
   needRollback?: boolean
-){
+) {
   const testName = sendCallMessage.name + (needRollback ? "WithRollback" : "");
   console.log(`\n### ${testName}: ${src} => ${dst}`);
   if (!msgData) {
     msgData = `${testName}_${src}_${dst}`;
   }
-  const rollbackData = needRollback ? `ThisIsRollbackMessage_${src}_${dst}` : undefined;
+  const rollbackData = needRollback
+    ? `ThisIsRollbackMessage_${src}_${dst}`
+    : undefined;
   let step = 1;
 
   console.log(`[${step++}] send message from DApp`);
-  const sendMessageReceipt:any = await sendMessageFromDApp(src, msgData, rollbackData);
+  const sendMessageReceipt: any = await sendMessageFromDApp(
+    src,
+    msgData,
+    rollbackData
+  );
   const sn = await verifyCallMessageSent(src, sendMessageReceipt!);
+
+  console.log(`[${step++}] check CallMessage event on ${dst} chain`);
+  const [reqId, callData]:any = await checkCallMessage(dst);
+
+  console.log(`[${step++}] invoke executeCall with reqId=${reqId}`);
+  const executeCallReceipt = await invokeExecuteCall(dst, reqId, callData);
 }
-async function sendMessageFromDApp(src: string, msg: string, rollback?: string) {
-    const isRollback = rollback ? true : false;
-    if (src === "icon") {
-        const hexMsg = strToHex(msg)
-        return sendMessageFromDAppIcon(hexMsg, rollback, isRollback)
-        
-    } else if (src === "archway") {
-        const bytesData = GetDataInBytes(msg);
-        return await sendMessageFromDAppCosmos(bytesData,rollback)
-    } else {
-        throw new Error(`unknown source chain: ${src}`);
-    }
+
+async function sendMessageFromDApp(
+  src: string,
+  msg: string,
+  rollback?: string
+) {
+  const isRollback = rollback ? true : false;
+  if (src === "icon") {
+    const hexMsg = strToHex(msg);
+    return sendMessageFromDAppIcon(hexMsg, rollback, isRollback);
+  } else if (src === "archway") {
+    const bytesData = GetDataInBytes(msg);
+    return await sendMessageFromDAppCosmos(bytesData, rollback);
+  } else {
+    throw new Error(`unknown source chain: ${src}`);
+  }
 }
 
 async function verifyCallMessageSent(src: string, sendMessageReceipt: string) {
-    console.log("**** Verify CallMessageSent Event ****")
-    if (src === "icon") {
-        await verifyCallMessageSentEventIcon(sendMessageReceipt)
-    } else if (src === "archway") {
-        await verifyCallMessageSentEventArchway(sendMessageReceipt)
-    }
+  console.log("**** Verify CallMessageSent Event ****");
+  if (src === "icon") {
+    await verifyCallMessageSentEventIcon(sendMessageReceipt);
+  } else if (src === "archway") {
+    await verifyCallMessageSentEventArchway(sendMessageReceipt);
+  }
+}
+
+async function checkCallMessage(dst: string) {
+  console.log("**** CallMessage Event ****");
+  if (dst === "archway") {
+    const eventLogs = await verifyCallMessageEventCosmos();
+    const reqIdObject = eventLogs?.attributes.find(
+      (item) => item.key === "reqId"
+    );
+    const dataObject = eventLogs?.attributes.find(
+      (item) => item.key === "data"
+    );
+    return [reqIdObject!.value, dataObject!.value];
+
+  } else if (dst === "icon") {
+    const eventLogs = await verifyCallMessageEventIcon();
+    return [eventLogs!._reqId, eventLogs!._data]
+  }
+}
+
+async function invokeExecuteCall(dst: string, reqId: any, callData: any) {
+    console.log("**** Execute Call ****");
+  if (dst === "archway") {
+    await executeCallCosmos(reqId, callData)
+  } else if (dst === "icon") {
+    console.log(await executeCallIcon(reqId, callData))
+  }
 }
 

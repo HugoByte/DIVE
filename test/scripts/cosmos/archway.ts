@@ -95,8 +95,8 @@ async function main() {
     "RollBack Data"
   );
   verifyCallMessageSentEvent(signingClient, receipt);
-  const [reqId, dataObject] = await verifyCallMessageEvent(signingClient);
-  await executeCall(signingClient, reqId, dataObject, accountAddress);
+  // const [reqId, dataObject] = await verifyCallMessageEvent(signingClient);
+  // await executeCall(signingClient, reqId, dataObject, accountAddress);
   await verifyCallExecutedEvent(signingClient);
   const seqNo = await verifyResponseMessageEvent(signingClient);
   await verifyRollbackMessageEvent(signingClient);
@@ -175,13 +175,14 @@ function sleep(millis: number) {
   return new Promise((resolve) => setTimeout(resolve, millis));
 }
 
+export async function verifyCallMessageEventCosmos(){
+  [signingClient, accountAddress] = await Setup();
+  return verifyCallMessageEvent(signingClient);
+}
+
 async function verifyCallMessageEvent(signingClient: SigningCosmWasmClient) {
   const event = await waitForEvent(signingClient, "wasm-CallMessage");
-  console.log("*****");
-  console.log(event?.attributes);
-  const reqIdObject = event?.attributes.find((item) => item.key === "reqId");
-  const dataObject = event?.attributes.find((item) => item.key === "data");
-  return [reqIdObject?.value, dataObject?.value];
+  return event
 }
 
 async function waitForEvent(
@@ -191,7 +192,6 @@ async function waitForEvent(
   let height = await signingClient.getHeight();
   let flag = false;
   while (!flag) {
-    console.log(height);
     let tmp = height;
     const query = `tx.height=` + height;
     await sleep(5000);
@@ -199,7 +199,6 @@ async function waitForEvent(
     if (txs.length > 0) {
       for (const tx of txs) {
         const events = tx.events;
-        console.log(events);
         for (const event of events) {
           if (event.type === eventName) {
             const decodedEvent = fromTendermintEvent(event);
@@ -213,6 +212,10 @@ async function waitForEvent(
       height = await signingClient.getHeight();
     }
   }
+}
+
+export async function executeCallCosmos(reqId: string, data: any){
+  return await executeCall(signingClient, reqId, data, accountAddress)
 }
 
 async function executeCall(
