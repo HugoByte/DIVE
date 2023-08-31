@@ -5,7 +5,7 @@ import IconService, {
   KeyStore,
   TransactionResult,
 } from "icon-sdk-js";
-import { GetCosmosContracts, GetIconContracts } from "./helper";
+import { GetArchwayChainInfo, GetCosmosContracts, GetIconChainInfo, GetIconContracts } from "./helper";
 
 const {
   IconBuilder,
@@ -23,13 +23,19 @@ export class EventLog {
 
 const { CallTransactionBuilder, CallBuilder } = IconBuilder;
 
-const ICON_RPC_URL = "http://localhost:8090/api/v3/icon_dex";
-const NID = "0x3";
+const ICON_RPC_URL = GetIconChainInfo("endpoint")
+const NID = GetIconChainInfo("nid")
 const ICON_XCALL = GetIconContracts("xcall");
 const ICON_DAPP = GetIconContracts("dapp");
-const NETWORK_LABEL_DESTINATION = "constantine-3";
+const NETWORK_LABEL_DESTINATION = GetArchwayChainInfo("network")
 const DESTINATION_DAPP = GetCosmosContracts("dapp");
-const callMessageSentSignature = "CallMessageSent(Address,str,int)";
+
+const callMessageSentSignature = "CallMessageSent(Address,str,int)"
+const callMessageSignature = "CallMessage(str,str,int,int,bytes)"
+const callExecutedSignature = "CallExecuted(int,int,str)"
+const responseMessageSignature = "ResponseMessage(int,int)"
+const rollbackMessageSignature = "RollbackMessage(int)"
+const rollbackExecutedSignature = "RollbackExecuted(int)"
 
 const HTTP_PROVIDER = new HttpProvider(ICON_RPC_URL);
 const ICON_SERVICE = new IconService(HTTP_PROVIDER);
@@ -193,7 +199,7 @@ async function filterEventFromBlock(
 
 async function verifyCallMessageEventIcon() {
   let events = await waitEvent(
-    "CallMessage(str,str,int,int,bytes)",
+    callMessageSignature,
     ICON_XCALL
   );
   if (events.length > 0) {
@@ -246,7 +252,7 @@ async function executeCall(reqId: number, data: string) {
 async function verifyCallExecutedEventIcon(eventLogs:TransactionResult["eventLogs"]) {
   const filtereCallExecute = filterEvent(
     eventLogs,
-    "CallExecuted(int,int,str)",
+    callExecutedSignature,
     ICON_XCALL
   );  
   console.log(filtereCallExecute);
@@ -254,7 +260,7 @@ async function verifyCallExecutedEventIcon(eventLogs:TransactionResult["eventLog
 
 async function verifyResponseMessageEventIcon() {
   let events = await waitEvent(
-    "ResponseMessage(int,int)",
+    responseMessageSignature,
     ICON_XCALL
   );
   if (events.length > 0) {
@@ -273,7 +279,7 @@ async function verifyResponseMessageEventIcon() {
 
 async function verifyRollbackMessageEventIcon(){
   let events = await waitEvent(
-    "RollbackMessage(int)",
+    rollbackMessageSignature,
     ICON_XCALL
   );
   if (events.length > 0) {

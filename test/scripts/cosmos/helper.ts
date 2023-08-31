@@ -100,12 +100,22 @@ export async function getBalance(
 
 export function GetCosmosContracts(contract: string) {
   var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"));
-  return dataArray["node-service-constantine-3"]["contracts"][contract];
+  return dataArray["archway"]["contracts"][contract];
 }
 
 export function GetIconContracts(contract: string) {
   var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"));
-  return dataArray["icon-node-0xacbc4e"]["contracts"][contract];
+  return dataArray["icon"]["contracts"][contract];
+}
+
+export function GetArchwayChainInfo(args: string){
+  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
+  return dataArray["archway"][args];
+}
+
+export function GetIconChainInfo(args: string){
+  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
+  return dataArray["icon"][args];
 }
 
 export function GetDataInBytes(msg: string) {
