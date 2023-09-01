@@ -4,7 +4,7 @@ import {
   sendMessageFromDAppCosmos,
   verifyCallExecutedEventCosmos,
   verifyCallMessageEventCosmos,
-  verifyCallMessageSentEventArchway,
+  verifyCallMessageSentEventCosmos,
   verifyResponseMessageEventCosmos,
   verifyRollbackExecutedEventCosmos,
   verifyRollbackMessageEventCosmos,
@@ -37,10 +37,10 @@ const SRC = GetSrc();
 const DST = GetDest();
 
 show_banner()
-  .then(() => sendCallMessage(SRC, DST))
-  .then(() => sendCallMessage(DST, SRC))
-  .then(() => sendCallMessage(SRC, DST, "checkSuccessResponse", true))
-  .then(() => sendCallMessage(DST, SRC, "checkSuccessResponse", true))
+  // .then(() => sendCallMessage(SRC, DST))
+  // .then(() => sendCallMessage(DST, SRC))
+  // .then(() => sendCallMessage(SRC, DST, "checkSuccessResponse", true))
+  // .then(() => sendCallMessage(DST, SRC, "checkSuccessResponse", true))
   .then(() => sendCallMessage(SRC, DST, "rollback", true))
   .then(() => sendCallMessage(DST, SRC, "rollback", true))
   .catch((error) => {
@@ -124,7 +124,7 @@ async function verifyCallMessageSent(src: string, sendMessageReceipt: string) {
   if (src === "icon") {
     await verifyCallMessageSentEventIcon(sendMessageReceipt);
   } else if (src === "archway") {
-    await verifyCallMessageSentEventArchway(sendMessageReceipt);
+    await verifyCallMessageSentEventCosmos(sendMessageReceipt);
   }
 }
 

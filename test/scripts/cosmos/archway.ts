@@ -10,18 +10,24 @@ import {
   getStake,
   getTestAccountWithStake,
 } from "./helper";
-import { Event, fromTendermintEvent, GasPrice, calculateFee } from "@cosmjs/stargate";
+import {
+  Event,
+  fromTendermintEvent,
+  GasPrice,
+  calculateFee,
+} from "@cosmjs/stargate";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 // configure dotenv
 dotenv.config();
 
+// Define Global Variables
 const defaultGasPrice = GasPrice.fromString("0stake");
 let signingClient: SigningCosmWasmClient;
 let accountAddress: string;
 
 async function Setup(): Promise<[SigningCosmWasmClient, string]> {
-  // Chain Constants, modify as required
+  // Chain Constants, modify as required in contracts.json
   const chain1 = {
     chainId: GetArchwayChainInfo("chainId"),
     endpoint: GetArchwayChainInfo("endpoint"),
@@ -52,58 +58,6 @@ async function Setup(): Promise<[SigningCosmWasmClient, string]> {
   return [signingClient, accountAddress];
 }
 
-async function main() {
-  // Chain Constants, modify as required
-  const chain1 = {
-    chainId: GetArchwayChainInfo("chainId"),
-    endpoint: GetArchwayChainInfo("endpoint"),
-    prefix: GetArchwayChainInfo("prefix"),
-  };
-
-  // Create signing client and account address
-  const mnemonic1 = process.env.MNEMONIC1 as string;
-  console.log("");
-  console.log("Chain 1: " + chain1.chainId);
-  const [signingClient, accountAddress] = await CreateSigningClient(
-    mnemonic1,
-    chain1.prefix,
-    chain1.endpoint
-  );
-
-  // To Check if the client is connected to local chain
-  getHeight(signingClient, chain1.chainId);
-
-  // Get Test Account with stake
-  const testAccount = await getTestAccountWithStake();
-  const testAddress = testAccount.substring(8, testAccount.length).trim();
-
-  // To Get balance of given account address and transfer balance if 0
-  const bal = await signingClient.getBalance(accountAddress, "stake");
-  if (bal.amount == "0") {
-    console.log(
-      "No Balance in Signer account, Transferring balance to Signer account"
-    );
-    await getStake(testAddress!, accountAddress);
-  }
-  await new Promise((f) => setTimeout(f, 5000));
-  const data = GetDataInBytes("Sending message from Cosmos to Icon0");
-  const rbData = GetDataInBytes("RollBack Data");
-  const receipt = await sendMessageFromDapp(
-    accountAddress,
-    signingClient,
-    data,
-    "RollBack Data"
-  );
-  verifyCallMessageSentEvent(signingClient, receipt);
-  // const [reqId, dataObject] = await verifyCallMessageEvent(signingClient);
-  // await executeCall(signingClient, reqId, dataObject, accountAddress);
-  await verifyCallExecutedEvent(signingClient);
-  const seqNo = await verifyResponseMessageEvent(signingClient);
-  // await verifyRollbackMessageEvent(signingClient);
-  // await executeRollback(signingClient, accountAddress, seqNo);
-  // await rollbackExecutedEvent(signingClient);
-}
-
 export async function sendMessageFromDAppCosmos(
   data: number[],
   rollbackData?: string
@@ -115,10 +69,6 @@ export async function sendMessageFromDAppCosmos(
     data,
     rollbackData
   );
-}
-
-export async function verifyCallMessageSentEventArchway(receipt: string) {
-  await verifyCallMessageSentEvent(signingClient, receipt);
 }
 
 async function sendMessageFromDapp(
@@ -157,10 +107,7 @@ async function sendMessageFromDapp(
   return exeResult;
 }
 
-async function verifyCallMessageSentEvent(
-  signingClient: SigningCosmWasmClient,
-  exeResult: any
-) {
+export async function verifyCallMessageSentEventCosmos(exeResult: any) {
   const txResult = await signingClient.getTx(exeResult.transactionHash);
   const events = txResult?.events;
   for (const event of events!) {
@@ -175,26 +122,26 @@ function sleep(millis: number) {
   return new Promise((resolve) => setTimeout(resolve, millis));
 }
 
-export async function verifyCallMessageEventCosmos(){
+export async function verifyCallMessageEventCosmos() {
   [signingClient, accountAddress] = await Setup();
   return verifyCallMessageEvent(signingClient);
 }
 
 async function verifyCallMessageEvent(signingClient: SigningCosmWasmClient) {
   const event = await waitForEvent(signingClient, "wasm-CallMessage");
-  return event?.[0]
+  return event?.[0];
 }
 
 async function waitForEvent(
   signingClient: SigningCosmWasmClient,
   eventName: string,
   Target_height?: number
-):Promise<[Event, number] | undefined> {
+): Promise<[Event, number] | undefined> {
   let height = await signingClient.getHeight();
-  if (Target_height != undefined){
-    height = Target_height
+  if (Target_height != undefined) {
+    height = Target_height;
   }
-  let decodedEvent:Event
+  let decodedEvent: Event;
   let flag = false;
   while (!flag) {
     let tmp = height;
@@ -208,7 +155,7 @@ async function waitForEvent(
           if (event.type === eventName) {
             decodedEvent = fromTendermintEvent(event);
             flag = true;
-            return [decodedEvent, height]
+            return [decodedEvent, height];
           }
         }
       }
@@ -219,16 +166,7 @@ async function waitForEvent(
   }
 }
 
-export async function executeCallCosmos(reqId: string, data: any){
-  return await executeCall(signingClient, reqId, data, accountAddress)
-}
-
-async function executeCall(
-  signingClient: SigningCosmWasmClient,
-  reqId: any,
-  data: any,
-  accountAddress: string
-) {
+export async function executeCallCosmos(reqId: any, data: any) {
   const xcall = await GetCosmosContracts("xcall");
   const execMsg = {
     execute_call: {
@@ -248,36 +186,30 @@ async function executeCall(
   return exeResult;
 }
 
-export async function verifyCallExecutedEventCosmos(){
-  await verifyCallExecutedEvent(signingClient)
+export async function verifyCallExecutedEventCosmos() {
+  const response = await waitForEvent(signingClient, "wasm-CallExecuted");
+  const event = response![0]
+  const decodedEvent = fromTendermintEvent(event)
+  console.log(decodedEvent);
 }
 
-async function verifyCallExecutedEvent(signingClient: SigningCosmWasmClient) {
-  const event = await waitForEvent(signingClient, "wasm-CallExecuted");
-  console.log(event);
-}
-
-export async function verifyResponseMessageEventCosmos(): Promise<[string, number]>{
- return await verifyResponseMessageEvent(signingClient)
-}
-
-async function verifyResponseMessageEvent(
-  signingClient: SigningCosmWasmClient
-): Promise<[string, number]> {
-  const values = await waitForEvent(signingClient, "wasm-ResponseMessage")
+export async function verifyResponseMessageEventCosmos(): Promise<[string, number]> {
+  const values = await waitForEvent(signingClient, "wasm-ResponseMessage");
   console.log(values?.[0]);
   const seqNo = values?.[0].attributes.find((item) => item.key === "sn");
-  return [seqNo!.value, values![1]]
+  return [seqNo!.value, values![1]];
 }
 
-export async function verifyRollbackMessageEventCosmos(height:number) {
-  const event = await waitForEvent(signingClient, "wasm-RollbackMessage", height);
+export async function verifyRollbackMessageEventCosmos(height: number) {
+  const event = await waitForEvent(
+    signingClient,
+    "wasm-RollbackMessage",
+    height
+  );
   console.log(event?.[0]);
 }
 
-export async function executeRollbackCosmos(
-  seqNo: any
-) {
+export async function executeRollbackCosmos(seqNo: any) {
   const xcall = await GetCosmosContracts("xcall");
   const execMsg = {
     execute_rollback: {

@@ -35,7 +35,6 @@ const callMessageSignature = "CallMessage(str,str,int,int,bytes)"
 const callExecutedSignature = "CallExecuted(int,int,str)"
 const responseMessageSignature = "ResponseMessage(int,int)"
 const rollbackMessageSignature = "RollbackMessage(int)"
-const rollbackExecutedSignature = "RollbackExecuted(int)"
 
 const HTTP_PROVIDER = new HttpProvider(ICON_RPC_URL);
 const ICON_SERVICE = new IconService(HTTP_PROVIDER);
@@ -67,7 +66,6 @@ const ICON_WALLET = IconWallet.loadKeystore(ks as KeyStore, "gochain", false);
 async function sendMessage(_to: string, _data: string, _rollback?: string, isRollback?: boolean) {
   try {
     const fee = await getFee(isRollback);
-    const rollbackData = isRollback ? `ThisIsRollbackMessage_Icon` : true;
     const _params = _rollback
       ? {_to: _to, _data: _data, _rollback: IconConverter.toHex(_rollback)}
       : {_to: _to, _data: _data}
@@ -132,15 +130,6 @@ function filterEvent(
   );
 }
 
-function parseCallMessageSentEvent(event: any) {
-  const indexed = event[0].indexed || [];
-  const data = event[0].data || [];
-  return {
-    _from: indexed[1],
-    _to: indexed[2],
-    _sn: indexed[3],
-  };
-}
 
 export async function waitEvent(sig: string, contract_address: string): Promise<[EventLog[], number]>{
   let latest = await ICON_SERVICE.getLastBlock().execute();
@@ -246,9 +235,18 @@ export async function executeCallIcon(reqId: number, data: string) {
 
 export async function verifyCallExecutedEventIcon() {
   let events = await waitEvent(callExecutedSignature, ICON_XCALL)
+  console.log(events[0])
+  let event;
   if (events.length > 0){
-    console.log(events)
+    const indexed = events[0][0].indexed || [];
+    const data = events[0][0].data || [];
+    event = {
+      _reqId: IconConverter.toNumber(indexed[1]),
+      _code: IconConverter.toNumber(data[0]),
+      _msg: data[1]
+    }
   }
+  console.log(event)
 }
 
 export async function verifyResponseMessageEventIcon(): Promise<[number, number]> {
@@ -334,55 +332,4 @@ export async function verifyCallMessageSentEventIcon(receipt:string){
     ICON_XCALL
   );
   console.log(filteredEvent)
-}
-
-
-
-async function main() {
-  const _to = `${NETWORK_LABEL_DESTINATION}/${DESTINATION_DAPP}`;
-  const _data = strToHex("rollback");
-  const _rollback = strToHex("This is the rollback meesage to be executed")
-
-  const receipt = await sendMessage(_to, _data, _rollback);
-  console.log(receipt);
-  await sleep(5000);
-  const txResult = await ICON_SERVICE.getTransactionResult(receipt).execute();
-  const filteredEvent = filterEvent(
-    txResult.eventLogs,
-    callMessageSentSignature,
-    ICON_XCALL
-  );
-  // parsing the CallMessageSent event logs
-  const parsedEvent = parseCallMessageSentEvent(filteredEvent);
-  console.log("parsedEvent", parsedEvent);
-
-  // // Verify CallMessage event
-  const callMsgEvent = await verifyCallMessageEventIcon();
-  const request_id = callMsgEvent!._reqId;
-  const Data = callMsgEvent!._data;
-
-  // // Execute Call
-  const execResult = await executeCallIcon(request_id, Data);
-  await sleep(5000);
-  // const execResult = await ICON_SERVICE.getTransactionResult(
-  //   execReceipt
-  // ).execute();
-  console.log(execResult);
-
-  // // verify Call Executed Event
-  await verifyCallExecutedEventIcon();
-
-  // verify Response Message Event
-  const seqNo = await verifyResponseMessageEventIcon()
-  console.log("seqNo: ", seqNo)
-
-  // verify Rollback Message Event
-  // await verifyRollbackMessageEventIcon()
-
-  // Execute Rollback
-  // const execRollback = await executeRollback(seqNo!)
-  // console.log(execRollback);
-
-  //verify rollbackExecuted event 
-  await verifyRollbackExecutedEventIcon()
 }
