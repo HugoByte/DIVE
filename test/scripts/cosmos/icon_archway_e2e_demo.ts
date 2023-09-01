@@ -5,6 +5,7 @@ import {
   verifyCallExecutedEventCosmos,
   verifyCallMessageEventCosmos,
   verifyCallMessageSentEventCosmos,
+  verifyReceivedMessageCosmos,
   verifyResponseMessageEventCosmos,
   verifyRollbackExecutedEventCosmos,
   verifyRollbackMessageEventCosmos,
@@ -17,6 +18,7 @@ import {
   verifyCallExecutedEventIcon,
   verifyCallMessageEventIcon,
   verifyCallMessageSentEventIcon,
+  verifyReceivedMessageIcon,
   verifyResponseMessageEventIcon,
   verifyRollbackExecutedEventIcon,
   verifyRollbackMessageEventIcon,
@@ -37,10 +39,10 @@ const SRC = GetSrc();
 const DST = GetDest();
 
 show_banner()
-  // .then(() => sendCallMessage(SRC, DST))
-  // .then(() => sendCallMessage(DST, SRC))
-  // .then(() => sendCallMessage(SRC, DST, "checkSuccessResponse", true))
-  // .then(() => sendCallMessage(DST, SRC, "checkSuccessResponse", true))
+  .then(() => sendCallMessage(SRC, DST))
+  .then(() => sendCallMessage(DST, SRC))
+  .then(() => sendCallMessage(SRC, DST, "checkSuccessResponse", true))
+  .then(() => sendCallMessage(DST, SRC, "checkSuccessResponse", true))
   .then(() => sendCallMessage(SRC, DST, "rollback", true))
   .then(() => sendCallMessage(DST, SRC, "rollback", true))
   .catch((error) => {
@@ -80,7 +82,12 @@ async function sendCallMessage(
   const executeCallReceipt = await invokeExecuteCall(dst, reqId, callData);
 
   console.log(`\n[${step++}] check CallExecuted event on ${dst} chain`);
-  await checkCallExecuted(dst, executeCallReceipt, reqId);
+  const height = await checkCallExecuted(dst, executeCallReceipt, reqId);
+
+  // Verify if correct meesage is received)
+  if (!expectRevert){
+  await verifyMessageReceived(dst, height!, msgData)
+  }
 
   if (needRollback) {
     console.log(`\n[${step++}] check ResponseMessage event on ${src} chain`);
@@ -162,11 +169,32 @@ async function checkCallExecuted(
 ) {
   console.log("**** Verify CallExecuted Event ****");
   if (dst === "archway") {
-    await verifyCallExecutedEventCosmos();
+    return await verifyCallExecutedEventCosmos();
   } else if (dst === "icon") {
-    await verifyCallExecutedEventIcon();
+    return await verifyCallExecutedEventIcon();
   }
 }
+
+async function verifyMessageReceived(
+  dst: string,
+  height: number,
+  msgData: string
+) {
+  let executedMsg:string | undefined;
+  if (dst === "archway") {
+    executedMsg = await verifyReceivedMessageCosmos(height!);
+  } else if (dst === "icon") {
+    executedMsg = await verifyReceivedMessageIcon(height)
+  }  
+  if (executedMsg! === msgData) {
+  } else {
+    throw new Error(
+      "Received Different Message. Message sent from source is : " + msgData
+    );
+  }
+}
+
+
 async function checkResponseMessage(
   src: string,
   expectRevert: boolean
