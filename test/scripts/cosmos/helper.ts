@@ -18,7 +18,6 @@ export async function CreateSigningClient(
   // Print account address
   const accounts = await wallet.getAccounts();
   const accountAddress = accounts[0].address;
-  console.log("Test Account address : " + accountAddress);
 
   // Create an signing client with created wallet
   const signingClient = await SigningCosmWasmClient.connectWithSigner(
@@ -100,12 +99,32 @@ export async function getBalance(
 
 export function GetCosmosContracts(contract: string) {
   var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"));
-  return dataArray["node-service-constantine-3"]["contracts"][contract];
+  return dataArray["archway"]["contracts"][contract];
 }
 
 export function GetIconContracts(contract: string) {
   var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"));
-  return dataArray["icon-node-0xacbc4e"]["contracts"][contract];
+  return dataArray["icon"]["contracts"][contract];
+}
+
+export function GetArchwayChainInfo(args: string){
+  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
+  return dataArray["archway"][args];
+}
+
+export function GetIconChainInfo(args: string){
+  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
+  return dataArray["icon"][args];
+}
+
+export function GetSrc(){
+  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
+  return dataArray["path"]["src"];
+}
+
+export function GetDest(){
+  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
+  return dataArray["path"]["dest"];
 }
 
 export function GetDataInBytes(msg: string) {
@@ -116,4 +135,12 @@ export function GetDataInBytes(msg: string) {
     bytes.push(charCode);
   }
   return bytes;
+}
+
+export function strToHex(str: string) {
+  let hex = "";
+  for (let i = 0; i < str.length; i++) {
+    hex += "" + str.charCodeAt(i).toString(16);
+  }
+  return hex;
 }

@@ -1,5 +1,10 @@
 {
-  "node-service-constantine-3": {
+  "archway": {
+    "chainId": "constantine-3",
+    "endpoint": "http://localhost:4564",
+    "prefix": "archway",
+    "network": "constantine-3",
+    "service_name": "node-service-constantine-3",
     "contracts": {
       "dapp": "archway1eyfccmjm6732k7wp4p6gdjwhxjwsvje44j0hfx8nkgrm8fs7vqfshgatxw",
       "ibc_core": "archway14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sy85n2u",
@@ -8,8 +13,11 @@
       "xcall_connection": "archway1ghd753shjuwexxywmgs4xz7x2q732vcnkm6h2pyv9s6ah3hylvrqvlzdpl"
     }
   },
-  "icon-node-0xacbc4e": {
+  "icon": {
     "network": "0x3.icon",
+    "endpoint": "http://localhost:8090/api/v3/icon_dex",
+    "nid": "0x3",
+    "service_name": "icon-node-0xacbc4e",
     "contracts": {
       "dapp": "cx5daa87ca057b824c0771b68391e6b4767ee4a928",
       "ibc_core": "cxb5ba9824fbac0d8559504804d5224d9dc9c9ffe9",
@@ -17,5 +25,9 @@
       "xcall": "cx54a4b1d02be781ce7e3c8b1df6f294ba656d98e8",
       "xcall_connection": "cx9eb3f276557b8057e3bb44f378b5cf8bf6c71b6f"
     }
+  },
+  "path": {
+    "src": "icon",
+    "dest": "archway"
   }
 }
