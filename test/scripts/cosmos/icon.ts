@@ -71,7 +71,7 @@ async function sendMessage(_to: string, _data: string, _rollback?: string, isRol
     const _params = _rollback
       ? {_to: _to, _data: _data, _rollback: IconConverter.toHex(_rollback)}
       : {_to: _to, _data: _data}
-    console.log("params: \n", _params)
+    console.log("params: \n", _params, "\n") 
     const txObj = new CallTransactionBuilder()
       .from(ICON_WALLET.getAddress())
       .to(ICON_DAPP)
@@ -142,7 +142,7 @@ function parseCallMessageSentEvent(event: any) {
   };
 }
 
-export async function waitEvent(sig: string, contract_address: string) {
+export async function waitEvent(sig: string, contract_address: string): Promise<[EventLog[], number]>{
   let latest = await ICON_SERVICE.getLastBlock().execute();
   let height = latest.height - 1;
   const heights = BigNumber.isBigNumber(height)
@@ -153,7 +153,7 @@ export async function waitEvent(sig: string, contract_address: string) {
     while (height < latest.height) {
       const events = await filterEventFromBlock(block, sig, contract_address);
       if (events.length > 0) {
-        return events;
+        return [events, height];
       }
       height++;
       if (height === latest.height) {
@@ -191,7 +191,7 @@ async function filterEventFromBlock(
 }
 
 export async function verifyCallMessageEventIcon() {
-  let events = await waitEvent(
+  let [events, height] = await waitEvent(
     callMessageSignature,
     ICON_XCALL
   );
@@ -235,28 +235,27 @@ export async function executeCallIcon(reqId: number, data: string) {
       .build();
 
     const signedTx = new SignedTransaction(txObj, ICON_WALLET);
-    return await ICON_SERVICE.sendTransaction(signedTx).execute();
+    const receipt= await ICON_SERVICE.sendTransaction(signedTx).execute();
+    await sleep(5000)
+    return await ICON_SERVICE.getTransactionResult(receipt).execute()
   } catch (e) {
     console.log(e);
     throw new Error("Error calling contract method");
   }
 }
 
-async function verifyCallExecutedEventIcon(eventLogs:TransactionResult["eventLogs"]) {
-  const filtereCallExecute = filterEvent(
-    eventLogs,
-    callExecutedSignature,
-    ICON_XCALL
-  );  
-  console.log(filtereCallExecute);
+export async function verifyCallExecutedEventIcon() {
+  let events = await waitEvent(callExecutedSignature, ICON_XCALL)
+  if (events.length > 0){
+    console.log(events)
+  }
 }
 
-async function verifyResponseMessageEventIcon() {
-  let events = await waitEvent(
+export async function verifyResponseMessageEventIcon(): Promise<[number, number]> {
+  let [events, height] = await waitEvent(
     responseMessageSignature,
     ICON_XCALL
   );
-  if (events.length > 0) {
     const indexed = events[0].indexed || [];
     const data = events[0].data || [];
     const event = {
@@ -264,28 +263,17 @@ async function verifyResponseMessageEventIcon() {
       _code: IconConverter.toNumber(data[0]),
     }
     console.log(events);
-    return {
-      _sn: event._sn,
-    };
+    const seqNo = event._sn
+    return [seqNo!, height!];
   }
-}
 
-async function verifyRollbackMessageEventIcon(){
-  let events = await waitEvent(
-    rollbackMessageSignature,
-    ICON_XCALL
-  );
-  if (events.length > 0) {
-    const indexed = events[0].indexed || [];
-    const event = {
-      _sn: IconConverter.toNumber(indexed[1]),
-    }
+export async function verifyRollbackMessageEventIcon(height: number){
+  const block = await ICON_SERVICE.getBlockByHeight(IconConverter.toBigNumber(height)).execute()
+    let events = await filterEventFromBlock(block, rollbackMessageSignature, ICON_XCALL)
     console.log(events);
-  }
-
 }
 
-async function executeRollback(seqNo: number) {
+export async function executeRollbackIcon(seqNo: number) {
   try {
     const fee = await getFee();
     const params = {
@@ -305,15 +293,18 @@ async function executeRollback(seqNo: number) {
       .build();
 
     const signedTx = new SignedTransaction(txObj, ICON_WALLET);
-    return await ICON_SERVICE.sendTransaction(signedTx).execute();
+    const receipt = await ICON_SERVICE.sendTransaction(signedTx).execute();
+    await sleep(5000)
+    const transaction = await ICON_SERVICE.getTransaction(receipt).execute()
+    console.log(transaction)
   } catch (e) {
     console.log(e);
     throw new Error("Error calling contract method");
   }
 }
 
-async function verifyRollbackExecutedEventIcon(){
-  let events = await waitEvent(
+export async function verifyRollbackExecutedEventIcon(){
+  let [events, height] = await waitEvent(
     "RollbackExecuted(int)",
     ICON_XCALL
   );
@@ -371,26 +362,26 @@ async function main() {
   const Data = callMsgEvent!._data;
 
   // // Execute Call
-  const execReceipt = await executeCallIcon(request_id, Data);
+  const execResult = await executeCallIcon(request_id, Data);
   await sleep(5000);
-  const execResult = await ICON_SERVICE.getTransactionResult(
-    execReceipt
-  ).execute();
+  // const execResult = await ICON_SERVICE.getTransactionResult(
+  //   execReceipt
+  // ).execute();
   console.log(execResult);
 
   // // verify Call Executed Event
-  await verifyCallExecutedEventIcon(execResult.eventLogs);
+  await verifyCallExecutedEventIcon();
 
   // verify Response Message Event
   const seqNo = await verifyResponseMessageEventIcon()
-  console.log("seqNo: ", seqNo?._sn);
+  console.log("seqNo: ", seqNo)
 
   // verify Rollback Message Event
-  await verifyRollbackMessageEventIcon()
+  // await verifyRollbackMessageEventIcon()
 
   // Execute Rollback
-  const execRollback = await executeRollback(seqNo?._sn!)
-  console.log(execRollback);
+  // const execRollback = await executeRollback(seqNo!)
+  // console.log(execRollback);
 
   //verify rollbackExecuted event 
   await verifyRollbackExecutedEventIcon()

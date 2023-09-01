@@ -1,15 +1,25 @@
 import {
-    executeCallCosmos,
+  executeCallCosmos,
+  executeRollbackCosmos,
   sendMessageFromDAppCosmos,
+  verifyCallExecutedEventCosmos,
   verifyCallMessageEventCosmos,
   verifyCallMessageSentEventArchway,
+  verifyResponseMessageEventCosmos,
+  verifyRollbackExecutedEventCosmos,
+  verifyRollbackMessageEventCosmos,
 } from "./archway";
 import { GetDataInBytes, GetDest, GetSrc, strToHex } from "./helper";
 import {
-    executeCallIcon,
+  executeCallIcon,
+  executeRollbackIcon,
   sendMessageFromDAppIcon,
+  verifyCallExecutedEventIcon,
   verifyCallMessageEventIcon,
   verifyCallMessageSentEventIcon,
+  verifyResponseMessageEventIcon,
+  verifyRollbackExecutedEventIcon,
+  verifyRollbackMessageEventIcon,
 } from "./icon";
 
 async function show_banner() {
@@ -27,12 +37,12 @@ const SRC = GetSrc();
 const DST = GetDest();
 
 show_banner()
-//   .then(() => sendCallMessage(SRC, DST))
-    .then(() => sendCallMessage(DST, SRC))
-  //   .then(() => sendCallMessage(SRC, DST, "checkSuccessResponse", true))
-  //   .then(() => sendCallMessage(DST, SRC, "checkSuccessResponse", true))
-  //   .then(() => sendCallMessage(SRC, DST, "rollback", true))
-  //   .then(() => sendCallMessage(DST, SRC, "rollback", true))
+  .then(() => sendCallMessage(SRC, DST))
+  .then(() => sendCallMessage(DST, SRC))
+  .then(() => sendCallMessage(SRC, DST, "checkSuccessResponse", true))
+  .then(() => sendCallMessage(DST, SRC, "checkSuccessResponse", true))
+  .then(() => sendCallMessage(SRC, DST, "rollback", true))
+  .then(() => sendCallMessage(DST, SRC, "rollback", true))
   .catch((error) => {
     console.error(error);
     process.exitCode = 1;
@@ -49,6 +59,7 @@ async function sendCallMessage(
   if (!msgData) {
     msgData = `${testName}_${src}_${dst}`;
   }
+  const expectRevert = msgData === "rollback";
   const rollbackData = needRollback
     ? `ThisIsRollbackMessage_${src}_${dst}`
     : undefined;
@@ -62,11 +73,33 @@ async function sendCallMessage(
   );
   const sn = await verifyCallMessageSent(src, sendMessageReceipt!);
 
-  console.log(`[${step++}] check CallMessage event on ${dst} chain`);
-  const [reqId, callData]:any = await checkCallMessage(dst);
+  console.log(`\n[${step++}] check CallMessage event on ${dst} chain`);
+  const [reqId, callData]: any = await checkCallMessage(dst);
 
-  console.log(`[${step++}] invoke executeCall with reqId=${reqId}`);
+  console.log(`\n[${step++}] invoke executeCall with reqId=${reqId}`);
   const executeCallReceipt = await invokeExecuteCall(dst, reqId, callData);
+
+  console.log(`\n[${step++}] check CallExecuted event on ${dst} chain`);
+  await checkCallExecuted(dst, executeCallReceipt, reqId);
+
+  if (needRollback) {
+    console.log(`\n[${step++}] check ResponseMessage event on ${src} chain`);
+    const [responseHeight, seqNo]: any = await checkResponseMessage(
+      src,
+      expectRevert
+    );
+
+    if (expectRevert) {
+      console.log(`\n[${step++}] check RollbackMessage event on ${src} chain`);
+      const sn = await checkRollbackMessage(src, responseHeight);
+
+      console.log(`\n[${step++}] invoke executeRollback with sn=${seqNo}`);
+      const executeRollbackReceipt = await invokeExecuteRollback(src, seqNo);
+
+      console.log(`\n[${step++}] check RollbackExecuted event on ${src} chain`);
+      await checkRollbackExecuted(src);
+    }
+  }
 }
 
 async function sendMessageFromDApp(
@@ -99,6 +132,7 @@ async function checkCallMessage(dst: string) {
   console.log("**** CallMessage Event ****");
   if (dst === "archway") {
     const eventLogs = await verifyCallMessageEventCosmos();
+    console.log(eventLogs);
     const reqIdObject = eventLogs?.attributes.find(
       (item) => item.key === "reqId"
     );
@@ -106,19 +140,70 @@ async function checkCallMessage(dst: string) {
       (item) => item.key === "data"
     );
     return [reqIdObject!.value, dataObject!.value];
-
   } else if (dst === "icon") {
     const eventLogs = await verifyCallMessageEventIcon();
-    return [eventLogs!._reqId, eventLogs!._data]
+    return [eventLogs!._reqId, eventLogs!._data];
   }
 }
 
 async function invokeExecuteCall(dst: string, reqId: any, callData: any) {
-    console.log("**** Execute Call ****");
+  console.log("**** Execute Call ****");
   if (dst === "archway") {
-    await executeCallCosmos(reqId, callData)
+    console.log(await executeCallCosmos(reqId, callData));
   } else if (dst === "icon") {
-    console.log(await executeCallIcon(reqId, callData))
+    console.log(await executeCallIcon(reqId, callData));
   }
 }
 
+async function checkCallExecuted(
+  dst: string,
+  executeCallReceipt: any,
+  reqId: any
+) {
+  console.log("**** Verify CallExecuted Event ****");
+  if (dst === "archway") {
+    await verifyCallExecutedEventCosmos();
+  } else if (dst === "icon") {
+    await verifyCallExecutedEventIcon();
+  }
+}
+async function checkResponseMessage(
+  src: string,
+  expectRevert: boolean
+): Promise<[number, any] | undefined> {
+  console.log("**** Verify ResponseMessage Event ****");
+  if (src === "icon") {
+    const [seqNo, height] = await verifyResponseMessageEventIcon();
+    return [height, seqNo];
+  } else if (src === "archway") {
+    const [seqNo, height] = await verifyResponseMessageEventCosmos();
+    return [height, seqNo];
+  }
+}
+
+async function checkRollbackMessage(src: string, height: number) {
+  console.log("**** Verify RollbackMessage Event ****");
+  if (src === "icon") {
+    await verifyRollbackMessageEventIcon(height);
+  } else if (src === "archway") {
+    await verifyRollbackMessageEventCosmos(height);
+  }
+}
+
+async function invokeExecuteRollback(src: string, seqNo: number) {
+  console.log("**** Execute Rollback ****");
+  if (src === "icon") {
+    await executeRollbackIcon(seqNo);
+  } else if (src === "archway") {
+    await executeRollbackCosmos(seqNo);
+  }
+}
+
+async function checkRollbackExecuted(src: string) {
+  console.log("**** Verify RollbackExecuted event ****");
+  if (src === "icon") {
+    await verifyRollbackExecutedEventIcon();
+  } else if (src === "archway") {
+    await verifyRollbackExecutedEventCosmos();
+  }
+}
