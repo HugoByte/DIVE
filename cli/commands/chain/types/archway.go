@@ -163,7 +163,7 @@ func runArchwayWithDefaultServiceConfig(diveContext *common.DiveContext, enclave
 
 	params := `{"args":{"data":{}}}`
 	nodeServiceResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveArchwayDefaultNodeScript, runArchwayNodeWithDefaultConfigFunctionName, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
-
+	
 	if err != nil {
 
 		return "", err

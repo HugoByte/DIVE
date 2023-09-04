@@ -51,6 +51,11 @@ ARCHWAY_SERVICE_CONFIG = struct(
     password = "password",
 )
 
+NEUTRON_SERVICE_CONFIG = struct(
+    service_name = "neutron-node",
+    image = "hugobyte/neutron-node:v0.2"
+)
+
 IBC_RELAYER_SERVICE = struct(
     ibc_relay_config_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/archwayjson.tpl",
     relay_service_name = "cosmos-ibc-relay",
@@ -99,4 +104,18 @@ COMMON_ARCHWAY_PRIVATE_PORTS = struct(
     http = 9091,
     tcp = 26656,
     rpc = 26657,
+)
+
+NEUTRON_PRIVATE_PORTS = struct(
+    http = 1317,
+    rpc = 26657,
+    tcp = 26656,
+    grpc = 9090,
+)
+
+NEUTRON_PUBLIC_PORTS = struct(
+    http = 1317,
+    rpc = 26657,
+    tcp = 26656,
+    grpc = 8090,
 )

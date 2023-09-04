@@ -47,6 +47,7 @@ maintenance within the specified blockchain ecosystem.`,
 	chainCmd.AddCommand(types.NewEthCmd(diveContext))
 	chainCmd.AddCommand(types.NewHardhatCmd(diveContext))
 	chainCmd.AddCommand(types.NewArchwayCmd(diveContext))
+	chainCmd.AddCommand(types.NewNeutronCmd(diveContext))
 
 	return chainCmd
 

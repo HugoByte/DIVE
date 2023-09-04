@@ -68,7 +68,7 @@ def run_node(plan, node_name, args):
     elif node_name == "eth" or node_name == "hardhat":
         return eth_node.start_eth_node_serivce(plan, args, node_name)
 
-    elif node_name == "archway":
+    elif node_name == "archway" or node_name == "neutron":
         return cosmvm_node.start_cosmvm_chains(plan,node_name,args)
 
     else:
