@@ -13,6 +13,14 @@ const (
 	runNeutronNodeWithDefaultConfigFunctionName = "start_node_service"
 )
 
+
+// TODO: Implement custom Neutron node configuration.
+// This code can be used when writing functionality for running a Neutron node with a custom configuration.
+// Currently, it's commented out as the custom configuration feature is not yet implemented.
+// Uncomment the code below and adapt it to support custom configuration options.
+
+/*
+
 type NeurtronServiceConfig struct {
 	PrivateGrpcPort int    `json:"private_grpc"`
 	PrivateHttpPort int    `json:"private_http"`
@@ -46,7 +54,7 @@ func (as *NeurtronServiceConfig) ReadServiceConfig(path string) error {
 	}
 	return nil
 }
-
+*/
 
 func NewNeutronCmd(diveContext *common.DiveContext) *cobra.Command {
 
@@ -82,7 +90,7 @@ func RunNeutronNode(diveContext *common.DiveContext) *common.DiveserviceResponse
 	var starlarkExecutionData = ""
 	starlarkExecutionData, err = runNeutronWithDefaultServiceConfig(diveContext, kurtosisEnclaveContext)
 	if err != nil {
-		diveContext.FatalError("Starlark Run Failed 2", err.Error())
+		diveContext.FatalError("Starlark Run Failed", err.Error())
 	}
 	err = json.Unmarshal([]byte(starlarkExecutionData), neutronResponse)
 
@@ -110,7 +118,7 @@ func runNeutronWithDefaultServiceConfig(diveContext *common.DiveContext, enclave
 	if err != nil {
 
 		diveContext.StopServices(services)
-		diveContext.FatalError("Starlark Run Failed 1", err.Error())
+		diveContext.FatalError("Starlark Run Failed", err.Error())
 
 	}
 	diveContext.CheckInstructionSkipped(skippedInstructions, "Nueutron Node Already Running")
