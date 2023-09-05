@@ -14,48 +14,6 @@ const (
 )
 
 
-// TODO: Implement custom Neutron node configuration.
-// This code can be used when writing functionality for running a Neutron node with a custom configuration.
-// Currently, it's commented out as the custom configuration feature is not yet implemented.
-// Uncomment the code below and adapt it to support custom configuration options.
-
-/*
-
-type NeurtronServiceConfig struct {
-	PrivateGrpcPort int    `json:"private_grpc"`
-	PrivateHttpPort int    `json:"private_http"`
-	PrivateTcpPort  int    `json:"private_tcp"`
-	PrivateRpcPort  int    `json:"private_rpc"`
-	PublicGrpcPort  int    `json:"public_grpc"`
-	PublicHttpPort  int    `json:"public_http"`
-	PublicTcpPort   int    `json:"public_tcp"`
-	PublicRpcPort   int    `json:"public_rpc"`
-}
-
-func (as *NeurtronServiceConfig) EncodeToString() (string, error) {
-
-	data, err := json.Marshal(as)
-	if err != nil {
-		return "", err
-	}
-
-	return string(data), nil
-}
-func (as *NeurtronServiceConfig) ReadServiceConfig(path string) error {
-	configData, err := common.ReadConfigFile(config)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(configData, as)
-
-	if err != nil {
-		return err
-	}
-	return nil
-}
-*/
-
 func NewNeutronCmd(diveContext *common.DiveContext) *cobra.Command {
 
 	neutronCmd := &cobra.Command{
