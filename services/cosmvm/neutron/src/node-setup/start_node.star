@@ -75,10 +75,7 @@ def start_neutron_node(plan, args):
                 wait = "2m"
             ),
         },
-        entrypoint=["/bin/sh", "-c"],
-        cmd=[
-            "bash /opt/neutron/network/init.sh && bash /opt/neutron/network/init-neutrond.sh && bash /opt/neutron/network/start.sh"
-        ],
+        entrypoint=["/bin/sh", "-c", "bash /opt/neutron/network/init.sh && bash /opt/neutron/network/init-neutrond.sh && bash /opt/neutron/network/start.sh"],
         env_vars={
             "RUN_BACKGROUND": "0",
         },
@@ -112,8 +109,8 @@ def get_service_url(ip_address, ports):
         str: The constructed service URL.
     """
 
-    port_id = ports["rpc"].number
-    protocol = ports["rpc"].application_protocol
+    port_id = ports[network_port_keys_and_ip.rpc].number
+    protocol = ports[network_port_keys_and_ip.rpc].application_protocol
     url = "{0}://{1}:{2}".format(protocol, ip_address, port_id)
     return url
 
@@ -127,10 +124,12 @@ def get_service_config(private_grpc, private_http, private_tcp, private_rpc, pub
         private_http (int): Private HTTP port.
         private_tcp (int): Private TCP port.
         private_rpc (int): Private RPC port.
-        public_grpc (int): Public gRPC port.
         public_http (int): Public HTTP port.
         public_tcp (int): Public TCP port.
         public_rpc (int): Public RPC port.
+        public_rpc (int): Public RPC port.
+        service_name (str): Service name.
+
 
     Returns:
         dict: Service configuration dictionary.
