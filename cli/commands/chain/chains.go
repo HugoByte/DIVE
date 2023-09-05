@@ -31,7 +31,10 @@ maintenance within the specified blockchain ecosystem.`,
 			}
 			cmd.ValidArgs = validArgs
 
-			if !slices.Contains(cmd.ValidArgs, args[0]) {
+			if len(args) == 0 {
+				cmd.Help()
+				
+			} else if !slices.Contains(cmd.ValidArgs, args[0]) {
 
 				diveContext.Log.SetOutput(os.Stderr)
 				diveContext.Error(fmt.Sprintf("Invalid Subcommand: %v", args))
@@ -47,6 +50,7 @@ maintenance within the specified blockchain ecosystem.`,
 	chainCmd.AddCommand(types.NewEthCmd(diveContext))
 	chainCmd.AddCommand(types.NewHardhatCmd(diveContext))
 	chainCmd.AddCommand(types.NewArchwayCmd(diveContext))
+	chainCmd.AddCommand(types.NewNeutronCmd(diveContext))
 
 	return chainCmd
 
