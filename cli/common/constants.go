@@ -13,6 +13,8 @@ const (
 	DiveEthHardhatNodeScript     = "services/evm/eth/src/node-setup/start-eth-node.star"
 	DiveArchwayNodeScript        = "services/cosmvm/archway/src/node-setup/start_node.star"
 	DiveArchwayDefaultNodeScript = "services/cosmvm/archway/archway.star"
+	DiveNeutronNodeScript        = "services/cosmvm/neutron/src/node-setup/start_node.star"
+	DiveNeutronDefaultNodeScript = "services/cosmvm/neutron/neutron.star"
 	DiveBridgeScript             = "main.star"
 	DiveDryRun                   = false
 	DiveDefaultParallelism       = 4

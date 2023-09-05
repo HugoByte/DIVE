@@ -28,7 +28,10 @@ This will create an relay to connect two different chains and pass any messages 
 			}
 			cmd.ValidArgs = validArgs
 
-			if !slices.Contains(cmd.ValidArgs, args[0]) {
+			if len(args) == 0 {
+				cmd.Help()
+				
+			} else if !slices.Contains(cmd.ValidArgs, args[0]) {
 
 				diveContext.Log.SetOutput(os.Stderr)
 				diveContext.Error(fmt.Sprintf("Invalid Subcommand: %v", args))
