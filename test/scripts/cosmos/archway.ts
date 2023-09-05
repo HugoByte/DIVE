@@ -191,6 +191,27 @@ export async function verifyCallExecutedEventCosmos() {
   const event = response![0]
   const decodedEvent = fromTendermintEvent(event)
   console.log(decodedEvent);
+  return response![1]
+}
+
+export async function verifyReceivedMessageCosmos(height: number) {
+  let decodedEvent:Event
+  const query = `tx.height=` + height;
+    await sleep(5000);
+    const txs = await signingClient.searchTx(query);
+    if (txs.length > 0) {
+      for (const tx of txs) {
+        const events = tx.events;
+        for (const event of events) {
+          if (event.type === "wasm"){
+            if (event.attributes[1].key === "data") {
+              decodedEvent = fromTendermintEvent(event);
+              return decodedEvent.attributes[1].value
+            }
+          }      
+        }
+      }
+    }
 }
 
 export async function verifyResponseMessageEventCosmos(): Promise<[string, number]> {
