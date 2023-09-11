@@ -1,8 +1,11 @@
 {
   "devDependencies": {
+    "@cosmjs/cosmwasm-stargate": "^0.31.1",
+    "@cosmjs/stargate": "^0.31.1",
     "@iconfoundation/btp2-solidity-library": "^0.1.0",
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
     "@openzeppelin/contracts-upgradeable": "^4.7.3",
+    "@types/dotenv": "^8.2.0",
     "hardhat": "^2.12.7",
     "icon-sdk-js": "^1.4.3",
     "ts-node": "^10.9.1",
@@ -10,5 +13,8 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "long": "^5.2.3"
   }
 }
