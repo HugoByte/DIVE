@@ -84,7 +84,7 @@ ARCHAY_NODE0_CONFIG = struct(
     chain_id = "constantine-3",
     grpc = 9090,
     http = 9091,
-    tcp = 26656,
+    tcp = 26658,
     rpc = 4564,
     key = "constantine-3-key",
     
@@ -115,7 +115,7 @@ NEUTRON_PRIVATE_PORTS = struct(
 
 NEUTRON_PUBLIC_PORTS = struct(
     http = 1317,
-    rpc = 26657,
+    rpc = 26659,
     tcp = 26656,
     grpc = 8090,
 )
