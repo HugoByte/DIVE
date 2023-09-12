@@ -9,9 +9,6 @@ def get_main_preps(plan,service_name,uri):
         endpoint="/api/v3/icon_dex",
         content_type="application/json",
         body = '{ "jsonrpc": "2.0", "id": 1, "method": "icx_call", "params": { "to": "cx0000000000000000000000000000000000000000", "dataType": "call", "data": { "method": "getMainPReps", "params": {  } } } }',
-        extract={
-            "preps" : '.result.preps'
-        }
     )
     result = plan.wait(service_name=service_name,recipe=post_request,field="code",assertion="==",target_value=200)
     
@@ -209,11 +206,7 @@ def register_prep_node_publickey(plan,service_name,address,pubkey,uri,keystorepa
 
 # Start decentralisation for btp relay
 def ensure_decentralisation(plan,service_name,prep_address,uri,keystorepath,keypassword,nid):
-    main_preps = get_main_preps(plan,service_name,uri)
-    plan.print(main_preps)
 
-    response = get_prep(plan,service_name,prep_address,uri)
-    response_code = response.get("extract.code")
 
 
     plan.print("registerPRep")
