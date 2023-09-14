@@ -15,13 +15,29 @@ def start_neutron_node(plan, args):
         None
     """
 
+    chain_id = args["cid"]
+    key = args["key"]
+    password = args["password"]
     service_name = args["service_name"]
 
     plan.print("Launching " + service_name + " deployment service")
 
+    start_script_file = "start-script-%s" % chain_id
+    init_script_file = "init-script-%s" % chain_id
+    init_neutrond_script_file = "init-neutrond-script-%s" % chain_id
+
+    plan.upload_files(src = neutron_node_constants.init_script, name = init_script_file)
+    plan.upload_files(src = neutron_node_constants.init_nutrond_script, name = init_neutrond_script_file)
+    plan.upload_files(src = neutron_node_constants.start_script, name = start_script_file)
+
     # Define Neutron node configuration
     neutron_node_config = ServiceConfig(
         image=neutron_node_constants.image,
+        files = {
+            neutron_node_constants.path + "start": start_script_file,
+            neutron_node_constants.path + "init": init_script_file,
+            neutron_node_constants.path + "init-neutrond": init_neutrond_script_file,
+        },
         ports={
             network_port_keys_and_ip.http: PortSpec(
                 number=args["private_http"],
@@ -75,7 +91,8 @@ def start_neutron_node(plan, args):
                 wait = "2m"
             ),
         },
-        entrypoint=["/bin/sh", "-c", "bash /opt/neutron/network/init.sh && bash /opt/neutron/network/init-neutrond.sh && bash /opt/neutron/network/start.sh"],
+        entrypoint=["/bin/sh", "-c"],
+        cmd = ["chmod +x ../..%s/init/init.sh && chmod +x ../..%s/start/start.sh && chmod +x ../..%s/init-neutrond/init-neutrond.sh && key=%s password=\"%s\" CHAINID=%s ../..%s/init/init.sh && key=%s password=\"%s\" CHAINID=%s ../..%s/init-neutrond/init-neutrond.sh && key=%s password=\"%s\" CHAINID=%s ../..%s/start/start.sh" % (neutron_node_constants.path, neutron_node_constants.path, neutron_node_constants.path, key, password, chain_id, neutron_node_constants.path, key, password, chain_id,neutron_node_constants.path, key, password, chain_id, neutron_node_constants.path)],
         env_vars={
             "RUN_BACKGROUND": "0",
         },
@@ -94,6 +111,8 @@ def start_neutron_node(plan, args):
         service_name = service_name,
         endpoint = private_url,
         endpoint_public = public_url,
+        chain_id = chain_id,
+        chain_key = key
     )
 
 
@@ -115,7 +134,7 @@ def get_service_url(ip_address, ports):
     return url
 
 
-def get_service_config(private_grpc, private_http, private_tcp, private_rpc, public_grpc, public_http, public_tcp, public_rpc):
+def get_service_config(cid, key, password, private_grpc, private_http, private_tcp, private_rpc, public_grpc, public_http, public_tcp, public_rpc):
     """
     Get the service configuration based on provided port values.
 
@@ -135,7 +154,7 @@ def get_service_config(private_grpc, private_http, private_tcp, private_rpc, pub
         dict: Service configuration dictionary.
     """
 
-    service_name = "{0}".format(neutron_node_constants.service_name)
+    service_name = "{0}-{1}".format(neutron_node_constants.service_name, cid)
     config = {
         "public_grpc": public_grpc,
         "public_http": public_http,
@@ -146,5 +165,8 @@ def get_service_config(private_grpc, private_http, private_tcp, private_rpc, pub
         "private_rpc": private_rpc,
         "private_grpc": private_grpc,
         "service_name": service_name,
+        "cid" : cid,
+        "key" : key,
+        "password" : password,
     }
     return config

@@ -53,7 +53,14 @@ ARCHWAY_SERVICE_CONFIG = struct(
 
 NEUTRON_SERVICE_CONFIG = struct(
     service_name = "neutron-node",
-    image = "hugobyte/neutron-node:v0.2"
+    image = "hugobyte/neutron-node:v0.2",
+    init_script = "github.com/hugobyte/dive/services/cosmvm/neutron/static_files/init.sh",
+    start_script = "github.com/hugobyte/dive/services/cosmvm/neutron/static_files/start.sh",
+    init_nutrond_script = "github.com/hugobyte/dive/services/cosmvm/neutron/static_files/init-neutrond.sh",
+    path = "/neutron-scripts/",
+    chain_id = "test-chain",
+    key = "test-key",
+    password = "clock post desk civil pottery foster expand merit dash seminar song memory figure uniform spice circle try happy obvious trash crime hybrid hood cushion",
 )
 
 IBC_RELAYER_SERVICE = struct(

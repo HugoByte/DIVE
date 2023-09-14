@@ -22,6 +22,9 @@ def start_node_service(plan, args):
 
     if len(data) != 0:
         # Configure the service based on provided data
+        chainId = data["chainId"]
+        key = data["key"]
+        password = data["password"]
         private_grpc = data["private_grpc"]
         private_tcp = data["private_tcp"]
         private_http = data["private_http"]
@@ -33,12 +36,14 @@ def start_node_service(plan, args):
         public_rpc = data["public_rpc"]
 
         chain_config = neutron_node_service.get_service_config(
+            chainId, key, password,
             private_grpc, private_http, private_tcp, private_rpc,
             public_grpc, public_http, public_tcp, public_rpc
         )
     else:
         # Use predefined port values for configuration
         chain_config = neutron_node_service.get_service_config(
+            neutron_service_config.chain_id, neutron_service_config.key, neutron_service_config.password,
             neutron_private_ports.grpc, neutron_private_ports.http,
             neutron_private_ports.tcp, neutron_private_ports.rpc,
             neutron_public_ports.grpc, neutron_public_ports.http,
