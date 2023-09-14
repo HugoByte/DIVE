@@ -11,7 +11,7 @@ import (
 )
 
 var suppottedChainsForBtp = []string{"icon", "eth", "hardhat"}
-var supportedChainsForIbc = []string{"archway"}
+var supportedChainsForIbc = []string{"archway", "icon"}
 
 type Chains struct {
 	chainA            string
