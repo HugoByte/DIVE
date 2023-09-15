@@ -139,6 +139,9 @@ def get_service_config(cid, key, password, private_grpc, private_http, private_t
     Get the service configuration based on provided port values.
 
     Args:
+        cid (str): Chain id.
+        key (str): Key.
+        password (str): Memonic password combine with words between 20 - 34
         private_grpc (int): Private gRPC port.
         private_http (int): Private HTTP port.
         private_tcp (int): Private TCP port.
