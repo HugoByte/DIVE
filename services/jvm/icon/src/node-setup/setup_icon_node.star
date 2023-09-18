@@ -63,7 +63,7 @@ def register_prep(plan,service_name,name,uri,keystorepath,keypassword,nid):
 
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
     plan.print("Completed RegisterPrep")
 
@@ -99,7 +99,7 @@ def set_stake(plan,service_name,amount,uri,keystorepath,keypassword,nid):
     tx_hash = result["output"]
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
     plan.print("Set Stake Completed")
 
@@ -115,7 +115,7 @@ def set_delegation(plan,service_name,address,amount,uri,keystorepath,keypassword
     tx_hash = result["output"]
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
 # Sets the bonder list with `address` specified
 def set_bonder_list(plan,service_name,address,uri,keystorepath,keypassword,nid):
@@ -128,7 +128,7 @@ def set_bonder_list(plan,service_name,address,uri,keystorepath,keypassword,nid):
     tx_hash = result["output"]
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
 # Sets Bond `amount` to `address`
 def set_bond(plan,service_name,address,amount,uri,keystorepath,keypassword,nid):
@@ -142,7 +142,7 @@ def set_bond(plan,service_name,address,amount,uri,keystorepath,keypassword,nid):
     tx_hash = result["output"]
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
 # Returns Network revision
 def get_revision(plan,service_name):
@@ -173,7 +173,7 @@ def set_revision(plan,service_name,uri,code,keystorepath,keypassword,nid):
     tx_hash = result["output"]
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
 # Returns PREP Node Publci Key using `address` specified
 def get_prep_node_public_key(plan,service_name,address):
@@ -202,7 +202,7 @@ def register_prep_node_publickey(plan,service_name,address,pubkey,uri,keystorepa
     tx_hash = result["output"]
     tx_result = get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
 # Start decentralisation for btp relay
 def ensure_decentralisation(plan,service_name,prep_address,uri,keystorepath,keypassword,nid):
@@ -321,7 +321,7 @@ def open_btp_network(plan,service_name,args,uri,keystorepath,keypassword,nid):
     tx_hash = result["output"]
     tx_result = filter_event(plan,service_name,tx_hash)
 
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
     return tx_result
 
