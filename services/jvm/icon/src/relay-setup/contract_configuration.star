@@ -44,7 +44,7 @@ def add_service(plan,bmc_address,xcall_address,args):
 
     tx_hash = result["output"].replace('"',"")
     tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
 
 
@@ -94,7 +94,7 @@ def add_verifier(plan,service_name,bmc_address,dst_chain_network,bmv_address,uri
     tx_hash = result["output"].replace('"',"")
     tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
     return tx_result
 
 # Adds BTP Link to BMC contract on ICON
@@ -111,7 +111,7 @@ def add_btp_link(plan,service_name,bmc_address,dst_bmc_address,src_network_id,ur
 
 
     tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
     return tx_result
 
@@ -126,7 +126,7 @@ def add_relay(plan,service_name,bmc_address,dst_bmc_address,relay_address,uri,ke
 
     tx_hash = result["output"].replace('"',"")
     tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
     return tx_result
 
 # Configures Link in BMC on ICON
@@ -247,7 +247,7 @@ def add_connection_xcall_dapp(plan,xcall_dapp_address,wasm_network_id,java_xcall
 
     tx_hash = result["output"].replace('"',"")
     tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
     return tx_result
 
 def configure_xcall_connection(plan,xcall_connection_address,connection_id,counterparty_port_id,counterparty_nid,client_id,service_name,uri,keystorepath,keypassword,nid):
@@ -263,7 +263,7 @@ def configure_xcall_connection(plan,xcall_connection_address,connection_id,count
 
     tx_hash = result["output"].replace('"',"")
     tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
     return tx_result
 
 
@@ -279,7 +279,7 @@ def set_default_connection_xcall(plan,xcall_address,wasm_network_id,xcall_connec
     plan.print(params)
     tx_hash = result["output"].replace('"',"")
     tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
     return tx_result
 
 def setup_contracts_for_ibc_java(plan,args):
@@ -343,7 +343,7 @@ def registerClient(plan,service_name, light_client_address, keystorepath,keystor
     # tx_result = get_tx_result(plan,tx_hash,service_name,)
     tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
     return tx_hash
 
@@ -362,6 +362,6 @@ def bindPort(plan,service_name,xcall_conn_address,keystorepath,keystore_password
     tx_hash = result["output"]
     tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
 
-    plan.assert(value=tx_result["extract.status"],assertion="==",target_value="0x1")
+    plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
 
     return tx_hash
