@@ -9,7 +9,7 @@ network_keys_and_public_address = constants.NETWORK_PORT_KEYS_AND_IP_ADDRESS
 # Spins Up the ETH Node
 def start_eth_node(plan,args):
  	eth_contstants = constants.ETH_NODE_CLIENT
- 	args_with_right_defaults = input_parser.parse_input(args)
+ 	args_with_right_defaults = input_parser.get_args_with_default_values(args)
  	num_participants = len(args_with_right_defaults.participants)
  	network_params = args_with_right_defaults.network_params
 
