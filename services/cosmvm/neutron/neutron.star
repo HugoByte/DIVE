@@ -1,18 +1,30 @@
-# Import modules and constants
+# Import required modules and constants
 neutron_node_service = import_module("github.com/hugobyte/dive/services/cosmvm/neutron/src/node-setup/start_node.star")
 constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
 neutron_private_ports = constants.NEUTRON_PRIVATE_PORTS
 neutron_node1_config = constants.NEUTRON_NODE1_CONFIG
 neutron_node2_config = constants.NEUTRON_NODE2_CONFIG
 
-
 def start_node_services(plan, args):
+    """
+    Configure and start two Neutron node services, serving as the source and destination,
+    to establish an IBC relay connection between them.
+
+    Args:
+        plan (plan): plan.
+        args (dict): Arguments containing data for configuring the services.
+
+    Returns:
+        struct: Configuration information for the source and destination services.
+    """
+
     data_src = args["src_chain"]["data"]
     data_dst = args["dst_chain"]["data"] 
     src_chain_config = ""
     dst_chain_config = ""
+
     if len(data_src) != 0:
-        # Configure the service based on provided data
+        # Configure the service based on provided data for source chain
         chainId = data_src["chainId"]
         key = data_src["key"]
         password = data_src["password"]
@@ -27,7 +39,7 @@ def start_node_services(plan, args):
             public_grpc, public_http, public_tcp, public_rpc
         )
     else:
-        # Use predefined port values for configuration
+        # Use predefined port values for configuration for source chain
         src_chain_config = neutron_node_service.get_service_config(
             neutron_node1_config.chain_id, neutron_node1_config.key, neutron_node1_config.password,
             neutron_private_ports.grpc, neutron_private_ports.http,
@@ -37,7 +49,7 @@ def start_node_services(plan, args):
         )
 
     if len(data_dst) != 0:
-        # Configure the service based on provided data
+        # Configure the service based on provided data for destination chain
         chainId = data_dst["chainId"]
         key = data_dst["key"]
         password = data_dst["password"]
@@ -52,7 +64,7 @@ def start_node_services(plan, args):
             public_grpc, public_http, public_tcp, public_rpc
         )
     else:
-        # Use predefined port values for configuration
+        # Use predefined port values for configuration for destination chain
         dst_chain_config = neutron_node_service.get_service_config(
             neutron_node2_config.chain_id, neutron_node2_config.key, neutron_node2_config.password,
             neutron_private_ports.grpc, neutron_private_ports.http,
@@ -61,9 +73,11 @@ def start_node_services(plan, args):
             neutron_node2_config.tcp, neutron_node2_config.rpc
         )
     
+    # Start the source and destination Neutron node services
     src_chain_response = neutron_node_service.start_neutron_node(plan, src_chain_config)
     dst_chain_response = neutron_node_service.start_neutron_node(plan, dst_chain_config)
 
+    # Create configuration dictionaries for both services
     src_service_config = {
         "service_name": src_chain_response.service_name,
         "endpoint": src_chain_response.endpoint,
@@ -81,22 +95,20 @@ def start_node_services(plan, args):
     }
 
     return struct(
-        src_config = src_service_config,
-        dst_config = dst_service_config,
+        src_config=src_service_config,
+        dst_config=dst_service_config,
     )
-
-
 
 def start_node_service(plan, args):
     """
     Start a Neutron node service with the provided configuration.
 
     Args:
-        plan (Plan): The deployment plan.
+        plan (plan): plan.
         args (dict): Arguments containing data for configuring the service.
 
     Returns:
-        Any: The response from starting the Neutron node service.
+        struct: The response from starting the Neutron node service.
     """
 
     data = args["data"]

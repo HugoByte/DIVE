@@ -5,7 +5,7 @@
 "chain-id": "{{.CHAINID}}",
 "rpc-addr": "",
 "grpc-addr": "",
-"account-prefix": "neutron",
+"account-prefix": "{{.CHAIN}}",
 "keyring-backend": "test",
 "gas-adjustment": 1.5,
 "gas-prices": "0.0025stake",

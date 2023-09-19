@@ -61,7 +61,7 @@ NEUTRON_SERVICE_CONFIG = struct(
 )
 
 IBC_RELAYER_SERVICE = struct(
-    ibc_relay_config_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/archwayjson.tpl",
+    ibc_relay_config_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/cosmosjson.tpl",
     relay_service_name = "cosmos-ibc-relay",
     # updated the ibc relay image
     relay_service_image = "hugobyte/ibc-relay:v0.1",

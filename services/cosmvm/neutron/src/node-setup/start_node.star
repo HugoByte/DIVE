@@ -92,7 +92,7 @@ def start_neutron_node(plan, args):
             ),
         },
         entrypoint=["/bin/sh", "-c"],
-        cmd = ["chmod +x ../..%s/init/init.sh && chmod +x ../..%s/start/start.sh && chmod +x ../..%s/init-neutrond/init-neutrond.sh && key=%s password=\"%s\" CHAINID=%s ../..%s/init/init.sh && key=%s password=\"%s\" CHAINID=%s ../..%s/init-neutrond/init-neutrond.sh && key=%s password=\"%s\" CHAINID=%s ../..%s/start/start.sh" % (neutron_node_constants.path, neutron_node_constants.path, neutron_node_constants.path, key, password, chain_id, neutron_node_constants.path, key, password, chain_id,neutron_node_constants.path, key, password, chain_id, neutron_node_constants.path)],
+        cmd = ["chmod +x ../..%s/init/init.sh && chmod +x ../..%s/start/start.sh && chmod +x ../..%s/init-neutrond/init-neutrond.sh && key=%s password=\"%s\" CHAINID=%s ../..%s/init/init.sh && CHAINID=%s ../..%s/init-neutrond/init-neutrond.sh && CHAINID=%s ../..%s/start/start.sh" % (neutron_node_constants.path, neutron_node_constants.path, neutron_node_constants.path, key, password, chain_id, neutron_node_constants.path, chain_id,neutron_node_constants.path, chain_id, neutron_node_constants.path)],
         env_vars={
             "RUN_BACKGROUND": "0",
         },
