@@ -1,7 +1,7 @@
 constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
 ibc_relay_config = constants.IBC_RELAYER_SERVICE
 
-def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_config, dst_config):
+def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_config, dst_config, args):
     plan.print("starting cosmos relay")
 
     plan.upload_files(src = ibc_relay_config.run_file_path, name = "run")
@@ -34,11 +34,19 @@ def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_c
         name = "config-%s" % dst_chain_id,
     )
 
-    plan.exec(service_name = src_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apk add jq"]))
+    if args["links"]["src"] == "neutron": 
+        plan.exec(service_name = src_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apt install jq"]))
+    elif args["links"]["src"] == "archway":
+        plan.exec(service_name = src_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apk add jq"]))
 
     src_chain_seed = plan.exec(service_name = src_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "jq -r '.mnemonic' ../../start-scripts/key_seed.json | tr -d '\n\r'"]))
 
-    plan.exec(service_name = dst_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apk add jq"]))
+
+
+    if args["links"]["dst"] == "neutron": 
+        plan.exec(service_name = dst_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apt install jq"]))
+    elif args["links"]["src"] == "archway":
+        plan.exec(service_name = dst_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apk add jq"]))
 
     dst_chain_seed = plan.exec(service_name = dst_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "jq -r '.mnemonic' ../../start-scripts/key_seed.json | tr -d '\n\r'"]))
 

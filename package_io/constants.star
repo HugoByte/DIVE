@@ -57,10 +57,7 @@ NEUTRON_SERVICE_CONFIG = struct(
     init_script = "github.com/hugobyte/dive/services/cosmvm/neutron/static_files/init.sh",
     start_script = "github.com/hugobyte/dive/services/cosmvm/neutron/static_files/start.sh",
     init_nutrond_script = "github.com/hugobyte/dive/services/cosmvm/neutron/static_files/init-neutrond.sh",
-    path = "/neutron-scripts/",
-    chain_id = "test-chain",
-    key = "test-key",
-    password = "clock post desk civil pottery foster expand merit dash seminar song memory figure uniform spice circle try happy obvious trash crime hybrid hood cushion",
+    path = "/start-scripts/",
 )
 
 IBC_RELAYER_SERVICE = struct(
@@ -101,7 +98,7 @@ ARCHAY_NODE1_CONFIG = struct(
     chain_id = "archway-node-1",
     grpc = 9080,
     http = 9092,
-    tcp = 26658,
+    tcp = 26659,
     rpc = 4566,
     key = "archway-node-1-key",
 )
@@ -120,9 +117,22 @@ NEUTRON_PRIVATE_PORTS = struct(
     grpc = 9090,
 )
 
-NEUTRON_PUBLIC_PORTS = struct(
+NEUTRON_NODE1_CONFIG = struct(
     http = 1317,
-    rpc = 26659,
+    rpc = 26669,
     tcp = 26656,
     grpc = 8090,
+    chain_id = "test-chain1",
+    key = "test-key",
+    password = "clock post desk civil pottery foster expand merit dash seminar song memory figure uniform spice circle try happy obvious trash crime hybrid hood cushion",
+)
+
+NEUTRON_NODE2_CONFIG = struct(
+    http = 1311,
+    rpc = 26653,
+    tcp = 26652,
+    grpc = 8091,
+    chain_id = "test-chain2",
+    key = "test-key",
+    password = "clock post desk civil pottery foster expand merit dash seminar song memory figure uniform spice circle try happy obvious trash crime hybrid hood cushion",
 )

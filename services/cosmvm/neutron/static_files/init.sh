@@ -45,8 +45,9 @@ fi
 echo "Initializing $CHAINID..."
 $BINARY init test --home "$CHAIN_DIR" --chain-id="$CHAINID"
 
+
 echo "Adding genesis accounts..."
-(echo "$password"; echo "$password") | $BINARY keys add $key --home "$CHAIN_DIR" --recover --keyring-backend=test
+$BINARY keys add $key --home "$CHAIN_DIR" --keyring-backend=test --output json > ../../start-scripts/key_seed.json 
 #echo "$VAL_MNEMONIC_1" | $BINARY keys add $key --home "$CHAIN_DIR" --recover --keyring-backend=test
 echo "$VAL_MNEMONIC_2" | $BINARY keys add val2 --home "$CHAIN_DIR" --recover --keyring-backend=test
 echo "$DEMO_MNEMONIC_1" | $BINARY keys add demowallet1 --home "$CHAIN_DIR" --recover --keyring-backend=test
