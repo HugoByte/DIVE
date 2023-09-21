@@ -243,17 +243,11 @@ def run_cosmos_ibc_setup(plan, args):
     links = args["links"]
     source_chain = links["src"]
     destination_chain = links["dst"]
- 
-    if source_chain ="archway" and destination_chain = "archway":
+
+    if (source_chain in ["archway", "neutron"]) and (destination_chain in ["archway", "neutron"]):
         data = cosmvm_node.start_ibc_between_cosmvm_chains(plan, source_chain, destination_chain, args)
         config_data = run_cosmos_ibc_relay_for_already_running_chains(plan, links, data.src_config, data.dst_config, args)
         return config_data
-
-    if source_chain ="neutron" and destination_chain = "neutron":
-        data = cosmvm_node.start_ibc_between_cosmvm_chains(plan, source_chain, destination_chain, args)
-        config_data = run_cosmos_ibc_relay_for_already_running_chains(plan, links, data.src_config, data.dst_config, args)
-        return config_data
-
     
     if destination_chain == "archway":
 
