@@ -19,16 +19,16 @@ def start_ibc_between_cosmvm_chains(plan, chain_a, chain_b, args):
         return neutron_node_service.start_node_services(plan, args)
     
     elif chain_a == "neutron" and chain_b == "archway":
-        chain_a_service = parser.struct_to_dict(neutron_node_service.start_node_service(plan, args["src_chain"]))
-        chain_b_service = parser.struct_to_dict(archway_node_service.start_node_service(plan, args["dst_chain"]))
+        chain_a_service = parser.struct_to_dict(neutron_node_service.start_node_service(plan, args["src_config"]))
+        chain_b_service = parser.struct_to_dict(archway_node_service.start_node_service(plan, args["dst_config"]))
         return struct(
             src_config = chain_a_service,
             dst_config = chain_b_service
         )
 
     elif chain_a == "archway" and chain_b == "neutron":
-        chain_a_service = parser.struct_to_dict(archway_node_service.start_node_service(plan, args["src_chain"]))
-        chain_b_service = parser.struct_to_dict(neutron_node_service.start_node_service(plan, args["dst_chain"]))
+        chain_a_service = parser.struct_to_dict(archway_node_service.start_node_service(plan, args["src_config"]))
+        chain_b_service = parser.struct_to_dict(neutron_node_service.start_node_service(plan, args["dst_config"]))
         return struct(
             src_config = chain_a_service,
             dst_config = chain_b_service

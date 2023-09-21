@@ -8,7 +8,7 @@ network_keys_and_public_address = constants.NETWORK_PORT_KEYS_AND_IP_ADDRESS
 
 # Spins Up the ETH Node
 def start_eth_node(plan,args):
- 	eth_contstants = constants.ETH_NODE_CLIENT
+ 	eth_constants = constants.ETH_NODE_CLIENT
  	args_with_right_defaults = input_parser.get_args_with_default_values(args)
  	num_participants = len(args_with_right_defaults.participants)
  	network_params = args_with_right_defaults.network_params
@@ -19,13 +19,13 @@ def start_eth_node(plan,args):
 
 	return struct(
           service_name = all_participants[0].el_client_context.service_name,
-          network_name= eth_contstants.network_name,
-          network = eth_contstants.network,
-          nid = eth_contstants.nid,
+          network_name= eth_constants.network_name,
+          network = eth_constants.network,
+          nid = eth_constants.nid,
           endpoint = "http://%s" % network_address,
 		  endpoint_public = "http://",
-		  keystore_path = eth_contstants.keystore_path,
-		  keypassword = eth_contstants.keypassword
+		  keystore_path = eth_constants.keystore_path,
+		  keypassword = eth_constants.keypassword
 		  )
 
 

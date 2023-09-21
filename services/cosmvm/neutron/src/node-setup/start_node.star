@@ -8,11 +8,11 @@ def start_neutron_node(plan, args):
     Start a Neutron node service with the provided configuration.
 
     Args:
-        plan (Plan): The deployment plan.
+        plan (plan): plan.
         args (dict): Arguments for configuring the service.
 
     Returns:
-        None
+        struct: Service configuration
     """
 
     chain_id = args["cid"]

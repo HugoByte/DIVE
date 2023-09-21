@@ -11,7 +11,7 @@ import (
 )
 
 var suppottedChainsForBtp = []string{"icon", "eth", "hardhat"}
-var supportedChainsForIbc = []string{"archway"}
+var supportedChainsForIbc = []string{"archway", "neutron"}
 
 type Chains struct {
 	chainA            string
@@ -40,7 +40,7 @@ func (chains *Chains) getParams() string {
 }
 func (chains *Chains) getIbcRelayParams() string {
 
-	return fmt.Sprintf(`{"args":{"links": {"src": "%s", "dst": "%s"}}}`, chains.chainA, chains.chainB)
+	return fmt.Sprintf(`{"args":{"links": {"src": "%s", "dst": "%s"}, "src_config":{"data":{}}, "dst_config":{"data":{}}}}`, chains.chainA, chains.chainB)
 }
 
 func (chains *Chains) getServicesResponse() (string, string, error) {

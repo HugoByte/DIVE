@@ -18,8 +18,8 @@ def start_node_services(plan, args):
         struct: Configuration information for the source and destination services.
     """
 
-    data_src = args["src_chain"]["data"]
-    data_dst = args["dst_chain"]["data"] 
+    data_src = args["src_config"]["data"]
+    data_dst = args["dst_config"]["data"] 
     src_chain_config = ""
     dst_chain_config = ""
 
