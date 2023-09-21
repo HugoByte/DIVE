@@ -25,7 +25,7 @@ def start_node_services(plan, args):
 
     if len(data_src) != 0:
         # Configure the service based on provided data for source chain
-        chainId = data_src["chainId"]
+        chain_id = data_src["chainId"]
         key = data_src["key"]
         password = data_src["password"]
         public_grpc = data_src["public_grpc"]
@@ -34,7 +34,7 @@ def start_node_services(plan, args):
         public_rpc = data_src["public_rpc"]
 
         src_chain_config = neutron_node_service.get_service_config(
-            chainId, key, password,
+            chain_id, key, password,
             neutron_private_ports.grpc, neutron_private_ports.http, neutron_private_ports.tcp, neutron_private_ports.rpc,
             public_grpc, public_http, public_tcp, public_rpc
         )
@@ -50,7 +50,7 @@ def start_node_services(plan, args):
 
     if len(data_dst) != 0:
         # Configure the service based on provided data for destination chain
-        chainId = data_dst["chainId"]
+        chain_id = data_dst["chainId"]
         key = data_dst["key"]
         password = data_dst["password"]
         public_grpc = data_dst["public_grpc"]
@@ -59,7 +59,7 @@ def start_node_services(plan, args):
         public_rpc = data_dst["public_rpc"]
 
         dst_chain_config = neutron_node_service.get_service_config(
-            chainId, key, password,
+            chain_id, key, password,
             neutron_private_ports.grpc, neutron_private_ports.http, neutron_private_ports.tcp, neutron_private_ports.rpc,
             public_grpc, public_http, public_tcp, public_rpc
         )
@@ -116,7 +116,7 @@ def start_node_service(plan, args):
 
     if len(data) != 0:
         # Configure the service based on provided data
-        chainId = data["chainId"]
+        chain_id = data["chainId"]
         key = data["key"]
         password = data["password"]
         public_grpc = data["public_grpc"]
@@ -125,7 +125,7 @@ def start_node_service(plan, args):
         public_rpc = data["public_rpc"]
 
         chain_config = neutron_node_service.get_service_config(
-            chainId, key, password,
+            chain_id, key, password,
             neutron_private_ports.grpc, neutron_private_ports.http, neutron_private_ports.tcp, neutron_private_ports.rpc,
             public_grpc, public_http, public_tcp, public_rpc
         )
