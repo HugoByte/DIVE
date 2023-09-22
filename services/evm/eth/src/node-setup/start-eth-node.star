@@ -24,8 +24,8 @@ def start_eth_node(plan,args):
           nid = eth_constants.nid,
           endpoint = "http://%s" % network_address,
 		  endpoint_public = "http://",
-		  keystore_path = eth_contstants.keystore_path,
-		  keypassword = eth_contstants.keypassword
+		  keystore_path = eth_constants.keystore_path,
+		  keypassword = eth_constants.keypassword
 		  )
 
 
