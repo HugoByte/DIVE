@@ -78,3 +78,8 @@ def generate_new_config_data_cosmvm_cosmvm(links, srcchain_service_name, dst_cha
     }
 
     return config_data
+
+
+def struct_to_dict(s):
+    fields = dir(s)
+    return {field: getattr(s, field) for field in fields if not field.startswith("_")}

@@ -244,12 +244,11 @@ def run_cosmos_ibc_setup(plan, args):
     source_chain = links["src"]
     destination_chain = links["dst"]
 
-    if source_chain == "archway" and destination_chain == "archway":
-        data = cosmvm_node.start_ibc_between_cosmvm_chains(plan,source_chain,destination_chain)
-                
-        config_data = run_cosmos_ibc_relay_for_already_running_chains(plan,links,data.src_config,data.dst_config)
+    if (source_chain in ["archway", "neutron"]) and (destination_chain in ["archway", "neutron"]):
+        data = cosmvm_node.start_ibc_between_cosmvm_chains(plan, source_chain, destination_chain, args)
+        config_data = run_cosmos_ibc_relay_for_already_running_chains(plan, links, data.src_config, data.dst_config, args)
         return config_data
-
+    
     if destination_chain == "archway":
 
         src_chain_config = icon_service.start_node_service(plan)
@@ -334,7 +333,7 @@ def run_cosmos_ibc_setup(plan, args):
 
     
         
-def run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_config,dst_config):
+def run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_config,dst_config, args):
 
     src_chain_service_name = src_config["service_name"]
     dst_chain_service_name = dst_config["service_name"]
@@ -346,7 +345,7 @@ def run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_config,dst_co
     config_data = input_parser.generate_new_config_data_cosmvm_cosmvm(links, src_chain_service_name, dst_chain_service_name)
     config_data["chains"][src_chain_service_name] = src_config
     config_data["chains"][dst_chain_service_name] = dst_config
-    cosmvm_relay.start_cosmos_relay(plan, src_chain_key, src_chain_id, dst_chain_key, dst_chain_id, src_config, dst_config)
+    cosmvm_relay.start_cosmos_relay(plan, src_chain_key, src_chain_id, dst_chain_key, dst_chain_id, src_config, dst_config, args)
 
     return config_data
     

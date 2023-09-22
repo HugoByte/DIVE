@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/hugobyte/dive/cli/commands/bridge/relyas"
+	"github.com/hugobyte/dive/cli/commands/bridge/relays"
 	"github.com/hugobyte/dive/cli/common"
 	"github.com/spf13/cobra"
 	"golang.org/x/exp/slices"
@@ -30,7 +30,7 @@ This will create an relay to connect two different chains and pass any messages 
 
 			if len(args) == 0 {
 				cmd.Help()
-				
+
 			} else if !slices.Contains(cmd.ValidArgs, args[0]) {
 
 				diveContext.Log.SetOutput(os.Stderr)
@@ -42,9 +42,9 @@ This will create an relay to connect two different chains and pass any messages 
 		},
 	}
 
-	bridgeCmd.AddCommand(relyas.BtpRelayCmd(diveContext))
+	bridgeCmd.AddCommand(relays.BtpRelayCmd(diveContext))
 
-	bridgeCmd.AddCommand(relyas.IbcRelayCmd(diveContext))
+	bridgeCmd.AddCommand(relays.IbcRelayCmd(diveContext))
 
 	return bridgeCmd
 }
