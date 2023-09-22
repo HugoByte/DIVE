@@ -1,4 +1,4 @@
-package relyas
+package relays
 
 import (
 	"fmt"
