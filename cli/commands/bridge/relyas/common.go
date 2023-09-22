@@ -10,8 +10,8 @@ import (
 	"github.com/hugobyte/dive/cli/common"
 )
 
-var suppottedChainsForBtp = []string{"icon", "eth", "hardhat"}
-var supportedChainsForIbc = []string{"archway", "neutron"}
+var supportedChainsForBtp = []string{"icon", "eth", "hardhat"}
+var supportedChainsForIbc = []string{"archway", "neutron", "icon"}
 
 type Chains struct {
 	chainA            string
@@ -74,10 +74,10 @@ func (chains *Chains) getServicesResponse() (string, string, error) {
 }
 
 func (chains *Chains) checkForBtpSupportedChains() error {
-	if !slices.Contains(suppottedChainsForBtp, chains.chainA) {
+	if !slices.Contains(supportedChainsForBtp, chains.chainA) {
 		return fmt.Errorf("invalid Chain: %s", chains.chainA)
 	}
-	if !slices.Contains(suppottedChainsForBtp, chains.chainB) {
+	if !slices.Contains(supportedChainsForBtp, chains.chainB) {
 		return fmt.Errorf("invalid Chain: %s", chains.chainB)
 	}
 	return nil
