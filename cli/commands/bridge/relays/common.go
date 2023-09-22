@@ -1,4 +1,4 @@
-package relyas
+package relays
 
 import (
 	"fmt"
@@ -10,8 +10,8 @@ import (
 	"github.com/hugobyte/dive/cli/common"
 )
 
-var suppottedChainsForBtp = []string{"icon", "eth", "hardhat"}
-var supportedChainsForIbc = []string{"archway", "icon"}
+var supportedChainsForBtp = []string{"icon", "eth", "hardhat"}
+var supportedChainsForIbc = []string{"archway", "neutron", "icon"}
 
 type Chains struct {
 	chainA            string
@@ -40,7 +40,7 @@ func (chains *Chains) getParams() string {
 }
 func (chains *Chains) getIbcRelayParams() string {
 
-	return fmt.Sprintf(`{"args":{"links": {"src": "%s", "dst": "%s"}}}`, chains.chainA, chains.chainB)
+	return fmt.Sprintf(`{"args":{"links": {"src": "%s", "dst": "%s"}, "src_config":{"data":{}}, "dst_config":{"data":{}}}}`, chains.chainA, chains.chainB)
 }
 
 func (chains *Chains) getServicesResponse() (string, string, error) {
@@ -74,10 +74,10 @@ func (chains *Chains) getServicesResponse() (string, string, error) {
 }
 
 func (chains *Chains) checkForBtpSupportedChains() error {
-	if !slices.Contains(suppottedChainsForBtp, chains.chainA) {
+	if !slices.Contains(supportedChainsForBtp, chains.chainA) {
 		return fmt.Errorf("invalid Chain: %s", chains.chainA)
 	}
-	if !slices.Contains(suppottedChainsForBtp, chains.chainB) {
+	if !slices.Contains(supportedChainsForBtp, chains.chainB) {
 		return fmt.Errorf("invalid Chain: %s", chains.chainB)
 	}
 	return nil

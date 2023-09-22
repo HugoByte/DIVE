@@ -1,4 +1,4 @@
-package relyas
+package relays
 
 import (
 	"fmt"
@@ -64,7 +64,7 @@ func BtpRelayCmd(diveContext *common.DiveContext) *cobra.Command {
 			chains := initChains(chainA, chainB, serviceA, serviceB, bridge)
 
 			if err := chains.checkForBtpSupportedChains(); err != nil {
-				diveContext.FatalError(err.Error(), fmt.Sprintf("Supported Chains for BTP: %v", suppottedChainsForBtp))
+				diveContext.FatalError(err.Error(), fmt.Sprintf("Supported Chains for BTP: %v", supportedChainsForBtp))
 			}
 
 			diveContext.StartSpinner(fmt.Sprintf(" Starting BTP Bridge for %s,%s", chains.chainA, chains.chainB))
