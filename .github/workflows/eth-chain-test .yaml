@@ -1,11 +1,11 @@
-name: Functional test
+name: Eth Chain Functional test
 
 on:
   workflow_dispatch:
 
 jobs:
   functional_test:
-    name: Functional Testing
+    name: Eth Chain Functional Testing
     runs-on: "ubuntu-latest"
 
     steps:

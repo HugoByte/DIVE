@@ -1,11 +1,11 @@
-name: Functional test
+name: Hardhat Chain Functional test
 
 on:
   workflow_dispatch:
 
 jobs:
   functional_test:
-    name: Functional Testing
+    name: Hardhat Chain Functional Testing
     runs-on: "ubuntu-latest"
 
     steps:
