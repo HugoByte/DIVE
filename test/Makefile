@@ -40,9 +40,29 @@ run-smoke: BINARY
 	@echo "Running Smoke test cases"
 	@cd $(CURDIR)/functional && ginkgo --focus="Smoke Tests" -v
 
-run-functional: BINARY
-	@echo "Running all functional test cases"
-	@cd $(CURDIR)/functional && ginkgo --focus="Functional Tests" -v -timeout=3h
+run-bridge: BINARY
+	@echo "Running all bridge test cases"
+	@cd $(CURDIR)/functional && ginkgo --focus="Bridge command Test" -v -timeout=3h
+
+run-icon: BINARY
+	@echo "Running icon chain commands test cases"
+	@cd $(CURDIR)/functional && ginkgo --focus="Icon chain commands" -v -timeout=3h
+
+run-eth: BINARY
+	@echo "Running eth chain commands test cases"
+	@cd $(CURDIR)/functional && ginkgo --focus="Eth chain commands" -v -timeout=3h
+
+run-hardhat: BINARY
+	@echo "Running hardhat chain commands test cases"
+	@cd $(CURDIR)/functional && ginkgo --focus="Hardhat chain commands" -v -timeout=3h
+
+run-archway: BINARY
+	@echo "Running archway chain commands test cases"
+	@cd $(CURDIR)/functional && ginkgo --focus="Archway chain commands" -v -timeout=3h
+
+run-misc: BINARY
+	@echo "Running other test cases"
+	@cd $(CURDIR)/functional && ginkgo --focus="Other commands" -v -timeout=3h
 
 BINARY: GINKGO
 	@cd $(CURDIR)/../cli && go build -o dive
