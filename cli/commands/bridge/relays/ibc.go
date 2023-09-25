@@ -26,7 +26,7 @@ func IbcRelayCmd(diveContext *common.DiveContext) *cobra.Command {
 				diveContext.Error(err.Error())
 			}
 
-			result := stratIbcRelay(diveContext, enclaveCtx)
+			result := startIbcRelay(diveContext, enclaveCtx)
 
 			err = common.WriteToFile(result)
 
@@ -49,7 +49,7 @@ func IbcRelayCmd(diveContext *common.DiveContext) *cobra.Command {
 	return ibcRelayCommand
 }
 
-func stratIbcRelay(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext) string {
+func startIbcRelay(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext) string {
 	diveContext.StartSpinner(" Starting IBC Setup")
 	chains := initChains(chainA, chainB, serviceA, serviceB, false)
 	var starlarkExecutionResponse string
