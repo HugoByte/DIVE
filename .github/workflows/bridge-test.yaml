@@ -1,11 +1,11 @@
-name: Functional test
+name: Bridge Functional test
 
 on:
   workflow_dispatch:
 
 jobs:
   functional_test:
-    name: Functional Testing
+    name: Bridge Functional Testing
     runs-on: "ubuntu-latest"
 
     steps:
