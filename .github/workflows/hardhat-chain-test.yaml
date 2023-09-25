@@ -24,6 +24,6 @@ jobs:
           sudo apt install kurtosis-cli
           kurtosis engine start
 
-      - name: Running functional tests
+      - name: Running hardhat chain command tests
         run: |
-           cd test && make run-functional
+           cd test && make run-hardhat

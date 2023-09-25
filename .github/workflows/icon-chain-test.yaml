@@ -1,0 +1,29 @@
+name: Functional test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  functional_test:
+    name: Functional Testing
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+
+      - name: Installing Kurtosis CLI and starting the kurtosis engine
+        run: |
+          echo "deb [trusted=yes] https://apt.fury.io/kurtosis-tech/ /" | sudo tee /etc/apt/sources.list.d/kurtosis.list
+          sudo apt update
+          sudo apt install kurtosis-cli
+          kurtosis engine start
+
+      - name: Running icon chain command tests
+        run: |
+           cd test && make run-icon
