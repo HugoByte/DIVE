@@ -59,7 +59,7 @@ def parse_input(plan, args):
     if args["action"] == "start_relay":
         if args["relay"]["name"] == "ibc":
             service_name = args["relay"]["service"]
-            cosmvm_relay.start_relay(plan,service_name)
+            cosmvm_relay.start_relay(plan, service_name)
 
 def run_node(plan, node_name, args):
     if node_name == "icon":
@@ -69,7 +69,7 @@ def run_node(plan, node_name, args):
         return eth_node.start_eth_node_serivce(plan, args, node_name)
 
     elif node_name == "archway" or node_name == "neutron":
-        return cosmvm_node.start_cosmvm_chains(plan,node_name,args)
+        return cosmvm_node.start_cosmvm_chains(plan, node_name, args)
 
     else:
         fail("Unknown Chain Type. Expected ['icon','eth','hardhat','cosmwasm']")
@@ -95,12 +95,10 @@ def run_btp_setup(plan, args):
 
         return config
     else:
-
         if (source_chain == "eth" or source_chain == "hardhat") and destination_chain == "icon":
-            
             destination_chain = source_chain
             source_chain = "icon"
-        
+
         if destination_chain == "eth" or destination_chain == "hardhat":
             src_chain_config = icon_service.start_node_service(plan)
             dst_chain_config = eth_node.start_eth_node_serivce(plan, args, destination_chain)
@@ -113,22 +111,21 @@ def run_btp_setup(plan, args):
             config_data["chains"][dst_chain_service_name] = dst_chain_config
 
             icon_service.configure_icon_node(plan, src_chain_config)
-            config = start_btp_icon_to_eth_for_already_running_nodes(plan, source_chain,destination_chain, config_data,  src_chain_service_name, dst_chain_service_name)
+            config = start_btp_icon_to_eth_for_already_running_nodes(plan, source_chain, destination_chain, config_data, src_chain_service_name, dst_chain_service_name)
 
             return config
-            
+
         else:
-            fail("unsupported chain {0} - {1}".format(source_chain,destination_chain))
-    
+            fail("unsupported chain {0} - {1}".format(source_chain, destination_chain))
 
 def start_btp_for_already_running_icon_nodes(plan, src_chain, dst_chain, config_data, src_service_name, dst_service_name):
-    src_bmc_address, dst_bmc_address = icon_service.deploy_bmc_icon(plan, src_chain, dst_chain,src_service_name, dst_service_name, config_data)
+    src_bmc_address, dst_bmc_address = icon_service.deploy_bmc_icon(plan, src_chain, dst_chain, src_service_name, dst_service_name, config_data)
 
     response = icon_service.deploy_bmv_icon_to_icon(plan, src_service_name, dst_service_name, src_bmc_address, dst_bmc_address, config_data)
 
-    src_xcall_address, dst_xcall_address = icon_service.deploy_xcall_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc_address, config_data,src_service_name, dst_service_name)
+    src_xcall_address, dst_xcall_address = icon_service.deploy_xcall_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc_address, config_data, src_service_name, dst_service_name)
 
-    src_dapp_address, dst_dapp_address = icon_service.deploy_dapp_icon(plan, src_chain, dst_chain, src_xcall_address, dst_xcall_address, config_data,src_service_name, dst_service_name)
+    src_dapp_address, dst_dapp_address = icon_service.deploy_dapp_icon(plan, src_chain, dst_chain, src_xcall_address, dst_xcall_address, config_data, src_service_name, dst_service_name)
 
     src_block_height = icon_setup_node.hex_to_int(plan, src_service_name, response.src_block_height)
     dst_block_height = icon_setup_node.hex_to_int(plan, dst_service_name, response.dst_block_height)
@@ -157,7 +154,7 @@ def start_btp_for_already_running_icon_nodes(plan, src_chain, dst_chain, config_
     config_data["chains"][src_service_name]["block_number"] = src_block_height
     config_data["chains"][dst_service_name]["block_number"] = dst_block_height
 
-    config_data = start_btp_relayer(plan, src_chain, dst_chain, config_data,src_service_name,dst_service_name)
+    config_data = start_btp_relayer(plan, src_chain, dst_chain, config_data, src_service_name, dst_service_name)
 
     config_data["links"]["src"] = src_service_name
     config_data["links"]["dst"] = dst_service_name
@@ -170,9 +167,9 @@ def start_btp_icon_to_eth_for_already_running_nodes(plan, src_chain, dst_chain, 
 
     eth_contract_service.start_deploy_service(plan, dst_chain_config)
 
-    src_bmc_address = icon_service.deploy_bmc_icon(plan, src_chain, dst_chain,src_service_name, dst_service_name,config_data)
+    src_bmc_address = icon_service.deploy_bmc_icon(plan, src_chain, dst_chain, src_service_name, dst_service_name, config_data)
 
-    dst_bmc_deploy_response = eth_relay_setup.deploy_bmc(plan, config_data, dst_chain,dst_service_name)
+    dst_bmc_deploy_response = eth_relay_setup.deploy_bmc(plan, config_data, dst_chain, dst_service_name)
 
     dst_bmc_address = dst_bmc_deploy_response.bmc
 
@@ -182,15 +179,15 @@ def start_btp_icon_to_eth_for_already_running_nodes(plan, src_chain, dst_chain, 
 
     src_response = icon_service.deploy_bmv_icon(plan, src_service_name, dst_service_name, src_bmc_address, dst_bmc_address, dst_last_block_height_hex, config_data)
 
-    dst_bmv_address = eth_node.deploy_bmv_eth(plan, config_data["bridge"], src_response, config_data, dst_chain,dst_service_name)
+    dst_bmv_address = eth_node.deploy_bmv_eth(plan, config_data["bridge"], src_response, config_data, dst_chain, dst_service_name)
 
-    src_xcall_address = icon_service.deploy_xcall_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc_address, config_data,src_service_name, dst_service_name)
+    src_xcall_address = icon_service.deploy_xcall_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc_address, config_data, src_service_name, dst_service_name)
 
-    dst_xcall_address = eth_relay_setup.deploy_xcall(plan, config_data, dst_chain,dst_service_name)
+    dst_xcall_address = eth_relay_setup.deploy_xcall(plan, config_data, dst_chain, dst_service_name)
 
-    src_dapp_address = icon_service.deploy_dapp_icon(plan, src_chain, dst_chain, src_xcall_address, dst_xcall_address, config_data,src_service_name, dst_service_name)
+    src_dapp_address = icon_service.deploy_dapp_icon(plan, src_chain, dst_chain, src_xcall_address, dst_xcall_address, config_data, src_service_name, dst_service_name)
 
-    dst_dapp_address = eth_relay_setup.deploy_dapp(plan, config_data, dst_chain,dst_service_name)
+    dst_dapp_address = eth_relay_setup.deploy_dapp(plan, config_data, dst_chain, dst_service_name)
 
     src_block_height = icon_setup_node.hex_to_int(plan, src_service_name, src_response.block_height)
 
@@ -217,14 +214,14 @@ def start_btp_icon_to_eth_for_already_running_nodes(plan, src_chain, dst_chain, 
     config_data["chains"][src_service_name]["block_number"] = src_block_height
     config_data["chains"][dst_service_name]["block_number"] = dst_last_block_height_number
 
-    config_data = start_btp_relayer(plan, src_chain, dst_chain, config_data,src_service_name,dst_service_name)
-    
+    config_data = start_btp_relayer(plan, src_chain, dst_chain, config_data, src_service_name, dst_service_name)
+
     config_data["links"]["src"] = src_service_name
     config_data["links"]["dst"] = dst_service_name
 
     return config_data
 
-def start_btp_relayer(plan, src_chain, dst_chain, config_data,src_service_name,dst_service_name):
+def start_btp_relayer(plan, src_chain, dst_chain, config_data, src_service_name, dst_service_name):
     src_network = config_data["chains"][src_service_name]["network"]
     src_bmc = config_data["contracts"][src_service_name]["bmc"]
 
@@ -246,51 +243,49 @@ def run_cosmos_ibc_setup(plan, args):
 
     if (source_chain in ["archway", "neutron"]) and (destination_chain in ["archway", "neutron"]):
         data = cosmvm_node.start_ibc_between_cosmvm_chains(plan, source_chain, destination_chain, args)
-        config_data = run_cosmos_ibc_relay_for_already_running_chains(plan, links, data.src_config, data.dst_config, args)
+        config_data = run_cosmos_ibc_relay_for_already_running_chains(plan, links, data.src_config, data.dst_config)
         return config_data
-    
-    if destination_chain == "archway":
 
+    if destination_chain == "archway":
         src_chain_config = icon_service.start_node_service(plan)
-        data = {"data":{}}
-        dst_chain_config = cosmvm_node.start_cosmvm_chains(plan, destination_chain,data) 
+        data = {"data": {}}
+        dst_chain_config = cosmvm_node.start_cosmvm_chains(plan, destination_chain, data)
 
         src_chain_service_name = src_chain_config["service_name"]
         dst_chain_service_name = dst_chain_config.service_name
 
-        config_data = input_parser.generate_new_config_data(links, src_chain_service_name, dst_chain_service_name,"")
+        config_data = input_parser.generate_new_config_data(links, src_chain_service_name, dst_chain_service_name, "")
 
         config_data["chains"][src_chain_service_name] = src_chain_config
         config_data["chains"][dst_chain_service_name] = dst_chain_config
 
-        deploy_icon_contracts = icon_relay_setup.setup_contracts_for_ibc_java(plan,src_chain_config)
-        icon_register_client = icon_relay_setup.registerClient(plan,src_chain_service_name,deploy_icon_contracts["light_client"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"],src_chain_config["endpoint"],deploy_icon_contracts["ibc_core"])
+        deploy_icon_contracts = icon_relay_setup.setup_contracts_for_ibc_java(plan, src_chain_config)
+        icon_register_client = icon_relay_setup.registerClient(plan, src_chain_service_name, deploy_icon_contracts["light_client"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"], src_chain_config["endpoint"], deploy_icon_contracts["ibc_core"])
 
-        icon_setup_node.configure_node(plan,src_chain_config)
+        icon_setup_node.configure_node(plan, src_chain_config)
 
-        src_chain_last_block_height = icon_setup_node.get_last_block(plan,src_chain_service_name)
+        src_chain_last_block_height = icon_setup_node.get_last_block(plan, src_chain_service_name)
 
         plan.print("source block height %s" % src_chain_last_block_height)
 
-        network_name = "{0}-{1}".format("dst_chain_network_name",src_chain_last_block_height)
+        network_name = "{0}-{1}".format("dst_chain_network_name", src_chain_last_block_height)
 
         src_data = {
-            "name"  : network_name,
-            "owner" : deploy_icon_contracts["ibc_core"] 
+            "name": network_name,
+            "owner": deploy_icon_contracts["ibc_core"],
         }
 
-        icon_setup_node.open_btp_network(plan,src_chain_service_name,src_data,src_chain_config["endpoint"],src_chain_config["keystore_path"], src_chain_config["keypassword"],src_chain_config["nid"])
+        icon_setup_node.open_btp_network(plan, src_chain_service_name, src_data, src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"])
 
-        icon_bind_port = icon_relay_setup.bindPort(plan,src_chain_service_name,deploy_icon_contracts["xcall_connection"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"],src_chain_config["endpoint"],deploy_icon_contracts["ibc_core"],"xcall")
+        icon_bind_port = icon_relay_setup.bindPort(plan, src_chain_service_name, deploy_icon_contracts["xcall_connection"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"], src_chain_config["endpoint"], deploy_icon_contracts["ibc_core"], "xcall")
 
-        deploy_archway_contracts = cosmvm_relay_setup.setup_contracts_for_ibc_wasm(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,dst_chain_config.chain_id,"stake","xcall")
+        deploy_archway_contracts = cosmvm_relay_setup.setup_contracts_for_ibc_wasm(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, dst_chain_config.chain_id, "stake", "xcall")
 
-        cosmvm_relay_setup.registerClient(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["ibc_core"],deploy_archway_contracts["light_client"])
+        cosmvm_relay_setup.registerClient(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, deploy_archway_contracts["ibc_core"], deploy_archway_contracts["light_client"])
 
-        plan.wait(service_name=dst_chain_service_name,recipe=ExecRecipe(command=["/bin/sh","-c","sleep 10s && echo 'success'"]),field="code",assertion="==",target_value=0,timeout="200s")
+        plan.wait(service_name = dst_chain_service_name, recipe = ExecRecipe(command = ["/bin/sh", "-c", "sleep 10s && echo 'success'"]), field = "code", assertion = "==", target_value = 0, timeout = "200s")
 
-        cosmvm_relay_setup.bindPort(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["ibc_core"],deploy_archway_contracts["xcall_connection"])
-
+        cosmvm_relay_setup.bindPort(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, deploy_archway_contracts["ibc_core"], deploy_archway_contracts["xcall_connection"])
 
         config_data["contracts"][src_chain_service_name] = deploy_icon_contracts
         config_data["contracts"][dst_chain_service_name] = deploy_archway_contracts
@@ -299,42 +294,36 @@ def run_cosmos_ibc_setup(plan, args):
             "chain_id": "0xacbc4e",
             "rpc_address": src_chain_config["endpoint"],
             "ibc_address": deploy_icon_contracts["ibc_core"],
-            "password" : src_chain_config["keypassword"]
+            "password": src_chain_config["keypassword"],
         }
         dst_chain_data = {
             "chain_id": dst_chain_config.chain_id,
             "key": dst_chain_config.chain_key,
             "rpc_address": dst_chain_config.endpoint,
             "ibc_address": deploy_archway_contracts["ibc_core"],
-            "service_name": dst_chain_config.service_name
+            "service_name": dst_chain_config.service_name,
         }
-        relay_service_response = cosmvm_relay.start_cosmos_relay_for_icon_to_cosmos(plan,src_chain_data,dst_chain_data)
-        path_name = cosmvm_relay.setup_relay(plan,src_chain_data,dst_chain_data)
+        relay_service_response = cosmvm_relay.start_cosmos_relay_for_icon_to_cosmos(plan, src_chain_data, dst_chain_data)
+        path_name = cosmvm_relay.setup_relay(plan, src_chain_data, dst_chain_data)
 
-        relay_data = cosmvm_relay.get_relay_path_data(plan,relay_service_response.service_name,path_name)
+        relay_data = cosmvm_relay.get_relay_path_data(plan, relay_service_response.service_name, path_name)
 
-        dapp_result_java = icon_relay_setup.deploy_and_configure_dapp_java(plan,src_chain_config,deploy_icon_contracts["xcall"],dst_chain_config.chain_id,deploy_icon_contracts["xcall_connection"],deploy_archway_contracts["xcall_connection"],src_chain_service_name,src_chain_config["endpoint"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"])
+        dapp_result_java = icon_relay_setup.deploy_and_configure_dapp_java(plan, src_chain_config, deploy_icon_contracts["xcall"], dst_chain_config.chain_id, deploy_icon_contracts["xcall_connection"], deploy_archway_contracts["xcall_connection"], src_chain_service_name, src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"])
 
-        dapp_result_wasm = cosmvm_relay_setup.deploy_and_configure_xcall_dapp(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["xcall"],deploy_archway_contracts["xcall_connection"],deploy_icon_contracts["xcall_connection"],src_chain_config["network"])
+        dapp_result_wasm = cosmvm_relay_setup.deploy_and_configure_xcall_dapp(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, deploy_archway_contracts["xcall"], deploy_archway_contracts["xcall_connection"], deploy_icon_contracts["xcall_connection"], src_chain_config["network"])
 
+        cosmvm_relay_setup.configure_connection_for_wasm(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, deploy_archway_contracts["xcall_connection"], relay_data.dst_connection_id, "xcall", src_chain_config["network"], relay_data.dst_client_id, deploy_archway_contracts["xcall"])
 
-        cosmvm_relay_setup.configure_connection_for_wasm(plan,dst_chain_service_name,dst_chain_config.chain_id,dst_chain_config.chain_key,deploy_archway_contracts["xcall_connection"],relay_data.dst_connection_id,"xcall",src_chain_config["network"],relay_data.dst_client_id,deploy_archway_contracts["xcall"])
-
-        icon_relay_setup.configure_connection_for_java(plan,deploy_icon_contracts["xcall"],deploy_icon_contracts["xcall_connection"],dst_chain_config.chain_id,relay_data.src_connection_id,"xcall",dst_chain_config.chain_id,relay_data.src_client_id,src_chain_service_name,src_chain_config["endpoint"],src_chain_config["keystore_path"],src_chain_config["keypassword"],src_chain_config["nid"])
-
+        icon_relay_setup.configure_connection_for_java(plan, deploy_icon_contracts["xcall"], deploy_icon_contracts["xcall_connection"], dst_chain_config.chain_id, relay_data.src_connection_id, "xcall", dst_chain_config.chain_id, relay_data.src_client_id, src_chain_service_name, src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"])
 
         config_data["contracts"][src_chain_service_name]["dapp"] = dapp_result_java["xcall_dapp"]
         config_data["contracts"][dst_chain_service_name]["dapp"] = dapp_result_wasm["xcall_dapp"]
 
-        cosmvm_relay.start_channel(plan,relay_service_response.service_name,path_name,"xcall","xcall")
-
+        cosmvm_relay.start_channel(plan, relay_service_response.service_name, path_name, "xcall", "xcall")
 
         return config_data
 
-    
-        
-def run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_config,dst_config, args):
-
+def run_cosmos_ibc_relay_for_already_running_chains(plan, links, src_config, dst_config):
     src_chain_service_name = src_config["service_name"]
     dst_chain_service_name = dst_config["service_name"]
     src_chain_id = src_config["chain_id"]
@@ -345,7 +334,5 @@ def run_cosmos_ibc_relay_for_already_running_chains(plan,links,src_config,dst_co
     config_data = input_parser.generate_new_config_data_cosmvm_cosmvm(links, src_chain_service_name, dst_chain_service_name)
     config_data["chains"][src_chain_service_name] = src_config
     config_data["chains"][dst_chain_service_name] = dst_config
-    cosmvm_relay.start_cosmos_relay(plan, src_chain_key, src_chain_id, dst_chain_key, dst_chain_id, src_config, dst_config, args)
-
+    cosmvm_relay.start_cosmos_relay(plan, src_chain_key, src_chain_id, dst_chain_key, dst_chain_id, src_config, dst_config, links)
     return config_data
-    
