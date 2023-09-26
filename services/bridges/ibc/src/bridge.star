@@ -93,13 +93,25 @@ def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_c
         service_name = ibc_relay_config.relay_service_name,
     )
 
-def start_cosmos_relay_for_icon_to_cosmos(plan, src_chain_config, dst_chain_config):
+def start_cosmos_relay_for_icon_to_cosmos(plan, src_chain_config, dst_chain_config, args):
     plan.print("starting the cosmos relay for icon to cosmos")
 
-    plan.upload_files(src = ibc_relay_config.config_file_path, name = "archway_config")
+    source_chain = args["links"]["src"]
+    destination_chain = args["links"]["dst"]
+
+    if destination_chain == "archway":
+        plan.upload_files(src = ibc_relay_config.config_file_path, name = "archway_config")
+    elif destination_chain == "neutron":
+        plan.upload_files(src = ibc_relay_config.config_file_path, name = "neutron_config")
+
     plan.upload_files(src = ibc_relay_config.icon_keystore_file, name = "icon-keystore")
 
-    wasm_config = read_file(ibc_relay_config.ibc_relay_wasm_file_template)
+
+    if destination_chain == "archway":
+        wasm_config = read_file(ibc_relay_config.ibc_relay_wasm_file_template)
+    elif destination_chain == "neutron":
+        wasm_config = read_file(ibc_relay_config.ibc_relay_neutron_wasm_file_template)
+
     java_config = read_file(ibc_relay_config.ibc_relay_java_file_template)
 
     cfg_template_data_wasm = {
