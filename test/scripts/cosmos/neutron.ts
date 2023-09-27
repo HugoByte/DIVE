@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import {
   CreateSigningClient,
-  GetArchwayChainInfo,
+  GetNeutronChainInfo,
   GetCosmosContracts,
   GetDataInBytes,
   GetIconChainInfo,
@@ -29,9 +29,9 @@ let accountAddress: string;
 async function Setup(): Promise<[SigningCosmWasmClient, string]> {
   // Chain Constants, modify as required in contracts.json
   const chain1 = {
-    chainId: GetArchwayChainInfo("chainId"),
-    endpoint: GetArchwayChainInfo("endpoint"),
-    prefix: GetArchwayChainInfo("prefix"),
+    chainId: GetNeutronChainInfo("chainId"),
+    endpoint: GetNeutronChainInfo("endpoint"),
+    prefix: GetNeutronChainInfo("prefix"),
   };
 
   // Create signing client and account address
@@ -43,7 +43,7 @@ async function Setup(): Promise<[SigningCosmWasmClient, string]> {
   );
 
   // Get Test Account with stake
-  const testAccount = await getTestAccountWithStake("archway");
+  const testAccount = await getTestAccountWithStake("neutron");
   const testAddress = testAccount.substring(8, testAccount.length).trim();
 
   // To Get balance of given account address and transfer balance if 0
@@ -52,7 +52,7 @@ async function Setup(): Promise<[SigningCosmWasmClient, string]> {
     console.log(
       "No Balance in Signer account, Transferring balance to Signer account"
     );
-    await getStake(testAddress!, accountAddress, "archway");
+    await getStake(testAddress!, accountAddress, "neutron");
   }
   await new Promise((f) => setTimeout(f, 5000));
   return [signingClient, accountAddress];
@@ -77,7 +77,7 @@ async function sendMessageFromDapp(
   data: number[],
   rbData?: string
 ) {
-  const dapp = await GetCosmosContracts("dapp", "archway");
+  const dapp = await GetCosmosContracts("dapp", "neutron");
   const iconDappAddress = await GetIconContracts("dapp");
   const DestNetwork = GetIconChainInfo("network");
   const execMsg = rbData
@@ -167,7 +167,7 @@ async function waitForEvent(
 }
 
 export async function executeCallCosmos(reqId: any, data: any) {
-  const xcall = await GetCosmosContracts("xcall", "archway");
+  const xcall = await GetCosmosContracts("xcall", "neutron");
   const execMsg = {
     execute_call: {
       request_id: reqId.toString(),
@@ -231,7 +231,7 @@ export async function verifyRollbackMessageEventCosmos(height: number) {
 }
 
 export async function executeRollbackCosmos(seqNo: any) {
-  const xcall = await GetCosmosContracts("xcall", "archway");
+  const xcall = await GetCosmosContracts("xcall", "neutron");
   const execMsg = {
     execute_rollback: {
       sequence_no: seqNo.toString(),

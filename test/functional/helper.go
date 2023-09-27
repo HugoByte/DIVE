@@ -46,6 +46,13 @@ func RunArchwayNode() {
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
+func RunNeutronNode() {
+	cmd := GetBinaryCommand()
+	cmd.Args = append(cmd.Args, "chain", "neutron")
+	err := cmd.Run()
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+}
+
 func RunDecentralizedIconNode() {
 	cmd := GetBinaryCommand()
 	cmd.Args = append(cmd.Args, "chain", "icon", "-d")
@@ -77,6 +84,20 @@ func RunCustomArchwayNode1() {
 func RunCustomArchwayNode0() {
 	cmd := GetBinaryCommand()
 	cmd.Args = append(cmd.Args, "chain", "archway", "-c", "../../cli/sample-jsons/archway.json")
+	err := cmd.Run()
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+}
+
+func RunCustomNeutronNode1() {
+	cmd := GetBinaryCommand()
+	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", "../../cli/sample-jsons/neutron1.json")
+	err := cmd.Run()
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+}
+
+func RunCustomNeutronNode0() {
+	cmd := GetBinaryCommand()
+	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", "../../cli/sample-jsons/neutron.json")
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }

@@ -39,14 +39,21 @@ export async function getHeight(
   console.log("Current Block Height on " + chainId + " :" + height + "\n");
 }
 
-export async function getStake(testaddress: string, destaddress: string) {
-  const dockerID = await getContainerIdByPartialName();
+export async function getStake(testaddress: string, destaddress: string, chainName: string) {
+  const dockerID = await getContainerIdByPartialName(chainName);
   console.log(dockerID);
-
-  const commando = `docker exec ${dockerID} archwayd tx bank send ${testaddress} ${destaddress} 9000000stake --keyring-backend test \
+  
+  let command = "";
+  
+  if (chainName == "archway") {
+    command = `docker exec ${dockerID} archwayd tx bank send ${testaddress} ${destaddress} 9000000stake --keyring-backend test \
     --chain-id constantine-3 -y`;
+  } else if (chainName == "neutron"){
+    command = `docker exec ${dockerID} neutrond tx bank send ${testaddress} ${destaddress} 9000000stake --keyring-backend test \
+    --chain-id test-chain1 -y`;
+  }
 
-  exec(commando, (error, stdout, stderr) => {
+  exec(command, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error executing docker exec: ${error.message}`);
       return;
@@ -57,9 +64,16 @@ export async function getStake(testaddress: string, destaddress: string) {
   });
 }
 
-export async function getTestAccountWithStake(): Promise<string> {
-  const dockerID = await getContainerIdByPartialName();
-  const command = `docker exec ${dockerID} archwayd keys list --keyring-backend test |  grep 'address:'`;
+export async function getTestAccountWithStake(chainName: string): Promise<string> {
+  const dockerID = await getContainerIdByPartialName(chainName);
+  let command: string;
+  
+  if (chainName == "archway") {
+    command = `docker exec ${dockerID} archwayd keys list --keyring-backend test |  grep 'address:'`;
+  } else if (chainName == "neutron"){
+    command = `docker exec ${dockerID} neutrond keys list --keyring-backend test --home ./data/test-chain1 | grep -A 4 "name: test-key" | awk '/address:/ {print $2}' | cut -d':' -f2`;
+  }
+
   return new Promise<string>((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
       if (error) {
@@ -73,8 +87,14 @@ export async function getTestAccountWithStake(): Promise<string> {
   });
 }
 
-export async function getContainerIdByPartialName(): Promise<string> {
-  const command = 'docker ps -aqf "name=constantine-3"';
+export async function getContainerIdByPartialName(chainName: string): Promise<string> {
+  let command: string;
+  
+  if (chainName == "archway") {
+    command = 'docker ps -aqf "name=constantine-3"';
+  } else if (chainName == "neutron"){
+    command = 'docker ps -aqf "name=neutron"';
+  }
 
   return new Promise<string>((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
@@ -97,9 +117,9 @@ export async function getBalance(
   return balance.amount;
 }
 
-export function GetCosmosContracts(contract: string) {
+export function GetCosmosContracts(contract: string, chainName: string) {
   var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"));
-  return dataArray["archway"]["contracts"][contract];
+  return dataArray[chainName]["contracts"][contract];
 }
 
 export function GetIconContracts(contract: string) {
@@ -111,6 +131,12 @@ export function GetArchwayChainInfo(args: string){
   var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
   return dataArray["archway"][args];
 }
+
+export function GetNeutronChainInfo(args: string){
+  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
+  return dataArray["neutron"][args];
+}
+
 
 export function GetIconChainInfo(args: string){
   var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))

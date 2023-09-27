@@ -35,7 +35,7 @@ const NID = GetIconChainInfo("nid");
 const ICON_XCALL = GetIconContracts("xcall");
 const ICON_DAPP = GetIconContracts("dapp");
 const NETWORK_LABEL_DESTINATION = GetArchwayChainInfo("network");
-const DESTINATION_DAPP = GetCosmosContracts("dapp");
+const DESTINATION_DAPP = GetCosmosContracts("dapp", "archway");
 
 const callMessageSentSignature = "CallMessageSent(Address,str,int)";
 const callMessageSignature = "CallMessage(str,str,int,int,bytes)";

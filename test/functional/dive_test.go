@@ -273,6 +273,64 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
+		ginkgo.It("should start bridge between neutron and neutron by running one custom neutron chain", func() {
+			dive.RunNeutronNode()
+			dive.RunCustomNeutronNode1()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "neutron", "--chainB", "neutron", "--chainAServiceName", "neutron-node-test-chain1", "--chainBServiceName", "neutron-node-test-chain2")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start bridge between 2 custom neutron chains", func() {
+			dive.RunCustomNeutronNode0()
+			dive.RunCustomNeutronNode1()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "neutron", "--chainB", "neutron", "--chainAServiceName", "neutron-node-test-chain2", "--chainBServiceName", "neutron-node-test-chain2")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start bridge between 1 custom chain and running bridge command", func() {
+			dive.RunCustomNeutronNode1()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "neutron", "--chainB", "neutron", "--chainBServiceName", "neutron-node-test-chain2")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start bridge between archway and neutron chains", func() {
+
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "neutron")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start bridge between already running archway and neutron chains", func() {
+			dive.RunArchwayNode()
+			dive.RunNeutronNode()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "neutron", "--chainAServiceName", "node-service-constantine-3", "--chainBServiceName", "neutron-node-test-chain1")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start bridge between already running archway and neutron chains with custom configuration", func() {
+			dive.RunCustomNeutronNode0()
+			dive.RunCustomArchwayNode0()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "neutron", "--chainAServiceName", "node-service-archway-node-0", "--chainBServiceName", "neutron-node-test-chain2")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start IBC relay between icon and achway", func() {
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "archway")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start IBC relay between icon and neutron", func() {
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "neutron")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
 		ginkgo.It("should start bridge between icon and hardhat by running icon node first and running bridge command directly", func() {
 			dive.RunDecentralizedCustomIconNode0()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--chainAServiceName", "icon-node-0xacbc4e")
@@ -531,6 +589,41 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should output user that chain is already running when trying to run archway chain that is already running", func() {
 			dive.RunArchwayNode()
 			cmd.Args = append(cmd.Args, "chain", "archway")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+	})
+
+	ginkgo.Describe("Neutron chain commands", func() {
+		ginkgo.It("should run single neutron node", func() {
+			dive.RunNeutronNode()
+		})
+
+		ginkgo.It("should run single nurtron node with verbose flag enabled", func() {
+			cmd.Args = append(cmd.Args, "chain", "neutron", "--verbose")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should run single custom neutron node", func() {
+			dive.RunCustomNeutronNode0()
+		})
+
+		ginkgo.It("should run single custom neutron node with verbose flag enabled", func() {
+			cmd.Args = append(cmd.Args, "chain", "neutron", "-c", "../../cli/sample-jsons/neutron.json", "--verbose")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should run single custom neutron node with invalid json path", func() {
+			cmd.Args = append(cmd.Args, "chain", "neutron", "-c", "../../cli/sample-jsons/neutron5.json")
+			err := cmd.Run()
+			gomega.Expect(err).To(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should output user that chain is already running when trying to run neutron chain that is already running", func() {
+			dive.RunNeutronNode()
+			cmd.Args = append(cmd.Args, "chain", "neutron")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
