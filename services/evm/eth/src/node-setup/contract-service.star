@@ -1,5 +1,4 @@
-constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
-
+constants = import_module("../../../../../package_io/constants.star")
 # Starts the eth deploy service
 def start_deploy_service(plan,args):
 

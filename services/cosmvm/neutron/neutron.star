@@ -1,6 +1,6 @@
 # Import required modules and constants
-neutron_node_service = import_module("github.com/hugobyte/dive/services/cosmvm/neutron/src/node-setup/start_node.star")
-constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
+neutron_node_service = import_module("./src/node-setup/start_node.star")
+constants = import_module("../../../package_io/constants.star")
 neutron_private_ports = constants.NEUTRON_PRIVATE_PORTS
 neutron_node1_config = constants.NEUTRON_NODE1_CONFIG
 neutron_node2_config = constants.NEUTRON_NODE2_CONFIG

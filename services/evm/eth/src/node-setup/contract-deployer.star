@@ -1,4 +1,4 @@
-constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
+constants = import_module("../../../../../package_io/constants.star")
 
 # Deploy Contract to Eth Network
 def deploy_contract(plan,contract_name,params,network_name):

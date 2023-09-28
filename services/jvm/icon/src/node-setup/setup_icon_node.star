@@ -1,4 +1,4 @@
-wallet_config = import_module("github.com/hugobyte/dive/services/jvm/icon/src/node-setup/wallet.star")
+wallet_config = import_module("./wallet.star")
 
 BTP_VERSION = "21" # REV Version
 

@@ -1,7 +1,7 @@
-wallet = import_module("github.com/hugobyte/dive/services/jvm/icon/src/node-setup/wallet.star")
-setup_node = import_module("github.com/hugobyte/dive/services/jvm/icon/src/node-setup/setup_icon_node.star")
-icon_node_launcher = import_module("github.com/hugobyte/dive/services/jvm/icon/src/node-setup/start_icon_node.star")
-icon_relay_setup = import_module("github.com/hugobyte/dive/services/jvm/icon/src/relay-setup/contract_configuration.star")
+wallet = import_module("./src/node-setup/wallet.star")
+setup_node = import_module("./src/node-setup/setup_icon_node.star")
+icon_node_launcher = import_module("./src/node-setup/start_icon_node.star")
+icon_relay_setup = import_module("./src/relay-setup/contract_configuration.star")
 
 START_FILE_FOR_ICON0 = "start-icon.sh"
 START_FILE_FOR_ICON1 = "start-icon.sh"
