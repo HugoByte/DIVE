@@ -25,10 +25,12 @@ def start_neutron_node(plan, args):
     start_script_file = "start-script-%s" % chain_id
     init_script_file = "init-script-%s" % chain_id
     init_neutrond_script_file = "init-neutrond-script-%s" % chain_id
+    contract_files = "contract-%s" % chain_id
 
     plan.upload_files(src = neutron_node_constants.init_script, name = init_script_file)
     plan.upload_files(src = neutron_node_constants.init_nutrond_script, name = init_neutrond_script_file)
     plan.upload_files(src = neutron_node_constants.start_script, name = start_script_file)
+    plan.upload_files(src= neutron_node_constants.default_contract_path, name=contract_files)
 
     # Define Neutron node configuration
     neutron_node_config = ServiceConfig(
@@ -37,6 +39,7 @@ def start_neutron_node(plan, args):
             neutron_node_constants.path + "start": start_script_file,
             neutron_node_constants.path + "init": init_script_file,
             neutron_node_constants.path + "init-neutrond": init_neutrond_script_file,
+            neutron_node_constants.contract_path: contract_files
         },
         ports={
             network_port_keys_and_ip.http: PortSpec(
@@ -150,7 +153,6 @@ def get_service_config(cid, key, password, private_grpc, private_http, private_t
         public_tcp (int): Public TCP port.
         public_rpc (int): Public RPC port.
         public_rpc (int): Public RPC port.
-        service_name (str): Service name.
 
 
     Returns:

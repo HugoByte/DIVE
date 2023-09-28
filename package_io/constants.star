@@ -58,6 +58,8 @@ NEUTRON_SERVICE_CONFIG = struct(
     start_script = "github.com/hugobyte/dive/services/cosmvm/neutron/static_files/start.sh",
     init_nutrond_script = "github.com/hugobyte/dive/services/cosmvm/neutron/static_files/init-neutrond.sh",
     path = "/start-scripts/",
+    default_contract_path = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/contracts",
+    contract_path = "/root/contracts/",
 )
 
 IBC_RELAYER_SERVICE = struct(
@@ -71,6 +73,7 @@ IBC_RELAYER_SERVICE = struct(
     relay_service_name_icon_to_cosmos = "ibc-relayer",
     config_file_path = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config",
     ibc_relay_wasm_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/archwayibc.json.tpl",
+    ibc_relay_neutron_wasm_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/neutronibc.json.tpl",
     ibc_relay_java_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/icon.json.tpl",
     icon_keystore_file = "github.com/hugobyte/dive/services/bridges/btp/static-files/keystores/keystore.json",
     relay_keystore_path = "/root/.relayer/keys/"
@@ -121,7 +124,7 @@ NEUTRON_NODE1_CONFIG = struct(
     http = 1317,
     rpc = 26669,
     tcp = 26656,
-    grpc = 8090,
+    grpc = 8032,
     chain_id = "test-chain1",
     key = "test-key",
     password = "clock post desk civil pottery foster expand merit dash seminar song memory figure uniform spice circle try happy obvious trash crime hybrid hood cushion",

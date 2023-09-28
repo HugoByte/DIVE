@@ -1,4 +1,4 @@
-constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
+constants = import_module("../../../../../package_io/constants.star")
 participant_network = import_module("github.com/kurtosis-tech/eth-network-package/src/participant_network.star")
 input_parser = import_module("github.com/kurtosis-tech/eth-network-package/package_io/input_parser.star")
 static_files = import_module("github.com/kurtosis-tech/eth-network-package/static_files/static_files.star")
