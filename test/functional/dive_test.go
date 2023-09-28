@@ -363,6 +363,38 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
+		ginkgo.It("should start IBC relay between already running custom icon and archway chain", func() {
+			dive.RunCustomIconNode()
+			dive.RunArchwayNode()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "archway", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "node-service-constantine-3")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start IBC relay between already running custom icon and neutron chain", func() {
+			dive.RunCustomIconNode()
+			dive.RunNeutronNode()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "neutron", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "neutron-node-test-chain1")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start IBC relay between already running custom icon and custom archway chain", func() {
+			dive.RunCustomIconNode()
+			dive.RunCustomArchwayNode0()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "archway", "--chainAServiceName", "icon-node-0x42f1f3", "--chainBServiceName", "node-service-archway-node-0")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start IBC relay between already running custom icon and custom neutron chain", func() {
+			dive.RunCustomIconNode()
+			dive.RunCustomNeutronNode0()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "neutron", "--chainAServiceName", "icon-node-0x42f1f3", "--chainBServiceName", "neutron-node-test-chain2")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
 		ginkgo.It("should start bridge between icon and hardhat by running icon node first and running bridge command directly", func() {
 			dive.RunDecentralizedCustomIconNode0()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--chainAServiceName", "icon-node-0xacbc4e")
