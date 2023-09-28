@@ -1,7 +1,6 @@
-archway_node_service = import_module("github.com/hugobyte/dive/services/cosmvm/archway/archway.star")
-neutron_node_service = import_module("github.com/hugobyte/dive/services/cosmvm/neutron/neutron.star")
-parser = import_module("github.com/hugobyte/dive/package_io/input_parser.star")
-
+archway_node_service = import_module("./archway/archway.star")
+neutron_node_service = import_module("./neutron/neutron.star")
+parser = import_module("../../package_io/input_parser.star")
 
 def start_cosmvm_chains(plan,node_name,args):
     if node_name == "archway":

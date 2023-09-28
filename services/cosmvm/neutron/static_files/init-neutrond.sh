@@ -8,7 +8,7 @@ password=${password:-clock post desk civil pottery foster expand merit dash semi
 BINARY=${BINARY:-neutrond}
 BASE_DIR=./data
 CHAINID=${CHAINID:-test-1}
-STAKEDENOM=${STAKEDENOM:-untrn}
+STAKEDENOM=${STAKEDENOM:-stake}
 CONTRACTS_BINARIES_DIR=${CONTRACTS_BINARIES_DIR:-./contracts}
 THIRD_PARTY_CONTRACTS_DIR=${THIRD_PARTY_CONTRACTS_DIR:-./contracts_thirdparty}
 
