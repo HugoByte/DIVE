@@ -256,22 +256,40 @@ def run_cosmos_ibc_setup(plan, args):
     if (source_chain in ["archway", "neutron"]) and (destination_chain in ["archway", "neutron"]):
         # Start IBC between two CosmVM chains
         data = cosmvm_node.start_ibc_between_cosmvm_chains(plan, source_chain, destination_chain, args)
-        config_data = run_cosmos_ibc_relay_for_already_running_chains(plan, links, data.src_config, data.dst_config)
+        config_data = run_cosmos_ibc_relay_for_already_running_chains(plan, data.src_config, data.dst_config, args)
         return config_data
 
     # Check if the destination chain is CosmVM-based and the source chain is ICON
     if destination_chain in ["archway", "neutron"] and source_chain == "icon":
         # Start ICON node service
         src_chain_config = icon_service.start_node_service(plan)
-        
         # Start CosmVM node service
         data = {"data": {}}
         dst_chain_config = cosmvm_node.start_cosmvm_chains(plan, destination_chain, data)
-
         # Get service names and new generate configuration data
+        config_data = run_cosmos_ibc_relay_for_already_running_chains(plan, src_chain_config , dst_chain_config, args)
+        return config_data
+
+def run_cosmos_ibc_relay_for_already_running_chains(plan, src_chain_config, dst_chain_config, args):
+    source_chain = args["links"]["src"]
+    destination_chain = args["links"]["dst"]
+    if source_chain in ["archway", "neutron"] and destination_chain in ["archway", "neutron"]:
         src_chain_service_name = src_chain_config["service_name"]
-        dst_chain_service_name = dst_chain_config.service_name
-        config_data = input_parser.generate_new_config_data(links, src_chain_service_name, dst_chain_service_name, "")
+        dst_chain_service_name = dst_chain_config["service_name"]
+        src_chain_id = src_chain_config["chain_id"]
+        src_chain_key = src_chain_config["chain_key"]
+        dst_chain_id = dst_chain_config["chain_id"]
+        dst_chain_key = dst_chain_config["chain_key"]
+
+        config_data = input_parser.generate_new_config_data_cosmvm_cosmvm(args["links"], src_chain_service_name, dst_chain_service_name)
+        config_data["chains"][src_chain_service_name] = src_chain_config
+        config_data["chains"][dst_chain_service_name] = dst_chain_config
+        cosmvm_relay.start_cosmos_relay(plan, src_chain_key, src_chain_id, dst_chain_key, dst_chain_id, src_chain_config, dst_chain_config, args["links"])
+
+    elif source_chain == "icon" and destination_chain in ["archway", "neutron"]:
+        src_chain_service_name = src_chain_config["service_name"]
+        dst_chain_service_name = dst_chain_config["service_name"]
+        config_data = input_parser.generate_new_config_data(args["links"], src_chain_service_name, dst_chain_service_name, "")
 
         # Add chain configurations to the configuration data
         config_data["chains"][src_chain_service_name] = src_chain_config
@@ -302,15 +320,15 @@ def run_cosmos_ibc_setup(plan, args):
 
         # Depending on the destination chain (archway or neutron), set up Cosmos contracts
         if destination_chain == "archway":
-            deploy_cosmos_contracts = cosmvm_relay_setup.setup_contracts_for_ibc_wasm(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, dst_chain_config.chain_id, "stake", "xcall")
-            cosmvm_relay_setup.registerClient(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, deploy_cosmos_contracts["ibc_core"], deploy_cosmos_contracts["light_client"])
+            deploy_cosmos_contracts = cosmvm_relay_setup.setup_contracts_for_ibc_wasm(plan, dst_chain_service_name, dst_chain_config["chain_id"], dst_chain_config["chain_key"], dst_chain_config["chain_id"], "stake", "xcall")
+            cosmvm_relay_setup.registerClient(plan, dst_chain_service_name, dst_chain_config["chain_id"], dst_chain_config["chain_key"], deploy_cosmos_contracts["ibc_core"], deploy_cosmos_contracts["light_client"])
             plan.wait(service_name = dst_chain_service_name, recipe = ExecRecipe(command = ["/bin/sh", "-c", "sleep 10s && echo 'success'"]), field = "code", assertion = "==", target_value = 0, timeout = "200s")
-            cosmvm_relay_setup.bindPort(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, deploy_cosmos_contracts["ibc_core"], deploy_cosmos_contracts["xcall_connection"])
+            cosmvm_relay_setup.bindPort(plan, dst_chain_service_name, dst_chain_config["chain_id"], dst_chain_config["chain_key"], deploy_cosmos_contracts["ibc_core"], deploy_cosmos_contracts["xcall_connection"])
         elif destination_chain == "neutron":
-            deploy_cosmos_contracts = neutron_relay_setup.setup_contracts_for_ibc_wasm(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, dst_chain_config.chain_id, "stake", "xcall")
-            neutron_relay_setup.registerClient(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, deploy_cosmos_contracts["ibc_core"], deploy_cosmos_contracts["light_client"])
+            deploy_cosmos_contracts = neutron_relay_setup.setup_contracts_for_ibc_wasm(plan, dst_chain_service_name, dst_chain_config["chain_id"], dst_chain_config["chain_key"], dst_chain_config["chain_id"], "stake", "xcall")
+            neutron_relay_setup.registerClient(plan, dst_chain_service_name, dst_chain_config["chain_id"], dst_chain_config["chain_key"], deploy_cosmos_contracts["ibc_core"], deploy_cosmos_contracts["light_client"])
             plan.wait(service_name = dst_chain_service_name, recipe = ExecRecipe(command = ["/bin/sh", "-c", "sleep 10s && echo 'success'"]), field = "code", assertion = "==", target_value = 0, timeout = "200s")
-            neutron_relay_setup.bindPort(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, deploy_cosmos_contracts["ibc_core"], deploy_cosmos_contracts["xcall_connection"])
+            neutron_relay_setup.bindPort(plan, dst_chain_service_name, dst_chain_config["chain_id"], dst_chain_config["chain_key"], deploy_cosmos_contracts["ibc_core"], deploy_cosmos_contracts["xcall_connection"])
 
         # Add contract information to configuration data
         config_data["contracts"][src_chain_service_name] = deploy_icon_contracts
@@ -324,11 +342,11 @@ def run_cosmos_ibc_setup(plan, args):
         }
 
         dst_chain_data = {
-            "chain_id": dst_chain_config.chain_id,
-            "key": dst_chain_config.chain_key,
-            "rpc_address": dst_chain_config.endpoint,
+            "chain_id": dst_chain_config["chain_id"],
+            "key": dst_chain_config["chain_key"],
+            "rpc_address": dst_chain_config["endpoint"],
             "ibc_address": deploy_cosmos_contracts["ibc_core"],
-            "service_name": dst_chain_config.service_name,
+            "service_name": dst_chain_config["service_name"],
         }
 
         # Start the Cosmos relay for ICON to Cosmos communication
@@ -337,17 +355,17 @@ def run_cosmos_ibc_setup(plan, args):
 
         relay_data = cosmvm_relay.get_relay_path_data(plan, relay_service_response.service_name, path_name)
 
-        dapp_result_java = icon_relay_setup.deploy_and_configure_dapp_java(plan, src_chain_config, deploy_icon_contracts["xcall"], dst_chain_config.chain_id, deploy_icon_contracts["xcall_connection"], deploy_cosmos_contracts["xcall_connection"], src_chain_service_name, src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"])
+        dapp_result_java = icon_relay_setup.deploy_and_configure_dapp_java(plan, src_chain_config, deploy_icon_contracts["xcall"], dst_chain_config["chain_id"], deploy_icon_contracts["xcall_connection"], deploy_cosmos_contracts["xcall_connection"], src_chain_service_name, src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"])
 
         # Depending on the destination chain (archway or neutron), deploy and configure the DApp for Wasm
         if destination_chain == "archway":
-            dapp_result_wasm = cosmvm_relay_setup.deploy_and_configure_xcall_dapp(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, deploy_cosmos_contracts["xcall"], deploy_cosmos_contracts["xcall_connection"], deploy_icon_contracts["xcall_connection"], src_chain_config["network"])
-            cosmvm_relay_setup.configure_connection_for_wasm(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, deploy_cosmos_contracts["xcall_connection"], relay_data.dst_connection_id, "xcall", src_chain_config["network"], relay_data.dst_client_id, deploy_cosmos_contracts["xcall"])
+            dapp_result_wasm = cosmvm_relay_setup.deploy_and_configure_xcall_dapp(plan, dst_chain_service_name, dst_chain_config["chain_id"], dst_chain_config["chain_key"], deploy_cosmos_contracts["xcall"], deploy_cosmos_contracts["xcall_connection"], deploy_icon_contracts["xcall_connection"], src_chain_config["network"])
+            cosmvm_relay_setup.configure_connection_for_wasm(plan, dst_chain_service_name, dst_chain_config["chain_id"], dst_chain_config["chain_key"], deploy_cosmos_contracts["xcall_connection"], relay_data.dst_connection_id, "xcall", src_chain_config["network"], relay_data.dst_client_id, deploy_cosmos_contracts["xcall"])
         elif destination_chain == "neutron":
-            dapp_result_wasm = neutron_relay_setup.deploy_and_configure_xcall_dapp(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, deploy_cosmos_contracts["xcall"], deploy_cosmos_contracts["xcall_connection"], deploy_icon_contracts["xcall_connection"], src_chain_config["network"])
-            neutron_relay_setup.configure_connection_for_wasm(plan, dst_chain_service_name, dst_chain_config.chain_id, dst_chain_config.chain_key, deploy_cosmos_contracts["xcall_connection"], relay_data.dst_connection_id, "xcall", src_chain_config["network"], relay_data.dst_client_id, deploy_cosmos_contracts["xcall"])
+            dapp_result_wasm = neutron_relay_setup.deploy_and_configure_xcall_dapp(plan, dst_chain_service_name, dst_chain_config["chain_id"], dst_chain_config["chain_key"], deploy_cosmos_contracts["xcall"], deploy_cosmos_contracts["xcall_connection"], deploy_icon_contracts["xcall_connection"], src_chain_config["network"])
+            neutron_relay_setup.configure_connection_for_wasm(plan, dst_chain_service_name, dst_chain_config["chain_id"], dst_chain_config["chain_key"], deploy_cosmos_contracts["xcall_connection"], relay_data.dst_connection_id, "xcall", src_chain_config["network"], relay_data.dst_client_id, deploy_cosmos_contracts["xcall"])
 
-        icon_relay_setup.configure_connection_for_java(plan, deploy_icon_contracts["xcall"], deploy_icon_contracts["xcall_connection"], dst_chain_config.chain_id, relay_data.src_connection_id, "xcall", dst_chain_config.chain_id, relay_data.src_client_id, src_chain_service_name, src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"])
+        icon_relay_setup.configure_connection_for_java(plan, deploy_icon_contracts["xcall"], deploy_icon_contracts["xcall_connection"], dst_chain_config["chain_id"], relay_data.src_connection_id, "xcall", dst_chain_config["chain_id"], relay_data.src_client_id, src_chain_service_name, src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"])
             
         config_data["contracts"][src_chain_service_name]["dapp"] = dapp_result_java["xcall_dapp"]
         config_data["contracts"][dst_chain_service_name]["dapp"] = dapp_result_wasm["xcall_dapp"]
@@ -355,18 +373,10 @@ def run_cosmos_ibc_setup(plan, args):
         # Start relay channel
         cosmvm_relay.start_channel(plan, relay_service_response.service_name, path_name, "xcall", "xcall")
 
-        return config_data
 
-def run_cosmos_ibc_relay_for_already_running_chains(plan, links, src_config, dst_config):
-    src_chain_service_name = src_config["service_name"]
-    dst_chain_service_name = dst_config["service_name"]
-    src_chain_id = src_config["chain_id"]
-    src_chain_key = src_config["chain_key"]
-    dst_chain_id = dst_config["chain_id"]
-    dst_chain_key = dst_config["chain_key"]
-
-    config_data = input_parser.generate_new_config_data_cosmvm_cosmvm(links, src_chain_service_name, dst_chain_service_name)
-    config_data["chains"][src_chain_service_name] = src_config
-    config_data["chains"][dst_chain_service_name] = dst_config
-    cosmvm_relay.start_cosmos_relay(plan, src_chain_key, src_chain_id, dst_chain_key, dst_chain_id, src_config, dst_config, links)
     return config_data
+
+
+
+
+
