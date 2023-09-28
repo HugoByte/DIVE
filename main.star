@@ -9,7 +9,7 @@ input_parser = import_module("./package_io/input_parser.star")
 cosmvm_node = import_module("./services/cosmvm/cosmvm.star")
 cosmvm_relay = import_module("./services/bridges/ibc/src/bridge.star")
 cosmvm_relay_setup = import_module("./services/cosmvm/archway/src/relay-setup/contract-configuration.star")
-neutron_relay_setup = import_module("github.com/hugobyte/dive/services/cosmvm/neutron/src/relay-setup/contract-configuration.star")
+neutron_relay_setup = import_module("./services/cosmvm/neutron/src/relay-setup/contract-configuration.star")
 
 def run(plan, args):
     return parse_input(plan, args)
@@ -289,7 +289,6 @@ def run_cosmos_ibc_relay_for_already_running_chains(plan, src_chain_config, dst_
         src_chain_service_name = src_chain_config["service_name"]
         dst_chain_service_name = dst_chain_config["service_name"]
         config_data = input_parser.generate_new_config_data(args["links"], src_chain_service_name, dst_chain_service_name, "")
-neutron_relay_setup = import_module("github.com/hugobyte/dive/services/cosmvm/neutron/src/relay-setup/contract-configuration.star")
         # Add chain configurations to the configuration data
         config_data["chains"][src_chain_service_name] = src_chain_config
         config_data["chains"][dst_chain_service_name] = dst_chain_config
