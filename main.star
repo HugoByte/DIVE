@@ -265,6 +265,7 @@ def run_cosmos_ibc_setup(plan, args):
         # Start CosmVM node service
         data = {"data": {}}
         dst_chain_config = cosmvm_node.start_cosmvm_chains(plan, destination_chain, data)
+        dst_chain_config = input_parser.struct_to_dict(dst_chain_config)
         # Get service names and new generate configuration data
         config_data = run_cosmos_ibc_relay_for_already_running_chains(plan, src_chain_config , dst_chain_config, args)
         return config_data

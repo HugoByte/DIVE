@@ -19,11 +19,11 @@
     "nid": "0x3",
     "service_name": "icon-node-0xacbc4e",
     "contracts": {
-      "dapp": "cx5daa87ca057b824c0771b68391e6b4767ee4a928",
-      "ibc_core": "cxb5ba9824fbac0d8559504804d5224d9dc9c9ffe9",
-      "light_client": "cx55b3d7ae642ab8db9614946d0b83953e1a26b02d",
-      "xcall": "cx54a4b1d02be781ce7e3c8b1df6f294ba656d98e8",
-      "xcall_connection": "cx9eb3f276557b8057e3bb44f378b5cf8bf6c71b6f"
+      "dapp": "cx622d566e69ea18f68fdc43b4f25188d2d9e25d71",
+      "ibc_core": "cxe8c9dd9bcebfad5c08cc6d03f5ed001f59b455ee",
+      "light_client": "cxf27b008f286a26b412b09ce25648346075f3f60c",
+      "xcall": "cx1544a6e529edcaf95c63a79017aa77f0a0dd2b96",
+      "xcall_connection": "cxe294065564b2855ac83038d252904fb73849057a"    
     }
   },
   "path": {
@@ -31,3 +31,5 @@
     "dest": "archway"
   }
 }
+
+

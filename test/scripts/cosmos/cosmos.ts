@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import {
   CreateSigningClient,
-  GetArchwayChainInfo,
+  GetChainInfo,
   GetCosmosContracts,
   GetDataInBytes,
   GetIconChainInfo,
@@ -26,12 +26,12 @@ const defaultGasPrice = GasPrice.fromString("0stake");
 let signingClient: SigningCosmWasmClient;
 let accountAddress: string;
 
-async function Setup(): Promise<[SigningCosmWasmClient, string]> {
+async function Setup(chainName: string): Promise<[SigningCosmWasmClient, string]> {
   // Chain Constants, modify as required in contracts.json
   const chain1 = {
-    chainId: GetArchwayChainInfo("chainId"),
-    endpoint: GetArchwayChainInfo("endpoint"),
-    prefix: GetArchwayChainInfo("prefix"),
+    chainId: GetChainInfo(chainName, "chainId"),
+    endpoint: GetChainInfo(chainName, "endpoint"),
+    prefix: GetChainInfo(chainName, "prefix"),
   };
 
   // Create signing client and account address
@@ -43,7 +43,7 @@ async function Setup(): Promise<[SigningCosmWasmClient, string]> {
   );
 
   // Get Test Account with stake
-  const testAccount = await getTestAccountWithStake();
+  const testAccount = await getTestAccountWithStake(chainName);
   const testAddress = testAccount.substring(8, testAccount.length).trim();
 
   // To Get balance of given account address and transfer balance if 0
@@ -52,7 +52,7 @@ async function Setup(): Promise<[SigningCosmWasmClient, string]> {
     console.log(
       "No Balance in Signer account, Transferring balance to Signer account"
     );
-    await getStake(testAddress!, accountAddress);
+    await getStake(testAddress!, accountAddress, chainName);
   }
   await new Promise((f) => setTimeout(f, 5000));
   return [signingClient, accountAddress];
@@ -60,13 +60,15 @@ async function Setup(): Promise<[SigningCosmWasmClient, string]> {
 
 export async function sendMessageFromDAppCosmos(
   data: number[],
+  chainName: string,
   rollbackData?: string
 ) {
-  [signingClient, accountAddress] = await Setup();
+  [signingClient, accountAddress] = await Setup(chainName);
   return await sendMessageFromDapp(
     accountAddress,
     signingClient,
     data,
+    chainName,
     rollbackData
   );
 }
@@ -75,9 +77,10 @@ async function sendMessageFromDapp(
   accountAddress: string,
   signingClient: SigningCosmWasmClient,
   data: number[],
+  chainName: string,
   rbData?: string
 ) {
-  const dapp = await GetCosmosContracts("dapp");
+  const dapp = await GetCosmosContracts("dapp", chainName);
   const iconDappAddress = await GetIconContracts("dapp");
   const DestNetwork = GetIconChainInfo("network");
   const execMsg = rbData
@@ -122,8 +125,8 @@ function sleep(millis: number) {
   return new Promise((resolve) => setTimeout(resolve, millis));
 }
 
-export async function verifyCallMessageEventCosmos() {
-  [signingClient, accountAddress] = await Setup();
+export async function verifyCallMessageEventCosmos(chainName: string) {
+  [signingClient, accountAddress] = await Setup(chainName);
   return verifyCallMessageEvent(signingClient);
 }
 
@@ -166,8 +169,8 @@ async function waitForEvent(
   }
 }
 
-export async function executeCallCosmos(reqId: any, data: any) {
-  const xcall = await GetCosmosContracts("xcall");
+export async function executeCallCosmos(reqId: any, data: any, chainName: string) {
+  const xcall = await GetCosmosContracts("xcall", chainName);
   const execMsg = {
     execute_call: {
       request_id: reqId.toString(),
@@ -230,8 +233,8 @@ export async function verifyRollbackMessageEventCosmos(height: number) {
   console.log(event?.[0]);
 }
 
-export async function executeRollbackCosmos(seqNo: any) {
-  const xcall = await GetCosmosContracts("xcall");
+export async function executeRollbackCosmos(seqNo: any, chainName: string) {
+  const xcall = await GetCosmosContracts("xcall", chainName);
   const execMsg = {
     execute_rollback: {
       sequence_no: seqNo.toString(),
