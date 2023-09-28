@@ -120,7 +120,7 @@ func RunNeutronNode(diveContext *common.DiveContext) *common.DiveserviceResponse
 // RunNeutronWithServiceConfig runs the Neutron service with the provided configuration data.
 func RunNeutronWithServiceConfig(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext, data string) (string, error) {
 	params := fmt.Sprintf(`{"args":{"data":%s}}`, data)
-	nodeServiceResponse, _, err := enclaveContext.RunStarlarkPackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveNeutronDefaultNodeScript, runNeutronNodeWithDefaultConfigFunctionName, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	nodeServiceResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveNeutronDefaultNodeScript, runNeutronNodeWithDefaultConfigFunctionName, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
 	if err != nil {
 		return "", err
 	}
