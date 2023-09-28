@@ -127,9 +127,9 @@ export function GetIconContracts(contract: string) {
   return dataArray["icon"]["contracts"][contract];
 }
 
-export function GetArchwayChainInfo(args: string){
+export function GetChainInfo(chainName: string,args: string){
   var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
-  return dataArray["archway"][args];
+  return dataArray[chainName][args];
 }
 
 export function GetNeutronChainInfo(args: string){

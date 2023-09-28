@@ -1,0 +1,41 @@
+{
+	"chains": {
+		"icon-node-0xacbc4e": {
+			"endpoint": "http://172.16.0.3:9080/api/v3/icon_dex",
+			"endpoint_public": "http://127.0.0.1:8090/api/v3/icon_dex",
+			"keypassword": "gochain",
+			"keystore_path": "keystores/keystore.json",
+			"network": "0x3.icon",
+			"network_name": "icon-0xacbc4e",
+			"nid": "0x3",
+			"service_name": "icon-node-0xacbc4e"
+		},
+		"node-service-constantine-3": {
+			"chain_id": "constantine-3",
+			"chain_key": "constantine-3-key",
+			"endpoint": "http://172.16.0.4:26657",
+			"endpoint_public": "http://127.0.0.1:4564",
+			"service_name": "node-service-constantine-3"
+		}
+	},
+	"contracts": {
+		"icon-node-0xacbc4e": {
+			"dapp": "cx622d566e69ea18f68fdc43b4f25188d2d9e25d71",
+			"ibc_core": "cxe8c9dd9bcebfad5c08cc6d03f5ed001f59b455ee",
+			"light_client": "cxf27b008f286a26b412b09ce25648346075f3f60c",
+			"xcall": "cx1544a6e529edcaf95c63a79017aa77f0a0dd2b96",
+			"xcall_connection": "cxe294065564b2855ac83038d252904fb73849057a"
+		},
+		"node-service-constantine-3": {
+			"dapp": "archway1eyfccmjm6732k7wp4p6gdjwhxjwsvje44j0hfx8nkgrm8fs7vqfshgatxw",
+			"ibc_core": "archway14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sy85n2u",
+			"light_client": "archway1nc5tatafv6eyq7llkr2gv50ff9e22mnf70qgjlv737ktmt4eswrqgj33g6",
+			"xcall": "archway17p9rzwnnfxcjp32un9ug7yhhzgtkhvl9jfksztgw5uh69wac2pgssf05p7",
+			"xcall_connection": "archway1ghd753shjuwexxywmgs4xz7x2q732vcnkm6h2pyv9s6ah3hylvrqvlzdpl"
+		}
+	},
+	"links": {
+		"dst": "archway",
+		"src": "icon"
+	}
+}

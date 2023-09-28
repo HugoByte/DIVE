@@ -9,28 +9,64 @@ import {
   getTestAccountWithStake,
 } from "./helper";
 
+
+if (process.argv.length < 3) {
+  console.error('Usage: ts-node cosmos_e2e_demo.ts <chainName, eg "archway"/"neutron">');
+  process.exit(1);
+}
+
+const chainName = process.argv[2];
+
+
 // configure dotenv
 dotenv.config();
 
 async function main() {
   // Chain Constants, modify as required
-  const chain1 = {
-    chainId: "archway-node-0",
-    endpoint: "http://localhost:4564",
-    prefix: "archway",
-  };
+  let chain1;
+  let chain2;
+  if (chainName == "archway"){
+    chain1 = {
+      chainId: "archway-node-0",
+      endpoint: "http://localhost:4564",
+      prefix: "archway",
+    };
+  
+    chain2 = {
+      chainId: "archway-node-1",
+      endpoint: "http://localhost:4566",
+      prefix: "archway",
+    };
 
-  const chain2 = {
-    chainId: "archway-node-1",
-    endpoint: "http://localhost:4566",
-    prefix: "archway",
-  };
+    console.log("*".repeat(63));
+    console.log(
+      "Demo on Sending token transfer over IBC from archway to archway"
+    );
+    console.log("*".repeat(63));
 
-  console.log("*".repeat(63));
-  console.log(
-    "Demo on Sending token transfer over IBC from archway to archway"
-  );
-  console.log("*".repeat(63));
+  } else{
+
+      chain1 = {
+      chainId: "test-chain1",
+      endpoint: "http://localhost:26669",
+      prefix: "neutron",
+    };
+  
+      chain2 = {
+      chainId: "test-chain2",
+      endpoint: "http://localhost:26653",
+      prefix: "neutron",
+    };
+
+    console.log("*".repeat(63));
+    console.log(
+      "Demo on Sending token transfer over IBC from neutron to neutron"
+    );
+    console.log("*".repeat(63));
+  }
+
+
+ 
 
   // *****************************************************************
   // Setting up account on chain 1 by getting mnemonics from env file
@@ -47,7 +83,7 @@ async function main() {
   getHeight(signingClient, chain1.chainId);
 
   // Get Test Account with stake
-  const testAccount = await getTestAccountWithStake("archway");
+  const testAccount = await getTestAccountWithStake(chainName);
   const testAddress = testAccount.substring(8, testAccount.length).trim();
 
   // To Get balance of given account address and transfer balance if 0
@@ -56,7 +92,7 @@ async function main() {
     console.log(
       "No Balance in Signer account, Transferring balance to Signer account"
     );
-    await getStake(testAddress!, accountAddress, "archway");
+    await getStake(testAddress!, accountAddress, chainName);
   }
   await new Promise((f) => setTimeout(f, 5000));
   await getBalance(signingClient, accountAddress);

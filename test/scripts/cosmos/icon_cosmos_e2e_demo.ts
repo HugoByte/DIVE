@@ -1,3 +1,9 @@
+if (process.argv.length < 3) {
+  console.error('Usage: npx ts-node icon_archway_e2e_demo.ts <chainName, eg "archway"/"neutron">');
+  process.exit(1);
+}
+const chainName = process.argv[2];
+
 import {
   executeCallCosmos,
   executeRollbackCosmos,
@@ -9,7 +15,7 @@ import {
   verifyResponseMessageEventCosmos,
   verifyRollbackExecutedEventCosmos,
   verifyRollbackMessageEventCosmos,
-} from "./archway";
+} from "./cosmos";
 import { GetDataInBytes, GetDest, GetSrc, strToHex } from "./helper";
 import {
   executeCallIcon,
@@ -23,6 +29,7 @@ import {
   verifyRollbackExecutedEventIcon,
   verifyRollbackMessageEventIcon,
 } from "./icon";
+
 
 async function show_banner() {
   const banner = `
@@ -117,10 +124,10 @@ async function sendMessageFromDApp(
   const isRollback = rollback ? true : false;
   if (src === "icon") {
     const hexMsg = strToHex(msg);
-    return sendMessageFromDAppIcon(hexMsg, rollback, isRollback);
+    return sendMessageFromDAppIcon(hexMsg, chainName, rollback, isRollback);
   } else if (src === "archway") {
     const bytesData = GetDataInBytes(msg);
-    return await sendMessageFromDAppCosmos(bytesData, rollback);
+    return await sendMessageFromDAppCosmos(bytesData, chainName, rollback);
   } else {
     throw new Error(`unknown source chain: ${src}`);
   }
@@ -138,7 +145,7 @@ async function verifyCallMessageSent(src: string, sendMessageReceipt: string) {
 async function checkCallMessage(dst: string) {
   console.log("**** CallMessage Event ****");
   if (dst === "archway") {
-    const eventLogs = await verifyCallMessageEventCosmos();
+    const eventLogs = await verifyCallMessageEventCosmos(chainName);
     console.log(eventLogs);
     const reqIdObject = eventLogs?.attributes.find(
       (item) => item.key === "reqId"
@@ -156,9 +163,9 @@ async function checkCallMessage(dst: string) {
 async function invokeExecuteCall(dst: string, reqId: any, callData: any) {
   console.log("**** Execute Call ****");
   if (dst === "archway") {
-    console.log(await executeCallCosmos(reqId, callData));
+    console.log(await executeCallCosmos(reqId, callData, chainName));
   } else if (dst === "icon") {
-    console.log(await executeCallIcon(reqId, callData));
+    console.log(await executeCallIcon(reqId, callData, chainName));
   }
 }
 
@@ -221,9 +228,9 @@ async function checkRollbackMessage(src: string, height: number) {
 async function invokeExecuteRollback(src: string, seqNo: number) {
   console.log("**** Execute Rollback ****");
   if (src === "icon") {
-    await executeRollbackIcon(seqNo);
+    await executeRollbackIcon(seqNo, chainName);
   } else if (src === "archway") {
-    await executeRollbackCosmos(seqNo);
+    await executeRollbackCosmos(seqNo, chainName);
   }
 }
 

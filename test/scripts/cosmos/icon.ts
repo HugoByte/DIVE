@@ -6,7 +6,7 @@ import IconService, {
   TransactionResult,
 } from "icon-sdk-js";
 import {
-  GetArchwayChainInfo,
+  GetChainInfo,
   GetCosmosContracts,
   GetIconChainInfo,
   GetIconContracts,
@@ -34,8 +34,6 @@ const ICON_RPC_URL = GetIconChainInfo("endpoint");
 const NID = GetIconChainInfo("nid");
 const ICON_XCALL = GetIconContracts("xcall");
 const ICON_DAPP = GetIconContracts("dapp");
-const NETWORK_LABEL_DESTINATION = GetArchwayChainInfo("network");
-const DESTINATION_DAPP = GetCosmosContracts("dapp", "archway");
 
 const callMessageSentSignature = "CallMessageSent(Address,str,int)";
 const callMessageSignature = "CallMessage(str,str,int,int,bytes)";
@@ -74,11 +72,12 @@ const ICON_WALLET = IconWallet.loadKeystore(ks as KeyStore, "gochain", false);
 async function sendMessage(
   _to: string,
   _data: string,
+  chainName: string,
   _rollback?: string,
   isRollback?: boolean
 ) {
   try {
-    const fee = await getFee(isRollback);
+    const fee = await getFee(isRollback, chainName);
     const _params = _rollback
       ? { _to: _to, _data: _data, _rollback: IconConverter.toHex(_rollback) }
       : { _to: _to, _data: _data };
@@ -104,10 +103,10 @@ async function sendMessage(
   }
 }
 
-async function getFee(useRollback = false) {
+async function getFee(useRollback = false, chainName: string) {
   try {
     const params = {
-      _net: NETWORK_LABEL_DESTINATION,
+      _net: GetChainInfo(chainName, "network"),
       _rollback: useRollback ? "0x1" : "0x0",
     };
 
@@ -212,9 +211,9 @@ export async function verifyCallMessageEventIcon() {
   }
 }
 
-export async function executeCallIcon(reqId: number, data: string) {
+export async function executeCallIcon(reqId: number, data: string, chainName: string) {
   try {
-    const fee = await getFee();
+    const fee = await getFee(false, chainName);
 
     const params = {
       _reqId: `${reqId.toString()}`,
@@ -301,9 +300,9 @@ export async function verifyReceivedMessageIcon(height: number) {
   return hexToString(msg.slice(2))
 }
 
-export async function executeRollbackIcon(seqNo: number) {
+export async function executeRollbackIcon(seqNo: number, chainName: string) {
   try {
-    const fee = await getFee();
+    const fee = await getFee(false, chainName);
     const params = {
       _sn: `${seqNo.toString()}`,
     };
@@ -347,11 +346,12 @@ export async function verifyRollbackExecutedEventIcon() {
 
 export async function sendMessageFromDAppIcon(
   data: string,
+  chainName:string,
   rollbackData?: string,
   isRollback?: boolean
 ) {
-  const _to = `${NETWORK_LABEL_DESTINATION}/${DESTINATION_DAPP}`;
-  return await sendMessage(_to, data, rollbackData, isRollback);
+  const _to = `${GetChainInfo(chainName, "network")}/${GetCosmosContracts("dapp", chainName)}`;
+  return await sendMessage(_to, data, chainName, rollbackData, isRollback);
 }
 
 export async function verifyCallMessageSentEventIcon(receipt: string) {

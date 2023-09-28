@@ -266,7 +266,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		ginkgo.It("should start bridge between 1 custom chain and running bridge command", func() {
+		ginkgo.It("should start bridge between archway to archway with 1 custom chain parameter", func() {
 			dive.RunCustomArchwayNode1()
 			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "archway", "--chainBServiceName", "node-service-archway-node-1")
 			err := cmd.Run()
@@ -276,7 +276,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should start bridge between neutron and neutron by running one custom neutron chain", func() {
 			dive.RunNeutronNode()
 			dive.RunCustomNeutronNode1()
-			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "neutron", "--chainB", "neutron", "--chainAServiceName", "neutron-node-test-chain1", "--chainBServiceName", "neutron-node-test-chain2")
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "neutron", "--chainB", "neutron", "--chainAServiceName", "neutron-node-test-chain1", "--chainBServiceName", "neutron-node-test-chain3")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
@@ -284,14 +284,14 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should start bridge between 2 custom neutron chains", func() {
 			dive.RunCustomNeutronNode0()
 			dive.RunCustomNeutronNode1()
-			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "neutron", "--chainB", "neutron", "--chainAServiceName", "neutron-node-test-chain2", "--chainBServiceName", "neutron-node-test-chain2")
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "neutron", "--chainB", "neutron", "--chainAServiceName", "neutron-node-test-chain2", "--chainBServiceName", "neutron-node-test-chain3")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		ginkgo.It("should start bridge between 1 custom chain and running bridge command", func() {
+		ginkgo.It("should start IBC relay between nuetron to neutron with one 1 custom chain.", func() {
 			dive.RunCustomNeutronNode1()
-			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "neutron", "--chainB", "neutron", "--chainBServiceName", "neutron-node-test-chain2")
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "neutron", "--chainB", "neutron", "--chainBServiceName", "neutron-node-test-chain3")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
@@ -319,7 +319,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
 
-		ginkgo.It("should start IBC relay between icon and achway", func() {
+		ginkgo.It("should start IBC relay between icon and archway", func() {
 			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "archway")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -327,6 +327,38 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 
 		ginkgo.It("should start IBC relay between icon and neutron", func() {
 			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "neutron")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start IBC relay between already running icon and archway chain", func() {
+			dive.RunIconNode()
+			dive.RunArchwayNode()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "archway", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "node-service-constantine-3")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start IBC relay between already running icon and neutron chain", func() {
+			dive.RunIconNode()
+			dive.RunNeutronNode()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "neutron", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "neutron-node-test-chain1")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start IBC relay between already running icon and custom archway chain", func() {
+			dive.RunIconNode()
+			dive.RunCustomArchwayNode0()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "archway", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "node-service-archway-node-0")
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		})
+
+		ginkgo.It("should start IBC relay between already running icon and custom neutron chain", func() {
+			dive.RunIconNode()
+			dive.RunCustomNeutronNode0()
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "neutron", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "neutron-node-test-chain2")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})
@@ -599,7 +631,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			dive.RunNeutronNode()
 		})
 
-		ginkgo.It("should run single nurtron node with verbose flag enabled", func() {
+		ginkgo.It("should run single neutron node with verbose flag enabled", func() {
 			cmd.Args = append(cmd.Args, "chain", "neutron", "--verbose")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
