@@ -1,7 +1,6 @@
-cosmvm_deploy = import_module("github.com/hugobyte/dive/services/cosmvm/archway/src/node-setup/deploy.star")
+cosmvm_deploy = import_module("../node-setup/deploy.star")
 PASSCODE="password"
-
-node_constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
+node_constants = import_module("../../../../../package_io/constants.star")
 password = node_constants.ARCHWAY_SERVICE_CONFIG.password
 
 def deploy_core(plan,service_name,chain_id,chain_key):

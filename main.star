@@ -1,16 +1,15 @@
-icon_setup_node = import_module("github.com/hugobyte/dive/services/jvm/icon/src/node-setup/setup_icon_node.star")
-eth_contract_service = import_module("github.com/hugobyte/dive/services/evm/eth/src/node-setup/contract-service.star")
-eth_relay_setup = import_module("github.com/hugobyte/dive/services/evm/eth/src/relay-setup/contract_configuration.star")
-eth_node = import_module("github.com/hugobyte/dive/services/evm/eth/eth.star")
-icon_relay_setup = import_module("github.com/hugobyte/dive/services/jvm/icon/src/relay-setup/contract_configuration.star")
-icon_service = import_module("github.com/hugobyte/dive/services/jvm/icon/icon.star")
-btp_bridge = import_module("github.com/hugobyte/dive/services/bridges/btp/src/bridge.star")
-input_parser = import_module("github.com/hugobyte/dive/package_io/input_parser.star")
-cosmvm_node = import_module("github.com/hugobyte/dive/services/cosmvm/cosmvm.star")
-cosmvm_relay = import_module("github.com/hugobyte/dive/services/bridges/ibc/src/bridge.star")
-cosmvm_relay_setup = import_module("github.com/hugobyte/dive/services/cosmvm/archway/src/relay-setup/contract-configuration.star")
+icon_setup_node = import_module("./services/jvm/icon/src/node-setup/setup_icon_node.star")
+eth_contract_service = import_module("./services/evm/eth/src/node-setup/contract-service.star")
+eth_relay_setup = import_module("./services/evm/eth/src/relay-setup/contract_configuration.star")
+eth_node = import_module("./services/evm/eth/eth.star")
+icon_relay_setup = import_module("./services/jvm/icon/src/relay-setup/contract_configuration.star")
+icon_service = import_module("./services/jvm/icon/icon.star")
+btp_bridge = import_module("./services/bridges/btp/src/bridge.star")
+input_parser = import_module("./package_io/input_parser.star")
+cosmvm_node = import_module("./services/cosmvm/cosmvm.star")
+cosmvm_relay = import_module("./services/bridges/ibc/src/bridge.star")
+cosmvm_relay_setup = import_module("./services/cosmvm/archway/src/relay-setup/contract-configuration.star")
 neutron_relay_setup = import_module("github.com/hugobyte/dive/services/cosmvm/neutron/src/relay-setup/contract-configuration.star")
-
 
 def run(plan, args):
     return parse_input(plan, args)
@@ -290,7 +289,7 @@ def run_cosmos_ibc_relay_for_already_running_chains(plan, src_chain_config, dst_
         src_chain_service_name = src_chain_config["service_name"]
         dst_chain_service_name = dst_chain_config["service_name"]
         config_data = input_parser.generate_new_config_data(args["links"], src_chain_service_name, dst_chain_service_name, "")
-
+neutron_relay_setup = import_module("github.com/hugobyte/dive/services/cosmvm/neutron/src/relay-setup/contract-configuration.star")
         # Add chain configurations to the configuration data
         config_data["chains"][src_chain_service_name] = src_chain_config
         config_data["chains"][dst_chain_service_name] = dst_chain_config
