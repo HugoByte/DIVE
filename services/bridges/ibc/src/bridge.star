@@ -1,5 +1,5 @@
 # Import required modules and constants
-constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
+constants = import_module("../../../../package_io/constants.star")
 ibc_relay_config = constants.IBC_RELAYER_SERVICE
 
 def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_config, dst_config, links):

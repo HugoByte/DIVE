@@ -1,5 +1,5 @@
-archway_node_service = import_module("github.com/hugobyte/dive/services/cosmvm/archway/src/node-setup/start_node.star")
-constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
+archway_node_service = import_module("./src/node-setup/start_node.star")
+constants = import_module("../../../package_io/constants.star")
 archway_node_0_constant_config = constants.ARCHAY_NODE0_CONFIG
 archway_node_1_constant_config = constants.ARCHAY_NODE1_CONFIG
 archway_service_config = constants.ARCHWAY_SERVICE_CONFIG

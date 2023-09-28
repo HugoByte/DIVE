@@ -1,4 +1,4 @@
-constants = import_module("github.com/hugobyte/dive/package_io/constants.star")
+constants = import_module("../../../../../package_io/constants.star")
 network_keys_and_public_address = constants.NETWORK_PORT_KEYS_AND_IP_ADDRESS
 
 # Starts The Icon Node
