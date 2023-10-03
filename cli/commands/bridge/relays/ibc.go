@@ -83,7 +83,10 @@ func startIbcRelay(diveContext *common.DiveContext, enclaveContext *enclaves.Enc
 	}
 
 	if chainA == "icon" {
-		startIbcRelayIconToCosmos(diveContext, enclaveContext, common.RelayServiceNameIconToCosmos)
+		_, err := startIbcRelayIconToCosmos(diveContext, enclaveContext, common.RelayServiceNameIconToCosmos)
+		if err != nil {
+			diveContext.FatalError("Starlark Run Failed", err.Error())
+		}
 	}
 
 	return starlarkExecutionResponse
@@ -93,6 +96,10 @@ func startIbcRelayIconToCosmos(diveContext *common.DiveContext, enclaveContext *
 	params := fmt.Sprintf(`{"service_name": "%s"}`, serviceName)
 
 	executionData, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, "services/bridges/ibc/src/bridge.star", "start_relay", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+
+	if err != nil {
+		return "", err
+	}
 
 	executionSerializedData, services, _, err := diveContext.GetSerializedData(executionData)
 
