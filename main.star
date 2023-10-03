@@ -313,7 +313,7 @@ def run_cosmos_ibc_relay_for_already_running_chains(plan, src_chain_config, dst_
         }
 
         # Open BTP network on ICON chain
-        icon_setup_node.open_btp_network(plan, src_chain_service_name, src_data, src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"])
+        tx_result_open_btp_network = icon_setup_node.open_btp_network(plan, src_chain_service_name, src_data, src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"])
 
         icon_bind_port = icon_relay_setup.bindPort(plan, src_chain_service_name, deploy_icon_contracts["xcall_connection"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"], src_chain_config["endpoint"], deploy_icon_contracts["ibc_core"], "xcall")
 
@@ -333,11 +333,20 @@ def run_cosmos_ibc_relay_for_already_running_chains(plan, src_chain_config, dst_
         config_data["contracts"][src_chain_service_name] = deploy_icon_contracts
         config_data["contracts"][dst_chain_service_name] = deploy_cosmos_contracts
 
+        src_chain_id = src_chain_config["network_name"].split('-', 1)[1]
+
+        network_id = icon_setup_node.hex_to_int(plan, src_chain_service_name, src_chain_config["nid"])
+        btp_network_id = icon_setup_node.hex_to_int(plan, src_chain_service_name, tx_result_open_btp_network["extract.network_id"])
+        btp_network_type_id = icon_setup_node.hex_to_int(plan, src_chain_service_name, tx_result_open_btp_network["extract.network_type_id"])
+
         src_chain_data = {
-            "chain_id": "0xacbc4e",
+            "chain_id": src_chain_id,
             "rpc_address": src_chain_config["endpoint"],
             "ibc_address": deploy_icon_contracts["ibc_core"],
             "password": src_chain_config["keypassword"],
+            "network_id": network_id,
+            "btp_network_id": btp_network_id,
+            "btp_network_type_id": btp_network_type_id
         }
 
         dst_chain_data = {

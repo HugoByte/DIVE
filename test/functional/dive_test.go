@@ -374,7 +374,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should start IBC relay between already running custom icon and neutron chain", func() {
 			dive.RunCustomIconNode()
 			dive.RunNeutronNode()
-			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "neutron", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "neutron-node-test-chain1")
+			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "neutron", "--chainAServiceName", "icon-node-0x42f1f3", "--chainBServiceName", "neutron-node-test-chain1")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 		})

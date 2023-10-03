@@ -125,6 +125,9 @@ def start_cosmos_relay_for_icon_to_cosmos(plan, src_chain_config, dst_chain_conf
         "CHAINID": src_chain_config["chain_id"],
         "RPCADDRESS": src_chain_config["rpc_address"],
         "IBCADDRESS": src_chain_config["ibc_address"],
+        "ICONNETWORKNID": src_chain_config["network_id"],
+        "BTPNETWORKID": src_chain_config["btp_network_id"],
+        "BTPNETWORKTYPEID": src_chain_config["btp_network_type_id"]
     }
 
     plan.render_templates(
