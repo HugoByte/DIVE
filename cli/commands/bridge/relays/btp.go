@@ -6,7 +6,6 @@ import (
 
 	"github.com/hugobyte/dive/cli/commands/chain/types"
 	"github.com/hugobyte/dive/cli/common"
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/spf13/cobra"
 )
@@ -195,8 +194,8 @@ func BtpRelayCmd(diveContext *common.DiveContext) *cobra.Command {
 
 func runBtpSetupByRunningNodes(diveContext *common.DiveContext, enclaveCtx *enclaves.EnclaveContext, params string) {
 	diveContext.SetSpinnerMessage(" Executing BTP Starlark Package")
-
-	data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, bridgeMainFunction, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveBridgeScript, bridgeMainFunction)
+	data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 		diveContext.FatalError("Starlark Run Failed", err.Error())
@@ -218,7 +217,8 @@ func runBtpSetupForAlreadyRunningNodes(diveContext *common.DiveContext, enclaveC
 
 	params := fmt.Sprintf(`{"src_chain":"%s", "dst_chain":"%s", "config_data":%s, "src_service_name":"%s", "dst_service_name":"%s"}`, srcChain, dstChain, configData, srcChainServiceName, dstChainServiceName)
 
-	data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, mainFunctionName, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveBridgeScript, mainFunctionName)
+	data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 		diveContext.FatalError("Starlark Run Failed", err.Error())

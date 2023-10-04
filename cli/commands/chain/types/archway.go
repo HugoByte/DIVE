@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/hugobyte/dive/cli/common"
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/spf13/cobra"
 )
@@ -124,8 +123,8 @@ func RunArchwayNode(diveContext *common.DiveContext) *common.DiveserviceResponse
 }
 
 func runArchwayWithCustomServiceConfig(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext, data string) (string, error) {
-
-	serviceExecutionResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveArchwayNodeScript, constructServiceConfigFunctionName, data, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	starlarkConfig := diveContext.GetStarlarkRunConfig(data, common.DiveArchwayNodeScript, constructServiceConfigFunctionName)
+	serviceExecutionResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 
@@ -140,8 +139,9 @@ func runArchwayWithCustomServiceConfig(diveContext *common.DiveContext, enclaveC
 
 	}
 	params := fmt.Sprintf(`{"args":%s}`, serviceExecutionResponseData)
+	starlarkConfig = diveContext.GetStarlarkRunConfig(params, common.DiveArchwayNodeScript, runArchwayNodeWithCustomServiceFunctionName)
 
-	nodeExecutionResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveArchwayNodeScript, runArchwayNodeWithCustomServiceFunctionName, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	nodeExecutionResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 
@@ -162,7 +162,8 @@ func runArchwayWithCustomServiceConfig(diveContext *common.DiveContext, enclaveC
 func runArchwayWithDefaultServiceConfig(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext) (string, error) {
 
 	params := `{"args":{"data":{}}}`
-	nodeServiceResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveArchwayDefaultNodeScript, runArchwayNodeWithDefaultConfigFunctionName, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveArchwayDefaultNodeScript, runArchwayNodeWithDefaultConfigFunctionName)
+	nodeServiceResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 

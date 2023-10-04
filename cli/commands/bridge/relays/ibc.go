@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/hugobyte/dive/cli/common"
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/spf13/cobra"
 )
@@ -94,8 +93,8 @@ func startIbcRelay(diveContext *common.DiveContext, enclaveContext *enclaves.Enc
 
 func startIbcRelayIconToCosmos(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext, serviceName string) (string, error) {
 	params := fmt.Sprintf(`{"service_name": "%s"}`, serviceName)
-
-	executionData, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, "services/bridges/ibc/src/bridge.star", "start_relay", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	starlarkConfig := diveContext.GetStarlarkRunConfig(params, "services/bridges/ibc/src/bridge.star", "start_relay")
+	executionData, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 		return "", err
@@ -139,7 +138,8 @@ func setupIbcRelayforAlreadyRunningCosmosChain(diveContext *common.DiveContext, 
 }
 
 func runStarlarkPackage(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext, params, functionName string) (string, error) {
-	executionData, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveBridgeScript, functionName, params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveBridgeScript, functionName)
+	executionData, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 		return "", err
