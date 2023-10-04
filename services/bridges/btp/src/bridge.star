@@ -1,7 +1,7 @@
 RELAY_SERVICE_IMAGE = 'hugobyte/btp-relay'
 RELAY_SERVICE_NAME = "btp-bridge"
 RELAY_KEYSTORE_FILES_PATH = "/relay/keystores/"
-RELAY_KESYTORE_PATH = "github.com/hugobyte/dive/services/bridges/btp/static-files/keystores/"
+RELAY_KESYTORE_PATH = "../static-files/keystores/"
 
 # Starts BTP relayer
 def start_relayer(plan,src_chain,dst_chain,args,src_btp_address,dst_btp_address,bridge):
