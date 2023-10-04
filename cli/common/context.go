@@ -12,6 +12,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
+	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/starlark_run_config"
 	"github.com/kurtosis-tech/kurtosis/api/golang/engine/lib/kurtosis_context"
 
 	log "github.com/sirupsen/logrus"
@@ -206,7 +207,9 @@ func (diveContext *DiveContext) StopServices(services map[string]string) {
 
 		for serviceName, serviceUUID := range services {
 			params := fmt.Sprintf(`{"service_name": "%s", "uuid": "%s"}`, serviceName, serviceUUID)
-			_, err := enclaveContext.RunStarlarkScriptBlocking(diveContext.Ctx, "", starlarkScript, params, DiveDryRun, DiveDefaultParallelism, nil)
+			starlarkConfig := diveContext.GetStarlarkRunConfig(params, "", "")
+			_, err := enclaveContext.RunStarlarkScriptBlocking(diveContext.Ctx, starlarkScript, starlarkConfig)
+
 			if err != nil {
 				diveContext.Log.Fatal("Failed To Stop Services", err)
 			}
@@ -215,4 +218,17 @@ func (diveContext *DiveContext) StopServices(services map[string]string) {
 
 	}
 
+}
+
+func (diveContext *DiveContext) GetStarlarkRunConfig(params string, relativePathToMainFile string, mainFunctionName string) *starlark_run_config.StarlarkRunConfig {
+
+	starlarkConfig := &starlark_run_config.StarlarkRunConfig{
+		RelativePathToMainFile:   relativePathToMainFile,
+		MainFunctionName:         mainFunctionName,
+		DryRun:                   DiveDryRun,
+		SerializedParams:         params,
+		Parallelism:              DiveDefaultParallelism,
+		ExperimentalFeatureFlags: []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{},
+	}
+	return starlarkConfig
 }

@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/hugobyte/dive/cli/common"
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/spf13/cobra"
 )
@@ -14,7 +13,7 @@ import (
 const (
 	runNeutronNodeWithDefaultConfigFunctionName = "start_node_service"
 	runNeutronNodeWithCustomServiceFunctionName = "start_neutron_node"
-	construcNeutrontServiceConfigFunctionName   = "get_service_config"
+	constructNeutronServiceConfigFunctionName   = "get_service_config"
 )
 
 // Variable to store the Neutron node configuration file path
@@ -120,7 +119,8 @@ func RunNeutronNode(diveContext *common.DiveContext) *common.DiveserviceResponse
 // RunNeutronWithServiceConfig runs the Neutron service with the provided configuration data.
 func RunNeutronWithServiceConfig(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext, data string) (string, error) {
 	params := fmt.Sprintf(`{"args":{"data":%s}}`, data)
-	nodeServiceResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveNeutronDefaultNodeScript, runNeutronNodeWithDefaultConfigFunctionName, params, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveNeutronDefaultNodeScript, runNeutronNodeWithDefaultConfigFunctionName)
+	nodeServiceResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 	if err != nil {
 		return "", err
 	}
