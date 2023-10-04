@@ -58,7 +58,7 @@ NEUTRON_SERVICE_CONFIG = struct(
     start_script = "../../static_files/start.sh",
     init_nutrond_script = "../../static_files/init-neutrond.sh",
     path = "/start-scripts/",
-    default_contract_path = "../../static_files/contracts",
+    default_contract_path = "../../../archway/static_files/contracts",
     contract_path = "/root/contracts/",
 )
 
