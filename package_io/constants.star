@@ -3,9 +3,9 @@ ICON_NODE_CLIENT = struct(
     config_files_directory = "/goloop/config/",
     contracts_directory = "/goloop/contracts/",
     keystore_directory = "/goloop/keystores/",
-    config_files_path = "github.com/hugobyte/dive/services/jvm/icon/static-files/config/",
-    contract_files_path = "github.com/hugobyte/dive/services/jvm/icon/static-files/contracts/",
-    keystore_files_path = "github.com/hugobyte/dive/services/bridges/btp/static-files/keystores/keystore.json",
+    config_files_path = "../../static-files/config/",
+    contract_files_path = "../../static-files/contracts/",
+    keystore_files_path = "../../../../bridges/btp/static-files/keystores/keystore.json",
     rpc_endpoint_path = "api/v3/icon_dex",
     service_name = "icon-node-",
     genesis_file_path = "/goloop/genesis/",
@@ -14,7 +14,7 @@ ICON_NODE_CLIENT = struct(
 HARDHAT_NODE_CLIENT = struct(
     node_image = "node:lts-alpine",
     port = 8545,
-    config_files_path = "github.com/hugobyte/dive/services/evm/eth/static-files/hardhat.config.js",
+    config_files_path = "../../static-files/hardhat.config.js",
     config_files_directory = "/config/",
     service_name = "hardhat-node",
     network = "0x539.hardhat",
@@ -25,10 +25,10 @@ HARDHAT_NODE_CLIENT = struct(
 
 CONTRACT_DEPLOYMENT_SERVICE_ETHEREUM = struct(
     node_image = "node:lts-alpine",
-    static_file_path = "github.com/hugobyte/dive/services/evm/eth/static-files/",
+    static_file_path = "../../static-files/",
     static_files_directory_path = "/static-files/",
     service_name = "eth-contract-deployer",
-    template_file = "github.com/hugobyte/dive/services/evm/eth/static-files/hardhat.config.ts.tmpl",
+    template_file = "../../static-files/hardhat.config.ts.tmpl",
     rendered_file_directory = "/static-files/rendered/",
 )
 
@@ -41,41 +41,41 @@ ETH_NODE_CLIENT = struct(
     keypassword = "password",
 )
 ARCHWAY_SERVICE_CONFIG = struct(
-    start_script = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/start.sh",
-    default_contract_path = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/contracts",
+    start_script = "../../static_files/start.sh",
+    default_contract_path = "../../static_files/contracts",
     service_name = "node-service",
     image = "archwaynetwork/archwayd:v2.0.0",
     path = "/start-scripts/",
     contract_path = "/root/contracts/",
-    config_files = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/config/",
+    config_files = "../../static_files/config/",
     password = "password",
 )
 
 NEUTRON_SERVICE_CONFIG = struct(
     service_name = "neutron-node",
     image = "hugobyte/neutron-node:v0.2",
-    init_script = "github.com/hugobyte/dive/services/cosmvm/neutron/static_files/init.sh",
-    start_script = "github.com/hugobyte/dive/services/cosmvm/neutron/static_files/start.sh",
-    init_nutrond_script = "github.com/hugobyte/dive/services/cosmvm/neutron/static_files/init-neutrond.sh",
+    init_script = "../../static_files/init.sh",
+    start_script = "../../static_files/start.sh",
+    init_nutrond_script = "../../static_files/init-neutrond.sh",
     path = "/start-scripts/",
-    default_contract_path = "github.com/hugobyte/dive/services/cosmvm/archway/static_files/contracts",
+    default_contract_path = "../../static_files/contracts",
     contract_path = "/root/contracts/",
 )
 
 IBC_RELAYER_SERVICE = struct(
-    ibc_relay_config_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/cosmosjson.tpl",
+    ibc_relay_config_file_template = "../static-files/config/cosmosjson.tpl",
     relay_service_name = "cosmos-ibc-relay",
     # updated the ibc relay image
     relay_service_image = "hugobyte/ibc-relay:v0.1",
     relay_config_files_path = "/script/",
-    run_file_path = "github.com/hugobyte/dive/services/bridges/ibc/static-files/run.sh",
+    run_file_path = "../static-files/run.sh",
     relay_service_image_icon_to_cosmos = "hugobyte/icon-ibc-relay:v0.1",
     relay_service_name_icon_to_cosmos = "ibc-relayer",
-    config_file_path = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config",
-    ibc_relay_wasm_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/archwayibc.json.tpl",
-    ibc_relay_neutron_wasm_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/neutronibc.json.tpl",
-    ibc_relay_java_file_template = "github.com/hugobyte/dive/services/bridges/ibc/static-files/config/icon.json.tpl",
-    icon_keystore_file = "github.com/hugobyte/dive/services/bridges/btp/static-files/keystores/keystore.json",
+    config_file_path = "../static-files/config",
+    ibc_relay_wasm_file_template = "../static-files/config/archwayibc.json.tpl",
+    ibc_relay_neutron_wasm_file_template = "../static-files/config/neutronibc.json.tpl",
+    ibc_relay_java_file_template = "../static-files/config/icon.json.tpl",
+    icon_keystore_file = "../../btp/static-files/keystores/keystore.json",
     relay_keystore_path = "/root/.relayer/keys/"
 )
 

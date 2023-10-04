@@ -15,8 +15,8 @@ ICON1_NODE_P2P_LISTEN_ADDRESS = 7081
 ICON1_NODE_P2P_ADDRESS = 8081
 ICON0_NODE_CID = "0xacbc4e"
 ICON1_NODE_CID = "0x42f1f3"
-ICON0_GENESIS_FILE_PATH = "github.com/hugobyte/dive/services/jvm/icon/static-files/config/genesis-icon-0.zip"
-ICON1_GENESIS_FILE_PATH = "github.com/hugobyte/dive/services/jvm/icon/static-files/config/genesis-icon-1.zip"
+ICON0_GENESIS_FILE_PATH = "static-files/config/genesis-icon-0.zip"
+ICON1_GENESIS_FILE_PATH = "static-files/config/genesis-icon-1.zip"
 ICON0_GENESIS_FILE_NAME = "genesis-icon-0.zip"
 ICON1_GENESIS_FILE_NAME = "genesis-icon-1.zip"
 

@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const DefaultIconGenesisFile = "github.com/hugobyte/dive/services/jvm/icon/static-files/config/genesis-icon-0.zip"
+const DefaultIconGenesisFile = "../../static-files/config/genesis-icon-0.zip"
 
 var (
 	genesis          = ""
