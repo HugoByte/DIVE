@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/hugobyte/dive/cli/common"
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/spf13/cobra"
 )
 
@@ -45,8 +44,8 @@ func RunEthNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
 	}
 	diveContext.StartSpinner(" Starting ETH Node")
-
-	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveEthHardhatNodeScript, "start_eth_node", `{"args":{}}`, common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	starlarkConfig := diveContext.GetStarlarkRunConfig(`{"args":{}}`, common.DiveEthHardhatNodeScript, "start_eth_node")
+	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 

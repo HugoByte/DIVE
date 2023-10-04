@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	"github.com/hugobyte/dive/cli/common"
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/spf13/cobra"
 )
@@ -159,8 +158,8 @@ func RunIconNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 	if err != nil {
 		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
 	}
-
-	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveIconNodeScript, "get_service_config", paramData, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	starlarkConfig := diveContext.GetStarlarkRunConfig(paramData, common.DiveIconNodeScript, "get_service_config")
+	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 		diveContext.FatalError("Starlark Run Failed", err.Error())
@@ -182,7 +181,8 @@ func RunIconNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 	diveContext.CheckInstructionSkipped(skippedInstructions, "Instruction Executed Already")
 
 	params := fmt.Sprintf(`{"service_config":%s,"uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, responseData, genesisHandler.uploadedFiles, genesisHandler.genesisPath, genesisHandler.genesisFile)
-	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveIconNodeScript, "start_icon_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	starlarkConfig = diveContext.GetStarlarkRunConfig(params, common.DiveIconNodeScript, "start_icon_node")
+	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 
@@ -225,8 +225,8 @@ func Decentralisation(diveContext *common.DiveContext, params string) {
 	if err != nil {
 		diveContext.FatalError("Failed To Retrieve Enclave Context", err.Error())
 	}
-
-	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveIconDecentraliseScript, "configure_node", params, false, 4, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveIconDecentraliseScript, "configure_node")
+	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 		diveContext.FatalError("Starlark Run Failed", err.Error())

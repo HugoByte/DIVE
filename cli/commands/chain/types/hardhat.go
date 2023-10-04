@@ -2,7 +2,6 @@ package types
 
 import (
 	"github.com/hugobyte/dive/cli/common"
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/spf13/cobra"
 )
 
@@ -43,7 +42,8 @@ func RunHardhatNode(diveContext *common.DiveContext) *common.DiveserviceResponse
 		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
 	}
 	diveContext.StartSpinner(" Starting Hardhat Node")
-	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, common.DiveEthHardhatNodeScript, "start_hardhat_node", "{}", common.DiveDryRun, common.DiveDefaultParallelism, []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{})
+	starlarkConfig := diveContext.GetStarlarkRunConfig("{}", common.DiveEthHardhatNodeScript, "start_hardhat_node")
+	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 		diveContext.FatalError("Starlark Run Failed", err.Error())
