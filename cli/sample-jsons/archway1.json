@@ -1,5 +1,5 @@
 {
-    "cid": "archway-node-1",
+    "chain_id": "archway-node-1",
     "key": "archway-node-1-key",
     "private_grpc": 9090,
     "private_http": 9091,

@@ -1,0 +1,1 @@
+{"neutron-node-test-chain1":{"service_name":"neutron-node-test-chain1","endpoint_public":"http://127.0.0.1:26669","endpoint":"http://172.16.0.4:26657","chain_id":"test-chain1","chain_key":"test-key"}}

@@ -23,13 +23,13 @@ var (
 
 // NeutronServiceConfig stores configuration parameters for the Neutron service.
 type NeutronServiceConfig struct {
-	ChainID    string `json:"chainId"`
-	Key        string `json:"key"`
-	Password   string `json:"password"`
-	PublicGrpc int    `json:"public_grpc"`
-	PublicTCP  int    `json:"public_tcp"`
-	PublicHTTP int    `json:"public_http"`
-	PublicRPC  int    `json:"public_rpc"`
+	ChainID    *string `json:"chain_id"`
+	Key        *string `json:"key"`
+	Password   *string `json:"password"`
+	PublicGrpc *int    `json:"public_grpc"`
+	PublicTCP  *int    `json:"public_tcp"`
+	PublicHTTP *int    `json:"public_http"`
+	PublicRPC  *int    `json:"public_rpc"`
 }
 
 // EncodeToString encodes the NeutronServiceConfig struct to a JSON string.
@@ -95,14 +95,20 @@ func RunNeutronNode(diveContext *common.DiveContext) *common.DiveserviceResponse
 			diveContext.FatalError("Failed to encode service config", err.Error())
 		}
 
+		fmt.Printf("encodedServiceConfigDataString: %v\n", encodedServiceConfigDataString)
 		// Run Neutron Node with custom service config
 		starlarkExecutionData, err = RunNeutronWithServiceConfig(diveContext, kurtosisEnclaveContext, encodedServiceConfigDataString)
 		if err != nil {
 			diveContext.FatalError("Starlark Run Failed", err.Error())
 		}
+
 	} else {
 		// Run Neutron Node with default service config
-		starlarkExecutionData, err = RunNeutronWithServiceConfig(diveContext, kurtosisEnclaveContext, "{}")
+		encodedServiceConfigDataString, err := serviceConfig.EncodeToString()
+		if err != nil {
+			diveContext.FatalError("Failed to encode service config", err.Error())
+		}
+		starlarkExecutionData, err = RunNeutronWithServiceConfig(diveContext, kurtosisEnclaveContext, encodedServiceConfigDataString)
 		if err != nil {
 			diveContext.FatalError("Starlark Run Failed", err.Error())
 		}
@@ -117,9 +123,9 @@ func RunNeutronNode(diveContext *common.DiveContext) *common.DiveserviceResponse
 }
 
 // RunNeutronWithServiceConfig runs the Neutron service with the provided configuration data.
-func RunNeutronWithServiceConfig(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext, data string) (string, error) {
-	params := fmt.Sprintf(`{"args":{"data":%s}}`, data)
-	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveNeutronDefaultNodeScript, runNeutronNodeWithDefaultConfigFunctionName)
+func RunNeutronWithServiceConfig(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext, config string) (string, error) {
+
+	starlarkConfig := diveContext.GetStarlarkRunConfig(config, common.DiveNeutronDefaultNodeScript, runNeutronNodeWithDefaultConfigFunctionName)
 	nodeServiceResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 	if err != nil {
 		return "", err
