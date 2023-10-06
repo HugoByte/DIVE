@@ -7,9 +7,9 @@ genesis_constants = import_module("github.com/kurtosis-tech/eth-network-package/
 network_keys_and_public_address = constants.NETWORK_PORT_KEYS_AND_IP_ADDRESS
 
 # Spins Up the ETH Node
-def start_eth_node(plan,args):
+def start_eth_node(plan):
  	eth_constants = constants.ETH_NODE_CLIENT
- 	args_with_right_defaults = input_parser.get_args_with_default_values(args)
+ 	args_with_right_defaults = input_parser.get_args_with_default_values({})
  	num_participants = len(args_with_right_defaults.participants)
  	network_params = args_with_right_defaults.network_params
 
@@ -33,10 +33,10 @@ def start_eth_node(plan,args):
 def get_network_address(ip_addr,rpc_port):
      return '{0}:{1}'.format(ip_addr,rpc_port)
 
-def start_node_service(plan,args,node_type):
+def start_node_service(plan,node_type):
 
 	if node_type == "eth":
-		return start_eth_node(plan,args)
+		return start_eth_node(plan)
 	
 	else:
 		return start_hardhat_node(plan)

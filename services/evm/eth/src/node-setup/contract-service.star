@@ -1,12 +1,11 @@
 constants = import_module("../../../../../package_io/constants.star")
 # Starts the eth deploy service
-def start_deploy_service(plan,args):
+def start_deploy_service(plan, endpoint):
 
     deployer_constants = constants.CONTRACT_DEPLOYMENT_SERVICE_ETHEREUM
 
     plan.print("Starting Contract Deploy Service")
-    endpoint = args["endpoint"]
-
+    
     plan.upload_files(src=deployer_constants.static_file_path,name="static-files")
 
     hardhat_config = read_file(deployer_constants.template_file)

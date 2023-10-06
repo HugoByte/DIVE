@@ -1,9 +1,9 @@
 eth_node = import_module("./src/node-setup/start-eth-node.star")
 eth_relay_setup = import_module("./src/relay-setup/contract_configuration.star")
 
-def start_eth_node_serivce(plan,args,node_type):
+def start_eth_node_serivce(plan,node_type):
 
-    node_service_data = eth_node.start_node_service(plan,args,node_type)
+    node_service_data = eth_node.start_node_service(plan,node_type)
 
     config_data = {
                 "service_name" : node_service_data.service_name,
@@ -19,15 +19,15 @@ def start_eth_node_serivce(plan,args,node_type):
     return config_data
 
 
-def deploy_bmv_eth(plan,bridge,data,args,chain_name,service_name):
+def deploy_bmv_eth(plan,bridge,data, network, network_name, chain_name):
 
     if bridge == "true":
 
-        address = eth_relay_setup.deploy_bmv_bridge(plan,args,data.block_height,data.bmc,data.network,chain_name,service_name)
+        address = eth_relay_setup.deploy_bmv_bridge(plan,network, network_name,data.block_height,data.bmc,data.network,chain_name)
         return address
 
     else :
-        address = eth_relay_setup.deploy_bmv(plan,args,data.block_header,data.bmc,data.network,data.network_type_id,chain_name,service_name)
+        address = eth_relay_setup.deploy_bmv(plan,network, network_name,data.block_header,data.bmc,data.network,data.network_type_id,chain_name)
 
         return address
 

@@ -67,7 +67,7 @@ def run_node(plan, node_name, args):
         return icon_service.start_node_service(plan)
 
     elif node_name == "eth" or node_name == "hardhat":
-        return eth_node.start_eth_node_serivce(plan, args, node_name)
+        return eth_node.start_eth_node_serivce(plan, node_name)
 
     elif node_name == "archway" or node_name == "neutron":
         return cosmvm_node.start_cosmvm_chains(plan, node_name, args)
@@ -102,7 +102,7 @@ def run_btp_setup(plan, args):
 
         if destination_chain == "eth" or destination_chain == "hardhat":
             src_chain_config = icon_service.start_node_service(plan)
-            dst_chain_config = eth_node.start_eth_node_serivce(plan, args, destination_chain)
+            dst_chain_config = eth_node.start_eth_node_serivce(plan, destination_chain)
 
             src_chain_service_name = src_chain_config["service_name"]
             dst_chain_service_name = dst_chain_config["service_name"]
@@ -166,11 +166,11 @@ def start_btp_icon_to_eth_for_already_running_nodes(plan, src_chain, dst_chain, 
     dst_chain_config = config_data["chains"][dst_service_name]
     src_chain_config = config_data["chains"][src_service_name]
 
-    eth_contract_service.start_deploy_service(plan, dst_chain_config)
+    eth_contract_service.start_deploy_service(plan, dst_chain_config["endpoint"])
 
     src_bmc_address = icon_service.deploy_bmc_icon(plan, src_chain, dst_chain, src_service_name, dst_service_name, config_data)
 
-    dst_bmc_deploy_response = eth_relay_setup.deploy_bmc(plan, config_data, dst_chain, dst_service_name)
+    dst_bmc_deploy_response = eth_relay_setup.deploy_bmc(plan, config_data["chains"][dst_service_name]["network"], config_data["chains"][dst_service_name]["network_name"], dst_chain)
 
     dst_bmc_address = dst_bmc_deploy_response.bmc
 
@@ -180,15 +180,15 @@ def start_btp_icon_to_eth_for_already_running_nodes(plan, src_chain, dst_chain, 
 
     src_response = icon_service.deploy_bmv_icon(plan, src_service_name, dst_service_name, src_bmc_address, dst_bmc_address, dst_last_block_height_hex, config_data)
 
-    dst_bmv_address = eth_node.deploy_bmv_eth(plan, config_data["bridge"], src_response, config_data, dst_chain, dst_service_name)
+    dst_bmv_address = eth_node.deploy_bmv_eth(plan, config_data["bridge"], src_response, config_dataconfig_data["chains"][dst_service_name]["network_name"], config_data["chains"][dst_service_name]["network_name"], dst_chain)
 
     src_xcall_address = icon_service.deploy_xcall_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc_address, config_data, src_service_name, dst_service_name)
 
-    dst_xcall_address = eth_relay_setup.deploy_xcall(plan, config_data, dst_chain, dst_service_name)
+    dst_xcall_address = eth_relay_setup.deploy_xcall(plan, config_data["chains"][dst_service_name]["network"], config_data["chains"][dst_service_name]["network_name"], dst_chain)
 
     src_dapp_address = icon_service.deploy_dapp_icon(plan, src_chain, dst_chain, src_xcall_address, dst_xcall_address, config_data, src_service_name, dst_service_name)
 
-    dst_dapp_address = eth_relay_setup.deploy_dapp(plan, config_data, dst_chain, dst_service_name)
+    dst_dapp_address = eth_relay_setup.deploy_dapp(plan, config_data["chains"][dst_service_name]["network"], config_data["chains"][dst_service_name]["network_name"], dst_chain)
 
     src_block_height = icon_setup_node.hex_to_int(plan, src_service_name, src_response.block_height)
 
