@@ -17,7 +17,7 @@ def deploy_core(plan, service_name, chain_id, chain_key):
         str: The contract address of ibc-core.
     """
     plan.print("Deploying ibc-core contract")
-    message = "{}"
+    message = '{}'
     contract_addr_ibc_core = cosmvm_deploy.deploy(plan, chain_id, chain_key, "cw_ibc_core", message, service_name)
     return contract_addr_ibc_core
 
