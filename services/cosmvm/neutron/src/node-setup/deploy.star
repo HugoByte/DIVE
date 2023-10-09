@@ -9,7 +9,7 @@ def deploy(plan, chain_id, chain_key, contract_name, message, service_name):
         contract_name (str): The name of the contract to deploy.
         message (str): The message to pass during contract deployment.
         service_name (str): The name of the Neutron node service.
-        
+
     Returns:
         str: The contract address.
     """
