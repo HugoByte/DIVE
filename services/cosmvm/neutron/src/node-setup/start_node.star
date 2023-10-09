@@ -35,79 +35,78 @@ def start_neutron_node(plan, chain_id, key, password, service_name, private_http
     plan.upload_files(src = neutron_node_constants.init_script, name = init_script_file)
     plan.upload_files(src = neutron_node_constants.init_nutrond_script, name = init_neutrond_script_file)
     plan.upload_files(src = neutron_node_constants.start_script, name = start_script_file)
-    plan.upload_files(src= neutron_node_constants.default_contract_path, name=contract_files)
+    plan.upload_files(src = neutron_node_constants.default_contract_path, name = contract_files)
 
     # Define Neutron node configuration
     neutron_node_config = ServiceConfig(
-        image=neutron_node_constants.image,
+        image = neutron_node_constants.image,
         files = {
             neutron_node_constants.path + "start": start_script_file,
             neutron_node_constants.path + "init": init_script_file,
             neutron_node_constants.path + "init-neutrond": init_neutrond_script_file,
-            neutron_node_constants.contract_path: contract_files
+            neutron_node_constants.contract_path: contract_files,
         },
-        ports={
+        ports = {
             network_port_keys_and_ip.http: PortSpec(
                 number = private_http_port,
-                transport_protocol=network_port_keys_and_ip.tcp.upper(),
-                application_protocol=network_port_keys_and_ip.http,
-                wait="2m"
+                transport_protocol = network_port_keys_and_ip.tcp.upper(),
+                application_protocol = network_port_keys_and_ip.http,
+                wait = "2m",
             ),
             network_port_keys_and_ip.rpc: PortSpec(
-                number = private_rcp_port, 
-                transport_protocol =network_port_keys_and_ip.tcp.upper(),
-                application_protocol =network_port_keys_and_ip.http, 
-                wait = "2m"
+                number = private_rcp_port,
+                transport_protocol = network_port_keys_and_ip.tcp.upper(),
+                application_protocol = network_port_keys_and_ip.http,
+                wait = "2m",
             ),
             network_port_keys_and_ip.tcp: PortSpec(
-                number = private_tcp_port, 
-                transport_protocol =network_port_keys_and_ip.tcp.upper(), 
-                application_protocol =network_port_keys_and_ip.http, 
-                wait = "2m"
+                number = private_tcp_port,
+                transport_protocol = network_port_keys_and_ip.tcp.upper(),
+                application_protocol = network_port_keys_and_ip.http,
+                wait = "2m",
             ),
             network_port_keys_and_ip.grpc: PortSpec(
                 number = private_grpc_port,
-                transport_protocol =network_port_keys_and_ip.tcp.upper(), 
-                application_protocol =network_port_keys_and_ip.http, 
-                wait = "2m"
+                transport_protocol = network_port_keys_and_ip.tcp.upper(),
+                application_protocol = network_port_keys_and_ip.http,
+                wait = "2m",
             ),
-
         },
-        public_ports={
+        public_ports = {
             network_port_keys_and_ip.http: PortSpec(
                 number = public_http_port,
-                transport_protocol=network_port_keys_and_ip.tcp.upper(),
-                application_protocol=network_port_keys_and_ip.http,
-                wait="2m"
+                transport_protocol = network_port_keys_and_ip.tcp.upper(),
+                application_protocol = network_port_keys_and_ip.http,
+                wait = "2m",
             ),
             network_port_keys_and_ip.rpc: PortSpec(
-                number = public_rcp_port, 
-                transport_protocol =network_port_keys_and_ip.tcp.upper(), 
-                application_protocol =network_port_keys_and_ip.http, 
-                wait = "2m"
+                number = public_rcp_port,
+                transport_protocol = network_port_keys_and_ip.tcp.upper(),
+                application_protocol = network_port_keys_and_ip.http,
+                wait = "2m",
             ),
             network_port_keys_and_ip.tcp: PortSpec(
-                number = public_tcp_port, 
-                transport_protocol =network_port_keys_and_ip.tcp.upper(), 
-                application_protocol =network_port_keys_and_ip.http, 
-                wait = "2m"
+                number = public_tcp_port,
+                transport_protocol = network_port_keys_and_ip.tcp.upper(),
+                application_protocol = network_port_keys_and_ip.http,
+                wait = "2m",
             ),
             network_port_keys_and_ip.grpc: PortSpec(
-                number = public_grpc_port, 
-                transport_protocol =network_port_keys_and_ip.tcp.upper(), 
-                application_protocol =network_port_keys_and_ip.http, 
-                wait = "2m"
+                number = public_grpc_port,
+                transport_protocol = network_port_keys_and_ip.tcp.upper(),
+                application_protocol = network_port_keys_and_ip.http,
+                wait = "2m",
             ),
         },
-        entrypoint=["/bin/sh", "-c"],
-        cmd = ["chmod +x ../..%s/init/init.sh && chmod +x ../..%s/start/start.sh && chmod +x ../..%s/init-neutrond/init-neutrond.sh && key=%s password=\"%s\" CHAINID=%s ../..%s/init/init.sh && CHAINID=%s ../..%s/init-neutrond/init-neutrond.sh && CHAINID=%s ../..%s/start/start.sh" % (neutron_node_constants.path, neutron_node_constants.path, neutron_node_constants.path, key, password, chain_id, neutron_node_constants.path, chain_id,neutron_node_constants.path, chain_id, neutron_node_constants.path)],
-        env_vars={
+        entrypoint = ["/bin/sh", "-c"],
+        cmd = ["chmod +x ../..%s/init/init.sh && chmod +x ../..%s/start/start.sh && chmod +x ../..%s/init-neutrond/init-neutrond.sh && key=%s password=\"%s\" CHAINID=%s ../..%s/init/init.sh && CHAINID=%s ../..%s/init-neutrond/init-neutrond.sh && CHAINID=%s ../..%s/start/start.sh" % (neutron_node_constants.path, neutron_node_constants.path, neutron_node_constants.path, key, password, chain_id, neutron_node_constants.path, chain_id, neutron_node_constants.path, chain_id, neutron_node_constants.path)],
+        env_vars = {
             "RUN_BACKGROUND": "0",
         },
     )
 
     # Add the service to the plan
-    node_service_response = plan.add_service(name=service_name, config=neutron_node_config)
+    node_service_response = plan.add_service(name = service_name, config = neutron_node_config)
     plan.print(node_service_response)
 
     # Get public and private url, (private IP returned by kurtosis service)
@@ -120,9 +119,8 @@ def start_neutron_node(plan, chain_id, key, password, service_name, private_http
         endpoint = private_url,
         endpoint_public = public_url,
         chain_id = chain_id,
-        chain_key = key
+        chain_key = key,
     )
-
 
 def get_service_url(ip_address, ports):
     """
