@@ -286,18 +286,11 @@ def get_stake_amount(plan,service_name,bond_amount,min_delegated):
     return result["output"]
 
 # Configure nodes
-def configure_node(plan,args):
+def configure_node(plan, service_name, uri, keystorepath, keypassword, nid):
 
     plan.print("Configuring ICON Node")
 
-    service_name = args["service_name"]
-    uri = args["endpoint"]
-    keystorepath = args["keystore_path"]
-    keypassword = args["keypassword"]
-    nid = args["nid"]
-
     prep_address =  wallet_config.get_network_wallet_address(plan,service_name)
-
     
     ensure_decentralisation(plan,service_name,prep_address,uri,keystorepath,keypassword,nid)
 
