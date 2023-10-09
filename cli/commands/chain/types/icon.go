@@ -159,7 +159,7 @@ func RunIconNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
 	}
 	starlarkConfig := diveContext.GetStarlarkRunConfig(paramData, common.DiveIconNodeScript, "get_service_config")
-	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
+	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 		diveContext.FatalError("Starlark Run Failed", err.Error())
@@ -182,7 +182,7 @@ func RunIconNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 
 	params := fmt.Sprintf(`{"private_port":%d, "public_port":%d, "p2p_listen_address": %s, "p2p_address":%s, "cid": "%s","uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, serviceConfig.Port, serviceConfig.PublicPort, serviceConfig.P2PListenAddress, serviceConfig.P2PAddress, serviceConfig.Cid, genesisHandler.uploadedFiles, genesisHandler.genesisPath, genesisHandler.genesisFile)
 	starlarkConfig = diveContext.GetStarlarkRunConfig(params, common.DiveIconNodeScript, "start_icon_node")
-	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
+	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 
@@ -226,7 +226,7 @@ func Decentralisation(diveContext *common.DiveContext, params string) {
 		diveContext.FatalError("Failed To Retrieve Enclave Context", err.Error())
 	}
 	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveIconDecentraliseScript, "configure_node")
-	data, _, err := kurtosisEnclaveContext.RunStarlarkPackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
+	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
 		diveContext.FatalError("Starlark Run Failed", err.Error())
