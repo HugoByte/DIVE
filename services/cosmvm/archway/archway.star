@@ -20,7 +20,7 @@ def start_nodes_services_archway(plan):
     """
     service_name_src = "{0}-{1}".format(archway_service_config.service_name, archway_node_0_constant_config.chain_id)
     service_name_dst = "{0}-{1}".format(archway_service_config.service_name, archway_node_1_constant_config.chain_id)
-    
+
     src_config = parser.struct_to_dict(archway_node_service.start_cosmos_node(
         plan,
         archway_node_0_constant_config.chain_id,
@@ -34,7 +34,7 @@ def start_nodes_services_archway(plan):
         archway_node_0_constant_config.grpc,
         archway_node_0_constant_config.http,
         archway_node_0_constant_config.tcp,
-        archway_node_0_constant_config.rpc
+        archway_node_0_constant_config.rpc,
     ))
 
     dst_config = parser.struct_to_dict(archway_node_service.start_cosmos_node(
@@ -50,16 +50,16 @@ def start_nodes_services_archway(plan):
         archway_node_1_constant_config.grpc,
         archway_node_1_constant_config.http,
         archway_node_1_constant_config.tcp,
-        archway_node_1_constant_config.rpc
+        archway_node_1_constant_config.rpc,
     ))
 
     return struct(
-        src_config=src_config,
-        dst_config=dst_config,
+        src_config = src_config,
+        dst_config = dst_config,
     )
 
 # Function to start a single Cosmos node for Archway
-def start_node_service(plan, chain_id=None, key=None, password=None, public_grpc=None, public_http=None, public_tcp=None, public_rpc=None):
+def start_node_service(plan, chain_id = None, key = None, password = None, public_grpc = None, public_http = None, public_tcp = None, public_rpc = None):
     """
     Configure and start a single Cosmos node for Archway.
 
@@ -97,5 +97,5 @@ def start_node_service(plan, chain_id=None, key=None, password=None, public_grpc
         public_grpc,
         public_http,
         public_tcp,
-        public_rpc
+        public_rpc,
     )
