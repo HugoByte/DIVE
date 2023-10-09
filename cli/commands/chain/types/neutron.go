@@ -2,7 +2,6 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/hugobyte/dive/cli/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
@@ -95,7 +94,6 @@ func RunNeutronNode(diveContext *common.DiveContext) *common.DiveserviceResponse
 			diveContext.FatalError("Failed to encode service config", err.Error())
 		}
 
-		fmt.Printf("encodedServiceConfigDataString: %v\n", encodedServiceConfigDataString)
 		// Run Neutron Node with custom service config
 		starlarkExecutionData, err = RunNeutronWithServiceConfig(diveContext, kurtosisEnclaveContext, encodedServiceConfigDataString)
 		if err != nil {
