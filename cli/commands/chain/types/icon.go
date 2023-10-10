@@ -165,7 +165,7 @@ func RunIconNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 		diveContext.FatalError("Starlark Run Failed", err.Error())
 	}
 
-	responseData, services, skippedInstructions, err := diveContext.GetSerializedData(data)
+	_, services, skippedInstructions, err := diveContext.GetSerializedData(data)
 
 	if err != nil {
 		diveContext.StopServices(services)
@@ -180,7 +180,7 @@ func RunIconNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 
 	diveContext.CheckInstructionSkipped(skippedInstructions, "Instruction Executed Already")
 
-	params := fmt.Sprintf(`{"service_config":%s,"uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, responseData, genesisHandler.uploadedFiles, genesisHandler.genesisPath, genesisHandler.genesisFile)
+	params := fmt.Sprintf(`{"private_port":%d, "public_port":%d, "p2p_listen_address": %s, "p2p_address":%s, "cid": "%s","uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, serviceConfig.Port, serviceConfig.PublicPort, serviceConfig.P2PListenAddress, serviceConfig.P2PAddress, serviceConfig.Cid, genesisHandler.uploadedFiles, genesisHandler.genesisPath, genesisHandler.genesisFile)
 	starlarkConfig = diveContext.GetStarlarkRunConfig(params, common.DiveIconNodeScript, "start_icon_node")
 	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
@@ -244,9 +244,7 @@ func Decentralisation(diveContext *common.DiveContext, params string) {
 }
 
 func GetDecentralizeParms(serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID string) string {
-
-	return fmt.Sprintf(`{"args":{"service_name":"%s","endpoint":"%s","keystore_path":"%s","keypassword":"%s","nid":"%s"}}`, serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID)
-
+	return fmt.Sprintf(`{"service_name":"%s","uri":"%s","keystorepath":"%s","keypassword":"%s","nid":"%s"}`, serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID)
 }
 
 func getConfig() (*IconServiceConfig, error) {
