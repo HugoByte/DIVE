@@ -2,44 +2,37 @@ contract_deployment_service = import_module("../node-setup/contract_deploy.star"
 node_service = import_module("../node-setup/setup_icon_node.star")
 
 # Deploys BMC contract on ICON 
-def deploy_bmc(plan,args):
+def deploy_bmc(plan, network, service_name, uri, keystore_path, keystore_password, nid):
     plan.print("Deploying BMC Contract")
-    init_message = '{"_net":"%s"}' % args["network"]
+    init_message = '{"_net":"%s"}' % network
 
-    tx_hash = contract_deployment_service.deploy_contract(plan,"bmc",init_message,args)
+    tx_hash = contract_deployment_service.deploy_contract(plan,"bmc",init_message, service_name, uri, keystore_path, keystore_password, nid)
 
-    service_name = args["service_name"]
+    service_name = service_name
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
     return score_address
 
 # Deploys xCall on ICON
-def deploy_xcall(plan,bmc_address,args):
+def deploy_xcall(plan,bmc_address, service_name, uri, keystore_path, keystore_password, nid):
 
     plan.print("Deploying xCall Contract")
     init_message = '{"_bmc":"%s"}' % bmc_address
 
-    tx_hash = contract_deployment_service.deploy_contract(plan,"xcall",init_message,args)
-    service_name = args["service_name"]
+    tx_hash = contract_deployment_service.deploy_contract(plan,"xcall",init_message,service_name, uri, keystore_path, keystore_password, nid)
 
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
-    add_service(plan,bmc_address,score_address,args)
+    add_service(plan,bmc_address,score_address,service_name, uri, keystore_path, keystore_password, nid)
     return score_address   
 
 # Adds services to BMC contract on ICON
-def add_service(plan,bmc_address,xcall_address,args):
+def add_service(plan,bmc_address,xcall_address, service_name, uri, keystore_path, keystore_password, nid):
 
     plan.print("Adding xcall  to Bmc %s " % bmc_address)
-
-    service_name = args["service_name"]
-    uri = args["endpoint"]
-    keystore_path = args["keystore_path"]
-    keypassword = args["keypassword"]
-    nid = args["nid"]
 
     method = "addService"
     params = '{"_svc":"xcall","_addr":"%s"}' % xcall_address
 
-    exec_command = ["./bin/goloop","rpc","sendtx","call","--to",bmc_address,"--method",method,"--params",params,"--uri",uri,"--key_store",keystore_path,"--key_password",keypassword,"--step_limit","50000000000","--nid",nid]
+    exec_command = ["./bin/goloop","rpc","sendtx","call","--to",bmc_address,"--method",method,"--params",params,"--uri",uri,"--key_store",keystore_path,"--key_password",keystore_password,"--step_limit","50000000000","--nid",nid]
     result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
 
     tx_hash = result["output"].replace('"',"")
@@ -61,22 +54,21 @@ def open_btp_network(plan,service_name,src,dst,bmc_address,uri,keystorepath,keyp
     return result
 
 # Deploys BMV BTPBLOCK on ICON
-def deploy_bmv_btpblock_java(plan,bmc_address,dst_network_id,dst_network_type_id,first_block_header,args):
+def deploy_bmv_btpblock_java(plan, bmc_address, dst_network_id, dst_network_type_id, first_block_header, service_name, uri, keystore_path, keystore_password, nid):
     
     init_message = '{"bmc": "%s","srcNetworkID": "%s","networkTypeID": "%s", "blockHeader": "0x%s","seqOffset": "0x0"}' % (bmc_address,dst_network_id,dst_network_type_id,first_block_header)
-    service_name = args["service_name"]
 
-    tx_hash = contract_deployment_service.deploy_contract(plan,"bmv-btpblock",init_message,args)
+    tx_hash = contract_deployment_service.deploy_contract(plan,"bmv-btpblock",init_message, service_name, uri, keystore_path, keystore_password, nid)
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
 
     plan.print("BMV-BTPBlock: deployed")
     return score_address
 
 # Deploys BMVBRIDGE on ICON
-def deploy_bmv_bridge_java(plan,service_name,bmc_address,dst_network,offset,args):
+def deploy_bmv_bridge_java(plan,service_name, bmc_address, dst_network, offset, uri, keystore_path, keystore_password, nid):
 
     init_message = '{"_bmc": "%s","_net": "%s","_offset": "%s"}' %(bmc_address,dst_network,offset)
-    tx_hash = contract_deployment_service.deploy_contract(plan,"bmv-bridge",init_message,args)
+    tx_hash = contract_deployment_service.deploy_contract(plan,"bmv-bridge",init_message, service_name, uri, keystore_path, keystore_password, nid)
 
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
     plan.print("BMV-BTPBlock: deployed ")
@@ -130,14 +122,9 @@ def add_relay(plan,service_name,bmc_address,dst_bmc_address,relay_address,uri,ke
     return tx_result
 
 # Configures Link in BMC on ICON
-def setup_link_icon(plan,service_name,bmc_address,dst_chain_network,dst_chain_bmc_address,src_chain_network_id,bmv_address,relay_address,args):
+def setup_link_icon(plan,service_name, bmc_address, dst_chain_network, dst_chain_bmc_address, src_chain_network_id, bmv_address, relay_address, uri, keystore_path, keypassword, nid):
 
     dst_bmc_address = get_btp_address(dst_chain_network,dst_chain_bmc_address)
-
-    uri = args["endpoint"]
-    keystore_path = args["keystore_path"]
-    keypassword = args["keypassword"]
-    nid = args["nid"]
 
     add_verifier(plan,service_name,bmc_address,dst_chain_network,bmv_address,uri,keystore_path,keypassword,nid)
     add_btp_link(plan,service_name,bmc_address,dst_bmc_address,src_chain_network_id,uri,keystore_path,keypassword,nid)
@@ -150,28 +137,26 @@ def get_btp_address(network,dapp):
     return "btp://{0}/{1}".format(network,dapp)
 
 # Deploys dAPP on ICON
-def deploy_dapp(plan,xcall_address,args):
+def deploy_dapp(plan,xcall_address, service_name, uri, keystore_path, keystore_password, nid):
 
     plan.print("Deploying dapp Contract")
     init_message = '{"_callService":"%s"}' % xcall_address
 
-    tx_hash = contract_deployment_service.deploy_contract(plan,"dapp-sample",init_message,args)
-    service_name = args["service_name"]
+    tx_hash = contract_deployment_service.deploy_contract(plan,"dapp-sample",init_message, service_name, uri, keystore_path, keystore_password, nid)
     
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
     return score_address   
 
 
 # Deploy ibc_hndler
-def deploy_ibc_handler(plan,args):
+def deploy_ibc_handler(plan, service_name, uri, keystore_path, keystore_password, nid):
 
     plan.print("IBC handler")
 
     init_message = '{}' 
 
-    tx_hash = contract_deployment_service.deploy_contract(plan,"ibc-0.1.0-optimized",init_message, args)
+    tx_hash = contract_deployment_service.deploy_contract(plan,"ibc-0.1.0-optimized",init_message, service_name, uri, keystore_path, keystore_password, nid)
     plan.print(tx_hash)
-    service_name = args["service_name"]
 
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
 
@@ -180,21 +165,20 @@ def deploy_ibc_handler(plan,args):
     return score_address
 
 # deploy light_client 
-def deploy_light_client_for_icon(plan,args, ibc_handler_address):
+def deploy_light_client_for_icon(plan,service_name, uri, keystore_path, keystore_password, nid, ibc_handler_address):
 
     plan.print("deploy tendermint lightclient")
 
     init_message = '{"ibcHandler":"%s"}' % ibc_handler_address
 
-    tx_hash = contract_deployment_service.deploy_contract(plan, "tendermint-0.1.0-optimized", init_message, args)
-    service_name = args["service_name"]
+    tx_hash = contract_deployment_service.deploy_contract(plan, "tendermint-0.1.0-optimized", init_message, service_name, uri, keystore_path, keystore_password, nid)
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
 
     plan.print("deployed light client")
 
     return score_address
 
-def deploy_xcall_connection(plan,args,xcall_address,ibc_address):
+def deploy_xcall_connection(plan, service_name, uri, keystore_path, keystore_password, nid, xcall_address,ibc_address):
 
     plan.print("deploy xcall connection")
     plan.print(xcall_address)
@@ -202,34 +186,29 @@ def deploy_xcall_connection(plan,args,xcall_address,ibc_address):
     init_message= '{"_xCall": "%s","_ibc": "%s","port": "xcall"}' % (xcall_address,ibc_address)
 
    
-    tx_hash = contract_deployment_service.deploy_contract(plan, "xcall-connection-0.1.0-optimized", init_message, args)
-
-    service_name = args["service_name"]
+    tx_hash = contract_deployment_service.deploy_contract(plan, "xcall-connection-0.1.0-optimized", init_message, service_name, uri, keystore_path, keystore_password, nid)
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
-
     return score_address
 
 
-def deploy_xcall_for_ibc(plan,args):
+def deploy_xcall_for_ibc(plan, network, service_name, uri, keystore_path, keystore_password, nid):
 
     plan.print("Deploying xCall Contract for IBC")
-    init_message = '{"networkId":"%s"}' % args["network"]
+    init_message = '{"networkId":"%s"}' % network
 
-    tx_hash = contract_deployment_service.deploy_contract(plan,"xcall-0.1.0-optimized",init_message,args)
-    service_name = args["service_name"]
+    tx_hash = contract_deployment_service.deploy_contract(plan,"xcall-0.1.0-optimized",init_message, service_name, uri, keystore_path, keystore_password, nid)
 
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
     
     return score_address  
 
-def deploy_xcall_dapp(plan,args,xcall_address):
+def deploy_xcall_dapp(plan, service_name, uri, keystore_path, keystore_password, nid, xcall_address):
     
     plan.print("Deploying Xcall Dapp Contract")
 
     params = '{"_callService":"%s"}' % (xcall_address)
 
-    tx_hash = contract_deployment_service.deploy_contract(plan,"dapp-multi-protocol-0.1.0-optimized",params,args)
-    service_name = args["service_name"]
+    tx_hash = contract_deployment_service.deploy_contract(plan,"dapp-multi-protocol-0.1.0-optimized",params, service_name, uri, keystore_path, keystore_password, nid)
 
     score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
     
@@ -282,17 +261,17 @@ def set_default_connection_xcall(plan,xcall_address,wasm_network_id,xcall_connec
     plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
     return tx_result
 
-def setup_contracts_for_ibc_java(plan,args):
+def setup_contracts_for_ibc_java(plan, service_name, uri, keystore_path, keystore_password, nid):
     
     plan.print("Setting Contracts")
 
-    ibc_core_address = deploy_ibc_handler(plan,args)
+    ibc_core_address = deploy_ibc_handler(plan, service_name, uri, keystore_path, keystore_password, nid)
 
-    xcall_address = deploy_xcall_for_ibc(plan,args)
+    xcall_address = deploy_xcall_for_ibc(plan, service_name, uri, keystore_path, keystore_password, nid)
 
-    light_client_address = deploy_light_client_for_icon(plan,args,ibc_core_address)
+    light_client_address = deploy_light_client_for_icon(plan, service_name, uri, keystore_path, keystore_password, nid ,ibc_core_address)
 
-    xcall_connection_address = deploy_xcall_connection(plan,args,xcall_address,ibc_core_address)
+    xcall_connection_address = deploy_xcall_connection(plan, service_name, uri, keystore_path, keystore_password, nid ,xcall_address,ibc_core_address)
 
     contracts = {
         "ibc_core": ibc_core_address,
@@ -313,11 +292,11 @@ def configure_connection_for_java(plan,xcall_address,xcall_connection_address,wa
 
     return set_xcall_connection_result
 
-def deploy_and_configure_dapp_java(plan,args,xcall_address,wasm_network_id,java_xcall_connection_address,wasm_xcall_connection_address,service_name,uri,keystorepath,keypassword,nid):
+def deploy_and_configure_dapp_java(plan,service_name, uri, keystore_path, keystore_password, nid, xcall_address,wasm_network_id,java_xcall_connection_address,wasm_xcall_connection_address,keystorepath,keypassword):
 
     plan.print("Deploy and Configure Dapp")
 
-    xcall_dapp_address = deploy_xcall_dapp(plan,args,xcall_address)
+    xcall_dapp_address = deploy_xcall_dapp(plan, service_name, uri, keystore_path, keystore_password, nid, xcall_address)
 
     add_connection_result = add_connection_xcall_dapp(plan,xcall_dapp_address,wasm_network_id,java_xcall_connection_address,wasm_xcall_connection_address,service_name,uri,keystorepath,keypassword,nid)
 

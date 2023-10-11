@@ -1,19 +1,9 @@
 DEFAULT_STEP_LIMIT = "500000000000"
 
-"""
-Deploys Contract on Icon Chain
-'contract_name' - Name of the Contract to be deployed
-'args' - Dict of params for deployment
-"""
-def deploy_contract(plan,contract_name,init_message,args):
+
+def deploy_contract(plan,contract_name,init_message, service_name, uri, keystore_path, keystore_password, nid):
 
     contract = contract_name+".jar"
-    service_name = args["service_name"]
-    uri = args["endpoint"]
-    keystore_path = args["keystore_path"]
-    keystore_password = args["keypassword"]
-    nid = args["nid"]
-
 
     execute_command = ["./bin/goloop","rpc","sendtx","deploy","contracts/"+contract,"--content_type","application/java","--params",init_message,"--key_store",keystore_path,"--key_password",keystore_password,"--step_limit",DEFAULT_STEP_LIMIT,"--uri",uri,"--nid",nid]
 
@@ -22,10 +12,6 @@ def deploy_contract(plan,contract_name,init_message,args):
 
     return result["output"]
 
-"""
-Returns Contract Address
-'tx_hash' - transaction hash
-"""
 def get_score_address(plan,service_name,tx_hash):
 
     post_request = PostHttpRequestRecipe(

@@ -1,7 +1,7 @@
 eth_contract_deployer_service = import_module("../node-setup/contract-deployer.star")
 
 # Deploy Bmc contract on ETH and Returns it's address
-def deploy_bmc(plan, network, network_name, chain_name):
+def deploy_bmc(plan, chain_name, network, network_name):
 
     plan.print("Deploying BMC Contract on %s" % network)
 
@@ -20,7 +20,7 @@ def deploy_bmc(plan, network, network_name, chain_name):
     )
 
 # Deploy xCall Contract and returns it's address
-def deploy_xcall(plan,network, network_name,chain_name,service_name):
+def deploy_xcall(plan,chain_name, network, network_name):
 
     plan.print("Deploying xCall Contract on %s" % network)
 
@@ -31,7 +31,7 @@ def deploy_xcall(plan,network, network_name,chain_name,service_name):
     return xcall_address
 
 # Deploy dapp Contract and returns it's address
-def deploy_dapp(plan,network, network_name,chain_name,service_name):
+def deploy_dapp(plan, chain_name, network, network_name):
 
     plan.print("Deploying dapp Contract on %s" % network)
 
@@ -42,8 +42,7 @@ def deploy_dapp(plan,network, network_name,chain_name,service_name):
     return dapp_address
 
 # Deploy BmvBridge Contract and returns it's address
-def deploy_bmv_bridge(plan,network, network_name ,lastblock_height,src_bmc_address,srcchain_network,chain_name,service_name):
-
+def deploy_bmv_bridge(plan, lastblock_height, src_bmc_address, srcchain_network, chain_name, network, network_name):
 
     plan.print("Deploying Bmv-Bridge Contract on %s" % network)
 
@@ -56,7 +55,7 @@ def deploy_bmv_bridge(plan,network, network_name ,lastblock_height,src_bmc_addre
     return bmvb
 
 # Deploy Bmv contract and returns it's address
-def deploy_bmv(plan,network, network_name, src_first_block_header,src_bmc_address,srcchain_network,srcchain_network_type_id,chain_name):
+def deploy_bmv(plan, src_first_block_header, src_bmc_address, srcchain_network, srcchain_network_type_id, chain_name,network, network_name):
 
     plan.print("Deploying Bmv Contract on %s" % network)
 
@@ -67,9 +66,6 @@ def deploy_bmv(plan,network, network_name, src_first_block_header,src_bmc_addres
     bmv = eth_contract_deployer_service.get_contract_address(plan,"bmv",chain_name)
 
     return bmv
-
-
-
 
 
 

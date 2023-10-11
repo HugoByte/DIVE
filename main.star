@@ -67,7 +67,7 @@ def run_node(plan, node_name, args):
         return icon_service.start_node_service(plan)
 
     elif node_name == "eth" or node_name == "hardhat":
-        return eth_node.start_eth_node_serivce(plan, node_name)
+        return eth_node.start_eth_node_service(plan, node_name)
 
     elif node_name == "archway" or node_name == "neutron":
         return cosmvm_node.start_cosmvm_chains(plan, node_name, args)
@@ -90,9 +90,9 @@ def run_btp_setup(plan, args):
         config_data["chains"][src_chain_service_name] = data.src_config
         config_data["chains"][dst_chain_service_name] = data.dst_config
 
-        icon_service.configure_icon_to_icon_node(plan, data.src_config, data.dst_config)
+        icon_service.configure_icon_to_icon_node(plan, data.src_config["service_name"], data.src_config["endpoint"], data.src_config["keystore_path"], data.src_config["keypassword"], data.src_config["nid"], data.dst_config["service_name"], data.dst_config["endpoint"], data.dst_config["keystore_path"], data.dst_config["keypassword"], data.dst_config["nid"])
 
-        config = start_btp_for_already_running_icon_nodes(plan, source_chain, destination_chain, config_data, data.src_config["service_name"], data.dst_config["service_name"])
+        config = start_btp_for_already_running_icon_nodes(plan, source_chain, destination_chain,config_data,data.src_config["service_name"], data.src_config["network"], data.src_config["network_name"],data.src_config["endpoint"],data.src_config["keystore_path"], data.src_config["keypassword"], data.src_config["nid"] ,data.dst_config["service_name"], data.dst_config["network"], data.dst_config["network_name"],data.dst_config["endpoint"],data.dst_config["keystore_path"], data.dst_config["keypassword"], data.dst_config["nid"], bridge)
 
         return config
     else:
@@ -102,7 +102,7 @@ def run_btp_setup(plan, args):
 
         if destination_chain == "eth" or destination_chain == "hardhat":
             src_chain_config = icon_service.start_node_service(plan)
-            dst_chain_config = eth_node.start_eth_node_serivce(plan, destination_chain)
+            dst_chain_config = eth_node.start_eth_node_service(plan, destination_chain)
 
             src_chain_service_name = src_chain_config["service_name"]
             dst_chain_service_name = dst_chain_config["service_name"]
@@ -111,22 +111,90 @@ def run_btp_setup(plan, args):
             config_data["chains"][src_chain_service_name] = src_chain_config
             config_data["chains"][dst_chain_service_name] = dst_chain_config
 
-            icon_service.configure_icon_node(plan, src_chain_config)
-            config = start_btp_icon_to_eth_for_already_running_nodes(plan, source_chain, destination_chain, config_data, src_chain_service_name, dst_chain_service_name)
+            icon_service.configure_icon_node(plan,src_chain_service_name, src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"])
+
+            config = start_btp_icon_to_eth_for_already_running_nodes(plan, source_chain, destination_chain, config_data, src_chain_service_name, src_chain_config["network"], src_chain_config["network_name"], src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"] , dst_chain_service_name, dst_chain_config["network"], dst_chain_config["network_name"], dst_chain_config["endpoint"], dst_chain_config["keystore_path"], dst_chain_config["keypassword"], dst_chain_config["nid"], bridge)
 
             return config
 
         else:
             fail("unsupported chain {0} - {1}".format(source_chain, destination_chain))
 
-def start_btp_for_already_running_icon_nodes(plan, src_chain, dst_chain, config_data, src_service_name, dst_service_name):
-    src_bmc_address, dst_bmc_address = icon_service.deploy_bmc_icon(plan, src_chain, dst_chain, src_service_name, dst_service_name, config_data)
+def start_btp_for_already_running_icon_nodes(plan, src_chain, dst_chain, config_data, src_service_name, src_network, src_network_name, src_uri, src_keystore_path, src_keystore_password, src_nid, dst_service_name, dst_network, dst_network_name, dst_uri, dst_keystore_path, dst_keystore_password, dst_nid, bridge):
 
-    response = icon_service.deploy_bmv_icon_to_icon(plan, src_service_name, dst_service_name, src_bmc_address, dst_bmc_address, config_data)
+    src_bmc_address, dst_bmc_address = icon_service.deploy_bmc_icon(
+        plan, 
+        src_chain, 
+        dst_chain, 
+        src_service_name,  
+        src_network, 
+        src_uri, 
+        src_keystore_path, 
+        src_keystore_password, 
+        src_nid, 
+        dst_service_name, 
+        dst_network, 
+        dst_uri, 
+        dst_keystore_path, 
+        dst_keystore_password, 
+        dst_nid
+    )
 
-    src_xcall_address, dst_xcall_address = icon_service.deploy_xcall_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc_address, config_data, src_service_name, dst_service_name)
+    response = icon_service.deploy_bmv_icon_to_icon(
+        plan, 
+        src_service_name,   
+        src_network,
+        src_network_name,
+        src_uri,
+        src_keystore_path,
+        src_keystore_password,
+        src_nid,
+        dst_service_name,   
+        dst_network,
+        dst_network_name,
+        dst_uri,
+        dst_keystore_path,
+        dst_keystore_password,
+        dst_nid,
+        src_bmc_address,
+        dst_bmc_address
+    )
 
-    src_dapp_address, dst_dapp_address = icon_service.deploy_dapp_icon(plan, src_chain, dst_chain, src_xcall_address, dst_xcall_address, config_data, src_service_name, dst_service_name)
+    src_xcall_address, dst_xcall_address = icon_service.deploy_xcall_icon(
+        plan, 
+        src_chain, 
+        dst_chain, 
+        src_bmc_address, 
+        dst_bmc_address, 
+        src_service_name, 
+        src_uri,
+        src_keystore_path,
+        src_keystore_password,
+        src_nid,
+        dst_service_name,
+        dst_uri,
+        dst_keystore_path,
+        dst_keystore_password,
+        dst_nid
+    )
+
+    src_dapp_address, dst_dapp_address = icon_service.deploy_dapp_icon(
+        plan, 
+        src_chain, 
+        dst_chain, 
+        src_xcall_address, 
+        dst_xcall_address, 
+        src_service_name, 
+        src_uri,
+        src_keystore_path,
+        src_keystore_password,
+        src_nid,
+        dst_service_name,
+        dst_uri,
+        dst_keystore_path,
+        dst_keystore_password,
+        dst_nid
+    )
 
     src_block_height = icon_setup_node.hex_to_int(plan, src_service_name, response.src_block_height)
     dst_block_height = icon_setup_node.hex_to_int(plan, dst_service_name, response.dst_block_height)
@@ -155,22 +223,20 @@ def start_btp_for_already_running_icon_nodes(plan, src_chain, dst_chain, config_
     config_data["chains"][src_service_name]["block_number"] = src_block_height
     config_data["chains"][dst_service_name]["block_number"] = dst_block_height
 
-    config_data = start_btp_relayer(plan, src_chain, dst_chain, config_data, src_service_name, dst_service_name)
+    start_btp_relayer(plan, src_network, response.src_bmc, src_uri, src_keystore_path, src_keystore_password, dst_network, response.dst_bmc, dst_uri, dst_keystore_path, dst_keystore_password, bridge)
 
     config_data["links"]["src"] = src_service_name
     config_data["links"]["dst"] = dst_service_name
 
     return config_data
 
-def start_btp_icon_to_eth_for_already_running_nodes(plan, src_chain, dst_chain, config_data, src_service_name, dst_service_name):
-    dst_chain_config = config_data["chains"][dst_service_name]
-    src_chain_config = config_data["chains"][src_service_name]
+def start_btp_icon_to_eth_for_already_running_nodes(plan, src_chain, dst_chain,config_data,src_service_name, src_network, src_network_name, src_uri, src_keystore_path, src_keystore_password, src_nid, dst_service_name, dst_network, dst_network_name, dst_uri, dst_keystore_path, dst_keystore_password, dst_nid, bridge):
+  
+    eth_contract_service.start_deploy_service(plan, dst_uri)
 
-    eth_contract_service.start_deploy_service(plan, dst_chain_config["endpoint"])
+    src_bmc_address = icon_service.deploy_bmc_icon(plan, src_chain, dst_chain, src_service_name, src_network, src_uri, src_keystore_path, src_keystore_password, src_nid, dst_service_name, dst_network, dst_uri, dst_keystore_path, dst_keystore_password, dst_nid)
 
-    src_bmc_address = icon_service.deploy_bmc_icon(plan, src_chain, dst_chain, src_service_name, dst_service_name, config_data)
-
-    dst_bmc_deploy_response = eth_relay_setup.deploy_bmc(plan, config_data["chains"][dst_service_name]["network"], config_data["chains"][dst_service_name]["network_name"], dst_chain)
+    dst_bmc_deploy_response = eth_relay_setup.deploy_bmc(plan, dst_chain, dst_network, dst_network_name)
 
     dst_bmc_address = dst_bmc_deploy_response.bmc
 
@@ -178,17 +244,33 @@ def start_btp_icon_to_eth_for_already_running_nodes(plan, src_chain, dst_chain, 
 
     dst_last_block_height_hex = icon_setup_node.int_to_hex(plan, src_service_name, dst_last_block_height_number)
 
-    src_response = icon_service.deploy_bmv_icon(plan, src_service_name, dst_service_name, src_bmc_address, dst_bmc_address, dst_last_block_height_hex, config_data)
+    src_response = icon_service.deploy_bmv_icon(plan, src_service_name, src_network, src_uri, src_keystore_path, src_keystore_password, src_nid, dst_network, dst_network_name, src_bmc_address, dst_bmc_address, dst_last_block_height_hex)
 
-    dst_bmv_address = eth_node.deploy_bmv_eth(plan, config_data["bridge"], src_response, config_dataconfig_data["chains"][dst_service_name]["network_name"], config_data["chains"][dst_service_name]["network_name"], dst_chain)
+    dst_bmv_address = eth_node.deploy_bmv_eth(plan, bridge, src_response, dst_network, dst_network_name, dst_chain)
 
-    src_xcall_address = icon_service.deploy_xcall_icon(plan, src_chain, dst_chain, src_bmc_address, dst_bmc_address, config_data, src_service_name, dst_service_name)
+    src_xcall_address = icon_service.deploy_xcall_icon(
+        plan, 
+        src_chain, 
+        dst_chain, 
+        src_bmc_address, 
+        dst_bmc_address, 
+        src_service_name, 
+        src_uri,
+        src_keystore_path,
+        src_keystore_password,
+        src_nid,
+        dst_service_name,
+        dst_uri,
+        dst_keystore_path,
+        dst_keystore_password,
+        dst_nid
+    )
 
-    dst_xcall_address = eth_relay_setup.deploy_xcall(plan, config_data["chains"][dst_service_name]["network"], config_data["chains"][dst_service_name]["network_name"], dst_chain)
+    dst_xcall_address = eth_relay_setup.deploy_xcall(plan, dst_chain, dst_network, dst_network_name)
 
-    src_dapp_address = icon_service.deploy_dapp_icon(plan, src_chain, dst_chain, src_xcall_address, dst_xcall_address, config_data, src_service_name, dst_service_name)
+    src_dapp_address = icon_service.deploy_dapp_icon(plan, src_chain, dst_chain, src_xcall_address, dst_xcall_address, src_service_name,  src_uri, src_keystore_path, src_keystore_password, src_nid, dst_service_name, dst_uri, dst_keystore_path, dst_keystore_password, dst_nid)
 
-    dst_dapp_address = eth_relay_setup.deploy_dapp(plan, config_data["chains"][dst_service_name]["network"], config_data["chains"][dst_service_name]["network_name"], dst_chain)
+    dst_dapp_address = eth_relay_setup.deploy_dapp(plan, dst_chain, dst_network, dst_network_name)
 
     src_block_height = icon_setup_node.hex_to_int(plan, src_service_name, src_response.block_height)
 
@@ -215,26 +297,23 @@ def start_btp_icon_to_eth_for_already_running_nodes(plan, src_chain, dst_chain, 
     config_data["chains"][src_service_name]["block_number"] = src_block_height
     config_data["chains"][dst_service_name]["block_number"] = dst_last_block_height_number
 
-    config_data = start_btp_relayer(plan, src_chain, dst_chain, config_data, src_service_name, dst_service_name)
+    #start_btp_relayer(plan, src_chain, dst_chain, config_data, src_service_name, dst_service_name)
+
+    start_btp_relayer(plan, src_network, src_response.bmc, src_uri, src_keystore_path, src_keystore_password, dst_network, dst_bmc_address, dst_uri, dst_keystore_path, dst_keystore_password, bridge)
 
     config_data["links"]["src"] = src_service_name
     config_data["links"]["dst"] = dst_service_name
 
     return config_data
 
-def start_btp_relayer(plan, src_chain, dst_chain, config_data, src_service_name, dst_service_name):
-    src_network = config_data["chains"][src_service_name]["network"]
-    src_bmc = config_data["contracts"][src_service_name]["bmc"]
-
-    dst_network = config_data["chains"][dst_service_name]["network"]
-    dst_bmc = config_data["contracts"][dst_service_name]["bmc"]
-
+def start_btp_relayer(plan, src_network, src_bmc,src_endpoint, src_keystore, src_keypassword, dst_network, dst_bmc, dst_endpoint, dst_keystore, dst_keypassword, bridge):
+  
     src_btp_address = "btp://{0}/{1}".format(src_network, src_bmc)
     dst_btp_address = "btp://{0}/{1}".format(dst_network, dst_bmc)
+    #start_relayer(plan, src_en, dst_service_name, config_data, src_btp_address, dst_btp_address, config_data["bridge"])
+    btp_bridge.start_relayer(plan, src_endpoint, src_keystore, src_keypassword, src_btp_address, dst_endpoint, dst_keystore, dst_keypassword, dst_btp_address, bridge)
 
-    btp_bridge.start_relayer(plan, src_service_name, dst_service_name, config_data, src_btp_address, dst_btp_address, config_data["bridge"])
 
-    return config_data
 
 def run_cosmos_ibc_setup(plan, args):
     """
@@ -383,8 +462,3 @@ def run_cosmos_ibc_relay_for_already_running_chains(plan, src_chain_config, dst_
 
 
     return config_data
-
-
-
-
-
