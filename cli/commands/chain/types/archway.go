@@ -2,7 +2,6 @@ package types
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/hugobyte/dive/cli/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
@@ -20,17 +19,13 @@ var (
 )
 
 type ArchwayServiceConfig struct {
-	Cid             string `json:"cid"`
-	Key             string `json:"key"`
-	PrivateGrpcPort int    `json:"private_grpc"`
-	PrivateHttpPort int    `json:"private_http"`
-	PrivateTcpPort  int    `json:"private_tcp"`
-	PrivateRpcPort  int    `json:"private_rpc"`
-	PublicGrpcPort  int    `json:"public_grpc"`
-	PublicHttpPort  int    `json:"public_http"`
-	PublicTcpPort   int    `json:"public_tcp"`
-	PublicRpcPort   int    `json:"public_rpc"`
-	Password        string `json:"password"`
+	Cid            *string `json:"chain_id"`
+	Key            *string `json:"key"`
+	PublicGrpcPort *int    `json:"public_grpc"`
+	PublicHttpPort *int    `json:"public_http"`
+	PublicTcpPort  *int    `json:"public_tcp"`
+	PublicRpcPort  *int    `json:"public_rpc"`
+	Password       *string `json:"password"`
 }
 
 func (as *ArchwayServiceConfig) EncodeToString() (string, error) {
@@ -102,13 +97,19 @@ func RunArchwayNode(diveContext *common.DiveContext) *common.DiveserviceResponse
 			diveContext.FatalError("Failed encode service config", err.Error())
 		}
 
-		starlarkExecutionData, err = runArchwayWithCustomServiceConfig(diveContext, kurtosisEnclaveContext, encodedServiceConfigDataString)
+		starlarkExecutionData, err = RunArchwayNodeWithConfig(diveContext, kurtosisEnclaveContext, encodedServiceConfigDataString)
 		if err != nil {
 			diveContext.FatalError("Starlark Run Failed", err.Error())
 		}
 
 	} else {
-		starlarkExecutionData, err = runArchwayWithDefaultServiceConfig(diveContext, kurtosisEnclaveContext)
+
+		encodedServiceConfigDataString, err := serviceConfig.EncodeToString()
+
+		if err != nil {
+			diveContext.FatalError("Failed encode service config", err.Error())
+		}
+		starlarkExecutionData, err = RunArchwayNodeWithConfig(diveContext, kurtosisEnclaveContext, encodedServiceConfigDataString)
 		if err != nil {
 			diveContext.FatalError("Starlark Run Failed", err.Error())
 		}
@@ -122,58 +123,16 @@ func RunArchwayNode(diveContext *common.DiveContext) *common.DiveserviceResponse
 	return archwayResponse
 }
 
-func runArchwayWithCustomServiceConfig(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext, data string) (string, error) {
-	starlarkConfig := diveContext.GetStarlarkRunConfig(data, common.DiveArchwayNodeScript, constructServiceConfigFunctionName)
-	serviceExecutionResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
-
-	if err != nil {
-
-		return "", err
-
-	}
-
-	serviceExecutionResponseData, _, _, err := diveContext.GetSerializedData(serviceExecutionResponse)
-	if err != nil {
-
-		return "", err
-
-	}
-	params := fmt.Sprintf(`{"args":%s}`, serviceExecutionResponseData)
-	starlarkConfig = diveContext.GetStarlarkRunConfig(params, common.DiveArchwayNodeScript, runArchwayNodeWithCustomServiceFunctionName)
-
-	nodeExecutionResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
-
-	if err != nil {
-
-		return "", err
-
-	}
-
-	nodeExecutionResponseData, _, _, err := diveContext.GetSerializedData(nodeExecutionResponse)
-	if err != nil {
-
-		return "", err
-
-	}
-
-	return nodeExecutionResponseData, nil
-}
-
-func runArchwayWithDefaultServiceConfig(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext) (string, error) {
-
-	params := `{"args":{"data":{}}}`
-	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveArchwayDefaultNodeScript, runArchwayNodeWithDefaultConfigFunctionName)
+func RunArchwayNodeWithConfig(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext, config string) (string, error) {
+	starlarkConfig := diveContext.GetStarlarkRunConfig(config, common.DiveArchwayDefaultNodeScript, runArchwayNodeWithDefaultConfigFunctionName)
 	nodeServiceResponse, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
-
 		return "", err
-
 	}
 
 	nodeServiceResponseData, services, skippedInstructions, err := diveContext.GetSerializedData(nodeServiceResponse)
 	if err != nil {
-
 		diveContext.StopServices(services)
 		diveContext.FatalError("Starlark Run Failed", err.Error())
 

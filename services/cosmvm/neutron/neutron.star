@@ -4,78 +4,24 @@ constants = import_module("../../../package_io/constants.star")
 neutron_private_ports = constants.NEUTRON_PRIVATE_PORTS
 neutron_node1_config = constants.NEUTRON_NODE1_CONFIG
 neutron_node2_config = constants.NEUTRON_NODE2_CONFIG
+neutron_service_config = constants.NEUTRON_SERVICE_CONFIG
 
-def start_node_services(plan, args):
+def start_node_services(plan):
     """
-    Configure and start two Neutron node services, serving as the source and destination,
-    to establish an IBC relay connection between them.
+    Configure and start two Neutron node services, serving as the source and destination to establish an IBC relay connection between them.
 
     Args:
         plan (plan): plan.
-        args (dict): Arguments containing data for configuring the services.
 
     Returns:
         struct: Configuration information for the source and destination services.
     """
 
-    data_src = args["src_config"]["data"]
-    data_dst = args["dst_config"]["data"] 
-    src_chain_config = ""
-    dst_chain_config = ""
-
-    if len(data_src) != 0:
-        # Configure the service based on provided data for source chain
-        chain_id = data_src["chainId"]
-        key = data_src["key"]
-        password = data_src["password"]
-        public_grpc = data_src["public_grpc"]
-        public_tcp = data_src["public_tcp"]
-        public_http = data_src["public_http"]
-        public_rpc = data_src["public_rpc"]
-
-        src_chain_config = neutron_node_service.get_service_config(
-            chain_id, key, password,
-            neutron_private_ports.grpc, neutron_private_ports.http, neutron_private_ports.tcp, neutron_private_ports.rpc,
-            public_grpc, public_http, public_tcp, public_rpc
-        )
-    else:
-        # Use predefined port values for configuration for source chain
-        src_chain_config = neutron_node_service.get_service_config(
-            neutron_node1_config.chain_id, neutron_node1_config.key, neutron_node1_config.password,
-            neutron_private_ports.grpc, neutron_private_ports.http,
-            neutron_private_ports.tcp, neutron_private_ports.rpc,
-            neutron_node1_config.grpc, neutron_node1_config.http,
-            neutron_node1_config.tcp, neutron_node1_config.rpc
-        )
-
-    if len(data_dst) != 0:
-        # Configure the service based on provided data for destination chain
-        chain_id = data_dst["chainId"]
-        key = data_dst["key"]
-        password = data_dst["password"]
-        public_grpc = data_dst["public_grpc"]
-        public_tcp = data_dst["public_tcp"]
-        public_http = data_dst["public_http"]
-        public_rpc = data_dst["public_rpc"]
-
-        dst_chain_config = neutron_node_service.get_service_config(
-            chain_id, key, password,
-            neutron_private_ports.grpc, neutron_private_ports.http, neutron_private_ports.tcp, neutron_private_ports.rpc,
-            public_grpc, public_http, public_tcp, public_rpc
-        )
-    else:
-        # Use predefined port values for configuration for destination chain
-        dst_chain_config = neutron_node_service.get_service_config(
-            neutron_node2_config.chain_id, neutron_node2_config.key, neutron_node2_config.password,
-            neutron_private_ports.grpc, neutron_private_ports.http,
-            neutron_private_ports.tcp, neutron_private_ports.rpc,
-            neutron_node2_config.grpc, neutron_node2_config.http,
-            neutron_node2_config.tcp, neutron_node2_config.rpc
-        )
-    
     # Start the source and destination Neutron node services
-    src_chain_response = neutron_node_service.start_neutron_node(plan, src_chain_config)
-    dst_chain_response = neutron_node_service.start_neutron_node(plan, dst_chain_config)
+    service_name_src = "{0}-{1}".format(neutron_service_config.service_name, neutron_node1_config.chain_id)
+    service_name_dst = "{0}-{1}".format(neutron_service_config.service_name, neutron_node2_config.chain_id)
+    src_chain_response = neutron_node_service.start_neutron_node(plan, neutron_node1_config.chain_id, neutron_node1_config.key, neutron_node1_config.password, service_name_src, neutron_private_ports.http, neutron_private_ports.rpc, neutron_private_ports.tcp, neutron_private_ports.grpc, neutron_node1_config.http, neutron_node1_config.rpc, neutron_node1_config.tcp, neutron_node1_config.grpc)
+    dst_chain_response = neutron_node_service.start_neutron_node(plan, neutron_node2_config.chain_id, neutron_node2_config.key, neutron_node2_config.password, service_name_dst, neutron_private_ports.http, neutron_private_ports.rpc, neutron_private_ports.tcp, neutron_private_ports.grpc, neutron_node2_config.http, neutron_node2_config.rpc, neutron_node2_config.tcp, neutron_node2_config.grpc)
 
     # Create configuration dictionaries for both services
     src_service_config = {
@@ -83,7 +29,7 @@ def start_node_services(plan, args):
         "endpoint": src_chain_response.endpoint,
         "endpoint_public": src_chain_response.endpoint_public,
         "chain_id": src_chain_response.chain_id,
-        "chain_key": src_chain_response.chain_key
+        "chain_key": src_chain_response.chain_key,
     }
 
     dst_service_config = {
@@ -91,53 +37,55 @@ def start_node_services(plan, args):
         "endpoint": dst_chain_response.endpoint,
         "endpoint_public": dst_chain_response.endpoint_public,
         "chain_id": dst_chain_response.chain_id,
-        "chain_key": dst_chain_response.chain_key
+        "chain_key": dst_chain_response.chain_key,
     }
 
     return struct(
-        src_config=src_service_config,
-        dst_config=dst_service_config,
+        src_config = src_service_config,
+        dst_config = dst_service_config,
     )
 
-def start_node_service(plan, args):
+def start_node_service(plan, chain_id = None, key = None, password = None, public_grpc = None, public_http = None, public_tcp = None, public_rpc = None):
     """
     Start a Neutron node service with the provided configuration.
 
     Args:
-        plan (plan): plan.
-        args (dict): Arguments containing data for configuring the service.
+        plan: Plan
+        chain_id: Chain Id of the chain to be started.
+        key: Key used for creating account.
+        password: Password for Key.
+        public_grpc: GRPC Endpoint for chain to run.
+        public_http: HTTP Endpoint for chain to run .
+        public_tcp: TCP Endpoint for chain to run.
+        public_rpc: RPC Endpoint for chain to run.
 
     Returns:
         struct: The response from starting the Neutron node service.
+
     """
 
-    data = args["data"]
-    chain_config = ""
+    # Start the Neutron node service with default configuration and return the response
+    chain_id = chain_id if chain_id != None else neutron_node1_config.chain_id
+    key = key if key != None else neutron_node1_config.key
+    password = password if key != None else neutron_node1_config.password
+    public_http = public_http if public_http != None else neutron_node1_config.http
+    public_rpc = public_rpc if public_rpc != None else neutron_node1_config.rpc
+    public_tcp = public_tcp if public_tcp != None else neutron_node1_config.tcp
+    public_grpc = public_grpc if public_grpc != None else neutron_node1_config.grpc
+    service_name = "{0}-{1}".format(neutron_service_config.service_name, chain_id)
 
-    if len(data) != 0:
-        # Configure the service based on provided data
-        chain_id = data["chainId"]
-        key = data["key"]
-        password = data["password"]
-        public_grpc = data["public_grpc"]
-        public_tcp = data["public_tcp"]
-        public_http = data["public_http"]
-        public_rpc = data["public_rpc"]
-
-        chain_config = neutron_node_service.get_service_config(
-            chain_id, key, password,
-            neutron_private_ports.grpc, neutron_private_ports.http, neutron_private_ports.tcp, neutron_private_ports.rpc,
-            public_grpc, public_http, public_tcp, public_rpc
-        )
-    else:
-        # Use predefined port values for configuration
-        chain_config = neutron_node_service.get_service_config(
-            neutron_node1_config.chain_id, neutron_node1_config.key, neutron_node1_config.password,
-            neutron_private_ports.grpc, neutron_private_ports.http,
-            neutron_private_ports.tcp, neutron_private_ports.rpc,
-            neutron_node1_config.grpc, neutron_node1_config.http,
-            neutron_node1_config.tcp, neutron_node1_config.rpc
-        )
-
-    # Start the Neutron node service and return the response
-    return neutron_node_service.start_neutron_node(plan, chain_config)
+    return neutron_node_service.start_neutron_node(
+        plan,
+        chain_id,
+        key,
+        password,
+        service_name,
+        neutron_private_ports.http,
+        neutron_private_ports.rpc,
+        neutron_private_ports.tcp,
+        neutron_private_ports.grpc,
+        public_http,
+        public_rpc,
+        public_tcp,
+        public_grpc,
+    )
