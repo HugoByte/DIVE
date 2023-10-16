@@ -6,15 +6,15 @@ def start_icon_node(plan, private_port, public_port, p2p_listen_address, p2p_add
     Function to start an ICON node.
 
     Args:
-        - plan: plan.
-        - private_port: The private port for the ICON node.
-        - public_port: The public port for the ICON node.
-        - p2p_listen_address: The P2P listen address for the ICON node.
-        - p2p_address: The P2P address for the ICON node.
-        - cid: The chain ID for the ICON network.
-        - uploaded_genesis: A dictionary containing uploaded genesis file data.
-        - genesis_file_path: The path to the genesis file.
-        - genesis_file_name: The name of the genesis file.
+        plan: kurtosis plan.
+        private_port: The private port for the ICON node.
+        public_port: The public port for the ICON node.
+        p2p_listen_address: The P2P listen address for the ICON node.
+        p2p_address: The P2P address for the ICON node.
+        cid: The chain ID for the ICON network.
+        uploaded_genesis: A dictionary containing uploaded genesis file data.
+        genesis_file_path: The path to the genesis file.
+        genesis_file_name: The name of the genesis file.
 
     Returns:
         Configuration data for the started ICON node service as a dictionary.
@@ -117,18 +117,3 @@ def get_service_url(ip_address, ports, path):
     protocol = ports[network_keys_and_public_address.rpc].application_protocol
     url = "{0}://{1}:{2}/{3}".format(protocol, ip_address, port_id, path)
     return url
-
-
-# Retruns Service Config
-def get_service_config(private_port, public_port, p2p_listen_address, p2p_address, cid):
-    config = {
-        "service_name": "{0}{1}".format(constants.ICON_NODE_CLIENT.service_name, cid),
-        "private_port": private_port,
-        "public_port": public_port,
-        "network_name": "icon-{0}".format(cid),
-        "p2p_listen_address": p2p_listen_address,
-        "p2p_address": p2p_address,
-        "cid": cid,
-    }
-
-    return config

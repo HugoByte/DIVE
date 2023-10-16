@@ -202,30 +202,30 @@ def deploy_xcall_for_ibc(plan, network, service_name, uri, keystore_path, keysto
     
     return score_address  
 
-def deploy_xcall_dapp(plan, service_name, uri, keystore_path, keystore_password, nid, xcall_address):
+def deploy_xcall_dapp(plan, src_chain_config, xcall_address):
     
     plan.print("Deploying Xcall Dapp Contract")
 
     params = '{"_callService":"%s"}' % (xcall_address)
 
-    tx_hash = contract_deployment_service.deploy_contract(plan,"dapp-multi-protocol-0.1.0-optimized",params, service_name, uri, keystore_path, keystore_password, nid)
+    tx_hash = contract_deployment_service.deploy_contract(plan,"dapp-multi-protocol-0.1.0-optimized",params, src_chain_config["service_name"], src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"])
 
-    score_address = contract_deployment_service.get_score_address(plan,service_name,tx_hash)
+    score_address = contract_deployment_service.get_score_address(plan, src_chain_config["service_name"], tx_hash)
     
     return score_address  
 
-def add_connection_xcall_dapp(plan,xcall_dapp_address,wasm_network_id,java_xcall_connection_address,wasm_xcall_connection_address,service_name,uri,keystorepath,keypassword,nid):
+def add_connection_xcall_dapp(plan,xcall_dapp_address,wasm_network_id,java_xcall_connection_address,wasm_xcall_connection_address, src_chain_config):
 
     plan.print("Configure dapp connection")
     method = "addConnection"
     params = '{"nid":"%s","source":"%s","destination":"%s"}' % (wasm_network_id,java_xcall_connection_address,wasm_xcall_connection_address)
 
     #execute
-    exec_command = ["./bin/goloop","rpc","sendtx","call","--to",xcall_dapp_address,"--method",method,"--params",params,"--uri",uri,"--key_store",keystorepath,"--key_password",keypassword,"--step_limit","500000000000","--nid",nid]
-    result = plan.exec(service_name=service_name,recipe=ExecRecipe(command=exec_command))
+    exec_command = ["./bin/goloop","rpc","sendtx","call","--to",xcall_dapp_address,"--method",method,"--params",params,"--uri",src_chain_config["endpoint"],"--key_store",src_chain_config["keystore_path"],"--key_password",src_chain_config["keypassword"],"--step_limit","500000000000","--nid",src_chain_config["nid"]]
+    result = plan.exec(service_name=src_chain_config["service_name"],recipe=ExecRecipe(command=exec_command))
 
     tx_hash = result["output"].replace('"',"")
-    tx_result = node_service.get_tx_result(plan,service_name,tx_hash,uri)
+    tx_result = node_service.get_tx_result(plan, src_chain_config["service_name"], tx_hash, src_chain_config["endpoint"])
     plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
     return tx_result
 
@@ -261,13 +261,13 @@ def set_default_connection_xcall(plan,xcall_address,wasm_network_id,xcall_connec
     plan.verify(value=tx_result["extract.status"],assertion="==",target_value="0x1")
     return tx_result
 
-def setup_contracts_for_ibc_java(plan, service_name, uri, keystore_path, keystore_password, nid):
+def setup_contracts_for_ibc_java(plan, service_name, uri, keystore_path, keystore_password, nid, network):
     
     plan.print("Setting Contracts")
 
     ibc_core_address = deploy_ibc_handler(plan, service_name, uri, keystore_path, keystore_password, nid)
 
-    xcall_address = deploy_xcall_for_ibc(plan, service_name, uri, keystore_path, keystore_password, nid)
+    xcall_address = deploy_xcall_for_ibc(plan, network, service_name, uri, keystore_path, keystore_password, nid)
 
     light_client_address = deploy_light_client_for_icon(plan, service_name, uri, keystore_path, keystore_password, nid ,ibc_core_address)
 
@@ -292,13 +292,13 @@ def configure_connection_for_java(plan,xcall_address,xcall_connection_address,wa
 
     return set_xcall_connection_result
 
-def deploy_and_configure_dapp_java(plan,service_name, uri, keystore_path, keystore_password, nid, xcall_address,wasm_network_id,java_xcall_connection_address,wasm_xcall_connection_address,keystorepath,keypassword):
+def deploy_and_configure_dapp_java(plan, src_chain_config, xcall_address, wasm_network_id, java_xcall_connection_address, wasm_xcall_connection_address):
 
     plan.print("Deploy and Configure Dapp")
 
-    xcall_dapp_address = deploy_xcall_dapp(plan, service_name, uri, keystore_path, keystore_password, nid, xcall_address)
+    xcall_dapp_address = deploy_xcall_dapp(plan, src_chain_config, xcall_address)
 
-    add_connection_result = add_connection_xcall_dapp(plan,xcall_dapp_address,wasm_network_id,java_xcall_connection_address,wasm_xcall_connection_address,service_name,uri,keystorepath,keypassword,nid)
+    add_connection_result = add_connection_xcall_dapp(plan, xcall_dapp_address, wasm_network_id, java_xcall_connection_address, wasm_xcall_connection_address, src_chain_config)
 
     result = {
         "xcall_dapp" : xcall_dapp_address,

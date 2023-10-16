@@ -6,8 +6,8 @@ def start_deploy_service(plan, endpoint):
     Function to start the Ethereum contract deployment service.
 
     Args:
-        - plan: A plan object representing the deployment plan.
-        - endpoint: The service endpoint URL.
+        plan: plan.
+        endpoint: The service endpoint URL.
 
     Returns:
         The service response containing configuration data.
@@ -46,15 +46,16 @@ def start_deploy_service(plan, endpoint):
 
     return service_response
 
+
 # Returns Latest block
 def get_latest_block(plan, current_chain, network_name):
     """
     Function to retrieve the latest block number from the Ethereum network.
 
     Args:
-        - plan: A plan object representing the deployment plan.
-        - current_chain: The current chain.
-        - network_name: The name of the Ethereum network.
+        plan: A plan object representing the deployment plan.
+        current_chain: The current chain.
+        network_name: The name of the Ethereum network.
 
     Returns:
         The latest block number as a string.

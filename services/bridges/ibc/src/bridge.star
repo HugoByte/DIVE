@@ -2,7 +2,7 @@
 constants = import_module("../../../../package_io/constants.star")
 ibc_relay_config = constants.IBC_RELAYER_SERVICE
 
-def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_config, dst_config, links):
+def start_cosmos_relay(plan, src_chain, dst_chain, src_config, dst_config):
     """
     Start a Cosmos relay service with given source and destination chains configuration.
 
@@ -27,48 +27,48 @@ def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_c
     cosmos_config = read_file(ibc_relay_config.ibc_relay_config_file_template)
 
     cfg_template_data = {
-        "KEY": src_key,
-        "CHAINID": src_chain_id,
-        "CHAIN": links["src"],
+        "KEY": src_config["chain_key"],
+        "CHAINID": src_config["chain_id"],
+        "CHAIN": src_chain,
     }
     plan.render_templates(
         config = {
-            "cosmos-%s.json" % src_chain_id: struct(
+            "cosmos-%s.json" % src_config["chain_id"]: struct(
                 template = cosmos_config,
                 data = cfg_template_data,
             ),
         },
-        name = "config-%s" % src_chain_id,
+        name = "config-%s" % src_config["chain_id"],
     )
 
     cfg_template_data = {
-        "KEY": dst_key,
-        "CHAINID": dst_chain_id,
-        "CHAIN": links["dst"],
+        "KEY": dst_config["chain_key"],
+        "CHAINID": dst_config["chain_id"],
+        "CHAIN": dst_chain,
     }
     plan.render_templates(
         config = {
-            "cosmos-%s.json" % dst_chain_id: struct(
+            "cosmos-%s.json" % dst_config["chain_id"]: struct(
                 template = cosmos_config,
                 data = cfg_template_data,
             ),
         },
-        name = "config-%s" % dst_chain_id,
+        name = "config-%s" % dst_config["chain_id"],
     )
 
     # Install 'jq' based on the type of chain (neutron or archway) for the source
-    if links["src"] == "neutron":
+    if src_chain == "neutron":
         plan.exec(service_name = src_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apt install jq"]))
-    elif links["src"] == "archway":
+    elif src_chain == "archway":
         plan.exec(service_name = src_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apk add jq"]))
 
     # Retrieve the seed for the source chain
     src_chain_seed = plan.exec(service_name = src_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "jq -r '.mnemonic' ../../start-scripts/key_seed.json | tr -d '\n\r'"]))
 
     # Install 'jq' based on the type of chain (neutron or archway) for the destination
-    if links["dst"] == "neutron":
+    if dst_chain == "neutron":
         plan.exec(service_name = dst_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apt install jq"]))
-    elif links["src"] == "archway":
+    elif dst_chain == "archway":
         plan.exec(service_name = dst_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apk add jq"]))
 
     # Retrieve the seed for the destination chain
@@ -78,11 +78,11 @@ def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_c
     relay_service = ServiceConfig(
         image = ibc_relay_config.relay_service_image,
         files = {
-            ibc_relay_config.relay_config_files_path + src_chain_id: "config-%s" % src_chain_id,
-            ibc_relay_config.relay_config_files_path + dst_chain_id: "config-%s" % dst_chain_id,
+            ibc_relay_config.relay_config_files_path + src_config["chain_id"]: "config-%s" % src_config["chain_id"],
+            ibc_relay_config.relay_config_files_path + dst_config["chain_id"]: "config-%s" % dst_config["chain_id"],
             ibc_relay_config.relay_config_files_path: "run",
         },
-        entrypoint = ["/bin/sh", "-c", "chmod +x ../script/run.sh && sh ../script/run.sh '%s' '%s' '%s' '%s' '%s' '%s' '%s' '%s'" % (src_chain_id, dst_chain_id, src_key, dst_key, src_config["endpoint"], dst_config["endpoint"], src_chain_seed["output"], dst_chain_seed["output"])],
+        entrypoint = ["/bin/sh", "-c", "chmod +x ../script/run.sh && sh ../script/run.sh '%s' '%s' '%s' '%s' '%s' '%s' '%s' '%s'" % (src_config["chain_id"], dst_config["chain_id"], src_config["chain_key"], dst_config["chain_key"], src_config["endpoint"], dst_config["endpoint"], src_chain_seed["output"], dst_chain_seed["output"])],
     )
 
     plan.print(relay_service)
@@ -93,23 +93,20 @@ def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_c
         service_name = ibc_relay_config.relay_service_name,
     )
 
-def start_cosmos_relay_for_icon_to_cosmos(plan, src_chain_config, dst_chain_config, args):
+def start_cosmos_relay_for_icon_to_cosmos(plan, src_chain, dst_chain, src_chain_config, dst_chain_config):
     plan.print("starting the cosmos relay for icon to cosmos")
 
-    source_chain = args["links"]["src"]
-    destination_chain = args["links"]["dst"]
-
-    if destination_chain == "archway":
+    if dst_chain == "archway":
         plan.upload_files(src = ibc_relay_config.config_file_path, name = "archway_config")
-    elif destination_chain == "neutron":
+    elif dst_chain == "neutron":
         plan.upload_files(src = ibc_relay_config.config_file_path, name = "neutron_config")
 
     plan.upload_files(src = ibc_relay_config.icon_keystore_file, name = "icon-keystore")
 
 
-    if destination_chain == "archway":
+    if dst_chain == "archway":
         wasm_config = read_file(ibc_relay_config.ibc_relay_wasm_file_template)
-    elif destination_chain == "neutron":
+    elif dst_chain == "neutron":
         wasm_config = read_file(ibc_relay_config.ibc_relay_neutron_wasm_file_template)
 
     java_config = read_file(ibc_relay_config.ibc_relay_java_file_template)

@@ -37,6 +37,9 @@ def get_args_data(args):
         bridge = bridge,
     )
 
+
+
+
 def generate_new_config_data(links, srcchain_service_name, dst_chain_service_name, bridge):
     config_data = "" 
     if bridge == "":
@@ -67,6 +70,67 @@ def generate_new_config_data(links, srcchain_service_name, dst_chain_service_nam
         }
 
     return config_data
+
+
+
+def generate_new_config_data_for_ibc(src_chain, dst_chain, srcchain_service_name, dst_chain_service_name):
+
+    config_data = {
+    "links": {
+        "src": "%s" % src_chain,
+        "dst": "%s" % dst_chain
+    },
+    "chains": {
+        "%s" % srcchain_service_name: {},
+        "%s" % dst_chain_service_name: {},
+    },
+    "contracts": {
+        "%s" % srcchain_service_name: {},
+        "%s" % dst_chain_service_name: {},
+    },
+    }
+    
+    return config_data
+
+
+def generate_new_config_data_for_btp(src_chain, dst_chain, srcchain_service_name, dst_chain_service_name, bridge):
+    config_data = "" 
+    if bridge == "":
+        config_data = {
+        "links": {
+            "src": "%s" % src_chain,
+            "dst": "%s" % dst_chain
+        },
+        "chains": {
+            "%s" % srcchain_service_name: {},
+            "%s" % dst_chain_service_name: {},
+        },
+        "contracts": {
+            "%s" % srcchain_service_name: {},
+            "%s" % dst_chain_service_name: {},
+        },
+        }
+    else:
+
+        config_data = {
+        "links": {
+            "src": "%s" % src_chain,
+            "dst": "%s" % dst_chain
+        },
+        "chains": {
+            "%s" % srcchain_service_name: {},
+            "%s" % dst_chain_service_name: {},
+        },
+        "contracts": {
+            "%s" % srcchain_service_name: {},
+            "%s" % dst_chain_service_name: {},
+        },
+        "bridge": "%s" % bridge
+        }
+
+    return config_data
+
+
 
 def generate_new_config_data_cosmvm_cosmvm(links, srcchain_service_name, dst_chain_service_name):
     config_data = {
