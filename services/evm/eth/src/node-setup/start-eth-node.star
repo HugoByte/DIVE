@@ -12,7 +12,7 @@ def start_eth_node(plan):
     Function to start an Ethereum node.
 
     Args:
-        - plan: A plan object representing the node setup plan.
+        plan: plan.
 
     Returns:
         A dictionary containing configuration data for the started Ethereum node.
@@ -75,7 +75,7 @@ def start_hardhat_node(plan):
     Function to start a Hardhat Ethereum node.
 
     Args:
-        - plan: A plan object representing the node setup plan.
+        plan: plan.
 
     Returns:
         Configuration data for the started Hardhat node service as a dictionary.

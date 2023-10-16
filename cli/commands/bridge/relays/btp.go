@@ -213,10 +213,7 @@ func runBtpSetupByRunningNodes(diveContext *common.DiveContext, enclaveCtx *encl
 
 func runBtpSetupForAlreadyRunningNodes(diveContext *common.DiveContext, enclaveCtx *enclaves.EnclaveContext, mainFunctionName string, srcChain string, dstChain string, srcChainServiceName string, dstChainServiceName string, bridge bool, srcChainServiceResponse string, dstChainServiceResponse string) {
 
-	configData := fmt.Sprintf(`{"links": {"src":"%s","dst":"%s"},"chains" : { "%s" : %s,"%s" : %s},"contracts" : {"%s"  : {},"%s" : {}},"bridge" : "%s"}`, srcChain, dstChain, srcChainServiceName, srcChainServiceResponse, dstChainServiceName, dstChainServiceResponse, srcChainServiceName, dstChainServiceName, strconv.FormatBool(bridge))
-
-	params := fmt.Sprintf(`{"src_chain":"%s", "dst_chain":"%s", "config_data":%s, "src_service_name":"%s", "dst_service_name":"%s"}`, srcChain, dstChain, configData, srcChainServiceName, dstChainServiceName)
-
+	params := fmt.Sprintf(`{"src_chain":"%s","dst_chain":"%s", "src_chain_config":%s, "dst_chain_config":%s, "bridge":%s}`, chainA, chainB, srcChainServiceResponse, dstChainServiceResponse, strconv.FormatBool(bridge))
 	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveBridgeScript, mainFunctionName)
 	data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 

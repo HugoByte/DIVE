@@ -31,20 +31,15 @@ def deploy_bmv_eth(plan, bridge, data, network, network_name, chain_name):
     """
     Function to deploy a BMV Ethereum contract.
 
-    Args:
-        - plan: A plan object representing the deployment plan.
-        - bridge: A boolean indicating whether to deploy a bridge.
-        - data: Data required for contract deployment.
-        - network: The Ethereum network.
-        - network_name: The name of the Ethereum network.
-        - chain_name: The name of the chain.
-
     Returns:
         The address of the deployed contract.
     """
     if bridge == "true":
-        address = eth_relay_setup.deploy_bmv_bridge(plan, network, network_name, data.block_height, data.bmc, data.network, chain_name)
+        address = eth_relay_setup.deploy_bmv_bridge(plan, data.block_height, data.bmc, data.network, chain_name, network, network_name)
         return address
-    else:
-        address = eth_relay_setup.deploy_bmv(plan, network, network_name, data.block_header, data.bmc, data.network, data.network_type_id, chain_name)
+
+    else :
+        address = eth_relay_setup.deploy_bmv(plan ,data.block_header, data.bmc, data.network, data.network_type_id, chain_name, network, network_name)
         return address
+
+

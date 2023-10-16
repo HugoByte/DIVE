@@ -3,7 +3,7 @@ constants = import_module("../../../../../package_io/constants.star")
 neutron_node_constants = constants.NEUTRON_SERVICE_CONFIG
 network_port_keys_and_ip = constants.NETWORK_PORT_KEYS_AND_IP_ADDRESS
 
-def start_neutron_node(plan, chain_id, key, password, service_name, private_http_port, private_rcp_port, private_tcp_port, private_grpc_port, public_http_port, public_rcp_port, public_tcp_port, public_grpc_port):
+def start_neutron_node(plan, chain_id, key, password, service_name, private_http_port, private_rpc_port, private_tcp_port, private_grpc_port, public_http_port, public_rpc_port, public_tcp_port, public_grpc_port):
     """
     Start a Neutron node service with the provided configuration.
 
@@ -54,7 +54,7 @@ def start_neutron_node(plan, chain_id, key, password, service_name, private_http
                 wait = "2m",
             ),
             network_port_keys_and_ip.rpc: PortSpec(
-                number = private_rcp_port,
+                number = private_rpc_port,
                 transport_protocol = network_port_keys_and_ip.tcp.upper(),
                 application_protocol = network_port_keys_and_ip.http,
                 wait = "2m",
@@ -80,7 +80,7 @@ def start_neutron_node(plan, chain_id, key, password, service_name, private_http
                 wait = "2m",
             ),
             network_port_keys_and_ip.rpc: PortSpec(
-                number = public_rcp_port,
+                number = public_rpc_port,
                 transport_protocol = network_port_keys_and_ip.tcp.upper(),
                 application_protocol = network_port_keys_and_ip.http,
                 wait = "2m",

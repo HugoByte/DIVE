@@ -126,7 +126,7 @@ func startCosmosChainsAndSetupIbcRelay(diveContext *common.DiveContext, enclaveC
 
 func setupIbcRelayforAlreadyRunningCosmosChain(diveContext *common.DiveContext, enclaveCtx *enclaves.EnclaveContext, chainA, chainB, chainAServiceResponse, chainBServiceResponse string) (string, error) {
 
-	params := fmt.Sprintf(`{"src_chain_config":%s,"dst_chain_config":%s, "args":{"links": {"src": "%s", "dst": "%s"}, "src_config":{"data":{}}, "dst_config":{"data":{}}}}`, chainAServiceResponse, chainBServiceResponse, chainA, chainB)
+	params := fmt.Sprintf(`{"src_chain":"%s","dst_chain":"%s", "src_chain_config":%s, "dst_chain_config":%s}`, chainA, chainB, chainAServiceResponse, chainBServiceResponse)
 
 	executionResult, err := runStarlarkPackage(diveContext, enclaveCtx, params, "run_cosmos_ibc_relay_for_already_running_chains")
 
