@@ -80,7 +80,9 @@ run-archway-e2e:
 	@echo "Running e2e demo cosmos"
 	@cd $(CURDIR)/scripts/cosmos && npx ts-node cosmos_e2e_demo.ts archway
 
-
+run-icon-archway-e2e:
+	@echo "Running e2e demo cosmos"
+	@cd $(CURDIR)/scripts/cosmos && npx ts-node icon_cosmos_demo.ts archway
 
 
 
