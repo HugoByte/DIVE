@@ -39,10 +39,8 @@ def run_cosmos_ibc_relay_for_already_running_chains(plan, src_chain, dst_chain, 
         start_cosmos_relay(plan, src_chain, dst_chain, src_chain_config, dst_chain_config)
 
     elif src_chain == "icon" and dst_chain in ["archway", "neutron"]:
-        config_data = generate_ibc_config(src_chain, dst_chain, src_chain_config, dst_chain_config)
         deploy_icon_contracts, src_chain_data = setup_icon_chain(plan, src_chain_config)
         deploy_cosmos_contracts, dst_chain_data = setup_cosmos_chain(plan, dst_chain, dst_chain_config)
-
         relay_service_response = start_cosmos_relay_for_icon_to_cosmos(plan, src_chain, dst_chain ,src_chain_data, dst_chain_data)
         path_name = setup_relay(plan, src_chain_data, dst_chain_data)
         relay_data = get_relay_path_data(plan, relay_service_response.service_name, path_name)
