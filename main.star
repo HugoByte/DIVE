@@ -98,7 +98,7 @@ def parse_input(plan, action, node_name= None, custom_config = None, icon_servic
                 fail("chain_a and chain_b paramter are missing, Add chain_a and chain_b to start relay between them.")
 
         # Start ibc relay between two nodes
-        elif args["relay"]["name"] == "ibc":
+        elif relay_type == "ibc":
             if chain_a != None and chain_b != None:
                 if service_config_a == None and service_config_b == None:
                     data = ibc_relay_setup.run_cosmos_ibc_setup(plan, chain_a, chain_b)
