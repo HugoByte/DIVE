@@ -41,9 +41,25 @@ To run the demo, the following software needs to be installed.
 
   ![img1](img/../../img/img4.png)
 
-- Step 2: now run the command `make run-cosmos` to execute e2e demo which transfers token from one archway chain to another.
+- Step 2: now run the command `make run-archway-e2e` to execute e2e demo which transfers token from one archway chain to another.
 
   ![img1](img/../../img/img5.png)
+
+> **Note:**
+> To run neutron-netron demo, follow the steps same as above but to run neutron nodes and then run the command `make run-neutron-e2e`
+
+# End-to-End icon - archway Demo
+- Step 1: Run the dive command that spins ups icon and archway chain and creates an ibc bridge for cross communication.
+  ![img1](img/../../img/img6.png)
+
+- Step 2: Update the `contracts.json` file present in the folder `test/scripts/cosmos` with contract address that can be found in dive.json after the command is run successfully.
+
+- Step 3: Now just the run the command `make run-icon-archway-e2e` from test folder to execute e2e demo from Icon to Archway and vice versa.
+  ![img1](img/../../img/img7.png)
+
+> **Note:**
+> To run icon-netron demo, follow the steps same as above but to run neutron and icon nodes and then run the command `make run-icon-neutron-e2e`
+
 
 ## Video
 
