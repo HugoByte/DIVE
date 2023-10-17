@@ -13,50 +13,34 @@ input_parser = import_module("../../../../package_io/input_parser.star")
 
 
 
-def run_btp_setup(plan, args):
-    links = args["links"]
-    source_chain = links["src"]
-    destination_chain = links["dst"]
-    bridge = args["bridge"]
-
-    if source_chain == "icon" and destination_chain == "icon":
+def run_btp_setup(plan, src_chain, dst_chain, bridge):
+    if src_chain == "icon" and dst_chain == "icon":
         data = icon_service.start_node_service_icon_to_icon(plan)
         src_chain_service_name = data.src_config["service_name"]
         dst_chain_service_name = data.dst_config["service_name"]
-
-        config_data = input_parser.generate_new_config_data(links, src_chain_service_name, dst_chain_service_name, bridge)
-        config_data["chains"][src_chain_service_name] = data.src_config
-        config_data["chains"][dst_chain_service_name] = data.dst_config
-
         icon_service.configure_icon_to_icon_node(plan, data.src_config, data.dst_config)
-
-        config = start_btp_for_already_running_icon_nodes(plan, source_chain, destination_chain, data.src_config, data.dst_config, bridge)
-
+        config = start_btp_for_already_running_icon_nodes(plan, src_chain, dst_chain, data.src_config, data.dst_config, bridge)
         return config
     else:
-        if (source_chain == "eth" or source_chain == "hardhat") and destination_chain == "icon":
-            destination_chain = source_chain
-            source_chain = "icon"
+        if (src_chain == "eth" or src_chain == "hardhat") and dst_chain == "icon":
+            dst_chain = src_chain
+            src_chain = "icon"
 
-        if destination_chain == "eth" or destination_chain == "hardhat":
+        if dst_chain == "eth" or dst_chain == "hardhat":
             src_chain_config = icon_service.start_node_service(plan)
-            dst_chain_config = eth_node.start_eth_node_service(plan, destination_chain)
+            dst_chain_config = eth_node.start_eth_node_service(plan, dst_chain)
 
             src_chain_service_name = src_chain_config["service_name"]
             dst_chain_service_name = dst_chain_config["service_name"]
 
-            config_data = input_parser.generate_new_config_data(links, src_chain_service_name, dst_chain_service_name, bridge)
-            config_data["chains"][src_chain_service_name] = src_chain_config
-            config_data["chains"][dst_chain_service_name] = dst_chain_config
-
             icon_service.configure_icon_node(plan, src_chain_service_name, src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"])
 
-            config = start_btp_icon_to_eth_for_already_running_nodes(plan, source_chain, destination_chain, src_chain_config, dst_chain_config, bridge)
+            config = start_btp_icon_to_eth_for_already_running_nodes(plan, src_chain, dst_chain, src_chain_config, dst_chain_config, bridge)
 
             return config
 
         else:
-            fail("unsupported chain {0} - {1}".format(source_chain, destination_chain))
+            fail("unsupported chain {0} - {1}".format(src_chain, dst_chain))
 
 
 
@@ -132,7 +116,8 @@ def start_btp_for_already_running_icon_nodes(plan, src_chain, dst_chain, src_cha
 
     # Generate new configuration data for BTP
     config_data = input_parser.generate_new_config_data_for_btp(src_chain, dst_chain, src_chain_config["service_name"], dst_chain_config["service_name"], bridge)
-
+    config_data["chains"][src_chain_config["service_name"]] = src_chain_config
+    config_data["chains"][dst_chain_config["service_name"]] = dst_chain_config
     # Update network and contract information in the configuration data
     config_data["chains"][src_chain_config["service_name"]]["networkTypeId"] = response.src_network_type_id
     config_data["chains"][src_chain_config["service_name"]]["networkId"] = response.src_network_id
@@ -232,6 +217,9 @@ def start_btp_icon_to_eth_for_already_running_nodes(plan, src_chain, dst_chain, 
 
     # Generate new configuration data for BTP
     config_data = input_parser.generate_new_config_data_for_btp(src_chain, dst_chain, src_chain_config["service_name"], dst_chain_config["service_name"], bridge)
+    config_data["chains"][src_chain_config["service_name"]] = src_chain_config
+    config_data["chains"][dst_chain_config["service_name"]] = dst_chain_config
+ 
     config_data["contracts"][src_chain_config["service_name"]] = src_contract_addresses
     config_data["contracts"][dst_chain_config["service_name"]] = dst_contract_addresses
     config_data["chains"][src_chain_config["service_name"]]["networkTypeId"] = src_response.network_type_id

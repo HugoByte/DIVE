@@ -194,7 +194,7 @@ func BtpRelayCmd(diveContext *common.DiveContext) *cobra.Command {
 
 func runBtpSetupByRunningNodes(diveContext *common.DiveContext, enclaveCtx *enclaves.EnclaveContext, params string) {
 	diveContext.SetSpinnerMessage(" Executing BTP Starlark Package")
-	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveBridgeScript, bridgeMainFunction)
+	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveBridgeBtpScript, bridgeMainFunction)
 	data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
@@ -214,7 +214,7 @@ func runBtpSetupByRunningNodes(diveContext *common.DiveContext, enclaveCtx *encl
 func runBtpSetupForAlreadyRunningNodes(diveContext *common.DiveContext, enclaveCtx *enclaves.EnclaveContext, mainFunctionName string, srcChain string, dstChain string, srcChainServiceName string, dstChainServiceName string, bridge bool, srcChainServiceResponse string, dstChainServiceResponse string) {
 
 	params := fmt.Sprintf(`{"src_chain":"%s","dst_chain":"%s", "src_chain_config":%s, "dst_chain_config":%s, "bridge":%s}`, chainA, chainB, srcChainServiceResponse, dstChainServiceResponse, strconv.FormatBool(bridge))
-	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveBridgeScript, mainFunctionName)
+	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveBridgeBtpScript, mainFunctionName)
 	data, _, err := enclaveCtx.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {

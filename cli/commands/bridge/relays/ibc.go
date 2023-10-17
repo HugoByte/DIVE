@@ -138,7 +138,7 @@ func setupIbcRelayforAlreadyRunningCosmosChain(diveContext *common.DiveContext, 
 }
 
 func runStarlarkPackage(diveContext *common.DiveContext, enclaveContext *enclaves.EnclaveContext, params, functionName string) (string, error) {
-	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveBridgeScript, functionName)
+	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveBridgeIbcScript, functionName)
 	executionData, _, err := enclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {

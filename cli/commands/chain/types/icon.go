@@ -147,30 +147,11 @@ func RunIconNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 		diveContext.FatalError("Failed To Get Node Service Config", err.Error())
 	}
 
-	paramData, err := serviceConfig.EncodeToString()
-	if err != nil {
-		diveContext.FatalError("Encoding Failed", err.Error())
-	}
-
 	diveContext.StartSpinner(" Starting Icon Node")
 	kurtosisEnclaveContext, err := diveContext.GetEnclaveContext()
 
 	if err != nil {
 		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
-	}
-	starlarkConfig := diveContext.GetStarlarkRunConfig(paramData, common.DiveIconNodeScript, "get_service_config")
-	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
-
-	if err != nil {
-		diveContext.FatalError("Starlark Run Failed", err.Error())
-	}
-
-	_, services, skippedInstructions, err := diveContext.GetSerializedData(data)
-
-	if err != nil {
-		diveContext.StopServices(services)
-		diveContext.FatalError("Starlark Run Failed", err.Error())
-
 	}
 
 	genesisHandler, err := genesismanager(kurtosisEnclaveContext)
@@ -178,17 +159,12 @@ func RunIconNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 		diveContext.FatalError("Failed To Get Genesis", err.Error())
 	}
 
-	diveContext.CheckInstructionSkipped(skippedInstructions, "Instruction Executed Already")
-
 	params := fmt.Sprintf(`{"private_port":%d, "public_port":%d, "p2p_listen_address": %s, "p2p_address":%s, "cid": "%s","uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, serviceConfig.Port, serviceConfig.PublicPort, serviceConfig.P2PListenAddress, serviceConfig.P2PAddress, serviceConfig.Cid, genesisHandler.uploadedFiles, genesisHandler.genesisPath, genesisHandler.genesisFile)
-	starlarkConfig = diveContext.GetStarlarkRunConfig(params, common.DiveIconNodeScript, "start_icon_node")
+	starlarkConfig := diveContext.GetStarlarkRunConfig(params, common.DiveIconNodeScript, "start_icon_node")
 	icon_data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
-
-		diveContext.StopServices(services)
-
-		diveContext.FatalError("Starlark Run Failed", err.Error())
+		diveContext.FatalError("Error while running kurtosis package to run icon node", err.Error())
 	}
 
 	diveContext.SetSpinnerMessage(" Finalizing Icon Node")
