@@ -18,11 +18,8 @@ def run_btp_setup(plan, src_chain, dst_chain, bridge):
         data = icon_service.start_node_service_icon_to_icon(plan)
         src_chain_service_name = data.src_config["service_name"]
         dst_chain_service_name = data.dst_config["service_name"]
-
         icon_service.configure_icon_to_icon_node(plan, data.src_config, data.dst_config)
-
         config = start_btp_for_already_running_icon_nodes(plan, src_chain, dst_chain, data.src_config, data.dst_config, bridge)
-
         return config
     else:
         if (src_chain == "eth" or src_chain == "hardhat") and dst_chain == "icon":
