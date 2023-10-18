@@ -15,7 +15,7 @@ btp_relay_setup = import_module("./services/bridges/btp/src/bridge.star")
 ibc_relay_setup = import_module("./services/bridges/ibc/src/bridge.star")
 
 
-def run(plan, command, node_name= None, custom_config = None, icon_service_config = None ,decentralize = false, chain_a = None, chain_b = None, service_config_a = None, service_config_b = None, bridge = false):
+def run(plan, command, node_name= None, custom_config = None, icon_service_config = None ,decentralize = false, bride_type = None ,chain_a = None, chain_b = None, service_config_a = None, service_config_b = None, bridge = false):
     """
     Parse the input and execute the specified action.
 
@@ -52,7 +52,7 @@ def run(plan, command, node_name= None, custom_config = None, icon_service_confi
         icon_service_config (dict, optional): ServiceConfig, this field should be provided when wanna decentralize already running icon node
 
         decentralize (bool, optional): Flag indicating whether to decentralize the ICON node.
-        relay_type (str, optional): The type of relay.
+        bride_type (str, optional): The type of relay.
             - 'ibc': Start an IBC relay.
             - 'btp': Start a BTP bridge.
 
@@ -65,7 +65,7 @@ def run(plan, command, node_name= None, custom_config = None, icon_service_confi
     Returns:
         service_details (dict): Details about the service started.
     """
-    return parse_input(plan, command, node_name, custom_config, icon_service_config ,decentralize, chain_a, chain_b, service_config_a, service_config_b, bridge)
+    return parse_input(plan, command, node_name, custom_config, icon_service_config ,decentralize, bride_type ,chain_a, chain_b, service_config_a, service_config_b, bridge)
 
 
 
@@ -90,7 +90,7 @@ def parse_input(plan, action, node_name= None, custom_config = None, icon_servic
                     elif chain_a == "icon" and chain_b in ["eth", "hardhat"]:
                         data = btp_relay_setup.start_btp_icon_to_eth_for_already_running_nodes(plan, chain_a, chain_b, service_config_a, service_config_b, bridge)
                     else:
-                        fail("unsupported chain {0} - {1}".format(src_chain, dst_chain))
+                        fail("unsupported chain {0} - {1}".format(chain_a, chain_b))
                 else: 
                     fail("Add Service configs for both chain_a and chain_b")
                 return data
