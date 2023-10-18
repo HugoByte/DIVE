@@ -23,6 +23,7 @@ type Chains struct {
 
 func initChains(chainA, chainB, serviceA, serviceB string, bridge bool) *Chains {
 	return &Chains{
+		
 		chainA:            strings.ToLower(chainA),
 		chainB:            strings.ToLower(chainB),
 		chainAServiceName: serviceA,
@@ -36,11 +37,11 @@ func (c *Chains) areChainsIcon() bool {
 }
 
 func (chains *Chains) getParams() string {
-	return fmt.Sprintf(`{"args":{"links": {"src": "%s", "dst": "%s"},"bridge":"%s"}}`, chains.chainA, chains.chainB, chains.bridge)
+	return fmt.Sprintf(`{"src_chain": "%s", "dst_chain": "%s", "bridge":"%s"}`, chains.chainA, chains.chainB, chains.bridge)
 }
 func (chains *Chains) getIbcRelayParams() string {
 
-	return fmt.Sprintf(`{"args":{"links": {"src": "%s", "dst": "%s"}, "src_config":{"data":{}}, "dst_config":{"data":{}}}}`, chains.chainA, chains.chainB)
+	return fmt.Sprintf(`{"src_chain": "%s", "dst_chain": "%s"}`, chains.chainA, chains.chainB)
 }
 
 func (chains *Chains) getServicesResponse() (string, string, error) {

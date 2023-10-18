@@ -44,7 +44,7 @@ func RunEthNode(diveContext *common.DiveContext) *common.DiveserviceResponse {
 		diveContext.FatalError("Failed To Retrive Enclave Context", err.Error())
 	}
 	diveContext.StartSpinner(" Starting ETH Node")
-	starlarkConfig := diveContext.GetStarlarkRunConfig(`{"args":{}}`, common.DiveEthHardhatNodeScript, "start_eth_node")
+	starlarkConfig := diveContext.GetStarlarkRunConfig(`{}`, common.DiveEthHardhatNodeScript, "start_eth_node")
 	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(diveContext.Ctx, common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {

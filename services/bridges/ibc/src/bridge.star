@@ -1,8 +1,146 @@
 # Import required modules and constants
 constants = import_module("../../../../package_io/constants.star")
 ibc_relay_config = constants.IBC_RELAYER_SERVICE
+icon_setup_node = import_module("../../../jvm/icon/src/node-setup/setup_icon_node.star")
+icon_relay_setup = import_module("../../../jvm/icon/src/relay-setup/contract_configuration.star")
+icon_service = import_module("../../../jvm/icon/icon.star")
+input_parser = import_module("../../../../package_io/input_parser.star")
+cosmvm_node = import_module("../../../cosmvm/cosmvm.star")
+cosmvm_relay_setup = import_module("../../../cosmvm/archway/src/relay-setup/contract-configuration.star")
+neutron_relay_setup = import_module("../../../cosmvm/neutron/src/relay-setup/contract-configuration.star")
 
-def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_config, dst_config, links):
+
+
+def run_cosmos_ibc_setup(plan, src_chain, dst_chain):
+
+    # Check if source and destination chains are both CosmVM-based chains (archway or neutron)
+    if (src_chain in ["archway", "neutron"]) and (dst_chain in ["archway", "neutron"]):
+        # Start IBC between two CosmVM chains
+        data = cosmvm_node.start_ibc_between_cosmvm_chains(plan, src_chain, dst_chain)
+        config_data = run_cosmos_ibc_relay_for_already_running_chains(plan, src_chain, dst_chain ,data.src_config, data.dst_config)
+        return config_data
+
+    if dst_chain in ["archway", "neutron"] and src_chain == "icon":
+        # Start ICON node service
+        src_chain_config = icon_service.start_node_service(plan)
+        # Start CosmVM node service
+        dst_chain_config = cosmvm_node.start_cosmvm_chains(plan, dst_chain)
+        dst_chain_config = input_parser.struct_to_dict(dst_chain_config)
+        # Get service names and new generate configuration data
+        config_data = run_cosmos_ibc_relay_for_already_running_chains(plan,src_chain, dst_chain ,src_chain_config , dst_chain_config)
+        return config_data
+
+
+
+def run_cosmos_ibc_relay_for_already_running_chains(plan, src_chain, dst_chain, src_chain_config, dst_chain_config):
+
+    config_data = generate_ibc_config(src_chain, dst_chain, src_chain_config, dst_chain_config)
+    if src_chain in ["archway", "neutron"] and dst_chain in ["archway", "neutron"]:
+        start_cosmos_relay(plan, src_chain, dst_chain, src_chain_config, dst_chain_config)
+
+    elif src_chain == "icon" and dst_chain in ["archway", "neutron"]:
+        deploy_icon_contracts, src_chain_data = setup_icon_chain(plan, src_chain_config)
+        deploy_cosmos_contracts, dst_chain_data = setup_cosmos_chain(plan, dst_chain, dst_chain_config)
+        relay_service_response = start_cosmos_relay_for_icon_to_cosmos(plan, src_chain, dst_chain ,src_chain_data, dst_chain_data)
+        path_name = setup_relay(plan, src_chain_data, dst_chain_data)
+        relay_data = get_relay_path_data(plan, relay_service_response.service_name, path_name)
+        dapp_result_java = icon_relay_setup.deploy_and_configure_dapp_java(plan, src_chain_config, deploy_icon_contracts["xcall"], dst_chain_config["chain_id"], deploy_icon_contracts["xcall_connection"], deploy_cosmos_contracts["xcall_connection"])
+
+        # Depending on the destination chain (archway or neutron), deploy and configure the DApp for Wasm
+        if dst_chain == "archway":
+            dapp_result_wasm = cosmvm_relay_setup.deploy_and_configure_xcall_dapp(plan, dst_chain_config["service_name"], dst_chain_config["chain_id"], dst_chain_config["chain_key"], deploy_cosmos_contracts["xcall"], deploy_cosmos_contracts["xcall_connection"], deploy_icon_contracts["xcall_connection"], src_chain_config["network"])
+            cosmvm_relay_setup.configure_connection_for_wasm(plan, dst_chain_config["service_name"], dst_chain_config["chain_id"], dst_chain_config["chain_key"], deploy_cosmos_contracts["xcall_connection"], relay_data.dst_connection_id, "xcall", src_chain_config["network"], relay_data.dst_client_id, deploy_cosmos_contracts["xcall"])
+        elif dst_chain == "neutron":
+            dapp_result_wasm = neutron_relay_setup.deploy_and_configure_xcall_dapp(plan, dst_chain_config["service_name"], dst_chain_config["chain_id"], dst_chain_config["chain_key"], deploy_cosmos_contracts["xcall"], deploy_cosmos_contracts["xcall_connection"], deploy_icon_contracts["xcall_connection"], src_chain_config["network"])
+            neutron_relay_setup.configure_connection_for_wasm(plan, dst_chain_config["service_name"], dst_chain_config["chain_id"], dst_chain_config["chain_key"], deploy_cosmos_contracts["xcall_connection"], relay_data.dst_connection_id, "xcall", src_chain_config["network"], relay_data.dst_client_id, deploy_cosmos_contracts["xcall"])
+
+        icon_relay_setup.configure_connection_for_java(plan, deploy_icon_contracts["xcall"], deploy_icon_contracts["xcall_connection"], dst_chain_config["chain_id"], relay_data.src_connection_id, "xcall", dst_chain_config["chain_id"], relay_data.src_client_id, src_chain_config["service_name"], src_chain_config["endpoint"], src_chain_config["keystore_path"], src_chain_config["keypassword"], src_chain_config["nid"])
+
+        config_data["contracts"][src_chain_config["service_name"]] = deploy_icon_contracts
+        config_data["contracts"][dst_chain_config["service_name"]] = deploy_cosmos_contracts    
+        config_data["contracts"][src_chain_config["service_name"]]["dapp"] = dapp_result_java["xcall_dapp"]
+        config_data["contracts"][dst_chain_config["service_name"]]["dapp"] = dapp_result_wasm["xcall_dapp"]
+
+        # Start relay channel
+        start_channel(plan, relay_service_response.service_name, path_name, "xcall", "xcall")
+
+    return config_data
+
+
+def setup_icon_chain(plan, chain_config):
+
+    deploy_icon_contracts = icon_relay_setup.setup_contracts_for_ibc_java(plan, chain_config["service_name"], chain_config["endpoint"], chain_config["keystore_path"], chain_config["keypassword"], chain_config["nid"], chain_config["network"])
+    icon_relay_setup.registerClient(plan, chain_config["service_name"], deploy_icon_contracts["light_client"], chain_config["keystore_path"], chain_config["keypassword"], chain_config["nid"], chain_config["endpoint"], deploy_icon_contracts["ibc_core"])
+
+    # Configure ICON node
+    icon_setup_node.configure_node(plan, chain_config["service_name"], chain_config["endpoint"], chain_config["keystore_path"], chain_config["keypassword"], chain_config["nid"])
+    src_chain_last_block_height = icon_setup_node.get_last_block(plan, chain_config["service_name"])
+
+    plan.print("source block height %s" % src_chain_last_block_height)
+
+    network_name = "{0}-{1}".format("dst_chain_network_name", src_chain_last_block_height)
+
+    src_data = {
+        "name": network_name,
+        "owner": deploy_icon_contracts["ibc_core"],
+    }
+
+     #Open BTP network on ICON chain
+    tx_result_open_btp_network = icon_setup_node.open_btp_network(plan, chain_config["service_name"], src_data, chain_config["endpoint"], chain_config["keystore_path"], chain_config["keypassword"], chain_config["nid"])
+
+    icon_relay_setup.bindPort(plan, chain_config["service_name"], deploy_icon_contracts["xcall_connection"], chain_config["keystore_path"], chain_config["keypassword"], chain_config["nid"], chain_config["endpoint"], deploy_icon_contracts["ibc_core"], "xcall")
+
+    src_chain_id = chain_config["network_name"].split('-', 1)[1]
+    network_id = icon_setup_node.hex_to_int(plan, chain_config["service_name"], chain_config["nid"])
+    btp_network_id = icon_setup_node.hex_to_int(plan, chain_config["service_name"], tx_result_open_btp_network["extract.network_id"])
+    btp_network_type_id = icon_setup_node.hex_to_int(plan, chain_config["service_name"], tx_result_open_btp_network["extract.network_type_id"])
+
+    src_chain_data = {
+        "chain_id": src_chain_id,
+        "rpc_address": chain_config["endpoint"],
+        "ibc_address": deploy_icon_contracts["ibc_core"],
+        "password": chain_config["keypassword"],
+        "network_id": network_id,
+        "btp_network_id": btp_network_id,
+        "btp_network_type_id": btp_network_type_id
+    }
+
+    return deploy_icon_contracts, src_chain_data
+
+
+def setup_cosmos_chain(plan, chain ,chain_config):
+    if chain == "archway":
+        deploy_cosmos_contracts = cosmvm_relay_setup.setup_contracts_for_ibc_wasm(plan, chain_config["service_name"], chain_config["chain_id"], chain_config["chain_key"], chain_config["chain_id"], "stake", "xcall")
+        cosmvm_relay_setup.registerClient(plan, chain_config["service_name"], chain_config["chain_id"], chain_config["chain_key"], deploy_cosmos_contracts["ibc_core"], deploy_cosmos_contracts["light_client"])
+        plan.wait(service_name = chain_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "sleep 10s && echo 'success'"]), field = "code", assertion = "==", target_value = 0, timeout = "200s")
+        cosmvm_relay_setup.bindPort(plan, chain_config["service_name"], chain_config["chain_id"], chain_config["chain_key"], deploy_cosmos_contracts["ibc_core"], deploy_cosmos_contracts["xcall_connection"])
+    elif chain == "neutron":
+        deploy_cosmos_contracts = neutron_relay_setup.setup_contracts_for_ibc_wasm(plan, chain_config["service_name"], chain_config["chain_id"], chain_config["chain_key"], chain_config["chain_id"], "stake", "xcall")
+        neutron_relay_setup.registerClient(plan, chain_config["service_name"], chain_config["chain_id"], chain_config["chain_key"], deploy_cosmos_contracts["ibc_core"], deploy_cosmos_contracts["light_client"])
+        plan.wait(service_name = chain_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "sleep 10s && echo 'success'"]), field = "code", assertion = "==", target_value = 0, timeout = "200s")
+        neutron_relay_setup.bindPort(plan, chain_config["service_name"], chain_config["chain_id"], chain_config["chain_key"], deploy_cosmos_contracts["ibc_core"], deploy_cosmos_contracts["xcall_connection"])
+
+    dst_chain_data = {
+        "chain_id": chain_config["chain_id"],
+        "key": chain_config["chain_key"],
+        "rpc_address": chain_config["endpoint"],
+        "ibc_address": deploy_cosmos_contracts["ibc_core"],
+        "service_name": chain_config["service_name"],
+    }
+
+    return deploy_cosmos_contracts, dst_chain_data
+
+
+
+def generate_ibc_config(src_chain, dst_chain, src_chain_config, dst_chain_config):
+    config_data = input_parser.generate_new_config_data_for_ibc(src_chain, dst_chain, src_chain_config["service_name"], dst_chain_config["service_name"])
+    config_data["chains"][src_chain_config["service_name"]] = src_chain_config
+    config_data["chains"][dst_chain_config["service_name"]] = dst_chain_config
+    return config_data
+
+
+
+def start_cosmos_relay(plan, src_chain, dst_chain, src_config, dst_config):
     """
     Start a Cosmos relay service with given source and destination chains configuration.
 
@@ -27,48 +165,48 @@ def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_c
     cosmos_config = read_file(ibc_relay_config.ibc_relay_config_file_template)
 
     cfg_template_data = {
-        "KEY": src_key,
-        "CHAINID": src_chain_id,
-        "CHAIN": links["src"],
+        "KEY": src_config["chain_key"],
+        "CHAINID": src_config["chain_id"],
+        "CHAIN": src_chain,
     }
     plan.render_templates(
         config = {
-            "cosmos-%s.json" % src_chain_id: struct(
+            "cosmos-%s.json" % src_config["chain_id"]: struct(
                 template = cosmos_config,
                 data = cfg_template_data,
             ),
         },
-        name = "config-%s" % src_chain_id,
+        name = "config-%s" % src_config["chain_id"],
     )
 
     cfg_template_data = {
-        "KEY": dst_key,
-        "CHAINID": dst_chain_id,
-        "CHAIN": links["dst"],
+        "KEY": dst_config["chain_key"],
+        "CHAINID": dst_config["chain_id"],
+        "CHAIN": dst_chain,
     }
     plan.render_templates(
         config = {
-            "cosmos-%s.json" % dst_chain_id: struct(
+            "cosmos-%s.json" % dst_config["chain_id"]: struct(
                 template = cosmos_config,
                 data = cfg_template_data,
             ),
         },
-        name = "config-%s" % dst_chain_id,
+        name = "config-%s" % dst_config["chain_id"],
     )
 
     # Install 'jq' based on the type of chain (neutron or archway) for the source
-    if links["src"] == "neutron":
+    if src_chain == "neutron":
         plan.exec(service_name = src_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apt install jq"]))
-    elif links["src"] == "archway":
+    elif src_chain == "archway":
         plan.exec(service_name = src_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apk add jq"]))
 
     # Retrieve the seed for the source chain
     src_chain_seed = plan.exec(service_name = src_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "jq -r '.mnemonic' ../../start-scripts/key_seed.json | tr -d '\n\r'"]))
 
     # Install 'jq' based on the type of chain (neutron or archway) for the destination
-    if links["dst"] == "neutron":
+    if dst_chain == "neutron":
         plan.exec(service_name = dst_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apt install jq"]))
-    elif links["src"] == "archway":
+    elif dst_chain == "archway":
         plan.exec(service_name = dst_config["service_name"], recipe = ExecRecipe(command = ["/bin/sh", "-c", "apk add jq"]))
 
     # Retrieve the seed for the destination chain
@@ -78,11 +216,11 @@ def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_c
     relay_service = ServiceConfig(
         image = ibc_relay_config.relay_service_image,
         files = {
-            ibc_relay_config.relay_config_files_path + src_chain_id: "config-%s" % src_chain_id,
-            ibc_relay_config.relay_config_files_path + dst_chain_id: "config-%s" % dst_chain_id,
+            ibc_relay_config.relay_config_files_path + src_config["chain_id"]: "config-%s" % src_config["chain_id"],
+            ibc_relay_config.relay_config_files_path + dst_config["chain_id"]: "config-%s" % dst_config["chain_id"],
             ibc_relay_config.relay_config_files_path: "run",
         },
-        entrypoint = ["/bin/sh", "-c", "chmod +x ../script/run.sh && sh ../script/run.sh '%s' '%s' '%s' '%s' '%s' '%s' '%s' '%s'" % (src_chain_id, dst_chain_id, src_key, dst_key, src_config["endpoint"], dst_config["endpoint"], src_chain_seed["output"], dst_chain_seed["output"])],
+        entrypoint = ["/bin/sh", "-c", "chmod +x ../script/run.sh && sh ../script/run.sh '%s' '%s' '%s' '%s' '%s' '%s' '%s' '%s'" % (src_config["chain_id"], dst_config["chain_id"], src_config["chain_key"], dst_config["chain_key"], src_config["endpoint"], dst_config["endpoint"], src_chain_seed["output"], dst_chain_seed["output"])],
     )
 
     plan.print(relay_service)
@@ -93,23 +231,20 @@ def start_cosmos_relay(plan, src_key, src_chain_id, dst_key, dst_chain_id, src_c
         service_name = ibc_relay_config.relay_service_name,
     )
 
-def start_cosmos_relay_for_icon_to_cosmos(plan, src_chain_config, dst_chain_config, args):
+def start_cosmos_relay_for_icon_to_cosmos(plan, src_chain, dst_chain, src_chain_config, dst_chain_config):
     plan.print("starting the cosmos relay for icon to cosmos")
 
-    source_chain = args["links"]["src"]
-    destination_chain = args["links"]["dst"]
-
-    if destination_chain == "archway":
+    if dst_chain == "archway":
         plan.upload_files(src = ibc_relay_config.config_file_path, name = "archway_config")
-    elif destination_chain == "neutron":
+    elif dst_chain == "neutron":
         plan.upload_files(src = ibc_relay_config.config_file_path, name = "neutron_config")
 
     plan.upload_files(src = ibc_relay_config.icon_keystore_file, name = "icon-keystore")
 
 
-    if destination_chain == "archway":
+    if dst_chain == "archway":
         wasm_config = read_file(ibc_relay_config.ibc_relay_wasm_file_template)
-    elif destination_chain == "neutron":
+    elif dst_chain == "neutron":
         wasm_config = read_file(ibc_relay_config.ibc_relay_neutron_wasm_file_template)
 
     java_config = read_file(ibc_relay_config.ibc_relay_java_file_template)
