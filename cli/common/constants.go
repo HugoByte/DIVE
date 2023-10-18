@@ -16,7 +16,8 @@ const (
 	DiveNeutronNodeScript        = "services/cosmvm/neutron/src/node-setup/start_node.star"
 	RelayServiceNameIconToCosmos = "ibc-relayer"
 	DiveNeutronDefaultNodeScript = "services/cosmvm/neutron/neutron.star"
-	DiveBridgeScript             = "main.star"
+	DiveBridgeBtpScript          = "/services/bridges/btp/src/bridge.star"
+	DiveBridgeIbcScript          = "/services/bridges/ibc/src/bridge.star"
 	DiveDryRun                   = false
 	DiveDefaultParallelism       = 4
 	DiveEthNodeAlreadyRunning    = "Eth Node Already Running"
