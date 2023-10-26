@@ -54,12 +54,24 @@ Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually co
   ```
 - Install on **`linux`**
 
-  ```bash
-   $ curl -L https://github.com/HugoByte/DIVE/releases/download/{latest-version}/dive-cli_{latest-version}_linux_{arch}.tar.gz
-   $ tar -xvzf dive-cli_{latest-version}_linux_{arch}.tar.gz
-   $ mv dive /usr/local/bin
-   $ rm dive-cli_{latest-version}_linux_{arch}.tar.gz
+  Please find the latest release [here](https://github.com/HugoByte/DIVE/releases)
 
+  Run below command to install DIVE CLI by mentioning latest release version and machine arch where dive is getting installed:
+
+  ```shell
+  	 curl -L https://github.com/HugoByte/DIVE/releases/download/{latest-version}/dive-cli_{latest-version}_linux_{arch}.tar.gz | sudo  tar -xzv -C /usr/local/bin/ dive
+  ```
+
+  For example, if the latest version is v0.0.13-beta and system's architecture is amd64, the command will be:
+
+  ```shell
+  	curl -L https://github.com/HugoByte/DIVE/releases/download/v0.0.13-beta/dive-cli_v0.0.13-beta_linux_amd64.tar.gz | sudo tar xzv -C /usr/local/bin/ dive
+  ```
+
+  Verify installation by running below command which should print out the dive version installed
+
+  ```shell
+  dive version
   ```
 
 - Install on **`windows`**:
