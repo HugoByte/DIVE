@@ -109,9 +109,6 @@ func WriteToFile(data string) error {
 		return err
 	}
 
-	if err != nil {
-		return err
-	}
 	defer file.Close()
 
 	_, err = file.WriteString(data)
@@ -201,9 +198,6 @@ func WriteToServiceFile(serviceName string, data DiveserviceResponse) error {
 		return err
 	}
 
-	if err != nil {
-		return err
-	}
 	defer file.Close()
 
 	jsonDataFromFile, err := ReadServiceJsonFile()
