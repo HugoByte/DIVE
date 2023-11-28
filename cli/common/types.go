@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"time"
 
 	"github.com/google/go-github/github"
 	"github.com/kurtosis-tech/stacktrace"
@@ -17,6 +18,9 @@ import (
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 )
+
+var lastChecked time.Time
+var latestVersion = ""
 
 type DiveserviceResponse struct {
 	ServiceName     string `json:"service_name,omitempty"`
@@ -74,17 +78,63 @@ func GetLatestVersion() string {
 	// Repo Name
 	repo := "DIVE"
 	owner := "HugoByte"
+	userHomeDir, err := os.UserHomeDir()
 
-	// Create a new github client
-	client := github.NewClient(nil)
-	release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repo)
 	if err != nil {
 		fmt.Println(err)
 		return ""
 	}
+	cachedFile := filepath.Join(userHomeDir, "/.dive/version_cache.txt")
 
-	// Print the release version.
-	return release.GetName()
+	if time.Since(lastChecked).Hours() > 1 {
+		cachedVersion, err := ReadConfigFile(cachedFile)
+		fmt.Println("here ")
+
+		if err == nil && string(cachedVersion) != "" {
+			latestVersion = string(cachedVersion)
+			fmt.Println("here 1")
+		} else {
+			fmt.Println("here 2")
+			client := github.NewClient(nil)
+			release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repo)
+			if err != nil {
+				fmt.Println(err)
+				return ""
+			}
+
+			latestVersion = release.GetName()
+			writeCache(cachedFile, latestVersion)
+		}
+		lastChecked = time.Now()
+
+	}
+
+	return latestVersion
+}
+
+func writeCache(filePath string, latestVersion string) {
+	// Extract the directory path from the file path
+	dir := filepath.Dir(filePath)
+
+	// Create the directory if it does not exist
+	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+		fmt.Println("Error creating directory:", err)
+		return
+	}
+
+	// Write the latest version to the cache file
+	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+
+	defer file.Close()
+
+	_, err = file.WriteString(latestVersion)
+	if err != nil {
+		fmt.Println("Error writing to cache:", err)
+	}
 }
 
 func ReadConfigFile(filePath string) ([]byte, error) {
@@ -146,7 +196,7 @@ func setupLogger() *logrus.Logger {
 	})
 
 	ditFilePath := pwd + DiveLogDirectory + DiveDitLogFile
-	errorFilePath := pwd + DiveLogDirectory + DiveErorLogFile
+	errorFilePath := pwd + DiveLogDirectory + DiveErrorLogFile
 
 	ditLogger := &lumberjack.Logger{
 		// Log file abbsolute path, os agnostic

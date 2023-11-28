@@ -25,7 +25,7 @@ const (
 	DiveIconNodeAlreadyRunning   = "Icon Node Already Running"
 	DiveLogDirectory             = "/logs/"
 	DiveDitLogFile               = "divelog.log"
-	DiveErorLogFile              = "error.log"
+	DiveErrorLogFile             = "error.log"
 	DiveOutFile                  = "dive.json"
 	ServiceFilePath              = "services.json"
 	starlarkScript               = `
