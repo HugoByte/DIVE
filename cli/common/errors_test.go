@@ -1,6 +1,7 @@
 package common
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -21,20 +22,20 @@ func TestCodedError(t *testing.T) {
 	}
 }
 
-func TestWrap(t *testing.T) {
+func TestWrapMessage(t *testing.T) {
 
-	err := Errorc(InvalidCommandError, "Usage of Invalid Command")
+	error1 := Errorc(InvalidCommandError, "Usage of Invalid Command")
 
-	err2 := WrapMessageToError(err, "Invalid Usage")
+	error2 := WrapMessageToError(error1, "Invalid Usage")
 
-	if c := CodeOf(err2); c != InvalidCommandError {
+	if c := CodeOf(error2); c != InvalidCommandError {
 		t.Error("Code of Wrap() isn't codeInvalidCommandError")
 	}
 
-	err3 := WrapCodeToError(WithCode(err, UnknownError), InvalidCommandError, "InvalidUsage")
+	err3 := WithCode(error1, UnknownError)
 
-	if c := CodeOf(err3); c != InvalidCommandError {
-		t.Errorf("Code of WithCode() isn't %d, got %d", InvalidCommandError, c)
+	if c := CodeOf(err3); c != UnknownError {
+		t.Errorf("with code doesn't change the Error code")
 	}
 
 }
@@ -57,5 +58,89 @@ func TestIs(t *testing.T) {
 
 	if !Is(error3, error1) {
 		t.Errorf("error3 is originated from error1")
+	}
+
+	if Is(error1, error3) {
+		t.Errorf("error1 is originated from error3")
+	}
+}
+
+func TestAsValue(t *testing.T) {
+	var coder ErrorCoder
+	if AsValue(&coder, Errorc(InvalidCommandError, "Test")) {
+		if coder == nil {
+			t.Error("Returned object is nil")
+		}
+		if c := coder.ErrorCode(); c != InvalidCommandError {
+			t.Error("Fail to find ErrorCoder")
+		}
+	} else {
+		t.Error("Fail to get ErrorCoder from result of Errorc()")
+	}
+}
+
+func TestWithCode(t *testing.T) {
+
+	errorCodes := []ErrorCode{
+		InvalidCommandError, InvalidEnclaveNameError,
+	}
+
+	tests := map[string]error{
+
+		"Errorc":       Errorc(UnsupportedOSError, "OS Error"),
+		"NewBaseError": NewBase(FileError, "Invalid File"),
+		"WrapMessage":  WrapMessageToError(Errorc(UnknownError, "Error Parsing Arguments"), "Invalid Usage"),
+		"WrapCode":     WrapCodeToError(Errorc(UnsupportedOSError, "Unknown Platform"), UnsupportedOSError, "Error"),
+		"WithCode":     WithCode(errors.New("test"), FileError),
+	}
+
+	for errName, err := range tests {
+		t.Run(errName, func(t *testing.T) {
+			for _, code := range errorCodes {
+				error1 := WithCode(err, code)
+				if c := CodeOf(error1); code != c {
+					t.Errorf("Returned code=%d exp=%d", code, c)
+				}
+			}
+		})
+	}
+}
+
+func TestCodeOf(t *testing.T) {
+	tests := []struct {
+		name         string
+		err          error
+		expectedCode ErrorCode
+	}{
+		{
+			"test_new_base",
+			NewBase(UnsupportedOSError, "Invalid OS"),
+			UnsupportedOSError,
+		},
+		{
+			"test_with_code",
+			WithCode(errors.New("test"), FileError),
+			FileError,
+		},
+		{
+			"test_with_wrapwessage",
+			WrapMessageToError(Errorc(UnknownError, "Error Parsing Arguments"), "Invalid Usage"),
+			UnknownError,
+		},
+		{
+			"test_with_wrap_code",
+			WrapCodeToError(Errorc(UnsupportedOSError, "Unknown Platform"), UnsupportedOSError, "Error"),
+			UnsupportedOSError,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			code := CodeOf(test.err)
+
+			if code != test.expectedCode {
+				t.Errorf("Expected %d got %d", test.expectedCode, code)
+			}
+		})
 	}
 }
