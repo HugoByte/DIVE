@@ -1,24 +1,23 @@
 package common
 
 import (
-	"os"
-
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/spf13/cobra"
 )
 
 type Logger interface {
-	SetOutput(*os.File)
+	SetErrorToStderr()
+	SetOutputToStdout()
 	Debug(message string)
 	Info(message string)
 	Warn(message string)
-	Error(errorCode int, errorMessage string)
-	Fatal(errorCode int, errorMessage string)
+	Error(errorCode ErrorCode, errorMessage string)
+	Fatal(errorCode ErrorCode, errorMessage string)
 	Infof(message string)
 	Warnf(message string)
 	Debugf(message string)
-	Errorf(format string, errorCode int8, errorMessage string)
-	Fatalf(format string, errorCode int8, errorMessage string)
+	Errorf(errorCode ErrorCode, errorMessage string)
+	Fatalf(errorCode ErrorCode, errorMessage string)
 }
 
 type Spinner interface {

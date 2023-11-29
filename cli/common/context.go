@@ -18,6 +18,31 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type Dive struct {
+	log     Logger
+	spinner Spinner
+	context Context
+}
+
+func InitDive() *Dive {
+	logger := NewDiveLogger("file.txt", "error.txt")
+
+	return &Dive{log: logger}
+}
+
+func (d *Dive) Log() Logger {
+
+	return d.log
+}
+
+func (d *Dive) Spinner() Spinner {
+	return d.spinner
+}
+
+func (d *Dive) Context() Context {
+	return d.context
+}
+
 type DiveContext struct {
 	Ctx             context.Context
 	KurtosisContext *kurtosis_context.KurtosisContext
