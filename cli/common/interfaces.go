@@ -9,13 +9,14 @@ import (
 
 type Logger interface {
 	SetOutput(*os.File)
-	Debug(errorCode int8, errorMessage string)
-	Info(errorCode int8, errorMessage string)
-	Warn(errorCode int8, errorMessage string)
-	Error(errorCode int8, errorMessage string)
-	Fatal(errorCode int8, errorMessage string)
-	Infof(format string, errorCode int8, errorMessage string)
-	Warnf(format string, errorCode int8, errorMessage string)
+	Debug(message string)
+	Info(message string)
+	Warn(message string)
+	Error(errorCode int, errorMessage string)
+	Fatal(errorCode int, errorMessage string)
+	Infof(message string)
+	Warnf(message string)
+	Debugf(message string)
 	Errorf(format string, errorCode int8, errorMessage string)
 	Fatalf(format string, errorCode int8, errorMessage string)
 }
