@@ -92,9 +92,9 @@ func (dc *diveCommandBuilder) SetLong(long string) CommandBuilder {
 }
 
 // SetRun sets the Run field of the command.
-func (dc *diveCommandBuilder) SetRun(run func(cmd *cobra.Command, args []string)) CommandBuilder {
+func (dc *diveCommandBuilder) SetRun(run func(cmd *cobra.Command, args []string) error) CommandBuilder {
 
-	dc.cmd.Run = run
+	dc.cmd.RunE = run
 
 	return dc
 }

@@ -19,7 +19,18 @@ func NewDiveSpinner() *diveSpinner {
 
 }
 
-func (s *diveSpinner) Start(message string)      {}
-func (s *diveSpinner) Stop()                     {}
-func (s *diveSpinner) SetMessage(message string) {}
-func (s *diveSpinner) SetColor(color string)     {}
+func (ds *diveSpinner) SetMessage(message string, color string) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (ds *diveSpinner) SetColor(color string) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (ds *diveSpinner) Start(message string) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (ds *diveSpinner) Stop(message string) {
+	panic("not implemented") // TODO: Implement
+}

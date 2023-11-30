@@ -1,6 +1,7 @@
 package common
 
 import (
+	"io/fs"
 	"os"
 
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
@@ -43,11 +44,14 @@ type Context interface {
 
 type FileHandler interface {
 	ReadFile(filePath string) ([]byte, error)
-	ReadJson(filePath string, obj interface{}) (string, error)
-	WriteFile(filePath string, data []byte) error
-	WriteJson(filePath string, data interface{}) error
-	GetPwd() string
-	MkdirAll(dirPath string, permission string) error
+	ReadJson(fileName string, obj interface{}) error
+	ReadAppFile(fileName string) ([]byte, error)
+	WriteFile(fileName string, data []byte) error
+	WriteJson(fileName string, data interface{}) error
+	WriteAppFile(fileName string, data []byte) error
+	GetPwd() (string, error)
+	GetHomeDir() (string, error)
+	MkdirAll(dirPath string, permission fs.FileMode) error
 	OpenFile(filePath string, fileOpenMode string, permission int) (*os.File, error)
 }
 
@@ -92,7 +96,7 @@ type CommandBuilder interface {
 	SetLong(long string) CommandBuilder
 
 	// SetRun sets the Run field of the command.
-	SetRun(run func(cmd *cobra.Command, args []string)) CommandBuilder
+	SetRun(run func(cmd *cobra.Command, args []string) error) CommandBuilder
 
 	ToggleHelpCommand(enable bool) CommandBuilder
 }
