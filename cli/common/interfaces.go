@@ -56,17 +56,17 @@ type CommandBuilder interface {
 	// AddCommand adds a subcommand to the command.
 	AddCommand(cmd *cobra.Command) CommandBuilder
 
-	// Add Persistant Bool Flag
-	AddBoolPersistantFlag(p *bool, name string, value bool, usage string) CommandBuilder
+	// Add Persistent Bool Flag
+	AddBoolPersistentFlag(p *bool, name string, value bool, usage string) CommandBuilder
 
-	// Add Persistant Bool Flag with Short hand
-	AddBoolPersistantFlagWithShortHand(p *bool, name string, value bool, usage string, shorthand string) CommandBuilder
+	// Add Persistent Bool Flag with Short hand
+	AddBoolPersistentFlagWithShortHand(p *bool, name string, value bool, usage string, shorthand string) CommandBuilder
 
-	// Add Persistant String Flag
-	AddStringPersistantFlag(p *string, name string, value string, usage string) CommandBuilder
+	// Add Persistent String Flag
+	AddStringPersistentFlag(p *string, name string, value string, usage string) CommandBuilder
 
-	// Add Persistant String Flag with Short hand
-	AddStringPersistantFlagWithShortHand(p *string, name string, shorthand string, value string, usage string) CommandBuilder
+	// Add Persistent String Flag with Short hand
+	AddStringPersistentFlagWithShortHand(p *string, name string, shorthand string, value string, usage string) CommandBuilder
 
 	// Add StringFlag adds a string flag to the command that persists
 	AddStringFlag(name string, value string, usage string) CommandBuilder
