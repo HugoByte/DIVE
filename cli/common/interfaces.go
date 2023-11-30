@@ -1,6 +1,8 @@
 package common
 
 import (
+	"os"
+
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/spf13/cobra"
 )
@@ -40,10 +42,13 @@ type Context interface {
 }
 
 type FileHandler interface {
-	ReadFromFile(filePath string) ([]byte, error)
-	ReadFromJson(filePath string, obj interface{}) (string, error)
-	WriteToFile(filePath string, data []byte) error
-	WriteToJson(filePath string, data interface{}) error
+	ReadFile(filePath string) ([]byte, error)
+	ReadJson(filePath string, obj interface{}) (string, error)
+	WriteFile(filePath string, data []byte) error
+	WriteJson(filePath string, data interface{}) error
+	GetPwd() string
+	MkdirAll(dirPath string, permission string) error
+	OpenFile(filePath string, fileOpenMode string, permission int) (*os.File, error)
 }
 
 // CommandBuilder is an interface for building a Cobra command.
