@@ -57,27 +57,27 @@ type CommandBuilder interface {
 	AddCommand(cmd *cobra.Command) CommandBuilder
 
 	// Add Persistent Bool Flag
-	AddBoolPersistentFlag(p *bool, name string, value bool, usage string) CommandBuilder
+	AddBoolPersistentFlag(boolV *bool, name string, value bool, usage string) CommandBuilder
 
 	// Add Persistent Bool Flag with Short hand
-	AddBoolPersistentFlagWithShortHand(p *bool, name string, value bool, usage string, shorthand string) CommandBuilder
+	AddBoolPersistentFlagWithShortHand(boolV *bool, name string, value bool, usage string, shorthand string) CommandBuilder
 
 	// Add Persistent String Flag
-	AddStringPersistentFlag(p *string, name string, value string, usage string) CommandBuilder
+	AddStringPersistentFlag(stringV *string, name string, value string, usage string) CommandBuilder
 
 	// Add Persistent String Flag with Short hand
-	AddStringPersistentFlagWithShortHand(p *string, name string, shorthand string, value string, usage string) CommandBuilder
+	AddStringPersistentFlagWithShortHand(stringV *string, name string, shorthand string, value string, usage string) CommandBuilder
 
 	// Add StringFlag adds a string flag to the command that persists
-	AddStringFlag(name string, value string, usage string) CommandBuilder
+	AddStringFlag(stringV *string, name string, value string, usage string) CommandBuilder
 
 	// Add StringFlag adds a string flag to the command that persists with short hand
-	AddStringFlagWithShortHand(p *string, name string, shorthand string, value string, usage string) CommandBuilder
+	AddStringFlagWithShortHand(stringV *string, name string, shorthand string, value string, usage string) CommandBuilder
 
 	// Add BooFlag adds a boolean flag to the command that persists
-	AddBoolFlag(name string, value bool, usage string) CommandBuilder
+	AddBoolFlag(boolV *bool, name string, value bool, usage string) CommandBuilder
 
-	AddBoolFlagWithShortHand(name string, shorthand string, value bool, usage string) CommandBuilder
+	AddBoolFlagWithShortHand(boolV *bool, name string, shorthand string, value bool, usage string) CommandBuilder
 
 	// Build constructs and returns the Cobra command.
 	Build() *cobra.Command
@@ -93,4 +93,6 @@ type CommandBuilder interface {
 
 	// SetRun sets the Run field of the command.
 	SetRun(run func(cmd *cobra.Command, args []string)) CommandBuilder
+
+	ToggleHelpCommand(enable bool) CommandBuilder
 }

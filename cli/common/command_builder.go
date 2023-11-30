@@ -13,70 +13,93 @@ func NewDiveCommandBuilder() *diveCommandBuilder {
 }
 
 // AddCommand adds a subcommand to the command.
-func (d *diveCommandBuilder) AddCommand(cmd *cobra.Command) CommandBuilder {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) AddCommand(cmd *cobra.Command) CommandBuilder {
+	dc.cmd.AddCommand(cmd)
+	return dc
 }
 
 // Add Persistent Bool Flag
-func (d *diveCommandBuilder) AddBoolPersistentFlag(p *bool, name string, value bool, usage string) CommandBuilder {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) AddBoolPersistentFlag(boolV *bool, name string, value bool, usage string) CommandBuilder {
+	dc.cmd.PersistentFlags().BoolVar(boolV, name, value, usage)
+	return dc
 }
 
 // Add Persistent Bool Flag with Short hand
-func (d *diveCommandBuilder) AddBoolPersistentFlagWithShortHand(p *bool, name string, value bool, usage string, shorthand string) CommandBuilder {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) AddBoolPersistentFlagWithShortHand(boolV *bool, name string, value bool, usage string, shorthand string) CommandBuilder {
+
+	dc.cmd.PersistentFlags().BoolVarP(boolV, name, shorthand, value, usage)
+	return dc
 }
 
 // Add Persistent String Flag
-func (d *diveCommandBuilder) AddStringPersistentFlag(p *string, name string, value string, usage string) CommandBuilder {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) AddStringPersistentFlag(stringV *string, name string, value string, usage string) CommandBuilder {
+	dc.cmd.PersistentFlags().StringVar(stringV, name, value, usage)
+	return dc
 }
 
 // Add Persistent String Flag with Short hand
-func (d *diveCommandBuilder) AddStringPersistentFlagWithShortHand(p *string, name string, shorthand string, value string, usage string) CommandBuilder {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) AddStringPersistentFlagWithShortHand(stringV *string, name string, shorthand string, value string, usage string) CommandBuilder {
+	dc.cmd.PersistentFlags().StringVarP(stringV, name, shorthand, value, usage)
+	return dc
 }
 
 // Add StringFlag adds a string flag to the command that persists
-func (d *diveCommandBuilder) AddStringFlag(name string, value string, usage string) CommandBuilder {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) AddStringFlag(stringV *string, name string, value string, usage string) CommandBuilder {
+	dc.cmd.Flags().StringVar(stringV, name, value, usage)
+	return dc
 }
 
 // Add StringFlag adds a string flag to the command that persists with short hand
-func (d *diveCommandBuilder) AddStringFlagWithShortHand(p *string, name string, shorthand string, value string, usage string) CommandBuilder {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) AddStringFlagWithShortHand(stringV *string, name string, shorthand string, value string, usage string) CommandBuilder {
+	dc.cmd.Flags().StringVarP(stringV, name, shorthand, value, usage)
+	return dc
 }
 
 // Add BooFlag adds a boolean flag to the command that persists
-func (d *diveCommandBuilder) AddBoolFlag(name string, value bool, usage string) CommandBuilder {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) AddBoolFlag(boolV *bool, name string, value bool, usage string) CommandBuilder {
+	dc.cmd.Flags().BoolVar(boolV, name, value, usage)
+	return dc
 }
 
-func (d *diveCommandBuilder) AddBoolFlagWithShortHand(name string, shorthand string, value bool, usage string) CommandBuilder {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) AddBoolFlagWithShortHand(boolV *bool, name string, shorthand string, value bool, usage string) CommandBuilder {
+	dc.cmd.Flags().BoolVarP(boolV, name, shorthand, value, usage)
+	return dc
 }
 
 // Build constructs and returns the Cobra command.
-func (d *diveCommandBuilder) Build() *cobra.Command {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) Build() *cobra.Command {
+	dc.cmd.CompletionOptions.DisableDefaultCmd = true
+	dc.cmd.CompletionOptions.DisableNoDescFlag = true
+	return dc.cmd
 }
 
 // SetUse sets the Use field of the command.
-func (d *diveCommandBuilder) SetUse(use string) CommandBuilder {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) SetUse(use string) CommandBuilder {
+	dc.cmd.Use = use
+	return dc
 }
 
 // SetShort sets the Short field of the command.
-func (d *diveCommandBuilder) SetShort(short string) CommandBuilder {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) SetShort(short string) CommandBuilder {
+	dc.cmd.Short = short
+	return dc
 }
 
 // SetLong sets the Long field of the command.
-func (d *diveCommandBuilder) SetLong(long string) CommandBuilder {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) SetLong(long string) CommandBuilder {
+	dc.cmd.Long = long
+	return dc
 }
 
 // SetRun sets the Run field of the command.
-func (d *diveCommandBuilder) SetRun(run func(cmd *cobra.Command, args []string)) CommandBuilder {
-	panic("not implemented") // TODO: Implement
+func (dc *diveCommandBuilder) SetRun(run func(cmd *cobra.Command, args []string)) CommandBuilder {
+
+	dc.cmd.Run = run
+
+	return dc
+}
+func (dc *diveCommandBuilder) ToggleHelpCommand(enable bool) CommandBuilder {
+
+	dc.cmd.SetHelpCommand(&cobra.Command{Hidden: enable})
+	return dc
 }
