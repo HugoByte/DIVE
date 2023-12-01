@@ -3,6 +3,8 @@ package cmd
 import (
 	"os"
 
+	"github.com/hugobyte/dive-core/cli/cmd/bridge"
+	"github.com/hugobyte/dive-core/cli/cmd/chains"
 	"github.com/hugobyte/dive-core/cli/cmd/social"
 	"github.com/hugobyte/dive-core/cli/cmd/utility"
 	"github.com/hugobyte/dive-core/cli/common"
@@ -19,6 +21,8 @@ var rootCmd = common.NewDiveCommandBuilder().
 	AddCommand(utility.VersionCmd).
 	AddCommand(social.DiscordCmd).
 	AddCommand(social.TwitterCmd).
+	AddCommand(chains.ChainCmd).
+	AddCommand(bridge.BridgeCmd).
 	AddBoolPersistentFlag(&common.DiveLogs, "verbose", false, "Prints out logs to Stdout").
 	SetRunE(run).
 	Build()
