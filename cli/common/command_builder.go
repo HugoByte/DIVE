@@ -92,14 +92,21 @@ func (dc *diveCommandBuilder) SetLong(long string) CommandBuilder {
 }
 
 // SetRun sets the Run field of the command.
-func (dc *diveCommandBuilder) SetRun(run func(cmd *cobra.Command, args []string) error) CommandBuilder {
+func (dc *diveCommandBuilder) SetRun(run func(cmd *cobra.Command, args []string)) CommandBuilder {
 
-	dc.cmd.RunE = run
+	dc.cmd.Run = run
 
 	return dc
 }
 func (dc *diveCommandBuilder) ToggleHelpCommand(enable bool) CommandBuilder {
 
 	dc.cmd.SetHelpCommand(&cobra.Command{Hidden: enable})
+	return dc
+}
+
+func (dc *diveCommandBuilder) SetRunE(run func(cmd *cobra.Command, args []string) error) CommandBuilder {
+
+	dc.cmd.RunE = run
+
 	return dc
 }

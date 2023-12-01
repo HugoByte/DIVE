@@ -16,7 +16,7 @@ func TestDiveCommandBuilder(t *testing.T) {
 	builder.SetUse("testCommand").
 		SetShort("Short description").
 		SetLong("Long description").
-		SetRun(func(cmd *cobra.Command, args []string) error {
+		SetRunE(func(cmd *cobra.Command, args []string) error {
 			cmd.Println("test function")
 
 			return nil

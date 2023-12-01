@@ -24,10 +24,13 @@ type Logger interface {
 }
 
 type Spinner interface {
-	SetMessage(message string, color string)
+	SetSuffixMessage(message, color string)
+	SetPrefixMessage(message string)
 	SetColor(color string)
-	Start(message string)
-	Stop(message string)
+	Start(color string)
+	StartWithMessage(message, color string)
+	Stop()
+	StopWithMessage(message string)
 }
 
 type Context interface {
@@ -37,7 +40,7 @@ type Context interface {
 	CreateEnclave(enclaveName string)
 	GetEnclaves() []string
 	GetSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) (string, map[string]string, map[string]bool, error)
-	InitialiseKurtosisContext()
+	InitializeKurtosisContext()
 	StopServices()
 	StopService()
 }
@@ -96,7 +99,9 @@ type CommandBuilder interface {
 	SetLong(long string) CommandBuilder
 
 	// SetRun sets the Run field of the command.
-	SetRun(run func(cmd *cobra.Command, args []string) error) CommandBuilder
+	SetRun(run func(cmd *cobra.Command, args []string)) CommandBuilder
 
 	ToggleHelpCommand(enable bool) CommandBuilder
+
+	SetRunE(run func(cmd *cobra.Command, args []string) error) CommandBuilder
 }
