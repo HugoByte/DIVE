@@ -1,6 +1,7 @@
 package common
 
 import (
+	"io/fs"
 	"os"
 
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
@@ -23,10 +24,13 @@ type Logger interface {
 }
 
 type Spinner interface {
-	SetMessage(message string, color string)
+	SetSuffixMessage(message, color string)
+	SetPrefixMessage(message string)
 	SetColor(color string)
-	Start(message string)
-	Stop(message string)
+	Start(color string)
+	StartWithMessage(message, color string)
+	Stop()
+	StopWithMessage(message string)
 }
 
 type Context interface {
@@ -36,18 +40,21 @@ type Context interface {
 	CreateEnclave(enclaveName string)
 	GetEnclaves() []string
 	GetSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) (string, map[string]string, map[string]bool, error)
-	InitialiseKurtosisContext()
+	InitializeKurtosisContext()
 	StopServices()
 	StopService()
 }
 
 type FileHandler interface {
 	ReadFile(filePath string) ([]byte, error)
-	ReadJson(filePath string, obj interface{}) (string, error)
-	WriteFile(filePath string, data []byte) error
-	WriteJson(filePath string, data interface{}) error
-	GetPwd() string
-	MkdirAll(dirPath string, permission string) error
+	ReadJson(fileName string, obj interface{}) error
+	ReadAppFile(fileName string) ([]byte, error)
+	WriteFile(fileName string, data []byte) error
+	WriteJson(fileName string, data interface{}) error
+	WriteAppFile(fileName string, data []byte) error
+	GetPwd() (string, error)
+	GetHomeDir() (string, error)
+	MkdirAll(dirPath string, permission fs.FileMode) error
 	OpenFile(filePath string, fileOpenMode string, permission int) (*os.File, error)
 }
 
@@ -56,28 +63,28 @@ type CommandBuilder interface {
 	// AddCommand adds a subcommand to the command.
 	AddCommand(cmd *cobra.Command) CommandBuilder
 
-	// Add Persistant Bool Flag
-	AddBoolPersistantFlag(p *bool, name string, value bool, usage string) CommandBuilder
+	// Add Persistent Bool Flag
+	AddBoolPersistentFlag(boolV *bool, name string, value bool, usage string) CommandBuilder
 
-	// Add Persistant Bool Flag with Short hand
-	AddBoolPersistantFlagWithShortHand(p *bool, name string, value bool, usage string, shorthand string) CommandBuilder
+	// Add Persistent Bool Flag with Short hand
+	AddBoolPersistentFlagWithShortHand(boolV *bool, name string, value bool, usage string, shorthand string) CommandBuilder
 
-	// Add Persistant String Flag
-	AddStringPersistantFlag(p *string, name string, value string, usage string) CommandBuilder
+	// Add Persistent String Flag
+	AddStringPersistentFlag(stringV *string, name string, value string, usage string) CommandBuilder
 
-	// Add Persistant String Flag with Short hand
-	AddStringPersistantFlagWithShortHand(p *string, name string, shorthand string, value string, usage string) CommandBuilder
+	// Add Persistent String Flag with Short hand
+	AddStringPersistentFlagWithShortHand(stringV *string, name string, shorthand string, value string, usage string) CommandBuilder
 
 	// Add StringFlag adds a string flag to the command that persists
-	AddStringFlag(name string, value string, usage string) CommandBuilder
+	AddStringFlag(stringV *string, name string, value string, usage string) CommandBuilder
 
 	// Add StringFlag adds a string flag to the command that persists with short hand
-	AddStringFlagWithShortHand(p *string, name string, shorthand string, value string, usage string) CommandBuilder
+	AddStringFlagWithShortHand(stringV *string, name string, shorthand string, value string, usage string) CommandBuilder
 
 	// Add BooFlag adds a boolean flag to the command that persists
-	AddBoolFlag(name string, value bool, usage string) CommandBuilder
+	AddBoolFlag(boolV *bool, name string, value bool, usage string) CommandBuilder
 
-	AddBoolFlagWithShortHand(name string, shorthand string, value bool, usage string) CommandBuilder
+	AddBoolFlagWithShortHand(boolV *bool, name string, shorthand string, value bool, usage string) CommandBuilder
 
 	// Build constructs and returns the Cobra command.
 	Build() *cobra.Command
@@ -93,4 +100,8 @@ type CommandBuilder interface {
 
 	// SetRun sets the Run field of the command.
 	SetRun(run func(cmd *cobra.Command, args []string)) CommandBuilder
+
+	ToggleHelpCommand(enable bool) CommandBuilder
+
+	SetRunE(run func(cmd *cobra.Command, args []string) error) CommandBuilder
 }
