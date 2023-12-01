@@ -19,6 +19,7 @@ const (
 	UnsupportedOSError
 	FileError
 	InvalidCommandError
+	KurtosisContextError
 	InvalidEnclaveContextError
 	InvalidEnclaveConfigError
 )
@@ -28,6 +29,7 @@ var (
 	ErrInvalidEnclaveName    = NewBase(InvalidEnclaveNameError, "InvalidEnclaveName")
 	ErrUnsupportedOS         = NewBase(UnsupportedOSError, "UnsupportedOS")
 	ErrFile                  = NewBase(FileError, "FileError")
+	ErrKurtosisContext       = NewBase(KurtosisContextError, "Failed To Get Kurtosis Context")
 	ErrInvalidCommand        = NewBase(InvalidCommandError, "InvalidCommand")
 	ErrInvalidEnclaveContext = NewBase(InvalidEnclaveContextError, "InvalidEnclaveContext")
 	ErrInvalidEnclaveConfig  = NewBase(InvalidEnclaveConfigError, "InvalidEnclaveConfig")

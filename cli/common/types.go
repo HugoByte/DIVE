@@ -310,3 +310,9 @@ func getPwd() (string, error) {
 
 	return pwd, nil
 }
+
+type EnclaveInfo struct {
+	Name      string
+	Uuid      string
+	ShortUuid string
+}
