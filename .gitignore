@@ -28,3 +28,6 @@ doc/tags
 
 # go work sum
 *.sum
+
+# log dir
+logs/
