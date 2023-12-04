@@ -2,7 +2,9 @@ package common
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
@@ -24,13 +26,14 @@ def run(plan, args):
 )
 
 var (
-	Once               sync.Once
 	kurtosisContextErr error
 )
 
 type diveContext struct {
-	ctx             context.Context
-	kurtosisContext *kurtosis_context.KurtosisContext
+	mu               sync.Mutex
+	ctx              context.Context
+	kurtosisContext  *kurtosis_context.KurtosisContext
+	kurtosisInitDone bool
 }
 
 func NewDiveContext1() *diveContext {
@@ -42,14 +45,16 @@ func (dc *diveContext) GetContext() context.Context {
 }
 
 func (dc *diveContext) GetKurtosisContext() (*kurtosis_context.KurtosisContext, error) {
-	once.Do(func() {
-		err := dc.initKurtosisContext()
+	dc.mu.Lock()
+	defer dc.mu.Unlock()
+
+	if !dc.kurtosisInitDone {
+		kurtosisContext, err := dc.initKurtosisContext()
 		if err != nil {
-			kurtosisContextErr = err
+			return nil, err
 		}
-	})
-	if kurtosisContextErr != nil {
-		return nil, kurtosisContextErr
+		dc.kurtosisContext = kurtosisContext
+		dc.kurtosisInitDone = true
 	}
 	return dc.kurtosisContext, nil
 }
@@ -116,8 +121,9 @@ func (dc *diveContext) CleanEnclaveByName(enclaveName string) error {
 	return nil
 }
 
-func (dc *diveContext) CheckSkippedInstructions() {
-	panic("not implemented") // TODO: Implement
+func (dc *diveContext) CheckSkippedInstructions(instructions map[string]bool) bool {
+
+	return len(instructions) != 0
 }
 
 func (dc *diveContext) StopService(serviceName string, enclaveName string) error {
@@ -219,26 +225,24 @@ func (dc *diveContext) CreateEnclave(enclaveName string) (*enclaves.EnclaveConte
 	return enclaveContext, nil
 }
 
-func (dc *diveContext) GetSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) (string, map[string]string, map[string]bool, error) {
-	panic("not implemented") // TODO: Implement
-}
-
-func (dc *diveContext) initKurtosisContext() error {
+func (dc *diveContext) initKurtosisContext() (*kurtosis_context.KurtosisContext, error) {
 
 	kurtosisContext, err := kurtosis_context.NewKurtosisContextFromLocalEngine()
 
 	if err != nil {
-		return WrapMessageToError(ErrKurtosisContext, err.Error())
+		return nil, WrapMessageToError(ErrKurtosisContext, err.Error())
 
 	}
 
-	dc.kurtosisContext = kurtosisContext
-
-	return nil
+	return kurtosisContext, nil
 }
 func (dc *diveContext) checkEnclaveExist(enclaveName string) (*EnclaveInfo, error) {
 
-	enclaveInfo, err := dc.kurtosisContext.GetEnclave(dc.ctx, enclaveName)
+	kurtosisContext, err := dc.GetKurtosisContext()
+	if err != nil {
+		return nil, Errorc(KurtosisContextError, err.Error())
+	}
+	enclaveInfo, err := kurtosisContext.GetEnclave(dc.ctx, enclaveName)
 	if err != nil {
 		return nil, Errorc(KurtosisContextError, err.Error())
 	}
@@ -261,4 +265,57 @@ func GetStarlarkRunConfig(params string, relativePathToMainFile string, mainFunc
 		ExperimentalFeatureFlags: []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{},
 	}
 	return starlarkConfig
+}
+
+func GetSerializedData(cliContext *Cli, response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) (string, map[string]string, map[string]bool, error) {
+
+	var serializedOutputObj string
+	services := map[string]string{}
+
+	skippedInstruction := map[string]bool{}
+	for executionResponse := range response {
+
+		if strings.Contains(executionResponse.GetInstructionResult().GetSerializedInstructionResult(), "added with service") {
+			res1 := strings.Split(executionResponse.GetInstructionResult().GetSerializedInstructionResult(), " ")
+			serviceName := res1[1][1 : len(res1[1])-1]
+			serviceUUID := res1[len(res1)-1][1 : len(res1[len(res1)-1])-1]
+			services[serviceName] = serviceUUID
+		}
+
+		cliContext.log.Info(executionResponse.String())
+
+		if executionResponse.GetInstruction().GetIsSkipped() {
+			skippedInstruction[executionResponse.GetInstruction().GetExecutableInstruction()] = executionResponse.GetInstruction().GetIsSkipped()
+			break
+		}
+
+		if executionResponse.GetError() != nil {
+
+			return "", services, nil, errors.New(executionResponse.GetError().String())
+
+		}
+
+		runFinishedEvent := executionResponse.GetRunFinishedEvent()
+
+		if runFinishedEvent != nil {
+
+			if runFinishedEvent.GetIsRunSuccessful() {
+				serializedOutputObj = runFinishedEvent.GetSerializedOutput()
+
+			} else {
+				return "", services, nil, errors.New(executionResponse.GetError().String())
+			}
+
+		} else {
+			cliContext.spinner.SetColor("blue")
+			if executionResponse.GetProgressInfo() != nil {
+
+				cliContext.spinner.SetSuffixMessage(strings.ReplaceAll(executionResponse.GetProgressInfo().String(), "current_step_info:", " "), "fgGreen")
+
+			}
+		}
+
+	}
+
+	return serializedOutputObj, services, skippedInstruction, nil
 }

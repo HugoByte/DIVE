@@ -16,7 +16,15 @@ func NewDiveFileHandler() *diveFileHandler {
 func (df *diveFileHandler) ReadFile(filePath string) ([]byte, error) {
 
 	fileData, err := os.ReadFile(filePath)
-	if err != nil {
+	if os.IsNotExist(err) {
+		_, err := df.OpenFile(filePath, "append|write|create", 0644)
+		if err != nil {
+			return nil, Errorcf(FileError, "Error While Creating File %s", err.Error())
+		}
+
+		return []byte{}, nil
+
+	} else if err != nil {
 		return nil, Errorcf(FileError, "Error While Reading File %s", err.Error())
 	}
 
@@ -24,12 +32,20 @@ func (df *diveFileHandler) ReadFile(filePath string) ([]byte, error) {
 }
 
 func (df *diveFileHandler) ReadJson(fileName string, obj interface{}) error {
-	pwd, err := df.GetPwd()
-	if err != nil {
-		return WrapMessageToError(err, "Error While Reading File")
-	}
 
-	filePath := filepath.Join(pwd, fileName)
+	var filePath string
+
+	if filepath.IsAbs(fileName) {
+		filePath = fileName
+	} else {
+		pwd, err := df.GetPwd()
+		if err != nil {
+			return WrapMessageToError(err, "Error While Reading File")
+		}
+
+		filePath = filepath.Join(pwd, fileName)
+
+	}
 
 	data, err := df.ReadFile(filePath)
 	if err != nil {
@@ -102,7 +118,7 @@ func (df *diveFileHandler) WriteFile(fileName string, data []byte) error {
 	}
 	filePath := filepath.Join(pwd, fileName)
 
-	file, err := df.OpenFile(filePath, "write|append|create", 0644)
+	file, err := df.OpenFile(filePath, "write|append|create|truncate", 0644)
 
 	if err != nil {
 		return WrapMessageToError(err, "Failed")

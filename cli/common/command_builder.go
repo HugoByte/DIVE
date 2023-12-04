@@ -110,3 +110,20 @@ func (dc *diveCommandBuilder) SetRunE(run func(cmd *cobra.Command, args []string
 
 	return dc
 }
+
+func (dc *diveCommandBuilder) MarkFlagsAsRequired(flags []string) CommandBuilder {
+
+	dc.cmd.MarkFlagsRequiredTogether(flags...)
+	return dc
+}
+
+func (dc *diveCommandBuilder) MarkFlagRequired(flag string) CommandBuilder {
+	dc.cmd.MarkFlagRequired(flag)
+	return dc
+}
+
+func (dc *diveCommandBuilder) AddBoolFlagP(name string, shorthand string, value bool, usage string) CommandBuilder {
+
+	dc.cmd.Flags().BoolP(name, shorthand, value, usage)
+	return dc
+}
