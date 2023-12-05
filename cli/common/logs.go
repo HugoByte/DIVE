@@ -27,7 +27,7 @@ func NewDiveLogger(infoFilePath string, errorFilePath string) *diveLogger {
 	})
 
 	ditLogger := &lumberjack.Logger{
-		// Log file abbsolute path, os agnostic
+		// Log file absolute path, os agnostic
 		Filename:  filepath.ToSlash(infoFilePath),
 		LocalTime: true,
 	}
@@ -66,69 +66,49 @@ func (d *diveLogger) SetErrorToStderr() {
 func (d *diveLogger) SetOutputToStdout() {
 	d.log.SetOutput(os.Stdout)
 }
+
+func (d *diveLogger) logWithFields(level logrus.Level, kind string, format string, args ...interface{}) {
+	if d.log.IsLevelEnabled(level) {
+		d.log.WithFields(logrus.Fields{"kind": kind}).Logf(level, format, args...)
+	}
+}
+
 func (d *diveLogger) Debug(message string) {
-
-	d.log.WithFields(logrus.Fields{
-		"level": "🐞 debug",
-	}).Debug(message)
-
+	d.logWithFields(logrus.DebugLevel, "🐞 debug", message)
 }
+
 func (d *diveLogger) Info(message string) {
-	d.log.WithFields(logrus.Fields{
-		"level": "ℹ️ info",
-	}).Info(message)
-
+	d.logWithFields(logrus.InfoLevel, "ℹ️ info", message)
 }
+
 func (d *diveLogger) Warn(message string) {
-	d.log.WithFields(logrus.Fields{
-		"level": "⚠️ warn",
-	}).Warn(message)
-
+	d.logWithFields(logrus.WarnLevel, "⚠️ warn", message)
 }
+
 func (d *diveLogger) Error(errorCode ErrorCode, errorMessage string) {
-	d.log.WithFields(logrus.Fields{
-		"level":      "🛑 error",
-		"error_code": errorCode,
-	}).Error(errorMessage)
-
+	d.logWithFields(logrus.ErrorLevel, "🛑 error", "%s", errorMessage)
 }
+
 func (d *diveLogger) Fatal(errorCode ErrorCode, errorMessage string) {
-	d.log.WithFields(logrus.Fields{
-		"level":      "💀 fatal",
-		"error_code": errorCode,
-	}).Fatal(errorMessage)
-
+	d.logWithFields(logrus.FatalLevel, "💀 fatal", "%s", errorMessage)
 }
-func (d *diveLogger) Infof(message string) {
-	d.log.WithFields(logrus.Fields{
-		"level": "ℹ️ info",
-	}).Infof("%s", message)
 
+func (d *diveLogger) Infof(format string, args ...interface{}) {
+	d.logWithFields(logrus.InfoLevel, "ℹ️ info", format, args...)
 }
-func (d *diveLogger) Warnf(message string) {
-	d.log.WithFields(logrus.Fields{
-		"level": "⚠️ warn",
-	}).Warnf("%s", message)
 
+func (d *diveLogger) Warnf(format string, args ...interface{}) {
+	d.logWithFields(logrus.WarnLevel, "⚠️ warn", format, args...)
 }
-func (d *diveLogger) Debugf(message string) {
 
-	d.log.WithFields(logrus.Fields{
-		"level": "🐞 debug",
-	}).Debugf("%s", message)
-
+func (d *diveLogger) Debugf(format string, args ...interface{}) {
+	d.logWithFields(logrus.DebugLevel, "🐞 debug", format, args...)
 }
-func (d *diveLogger) Errorf(errorCode ErrorCode, errorMessage string) {
-	d.log.WithFields(logrus.Fields{
-		"level":      "🛑 error",
-		"error_code": errorCode,
-	}).Errorf("%s", errorMessage)
 
+func (d *diveLogger) Errorf(errorCode ErrorCode, format string, args ...interface{}) {
+	d.logWithFields(logrus.ErrorLevel, "🛑 error", format, args...)
 }
-func (d *diveLogger) Fatalf(errorCode ErrorCode, errorMessage string) {
-	d.log.WithFields(logrus.Fields{
-		"level":      "💀 fatal",
-		"error_code": errorCode,
-	}).Fatalf("%s", errorMessage)
 
+func (d *diveLogger) Fatalf(errorCode ErrorCode, format string, args ...interface{}) {
+	d.logWithFields(logrus.FatalLevel, "💀 fatal", format, args...)
 }

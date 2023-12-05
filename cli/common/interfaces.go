@@ -18,11 +18,11 @@ type Logger interface {
 	Warn(message string)
 	Error(errorCode ErrorCode, errorMessage string)
 	Fatal(errorCode ErrorCode, errorMessage string)
-	Infof(message string)
-	Warnf(message string)
-	Debugf(message string)
-	Errorf(errorCode ErrorCode, errorMessage string)
-	Fatalf(errorCode ErrorCode, errorMessage string)
+	Infof(format string, args ...interface{})
+	Warnf(format string, args ...interface{})
+	Debugf(format string, args ...interface{})
+	Errorf(errorCode ErrorCode, format string, args ...interface{})
+	Fatalf(errorCode ErrorCode, format string, args ...interface{})
 }
 
 type Spinner interface {
