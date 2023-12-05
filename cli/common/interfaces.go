@@ -1,10 +1,12 @@
 package common
 
 import (
+	"context"
 	"io/fs"
 	"os"
 
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
+	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
+	"github.com/kurtosis-tech/kurtosis/api/golang/engine/lib/kurtosis_context"
 	"github.com/spf13/cobra"
 )
 
@@ -34,15 +36,18 @@ type Spinner interface {
 }
 
 type Context interface {
-	CheckSkippedInstructions()
-	CleanAll()
-	Clean(enclaveName string)
-	CreateEnclave(enclaveName string)
-	GetEnclaves() []string
-	GetSerializedData(response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) (string, map[string]string, map[string]bool, error)
-	InitializeKurtosisContext()
-	StopServices()
-	StopService()
+	GetContext() context.Context
+	GetKurtosisContext() (*kurtosis_context.KurtosisContext, error)
+	GetEnclaves() ([]EnclaveInfo, error)
+	GetEnclaveContext(enclaveName string) (*enclaves.EnclaveContext, error)
+	CleanEnclaves() ([]*EnclaveInfo, error)
+	CleanEnclaveByName(enclaveName string) error
+	CheckSkippedInstructions(instructions map[string]bool) bool
+	StopService(serviceName string, enclaveName string) error
+	StopServices(enclaveName string) error
+	RemoveServices(enclaveName string) error
+	RemoveService(serviceName string, enclaveName string) error
+	CreateEnclave(enclaveName string) (*enclaves.EnclaveContext, error)
 }
 
 type FileHandler interface {
@@ -104,4 +109,7 @@ type CommandBuilder interface {
 	ToggleHelpCommand(enable bool) CommandBuilder
 
 	SetRunE(run func(cmd *cobra.Command, args []string) error) CommandBuilder
+	MarkFlagsAsRequired(flags []string) CommandBuilder
+	MarkFlagRequired(flag string) CommandBuilder
+	AddBoolFlagP(name string, shorthand string, value bool, usage string) CommandBuilder
 }

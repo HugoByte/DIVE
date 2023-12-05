@@ -5,6 +5,7 @@ import (
 	"slices"
 
 	"github.com/hugobyte/dive-core/cli/cmd/chains/chain"
+	"github.com/hugobyte/dive-core/cli/cmd/chains/chain/icon"
 	"github.com/hugobyte/dive-core/cli/common"
 	"github.com/spf13/cobra"
 )
@@ -17,7 +18,7 @@ It encompasses compiling and configuring the necessary dependencies and componen
 By executing this command, the node is launched, enabling network participation, transaction processing, and ledger 
 maintenance within the specified blockchain ecosystem.`,
 	).
-	AddCommand(chain.IconCmd).
+	AddCommand(icon.IconCmd).
 	AddCommand(chain.EthCmd).
 	AddCommand(chain.HardhatCmd).
 	AddCommand(chain.ArchwayCmd).

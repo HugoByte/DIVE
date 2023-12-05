@@ -1,28 +1,18 @@
 package common
 
 import (
-	"context"
 	"encoding/json"
-	"fmt"
-	"io"
-	"log"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"runtime"
 	"time"
 
-	"github.com/google/go-github/github"
 	"github.com/kurtosis-tech/stacktrace"
-	"github.com/natefinch/lumberjack"
-	"github.com/rifflock/lfshook"
-	"github.com/sirupsen/logrus"
 )
 
 var lastChecked time.Time
 var latestVersion = ""
 
-type DiveserviceResponse struct {
+type DiveServiceResponse struct {
 	ServiceName     string `json:"service_name,omitempty"`
 	PublicEndpoint  string `json:"endpoint_public,omitempty"`
 	PrivateEndpoint string `json:"endpoint,omitempty"`
@@ -35,7 +25,7 @@ type DiveserviceResponse struct {
 	ChainKey        string `json:"chain_key,omitempty"`
 }
 
-func (dive *DiveserviceResponse) Decode(responseData []byte) (*DiveserviceResponse, error) {
+func (dive *DiveServiceResponse) Decode(responseData []byte) (*DiveServiceResponse, error) {
 
 	err := json.Unmarshal(responseData, &dive)
 	if err != nil {
@@ -43,7 +33,7 @@ func (dive *DiveserviceResponse) Decode(responseData []byte) (*DiveserviceRespon
 	}
 	return dive, nil
 }
-func (dive *DiveserviceResponse) EncodeToString() (string, error) {
+func (dive *DiveServiceResponse) EncodeToString() (string, error) {
 
 	encodedBytes, err := json.Marshal(dive)
 	if err != nil {
@@ -73,240 +63,49 @@ func OpenFile(URL string) error {
 }
 
 // This function will fetch the latest version from HugoByte/Dive repo
-func GetLatestVersion() string {
+// func GetLatestVersion() string {
 
-	// Repo Name
-	repo := "DIVE"
-	owner := "HugoByte"
-	userHomeDir, err := os.UserHomeDir()
+// 	// Repo Name
+// 	repo := "DIVE"
+// 	owner := "HugoByte"
+// 	userHomeDir, err := os.UserHomeDir()
 
-	if err != nil {
-		fmt.Println(err)
-		return ""
-	}
-	cachedFile := filepath.Join(userHomeDir, "/.dive/version_cache.txt")
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return ""
+// 	}
+// 	cachedFile := filepath.Join(userHomeDir, "/.dive/version_cache.txt")
 
-	if time.Since(lastChecked).Hours() > 1 {
-		cachedVersion, err := ReadConfigFile(cachedFile)
-		fmt.Println("here ")
+// 	if time.Since(lastChecked).Hours() > 1 {
+// 		cachedVersion, err := ReadConfigFile(cachedFile)
+// 		fmt.Println("here ")
 
-		if err == nil && string(cachedVersion) != "" {
-			latestVersion = string(cachedVersion)
-			fmt.Println("here 1")
-		} else {
-			fmt.Println("here 2")
-			client := github.NewClient(nil)
-			release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repo)
-			if err != nil {
-				fmt.Println(err)
-				return ""
-			}
+// 		if err == nil && string(cachedVersion) != "" {
+// 			latestVersion = string(cachedVersion)
+// 			fmt.Println("here 1")
+// 		} else {
+// 			fmt.Println("here 2")
+// 			client := github.NewClient(nil)
+// 			release, _, err := client.Repositories.GetLatestRelease(context.Background(), owner, repo)
+// 			if err != nil {
+// 				fmt.Println(err)
+// 				return ""
+// 			}
 
-			latestVersion = release.GetName()
-			writeCache(cachedFile, latestVersion)
-		}
-		lastChecked = time.Now()
+// 			latestVersion = release.GetName()
+// 			writeCache(cachedFile, latestVersion)
+// 		}
+// 		lastChecked = time.Now()
 
-	}
+// 	}
 
-	return latestVersion
-}
+// 	return latestVersion
+// }
 
-func writeCache(filePath string, latestVersion string) {
-	// Extract the directory path from the file path
-	dir := filepath.Dir(filePath)
+type Services map[string]*DiveServiceResponse
 
-	// Create the directory if it does not exist
-	if err := os.MkdirAll(dir, os.ModePerm); err != nil {
-		fmt.Println("Error creating directory:", err)
-		return
-	}
-
-	// Write the latest version to the cache file
-	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return
-	}
-
-	defer file.Close()
-
-	_, err = file.WriteString(latestVersion)
-	if err != nil {
-		fmt.Println("Error writing to cache:", err)
-	}
-}
-
-func ReadConfigFile(filePath string) ([]byte, error) {
-
-	file, err := os.ReadFile(filePath)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return file, nil
-}
-func WriteToFile(data string) error {
-	pwd, err := os.Getwd()
-
-	if err != nil {
-		return err
-	}
-
-	file, err := os.OpenFile(pwd+"/dive.json", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-
-	_, err = file.WriteString(data)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func ValidateCmdArgs(diveContext *DiveContext, args []string, cmd string) {
-	if len(args) != 0 {
-
-		diveContext.FatalError("Invalid Usage of command", cmd)
-
-	}
-}
-
-func setupLogger() *logrus.Logger {
-	pwd, err := os.Getwd()
-
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	log := logrus.New()
-
-	log.SetOutput(io.Discard)
-	log.SetFormatter(&logrus.TextFormatter{
-		TimestampFormat: "2006-01-02 15:04:05",
-		FullTimestamp:   true,
-		ForceColors:     true,
-		PadLevelText:    true,
-	})
-
-	ditFilePath := pwd + DiveLogDirectory + DiveDitLogFile
-	errorFilePath := pwd + DiveLogDirectory + DiveErrorLogFile
-
-	ditLogger := &lumberjack.Logger{
-		// Log file abbsolute path, os agnostic
-		Filename:  filepath.ToSlash(ditFilePath),
-		LocalTime: true,
-	}
-
-	// Fork writing into two outputs
-	ditWriter := io.MultiWriter(ditLogger)
-
-	errorLogger := &lumberjack.Logger{
-		Filename:  filepath.ToSlash(errorFilePath),
-		LocalTime: true,
-	}
-
-	// Fork writing into two outputs
-	errorWriter := io.MultiWriter(errorLogger)
-
-	log.AddHook(lfshook.NewHook(
-		lfshook.WriterMap{
-			logrus.InfoLevel:  ditWriter,
-			logrus.DebugLevel: ditWriter,
-			logrus.TraceLevel: ditWriter,
-			logrus.ErrorLevel: errorWriter,
-			logrus.FatalLevel: errorWriter,
-			logrus.WarnLevel:  errorWriter,
-		},
-		&logrus.JSONFormatter{
-			TimestampFormat: "2006-01-02 15:04:05",
-		},
-	))
-
-	return log
-}
-
-type Services map[string]*DiveserviceResponse
-
-func WriteToServiceFile(serviceName string, data DiveserviceResponse) error {
-
-	pwd, err := getPwd()
-	if err != nil {
-		return err
-	}
-
-	serviceFile := fmt.Sprintf("%s/%s", pwd, ServiceFilePath)
-
-	file, err := os.OpenFile(serviceFile, os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-
-	jsonDataFromFile, err := ReadServiceJsonFile()
-
-	if err != nil {
-		return err
-	}
-
-	if len(jsonDataFromFile) == 0 {
-		jsonDataFromFile = Services{}
-	}
-
-	var dataToWrite []byte
-
-	_, ok := jsonDataFromFile[serviceName]
-	if !ok {
-		jsonDataFromFile[serviceName] = &data
-		dataToWrite, err = json.Marshal(jsonDataFromFile)
-		if err != nil {
-			return err
-		}
-	}
-
-	_, err = file.Write(dataToWrite)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func ReadServiceJsonFile() (Services, error) {
-
-	services := Services{}
-
-	pwd, err := getPwd()
-	if err != nil {
-		return nil, err
-	}
-	serviceFile := fmt.Sprintf("%s/%s", pwd, ServiceFilePath)
-
-	jsonFile, _ := os.ReadFile(serviceFile)
-
-	if len(jsonFile) == 0 {
-		return nil, nil
-	}
-	json.Unmarshal(jsonFile, &services)
-
-	return services, nil
-
-}
-
-func getPwd() (string, error) {
-	pwd, err := os.Getwd()
-
-	if err != nil {
-		return "", err
-	}
-
-	return pwd, nil
+type EnclaveInfo struct {
+	Name      string
+	Uuid      string
+	ShortUuid string
 }

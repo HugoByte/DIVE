@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/hugobyte/dive-core/cli/cmd/bridge"
@@ -35,7 +36,11 @@ func run(cmd *cobra.Command, args []string) error {
 }
 
 func init() {
-	common.GetDiveContext()
+	_, err := common.GetCli()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
 
 func Execute() {
