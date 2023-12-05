@@ -97,7 +97,7 @@ func (df *diveFileHandler) WriteAppFile(fileName string, data []byte) error {
 		return WrapMessageToErrorf(err, "Failed To Get App File Path %s", fileName)
 	}
 
-	file, err := df.OpenFile(appFilePath, "append|write|create", 0644)
+	file, err := df.OpenFile(appFilePath, "append|write|create|truncate", 0644)
 	if err != nil {
 		return WrapMessageToErrorf(err, "Failed To Write App File %s", fileName)
 	}

@@ -69,7 +69,7 @@ func (d *diveLogger) SetOutputToStdout() {
 
 func (d *diveLogger) logWithFields(level logrus.Level, kind string, format string, args ...interface{}) {
 	if d.log.IsLevelEnabled(level) {
-		d.log.WithFields(logrus.Fields{"kind": kind}).Logf(level, format, args...)
+		d.log.WithFields(logrus.Fields{level.String(): kind}).Logf(level, format, args...)
 	}
 }
 
@@ -78,37 +78,37 @@ func (d *diveLogger) Debug(message string) {
 }
 
 func (d *diveLogger) Info(message string) {
-	d.logWithFields(logrus.InfoLevel, "ℹ️ info", message)
+	d.logWithFields(logrus.InfoLevel, "ℹ️", message)
 }
 
 func (d *diveLogger) Warn(message string) {
-	d.logWithFields(logrus.WarnLevel, "⚠️ warn", message)
+	d.logWithFields(logrus.WarnLevel, "⚠️", message)
 }
 
 func (d *diveLogger) Error(errorCode ErrorCode, errorMessage string) {
-	d.logWithFields(logrus.ErrorLevel, "🛑 error", "%s", errorMessage)
+	d.logWithFields(logrus.ErrorLevel, "🛑", "%s", errorMessage)
 }
 
 func (d *diveLogger) Fatal(errorCode ErrorCode, errorMessage string) {
-	d.logWithFields(logrus.FatalLevel, "💀 fatal", "%s", errorMessage)
+	d.logWithFields(logrus.FatalLevel, "💀", "%s", errorMessage)
 }
 
 func (d *diveLogger) Infof(format string, args ...interface{}) {
-	d.logWithFields(logrus.InfoLevel, "ℹ️ info", format, args...)
+	d.logWithFields(logrus.InfoLevel, "ℹ️", format, args...)
 }
 
 func (d *diveLogger) Warnf(format string, args ...interface{}) {
-	d.logWithFields(logrus.WarnLevel, "⚠️ warn", format, args...)
+	d.logWithFields(logrus.WarnLevel, "⚠️", format, args...)
 }
 
 func (d *diveLogger) Debugf(format string, args ...interface{}) {
-	d.logWithFields(logrus.DebugLevel, "🐞 debug", format, args...)
+	d.logWithFields(logrus.DebugLevel, "🐞", format, args...)
 }
 
 func (d *diveLogger) Errorf(errorCode ErrorCode, format string, args ...interface{}) {
-	d.logWithFields(logrus.ErrorLevel, "🛑 error", format, args...)
+	d.logWithFields(logrus.ErrorLevel, "🛑", format, args...)
 }
 
 func (d *diveLogger) Fatalf(errorCode ErrorCode, format string, args ...interface{}) {
-	d.logWithFields(logrus.FatalLevel, "💀 fatal", format, args...)
+	d.logWithFields(logrus.FatalLevel, "💀", format, args...)
 }

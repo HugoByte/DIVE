@@ -28,6 +28,14 @@ func version(cmd *cobra.Command, args []string) {
 
 	cli := common.GetCli()
 
+	err := common.ValidateArgs(args)
+
+	if err != nil {
+		cli.Logger().SetErrorToStderr()
+		cli.Logger().Fatal(common.CodeOf(err), err.Error())
+		cli.Context().Exit(1)
+	}
+
 	fmt.Println(GetLatestVersion(cli))
 
 }
