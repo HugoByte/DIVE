@@ -1,4 +1,4 @@
-package chain
+package hardhat
 
 import (
 	"github.com/hugobyte/dive-core/cli/common"

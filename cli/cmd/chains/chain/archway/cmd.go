@@ -1,4 +1,4 @@
-package chain
+package archway
 
 import (
 	"github.com/hugobyte/dive-core/cli/common"

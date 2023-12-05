@@ -1,4 +1,4 @@
-package chain
+package eth
 
 import (
 	"github.com/hugobyte/dive-core/cli/common"
