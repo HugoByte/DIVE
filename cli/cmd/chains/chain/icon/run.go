@@ -18,7 +18,6 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	cli.Spinner().StartWithMessage("Starting Icon Node", "green")
 
 	genesisHandler, err := genesismanager(enclaveContext)
 	if err != nil {
@@ -62,8 +61,6 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 }
 
 func RunDecentralization(cli *common.Cli, params string) error {
-
-	cli.Spinner().SetSuffixMessage("Starting Icon Node Decentralization", "green")
 
 	kurtosisEnclaveContext, err := cli.Context().GetEnclaveContext(common.DiveEnclave)
 

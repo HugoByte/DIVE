@@ -58,6 +58,7 @@ func icon(cmd *cobra.Command, args []string) {
 
 	var response = &common.DiveServiceResponse{}
 
+	cliContext.Spinner().StartWithMessage("Starting Icon Node", "green")
 	if decentralization {
 		response, err = RunIconNode(cliContext)
 
