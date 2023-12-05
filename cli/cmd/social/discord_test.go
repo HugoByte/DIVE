@@ -1,50 +1,52 @@
 package social
 
 import (
+	"bytes"
+	"os"
+	"os/exec"
 	"testing"
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestDiscordCommand(t *testing.T) {
-	tests := []struct {
-		name             string
-		args             []string
-		expectedError    *string // Use a pointer to string
-		expectedExitCode int
-	}{
-		{
-			name:             "ValidArgs",
-			args:             []string{},
-			expectedError:    nil,
-			expectedExitCode: 0,
-		},
-		{
-			name:             "InvalidArgs",
-			args:             []string{"arg1", "arg2"},
-			expectedError:    getStringPointer("Invalid Usage Of Command Arguments"),
-			expectedExitCode: 1,
-		},
+func TestDiscordWithInvalidArgs(t *testing.T) {
+
+	if os.Getenv("FLAG") == "1" {
+		cmd := &cobra.Command{}
+		args := []string{"arg1", "arg2"}
+		discord(cmd, args)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-
-			cmd := &cobra.Command{}
-
-			err := discord(cmd, tt.args)
-
-			if tt.expectedError != nil {
-				assert.NotNil(t, err)
-				assert.EqualError(t, err, *tt.expectedError)
-			} else {
-				assert.Nil(t, err)
-			}
-		})
-	}
+	cmd := exec.Command(os.Args[0], "-test.run=TestDiscord")
+	cmd.Env = append(os.Environ(), "FLAG=1")
+	err := cmd.Run()
+	e, ok := err.(*exec.ExitError)
+	expectedErrorString := "exit status 1"
+	assert.Equal(t, true, ok)
+	assert.Equal(t, expectedErrorString, e.Error())
 }
 
-func getStringPointer(s string) *string {
-	return &s
+func TestDiscord(t *testing.T) {
+	expectedLog := "Redirecting to DIVE discord channel..."
+	old := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+
+	defer func() {
+		w.Close()
+		os.Stdout = old
+	}()
+
+	cmd := &cobra.Command{}
+	args := []string{}
+
+	discord(cmd, args)
+
+	w.Close()
+	var capturedLog bytes.Buffer
+	_, _ = capturedLog.ReadFrom(r)
+
+	assert.Contains(t, capturedLog.String(), expectedLog)
+
 }
