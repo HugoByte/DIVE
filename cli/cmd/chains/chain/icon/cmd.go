@@ -43,12 +43,10 @@ var IconDecentralizeCmd = common.NewDiveCommandBuilder().
 	Build()
 
 func icon(cmd *cobra.Command, args []string) {
-	cliContext, err := common.GetCli()
-	if err != nil {
-		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
-	}
-	err = common.ValidateArgs(args)
 
+	cliContext := common.GetCliWithKurtosisContext()
+
+	err := common.ValidateArgs(args)
 	if err != nil {
 		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
 	}
@@ -57,7 +55,9 @@ func icon(cmd *cobra.Command, args []string) {
 	if err != nil {
 		cliContext.Logger().Error(common.InvalidCommandError, err.Error())
 	}
+
 	var response = &common.DiveServiceResponse{}
+
 	if decentralization {
 		response, err = RunIconNode(cliContext)
 
@@ -95,4 +95,26 @@ func icon(cmd *cobra.Command, args []string) {
 	cliContext.Spinner().StopWithMessage("Icon Node Started. Please find service details in current working directory(services.json)")
 }
 
-func iconDecentralization(cmd *cobra.Command, args []string) {}
+func iconDecentralization(cmd *cobra.Command, args []string) {
+
+	cliContext := common.GetCliWithKurtosisContext()
+
+	err := common.ValidateArgs(args)
+
+	if err != nil {
+		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
+	}
+
+	cliContext.Spinner().StartWithMessage("Starting Icon Node Decentralization", "green")
+
+	params := GetDecentralizeParams(serviceName, nodeEndpoint, ksPath, ksPassword, networkID)
+
+	err = RunDecentralization(cliContext, params)
+
+	if err != nil {
+		cliContext.Logger().Error(common.KurtosisContextError, err.Error())
+
+	}
+
+	cliContext.Spinner().StopWithMessage("Decentralization Completed")
+}

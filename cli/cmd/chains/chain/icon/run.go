@@ -8,13 +8,6 @@ import (
 
 func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
-	_, err := cli.Context().GetKurtosisContext()
-
-	if err != nil {
-		return nil, common.Errorc(common.KurtosisContextError, err.Error())
-
-	}
-
 	enclaveContext, err := cli.Context().GetEnclaveContext(common.DiveEnclave)
 
 	if err != nil {
@@ -43,12 +36,12 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	response, services, skippedInstructions, err := common.GetSerializedData(cli, iconData)
 
 	if err != nil {
-		for service := range services {
-			err = cli.Context().RemoveService(service, common.DiveEnclave)
-			if err != nil {
-				return nil, common.Errorc(common.InvalidEnclaveContextError, err.Error())
-			}
+
+		err = cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		if err != nil {
+			return nil, common.Errorc(common.InvalidEnclaveContextError, err.Error())
 		}
+
 		return nil, common.Errorc(common.KurtosisContextError, err.Error())
 	}
 
@@ -70,7 +63,7 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 func RunDecentralization(cli *common.Cli, params string) error {
 
-	cli.Spinner().SetSuffixMessage(" Starting Icon Node Decentralization", "green")
+	cli.Spinner().SetSuffixMessage("Starting Icon Node Decentralization", "green")
 
 	kurtosisEnclaveContext, err := cli.Context().GetEnclaveContext(common.DiveEnclave)
 
@@ -87,12 +80,12 @@ func RunDecentralization(cli *common.Cli, params string) error {
 	_, services, skippedInstructions, err := common.GetSerializedData(cli, data)
 	if err != nil {
 
-		for service := range services {
-			err = cli.Context().RemoveService(service, common.DiveEnclave)
-			if err != nil {
-				return common.Errorc(common.InvalidEnclaveContextError, err.Error())
-			}
+		err = cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		if err != nil {
+			return common.Errorc(common.InvalidEnclaveContextError, err.Error())
 		}
+
+		return common.Errorc(common.KurtosisContextError, err.Error())
 	}
 	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
 		return common.Errorc(common.KurtosisContextError, "Decentralization Already  Completed ")

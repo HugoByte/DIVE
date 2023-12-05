@@ -47,7 +47,9 @@ type Context interface {
 	StopServices(enclaveName string) error
 	RemoveServices(enclaveName string) error
 	RemoveService(serviceName string, enclaveName string) error
+	RemoveServicesByServiceNames(services map[string]string, enclaveName string) error
 	CreateEnclave(enclaveName string) (*enclaves.EnclaveContext, error)
+	Exit(statusCode int)
 }
 
 type FileHandler interface {
@@ -61,6 +63,8 @@ type FileHandler interface {
 	GetHomeDir() (string, error)
 	MkdirAll(dirPath string, permission fs.FileMode) error
 	OpenFile(filePath string, fileOpenMode string, permission int) (*os.File, error)
+	RemoveFile(fileName string) error
+	RemoveFiles(fileNames []string) error
 }
 
 // CommandBuilder is an interface for building a Cobra command.

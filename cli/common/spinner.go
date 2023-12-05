@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -38,7 +39,7 @@ func (ds *diveSpinner) Start(color string) {
 
 func (ds *diveSpinner) StartWithMessage(message, color string) {
 
-	ds.SetSuffixMessage(message, color)
+	ds.SetSuffixMessage(fmt.Sprint(" ", message), color)
 	ds.Start(color)
 }
 
@@ -52,5 +53,5 @@ func (ds *diveSpinner) StopWithMessage(message string) {
 }
 
 func (ds *diveSpinner) setFinalMessage(message string) {
-	ds.spinner.FinalMSG = message
+	ds.spinner.FinalMSG = fmt.Sprint(" ", message)
 }

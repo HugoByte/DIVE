@@ -1,12 +1,14 @@
 package common
 
 import (
+	"fmt"
+	"os"
 	"path/filepath"
 	"sync"
 )
 
 var (
-	CliContext *Cli
+	cliContext *Cli
 
 	initOnce sync.Once
 )
@@ -37,17 +39,30 @@ func initCli() (*Cli, error) {
 	}, nil
 }
 
-func GetCli() (*Cli, error) {
+func GetCli() *Cli {
+
 	var err error
 	initOnce.Do(func() {
-		CliContext, err = initCli()
+		cliContext, err = initCli()
 	})
 
 	if err != nil {
-		return nil, WrapMessageToError(err, "Failed To Retrieve Cli")
+		fmt.Println("Failed to get CLI context:", err)
+		os.Exit(1)
 	}
 
-	return CliContext, nil
+	return cliContext
+}
+
+func GetCliWithKurtosisContext() *Cli {
+
+	_, err := cliContext.Context().GetKurtosisContext()
+
+	if err != nil {
+		fmt.Println(Errorc(KurtosisContextError, err.Error()))
+		os.Exit(1)
+	}
+	return cliContext
 }
 
 func (c *Cli) Logger() Logger {

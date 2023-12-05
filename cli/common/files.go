@@ -2,6 +2,7 @@ package common
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -217,4 +218,48 @@ func parseFileOpenMode(fileOpenMode string) int {
 	}
 
 	return mode
+}
+
+func (df *diveFileHandler) RemoveFile(fileName string) error {
+
+	pwd, err := df.GetPwd()
+
+	if err != nil {
+		return WrapMessageToErrorf(err, "Failed To Remove File")
+	}
+
+	filePath := filepath.Join(pwd, fileName)
+
+	_, err = os.Stat(filePath)
+	if err != nil {
+		return Errorc(FileError, "File Not Exists")
+	}
+
+	err = os.Remove(filePath)
+	if err != nil {
+		return Errorc(FileError, fmt.Sprintf("Failed To Remove File %s", filePath))
+	}
+	return nil
+}
+
+func (df *diveFileHandler) RemoveFiles(fileNames []string) error {
+
+	pwd, err := df.GetPwd()
+
+	if err != nil {
+		return WrapMessageToErrorf(err, "Failed To Remove File")
+	}
+	for _, fileName := range fileNames {
+		filePath := filepath.Join(pwd, fileName)
+
+		_, err = os.Stat(filePath)
+		if err == nil {
+			err = os.Remove(filePath)
+			if err != nil {
+				return Errorc(FileError, fmt.Sprintf("Failed To Remove File %s", filePath))
+			}
+		}
+
+	}
+	return nil
 }

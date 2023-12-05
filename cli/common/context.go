@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 
@@ -318,4 +319,29 @@ func GetSerializedData(cliContext *Cli, response chan *kurtosis_core_rpc_api_bin
 	}
 
 	return serializedOutputObj, services, skippedInstruction, nil
+}
+
+func (dc *diveContext) RemoveServicesByServiceNames(services map[string]string, enclaveName string) error {
+	enclaveCtx, err := dc.GetEnclaveContext(enclaveName)
+
+	if err != nil {
+		return WrapMessageToError(err, "Failed To Remove Services")
+	}
+
+	for serviceName := range services {
+		params := fmt.Sprintf(`{"service_name": "%s"}`, serviceName)
+		starlarkConfig := GetStarlarkRunConfig(params, "", "")
+
+		_, err = enclaveCtx.RunStarlarkScriptBlocking(dc.ctx, removeServiceStarlarkScript, starlarkConfig)
+		if err != nil {
+			return err
+		}
+
+	}
+
+	return nil
+}
+
+func (dc *diveContext) Exit(statusCode int) {
+	os.Exit(statusCode)
 }
