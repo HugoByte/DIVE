@@ -65,6 +65,7 @@ type FileHandler interface {
 	OpenFile(filePath string, fileOpenMode string, permission int) (*os.File, error)
 	RemoveFile(fileName string) error
 	RemoveFiles(fileNames []string) error
+	GetAppDirPathOrAppFilePath(fileName string) (string, error)
 }
 
 // CommandBuilder is an interface for building a Cobra command.

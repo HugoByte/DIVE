@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+const appDir = ".dive"
+
 type diveFileHandler struct{}
 
 func NewDiveFileHandler() *diveFileHandler {
@@ -63,11 +65,10 @@ func (df *diveFileHandler) ReadJson(fileName string, obj interface{}) error {
 }
 func (df *diveFileHandler) ReadAppFile(fileName string) ([]byte, error) {
 
-	uhd, err := df.GetHomeDir()
+	appFilePath, err := df.GetAppDirPathOrAppFilePath(fileName)
 	if err != nil {
 		return nil, WrapMessageToError(err, "Failed to Read App File")
 	}
-	appFilePath := filepath.Join(uhd, ".dive", fileName)
 
 	data, err := df.ReadFile(appFilePath)
 
@@ -80,11 +81,10 @@ func (df *diveFileHandler) ReadAppFile(fileName string) ([]byte, error) {
 
 func (df *diveFileHandler) WriteAppFile(fileName string, data []byte) error {
 
-	uhd, err := df.GetHomeDir()
+	appFileDir, err := df.GetAppDirPathOrAppFilePath("")
 	if err != nil {
-		return WrapMessageToErrorf(err, "Failed To Write App File %s", fileName)
+		return WrapMessageToErrorf(err, "Failed To Get App File Path %s", fileName)
 	}
-	appFileDir := filepath.Join(uhd, ".dive")
 
 	err = df.MkdirAll(appFileDir, os.ModePerm)
 
@@ -92,7 +92,10 @@ func (df *diveFileHandler) WriteAppFile(fileName string, data []byte) error {
 		return WrapMessageToErrorf(err, "Failed To Write App File %s", fileName)
 	}
 
-	appFilePath := filepath.Join(appFileDir, fileName)
+	appFilePath, err := df.GetAppDirPathOrAppFilePath(fileName)
+	if err != nil {
+		return WrapMessageToErrorf(err, "Failed To Get App File Path %s", fileName)
+	}
 
 	file, err := df.OpenFile(appFilePath, "append|write|create", 0644)
 	if err != nil {
@@ -262,4 +265,20 @@ func (df *diveFileHandler) RemoveFiles(fileNames []string) error {
 
 	}
 	return nil
+}
+
+func (df *diveFileHandler) GetAppDirPathOrAppFilePath(fileName string) (string, error) {
+
+	var path string
+	uhd, err := df.GetHomeDir()
+	if err != nil {
+		return "", WrapMessageToErrorf(err, "Failed To Write App File %s", fileName)
+	}
+	if fileName == "" {
+		path = filepath.Join(uhd, appDir)
+	} else {
+		path = filepath.Join(uhd, appDir, fileName)
+	}
+
+	return path, nil
 }

@@ -1,5 +1,12 @@
 package common
 
+import (
+	"os/exec"
+	"runtime"
+
+	"github.com/kurtosis-tech/stacktrace"
+)
+
 func ValidateArgs(args []string) error {
 	if len(args) != 0 {
 
@@ -27,5 +34,24 @@ func WriteServiceResponseData(serviceName string, data DiveServiceResponse, cliC
 		return err
 	}
 
+	return nil
+}
+
+func OpenFile(URL string) error {
+	var args []string
+	switch runtime.GOOS {
+	case linuxOSName:
+		args = []string{openFileLinuxCommandName, URL}
+	case macOSName:
+		args = []string{openFileMacCommandName, URL}
+	case windowsOSName:
+		args = []string{openFileWindowsCommandName, openFileWindowsCommandFirstArgumentDefault, URL}
+	default:
+		return stacktrace.NewError("Unsupported operating system")
+	}
+	command := exec.Command(args[0], args[1:]...)
+	if err := command.Start(); err != nil {
+		return stacktrace.Propagate(err, "An error occurred while opening '%v'", URL)
+	}
 	return nil
 }
