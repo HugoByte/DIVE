@@ -1,6 +1,9 @@
 package archway
 
-import "github.com/hugobyte/dive-core/cli/common"
+import (
+	"github.com/hugobyte/dive-core/cli/cmd/chains/utils"
+	"github.com/hugobyte/dive-core/cli/common"
+)
 
 func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
@@ -10,7 +13,7 @@ func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 		return nil, err
 	}
 
-	var serviceConfig = &ArchwayServiceConfig{}
+	var serviceConfig = &utils.CosmosServiceConfig{}
 
 	err = common.LoadConfig(cli, serviceConfig, configFilePath)
 	if err != nil {
