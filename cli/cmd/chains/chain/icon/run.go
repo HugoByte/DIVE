@@ -14,7 +14,7 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 		return nil, err
 	}
 	var serviceConfig = &IconServiceConfig{}
-	err = LoadConfig(cli, serviceConfig, configFilePath)
+	err = common.LoadConfig(cli, serviceConfig, configFilePath)
 	if err != nil {
 		return nil, err
 	}

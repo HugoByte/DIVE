@@ -42,3 +42,8 @@ type EnclaveInfo struct {
 	Uuid      string
 	ShortUuid string
 }
+
+type ConfigLoader interface {
+	LoadDefaultConfig()
+	LoadConfigFromFile(cliContext *Cli, filePath string) error
+}

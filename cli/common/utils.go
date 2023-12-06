@@ -55,3 +55,15 @@ func OpenFile(URL string) error {
 	}
 	return nil
 }
+
+func LoadConfig(cliContext *Cli, config ConfigLoader, filePath string) error {
+	if filePath == "" {
+		config.LoadDefaultConfig()
+	} else {
+		err := config.LoadConfigFromFile(cliContext, filePath)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

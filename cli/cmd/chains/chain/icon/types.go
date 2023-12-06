@@ -6,11 +6,6 @@ import (
 	"github.com/hugobyte/dive-core/cli/common"
 )
 
-type ConfigLoader interface {
-	LoadDefaultConfig()
-	LoadConfigFromFile(cliContext *common.Cli, filePath string) error
-}
-
 type IconServiceConfig struct {
 	Port             int    `json:"private_port"`
 	PublicPort       int    `json:"public_port"`
@@ -38,7 +33,7 @@ func (sc *IconServiceConfig) EncodeToString() (string, error) {
 }
 
 func (sc *IconServiceConfig) LoadConfigFromFile(cliContext *common.Cli, filePath string) error {
-	err := cliContext.FileHandler().ReadJson(configFilePath, sc)
+	err := cliContext.FileHandler().ReadJson(filePath, sc)
 	if err != nil {
 		return err
 	}

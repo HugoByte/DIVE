@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/hugobyte/dive-core/cli/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 )
 
@@ -35,18 +34,6 @@ func genesismanager(enclaveContext *enclaves.EnclaveContext) (*genesisHandler, e
 	}
 
 	return &gm, nil
-}
-
-func LoadConfig(cliContext *common.Cli, config ConfigLoader, filePath string) error {
-	if filePath == "" {
-		config.LoadDefaultConfig()
-	} else {
-		err := config.LoadConfigFromFile(cliContext, filePath)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func GetDecentralizeParams(serviceName, nodeEndpoint, keystorePath, keystorepassword, networkID string) string {
