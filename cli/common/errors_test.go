@@ -88,10 +88,10 @@ func TestWithCode(t *testing.T) {
 	tests := map[string]error{
 
 		"Errorc":       Errorc(UnsupportedOSError, "OS Error"),
-		"NewBaseError": NewBase(FileError, "Invalid File"),
+		"NewBaseError": NewBase(InvalidFileError, "Invalid File"),
 		"WrapMessage":  WrapMessageToError(Errorc(UnknownError, "Error Parsing Arguments"), "Invalid Usage"),
 		"WrapCode":     WrapCodeToError(Errorc(UnsupportedOSError, "Unknown Platform"), UnsupportedOSError, "Error"),
-		"WithCode":     WithCode(errors.New("test"), FileError),
+		"WithCode":     WithCode(errors.New("test"), InvalidFileError),
 	}
 
 	for errName, err := range tests {
@@ -119,8 +119,8 @@ func TestCodeOf(t *testing.T) {
 		},
 		{
 			"test_with_code",
-			WithCode(errors.New("test"), FileError),
-			FileError,
+			WithCode(errors.New("test"), InvalidFileError),
+			InvalidFileError,
 		},
 		{
 			"test_with_wrapwessage",

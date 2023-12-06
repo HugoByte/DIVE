@@ -4,8 +4,11 @@ import (
 	"os"
 	"slices"
 
-	"github.com/hugobyte/dive-core/cli/cmd/chains/chain"
-	"github.com/hugobyte/dive-core/cli/cmd/chains/chain/icon"
+	"github.com/hugobyte/dive-core/cli/cmd/chains/archway"
+	"github.com/hugobyte/dive-core/cli/cmd/chains/eth"
+	"github.com/hugobyte/dive-core/cli/cmd/chains/hardhat"
+	"github.com/hugobyte/dive-core/cli/cmd/chains/icon"
+	"github.com/hugobyte/dive-core/cli/cmd/chains/neutron"
 	"github.com/hugobyte/dive-core/cli/common"
 	"github.com/spf13/cobra"
 )
@@ -19,10 +22,10 @@ By executing this command, the node is launched, enabling network participation,
 maintenance within the specified blockchain ecosystem.`,
 	).
 	AddCommand(icon.IconCmd).
-	AddCommand(chain.EthCmd).
-	AddCommand(chain.HardhatCmd).
-	AddCommand(chain.ArchwayCmd).
-	AddCommand(chain.NeutronCmd).
+	AddCommand(eth.EthCmd).
+	AddCommand(hardhat.HardhatCmd).
+	AddCommand(archway.ArchwayCmd).
+	AddCommand(neutron.NeutronCmd).
 	SetRun(chains).
 	Build()
 

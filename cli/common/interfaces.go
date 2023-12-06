@@ -18,11 +18,11 @@ type Logger interface {
 	Warn(message string)
 	Error(errorCode ErrorCode, errorMessage string)
 	Fatal(errorCode ErrorCode, errorMessage string)
-	Infof(message string)
-	Warnf(message string)
-	Debugf(message string)
-	Errorf(errorCode ErrorCode, errorMessage string)
-	Fatalf(errorCode ErrorCode, errorMessage string)
+	Infof(format string, args ...interface{})
+	Warnf(format string, args ...interface{})
+	Debugf(format string, args ...interface{})
+	Errorf(errorCode ErrorCode, format string, args ...interface{})
+	Fatalf(errorCode ErrorCode, format string, args ...interface{})
 }
 
 type Spinner interface {
@@ -47,7 +47,9 @@ type Context interface {
 	StopServices(enclaveName string) error
 	RemoveServices(enclaveName string) error
 	RemoveService(serviceName string, enclaveName string) error
+	RemoveServicesByServiceNames(services map[string]string, enclaveName string) error
 	CreateEnclave(enclaveName string) (*enclaves.EnclaveContext, error)
+	Exit(statusCode int)
 }
 
 type FileHandler interface {
@@ -61,6 +63,9 @@ type FileHandler interface {
 	GetHomeDir() (string, error)
 	MkdirAll(dirPath string, permission fs.FileMode) error
 	OpenFile(filePath string, fileOpenMode string, permission int) (*os.File, error)
+	RemoveFile(fileName string) error
+	RemoveFiles(fileNames []string) error
+	GetAppDirPathOrAppFilePath(fileName string) (string, error)
 }
 
 // CommandBuilder is an interface for building a Cobra command.

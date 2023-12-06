@@ -9,30 +9,30 @@ import (
 
 type ErrorCode int
 
-const (
-	ErrorCodeGeneral ErrorCode = iota + 1000
-)
-
-const (
-	UnknownError ErrorCode = ErrorCodeGeneral + iota
-	InvalidEnclaveNameError
-	UnsupportedOSError
-	FileError
-	InvalidCommandError
-	KurtosisContextError
-	InvalidEnclaveContextError
-	InvalidEnclaveConfigError
-)
-
 var (
-	ErrUnknown               = NewBase(UnknownError, "UnknownError")
-	ErrInvalidEnclaveName    = NewBase(InvalidEnclaveNameError, "InvalidEnclaveName")
-	ErrUnsupportedOS         = NewBase(UnsupportedOSError, "UnsupportedOS")
-	ErrFile                  = NewBase(FileError, "FileError")
-	ErrKurtosisContext       = NewBase(KurtosisContextError, "Failed To Get Kurtosis Context")
-	ErrInvalidCommand        = NewBase(InvalidCommandError, "InvalidCommand")
-	ErrInvalidEnclaveContext = NewBase(InvalidEnclaveContextError, "InvalidEnclaveContext")
-	ErrInvalidEnclaveConfig  = NewBase(InvalidEnclaveConfigError, "InvalidEnclaveConfig")
+	ErrUnknown                 = NewBase(UnknownError, "Unknown Error")
+	ErrReadFile                = NewBase(FileReadError, "Failed To Read File")
+	ErrWriteFile               = NewBase(FileWriteError, "Failed To Write File")
+	ErrOpenFile                = NewBase(FileOpenError, "Failed To Open File")
+	ErrNotExistsFile           = NewBase(FileNotExistError, "File Doesn't Exists")
+	ErrInitializingKurtosis    = NewBase(KurtosisInitError, "Error While Initializing Kurtosis")
+	ErrInitializingCLI         = NewBase(CLIInitError, "Error While Initializing CLI")
+	ErrEnclaveNameInvalid      = NewBase(InvalidEnclaveError, "Invalid Enclave Name")
+	ErrUnsupportedOS           = NewBase(UnsupportedOSError, "Unsupported OS")
+	ErrInvalidCommand          = NewBase(InvalidCommandError, "Invalid Command")
+	ErrEnclaveNotExist         = NewBase(EnclaveNotExistError, "Enclave Does Not Exist")
+	ErrInvalidEnclaveContext   = NewBase(InvalidEnclaveContextError, "Invalid Enclave Context")
+	ErrInvalidEnclaveConfig    = NewBase(InvalidEnclaveConfigError, "Invalid Enclave Config")
+	ErrInvalidCommandArguments = NewBase(InvalidCommandArgumentsError, "Invalid Command Arguments")
+	ErrInvalidKurtosisContext  = NewBase(InvalidKurtosisContextError, "Invalid Kurtosis Context")
+	ErrDataMarshall            = NewBase(DataMarshallError, "Data Marshall Error")
+	ErrDataUnMarshall          = NewBase(DataUnMarshallError, "Data UnMarshall Error")
+	ErrStarlarkRunFailed       = NewBase(StarlarkRunFailedError, "Starlark Run Failed")
+	ErrNotFound                = NewBase(NotFoundError, "Not Found")
+	ErrStarlarkResponse        = NewBase(StarlarkResponseError, "Starlark Response Error")
+	ErrPath                    = NewBase(InvalidPathError, "Failed To Resolve Path")
+	ErrInvalidFile             = NewBase(InvalidFileError, "Failed To Resolve to File")
+	ErrKurtosisService         = NewBase(KurtosisServiceError, "Kurtosis Service Error")
 )
 
 func (c ErrorCode) New(msg string) error {

@@ -20,4 +20,20 @@ var TutorialCmd = common.NewDiveCommandBuilder().
 
 func tutorial(cmd *cobra.Command, args []string) {
 
+	cli := common.GetCli()
+
+	cli.Logger().SetOutputToStdout()
+
+	err := common.ValidateArgs(args)
+
+	if err != nil {
+		cli.Logger().Error(common.CodeOf(err), common.Errorcf(common.CodeOf(err), "error %s !!! \n%s", err, cmd.UsageString()).Error())
+	}
+
+	cli.Logger().Info("Redirecting to YouTube.....")
+
+	if err := common.OpenFile(tutorialURL); err != nil {
+		cli.Logger().Fatalf(common.InvalidCommandError, common.Errorcf(common.CodeOf(err), "Failed to open Dive YouTube chanel with error %v", err).Error())
+	}
+
 }

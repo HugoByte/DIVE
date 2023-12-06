@@ -4,14 +4,13 @@ go 1.21
 
 require (
 	github.com/briandowns/spinner v1.23.0
-	github.com/fatih/color v1.16.0
+	github.com/fatih/color v1.16.0 // indirect
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/kurtosis-tech/kurtosis/api/golang v0.85.31
 	github.com/kurtosis-tech/stacktrace v0.0.0-20211028211901-1c67a77b5409
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.8.0
-	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa
 )
 
 require (
@@ -23,7 +22,7 @@ require (
 	github.com/kurtosis-tech/kurtosis/contexts-config-store v0.0.0-20231117200002-b558d38585bb // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.1 // indirect
-	github.com/stretchr/testify v1.8.4 // indirect
+	github.com/stretchr/testify v1.8.4
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
