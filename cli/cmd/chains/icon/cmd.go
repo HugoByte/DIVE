@@ -48,12 +48,12 @@ func icon(cmd *cobra.Command, args []string) {
 
 	err := common.ValidateArgs(args)
 	if err != nil {
-		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
+		cliContext.Fatalf("Error %s. %s", err, cmd.UsageString())
 	}
 
 	decentralization, err := cmd.Flags().GetBool("decentralization")
 	if err != nil {
-		cliContext.Logger().Error(common.InvalidCommandError, err.Error())
+		cliContext.Fatal(common.WrapMessageToError(common.ErrInvalidCommand, err.Error()))
 	}
 
 	var response = &common.DiveServiceResponse{}
@@ -63,33 +63,29 @@ func icon(cmd *cobra.Command, args []string) {
 		response, err = RunIconNode(cliContext)
 
 		if err != nil {
-			cliContext.Logger().Error(common.CodeOf(err), err.Error())
-			cliContext.Spinner().Stop()
+			cliContext.Fatal(err)
 		}
 		params := GetDecentralizeParams(response.ServiceName, response.PrivateEndpoint, response.KeystorePath, response.KeyPassword, response.NetworkId)
 
 		err = RunDecentralization(cliContext, params)
 
 		if err != nil {
-			cliContext.Logger().Error(common.CodeOf(err), err.Error())
-			cliContext.Spinner().Stop()
+			cliContext.Fatal(err)
 		}
 
 	} else {
 		response, err = RunIconNode(cliContext)
 
 		if err != nil {
-			cliContext.Logger().Error(common.CodeOf(err), err.Error())
-			cliContext.Spinner().Stop()
+			cliContext.Fatal(err)
 		}
 
 	}
 
 	err = common.WriteServiceResponseData(response.ServiceName, *response, cliContext)
 	if err != nil {
-		cliContext.Spinner().Stop()
-		cliContext.Logger().SetErrorToStderr()
-		cliContext.Logger().Error(common.CodeOf(err), err.Error())
+		cliContext.Error(err)
+		cliContext.Context().Exit(1)
 
 	}
 
@@ -103,7 +99,7 @@ func iconDecentralization(cmd *cobra.Command, args []string) {
 	err := common.ValidateArgs(args)
 
 	if err != nil {
-		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
+		cliContext.Fatalf("Error %s. %s", err, cmd.UsageString())
 	}
 
 	cliContext.Spinner().StartWithMessage("Starting Icon Node Decentralization", "green")
@@ -113,7 +109,7 @@ func iconDecentralization(cmd *cobra.Command, args []string) {
 	err = RunDecentralization(cliContext, params)
 
 	if err != nil {
-		cliContext.Logger().Error(common.KurtosisContextError, err.Error())
+		cliContext.Fatal(err)
 
 	}
 

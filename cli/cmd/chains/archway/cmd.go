@@ -29,7 +29,7 @@ func archway(cmd *cobra.Command, args []string) {
 
 	err := common.ValidateArgs(args)
 	if err != nil {
-		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
+		cliContext.Fatalf("Error %s. %s", err, cmd.UsageString())
 	}
 
 	cliContext.Spinner().StartWithMessage("Starting Archway Node", "green")
@@ -37,14 +37,12 @@ func archway(cmd *cobra.Command, args []string) {
 	response, err := RunArchway(cliContext)
 
 	if err != nil {
-		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
+		cliContext.Fatal(err)
 	}
 
 	err = common.WriteServiceResponseData(response.ServiceName, *response, cliContext)
 	if err != nil {
-		cliContext.Spinner().Stop()
-		cliContext.Logger().SetErrorToStderr()
-		cliContext.Logger().Error(common.CodeOf(err), err.Error())
+		cliContext.Fatal(err)
 
 	}
 

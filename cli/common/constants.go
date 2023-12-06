@@ -46,3 +46,34 @@ const (
 
 	openFileWindowsCommandFirstArgumentDefault = "url.dll,FileProtocolHandler"
 )
+
+const (
+	ErrorCodeGeneral ErrorCode = iota + 1000
+)
+
+const (
+	UnknownError ErrorCode = ErrorCodeGeneral + iota
+	FileReadError
+	FileWriteError
+	FileOpenError
+	FileNotExistError
+	KurtosisInitError
+	CLIInitError
+	InvalidEnclaveNameError
+	UnsupportedOSError
+	InvalidCommandError
+	InvalidEnclaveError
+	EnclaveNotExistError
+	InvalidEnclaveContextError
+	InvalidEnclaveConfigError
+	InvalidCommandArgumentsError
+	InvalidKurtosisContextError
+	DataMarshallError
+	DataUnMarshallError
+	StarlarkRunFailedError
+	NotFoundError
+	StarlarkResponseError
+	InvalidPathError
+	InvalidFileError
+	KurtosisServiceError
+)

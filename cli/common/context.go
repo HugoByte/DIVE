@@ -2,15 +2,11 @@ package common
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
-	"strings"
 	"sync"
 
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/starlark_run_config"
 	"github.com/kurtosis-tech/kurtosis/api/golang/engine/lib/kurtosis_context"
 )
 
@@ -24,10 +20,6 @@ def run(plan,args):
 def run(plan, args):
 	plan.stop_service(name=args["service_name"])
 `
-)
-
-var (
-	kurtosisContextErr error
 )
 
 type diveContext struct {
@@ -52,7 +44,7 @@ func (dc *diveContext) GetKurtosisContext() (*kurtosis_context.KurtosisContext, 
 	if !dc.kurtosisInitDone {
 		kurtosisContext, err := dc.initKurtosisContext()
 		if err != nil {
-			return nil, err
+			return nil, WrapMessageToError(ErrInitializingKurtosis, err.Error())
 		}
 		dc.kurtosisContext = kurtosisContext
 		dc.kurtosisInitDone = true
@@ -64,7 +56,7 @@ func (dc *diveContext) GetEnclaves() ([]EnclaveInfo, error) {
 	enclavesInfo, err := dc.kurtosisContext.GetEnclaves(dc.ctx)
 
 	if err != nil {
-		return nil, Errorc(KurtosisContextError, err.Error())
+		return nil, WrapMessageToError(ErrInvalidEnclaveContext, err.Error())
 	}
 	var enclaves []EnclaveInfo
 	enclaveMap := enclavesInfo.GetEnclavesByName()
@@ -85,7 +77,7 @@ func (dc *diveContext) GetEnclaveContext(enclaveName string) (*enclaves.EnclaveC
 	}
 	enclaveCtx, err := dc.kurtosisContext.GetEnclaveContext(dc.ctx, enclaveInfo.Name)
 	if err != nil {
-		return nil, Errorc(InvalidEnclaveNameError, err.Error())
+		return nil, WrapMessageToError(ErrEnclaveNameInvalid, err.Error())
 	}
 
 	return enclaveCtx, nil
@@ -96,7 +88,7 @@ func (dc *diveContext) CleanEnclaves() ([]*EnclaveInfo, error) {
 	enclaves, err := dc.kurtosisContext.Clean(dc.ctx, true)
 
 	if err != nil {
-		return nil, Errorc(InvalidEnclaveContextError, err.Error())
+		return nil, WrapMessageToError(ErrInvalidKurtosisContext, err.Error())
 	}
 
 	var enclaveInfo []*EnclaveInfo
@@ -113,11 +105,11 @@ func (dc *diveContext) CleanEnclaveByName(enclaveName string) error {
 	enclaveInfo, err := dc.checkEnclaveExist(enclaveName)
 
 	if err != nil {
-		return Errorc(KurtosisContextError, err.Error())
+		return WrapMessageToError(ErrInvalidKurtosisContext, err.Error())
 	}
 	err = dc.kurtosisContext.DestroyEnclave(dc.ctx, enclaveInfo.Uuid)
 	if err != nil {
-		return Errorc(KurtosisContextError, err.Error())
+		return WrapMessageToError(ErrInvalidKurtosisContext, err.Error())
 	}
 	return nil
 }
@@ -131,7 +123,7 @@ func (dc *diveContext) StopService(serviceName string, enclaveName string) error
 
 	enclaveContext, err := dc.GetEnclaveContext(enclaveName)
 	if err != nil {
-		return err
+		return WrapMessageToError(err, "Failed To Stop Services")
 	}
 
 	params := fmt.Sprintf(`{"service_name": "%s"}`, serviceName)
@@ -139,7 +131,7 @@ func (dc *diveContext) StopService(serviceName string, enclaveName string) error
 
 	_, err = enclaveContext.RunStarlarkScriptBlocking(dc.ctx, stopServiceStarlarkScript, starlarkConfig)
 	if err != nil {
-		return err
+		return ErrStarlarkRunFailed
 	}
 	return nil
 }
@@ -149,13 +141,13 @@ func (dc *diveContext) StopServices(enclaveName string) error {
 	enclaveCtx, err := dc.GetEnclaveContext(enclaveName)
 
 	if err != nil {
-		return WrapMessageToError(err, "Failed To Stop Services")
+		return WrapMessageToErrorf(err, "Failed To Stop Services on enclave %s", enclaveName)
 	}
 
 	services, err := enclaveCtx.GetServices()
 
 	if err != nil {
-		return WrapMessageToError(err, "Failed To Stop Services")
+		return WrapMessageToErrorf(ErrKurtosisService, "%s. Failed To Stop Services", err)
 	}
 
 	for serviceName := range services {
@@ -164,7 +156,7 @@ func (dc *diveContext) StopServices(enclaveName string) error {
 
 		_, err = enclaveCtx.RunStarlarkScriptBlocking(dc.ctx, stopServiceStarlarkScript, starlarkConfig)
 		if err != nil {
-			return err
+			return ErrStarlarkRunFailed
 		}
 
 	}
@@ -182,7 +174,7 @@ func (dc *diveContext) RemoveServices(enclaveName string) error {
 	services, err := enclaveCtx.GetServices()
 
 	if err != nil {
-		return WrapMessageToError(err, "Failed To Remove Services")
+		return WrapMessageToError(ErrKurtosisService, "Failed To Remove Services")
 	}
 
 	for serviceName := range services {
@@ -191,7 +183,7 @@ func (dc *diveContext) RemoveServices(enclaveName string) error {
 
 		_, err = enclaveCtx.RunStarlarkScriptBlocking(dc.ctx, removeServiceStarlarkScript, starlarkConfig)
 		if err != nil {
-			return err
+			return ErrStarlarkRunFailed
 		}
 
 	}
@@ -202,7 +194,7 @@ func (dc *diveContext) RemoveServices(enclaveName string) error {
 func (dc *diveContext) RemoveService(serviceName string, enclaveName string) error {
 	enclaveContext, err := dc.GetEnclaveContext(enclaveName)
 	if err != nil {
-		return err
+		return WrapMessageToErrorf(err, "Failed To Remove Service %s in enclave %s", serviceName, enclaveName)
 	}
 
 	params := fmt.Sprintf(`{"service_name": "%s"}`, serviceName)
@@ -210,7 +202,7 @@ func (dc *diveContext) RemoveService(serviceName string, enclaveName string) err
 
 	_, err = enclaveContext.RunStarlarkScriptBlocking(dc.ctx, removeServiceStarlarkScript, starlarkConfig)
 	if err != nil {
-		return err
+		return ErrStarlarkRunFailed
 	}
 	return nil
 }
@@ -220,7 +212,7 @@ func (dc *diveContext) CreateEnclave(enclaveName string) (*enclaves.EnclaveConte
 	enclaveContext, err := dc.kurtosisContext.CreateEnclave(dc.ctx, enclaveName)
 
 	if err != nil {
-		return nil, Errorc(InvalidEnclaveContextError, err.Error())
+		return nil, WrapMessageToError(ErrInvalidKurtosisContext, err.Error())
 	}
 
 	return enclaveContext, nil
@@ -231,7 +223,7 @@ func (dc *diveContext) initKurtosisContext() (*kurtosis_context.KurtosisContext,
 	kurtosisContext, err := kurtosis_context.NewKurtosisContextFromLocalEngine()
 
 	if err != nil {
-		return nil, WrapMessageToError(ErrKurtosisContext, err.Error())
+		return nil, WrapMessageToError(ErrInitializingKurtosis, err.Error())
 
 	}
 
@@ -241,11 +233,11 @@ func (dc *diveContext) checkEnclaveExist(enclaveName string) (*EnclaveInfo, erro
 
 	kurtosisContext, err := dc.GetKurtosisContext()
 	if err != nil {
-		return nil, Errorc(KurtosisContextError, err.Error())
+		return nil, WrapMessageToErrorf(err, "Failed To Check Enclave %s", enclaveName)
 	}
 	enclaveInfo, err := kurtosisContext.GetEnclave(dc.ctx, enclaveName)
 	if err != nil {
-		return nil, Errorc(KurtosisContextError, err.Error())
+		return nil, WrapMessageToError(ErrInvalidEnclaveContext, err.Error())
 	}
 
 	return &EnclaveInfo{
@@ -253,72 +245,6 @@ func (dc *diveContext) checkEnclaveExist(enclaveName string) (*EnclaveInfo, erro
 		Uuid:      enclaveInfo.EnclaveUuid,
 		ShortUuid: enclaveInfo.ShortenedUuid,
 	}, nil
-}
-
-func GetStarlarkRunConfig(params string, relativePathToMainFile string, mainFunctionName string) *starlark_run_config.StarlarkRunConfig {
-
-	starlarkConfig := &starlark_run_config.StarlarkRunConfig{
-		RelativePathToMainFile:   relativePathToMainFile,
-		MainFunctionName:         mainFunctionName,
-		DryRun:                   DiveDryRun,
-		SerializedParams:         params,
-		Parallelism:              DiveDefaultParallelism,
-		ExperimentalFeatureFlags: []kurtosis_core_rpc_api_bindings.KurtosisFeatureFlag{},
-	}
-	return starlarkConfig
-}
-
-func GetSerializedData(cliContext *Cli, response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) (string, map[string]string, map[string]bool, error) {
-
-	var serializedOutputObj string
-	services := map[string]string{}
-
-	skippedInstruction := map[string]bool{}
-	for executionResponse := range response {
-
-		if strings.Contains(executionResponse.GetInstructionResult().GetSerializedInstructionResult(), "added with service") {
-			res1 := strings.Split(executionResponse.GetInstructionResult().GetSerializedInstructionResult(), " ")
-			serviceName := res1[1][1 : len(res1[1])-1]
-			serviceUUID := res1[len(res1)-1][1 : len(res1[len(res1)-1])-1]
-			services[serviceName] = serviceUUID
-		}
-
-		cliContext.log.Info(executionResponse.String())
-
-		if executionResponse.GetInstruction().GetIsSkipped() {
-			skippedInstruction[executionResponse.GetInstruction().GetExecutableInstruction()] = executionResponse.GetInstruction().GetIsSkipped()
-			break
-		}
-
-		if executionResponse.GetError() != nil {
-
-			return "", services, nil, errors.New(executionResponse.GetError().String())
-
-		}
-
-		runFinishedEvent := executionResponse.GetRunFinishedEvent()
-
-		if runFinishedEvent != nil {
-
-			if runFinishedEvent.GetIsRunSuccessful() {
-				serializedOutputObj = runFinishedEvent.GetSerializedOutput()
-
-			} else {
-				return "", services, nil, errors.New(executionResponse.GetError().String())
-			}
-
-		} else {
-			cliContext.spinner.SetColor("blue")
-			if executionResponse.GetProgressInfo() != nil {
-
-				cliContext.spinner.SetSuffixMessage(strings.ReplaceAll(executionResponse.GetProgressInfo().String(), "current_step_info:", " "), "fgGreen")
-
-			}
-		}
-
-	}
-
-	return serializedOutputObj, services, skippedInstruction, nil
 }
 
 func (dc *diveContext) RemoveServicesByServiceNames(services map[string]string, enclaveName string) error {
@@ -334,7 +260,7 @@ func (dc *diveContext) RemoveServicesByServiceNames(services map[string]string, 
 
 		_, err = enclaveCtx.RunStarlarkScriptBlocking(dc.ctx, removeServiceStarlarkScript, starlarkConfig)
 		if err != nil {
-			return err
+			return ErrStarlarkRunFailed
 		}
 
 	}

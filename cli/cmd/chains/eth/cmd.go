@@ -22,7 +22,7 @@ func eth(cmd *cobra.Command, args []string) {
 	err := common.ValidateArgs(args)
 
 	if err != nil {
-		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
+		cliContext.Fatalf("Error %s. %s", err, cmd.UsageString())
 	}
 
 	cliContext.Spinner().StartWithMessage("Starting ETH Node", "green")
@@ -30,21 +30,17 @@ func eth(cmd *cobra.Command, args []string) {
 	responseData, err := RunEth(cliContext)
 	if err != nil {
 		if strings.Contains(err.Error(), "already running") {
-			cliContext.Spinner().StopWithMessage("ETH Node Already Running")
-			cliContext.Logger().Error(common.CodeOf(err), err.Error())
+			cliContext.Error(err)
 			cliContext.Context().Exit(0)
 		} else {
-			cliContext.Logger().SetErrorToStderr()
-			cliContext.Logger().Fatalf(common.CodeOf(err), err.Error())
+			cliContext.Fatal(err)
 		}
 	}
 
 	err = common.WriteServiceResponseData(responseData.ServiceName, *responseData, cliContext)
 
 	if err != nil {
-		cliContext.Spinner().Stop()
-		cliContext.Logger().SetErrorToStderr()
-		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
+		cliContext.Fatal(err)
 	}
 
 	cliContext.Spinner().StopWithMessage("ETH Node Started. Please find service details in current working directory(services.json)")

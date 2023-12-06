@@ -59,7 +59,7 @@ func GetCliWithKurtosisContext() *Cli {
 	_, err := cliContext.Context().GetKurtosisContext()
 
 	if err != nil {
-		fmt.Println(Errorc(KurtosisContextError, err.Error()))
+		fmt.Println(err)
 		os.Exit(1)
 	}
 	return cliContext
@@ -79,4 +79,50 @@ func (c *Cli) Context() Context {
 
 func (c *Cli) FileHandler() FileHandler {
 	return c.fileHandler
+}
+
+func (c *Cli) Errorf(format string, err error, args ...interface{}) {
+
+	c.spinner.Stop()
+	c.log.SetErrorToStderr()
+	c.log.Errorf(CodeOf(err), format, args)
+}
+
+func (c *Cli) Fatalf(format string, err error, args ...interface{}) {
+	c.spinner.Stop()
+	c.log.SetErrorToStderr()
+	c.log.Fatalf(CodeOf(err), format, args)
+}
+
+func (c *Cli) Error(err error) {
+	c.spinner.Stop()
+	c.log.SetErrorToStderr()
+	c.log.Error(CodeOf(err), err.Error())
+}
+
+func (c *Cli) Fatal(err error) {
+	c.spinner.Stop()
+	c.log.SetErrorToStderr()
+	c.log.Fatal(CodeOf(err), err.Error())
+}
+
+func (c *Cli) Info(message string) {
+	c.log.Info(message)
+}
+func (c *Cli) Infof(format string, args ...interface{}) {
+	c.log.Infof(format, args...)
+}
+
+func (c *Cli) Warn(message string) {
+	c.log.Warn(message)
+}
+func (c *Cli) Warnf(format string, args ...interface{}) {
+	c.log.Warnf(format, args...)
+}
+
+func (c *Cli) Debug(message string) {
+	c.log.Debug(message)
+}
+func (c *Cli) Debugf(format string, args ...interface{}) {
+	c.log.Debugf(format, args...)
 }

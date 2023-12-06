@@ -44,7 +44,9 @@ func (ds *diveSpinner) StartWithMessage(message, color string) {
 }
 
 func (ds *diveSpinner) Stop() {
-	ds.spinner.Stop()
+	if ds.spinner.Active() {
+		ds.spinner.Stop()
+	}
 }
 
 func (ds *diveSpinner) StopWithMessage(message string) {

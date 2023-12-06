@@ -21,7 +21,7 @@ func (dive *DiveServiceResponse) Decode(responseData []byte) (*DiveServiceRespon
 
 	err := json.Unmarshal(responseData, &dive)
 	if err != nil {
-		return nil, err
+		return nil, WrapMessageToError(ErrDataUnMarshall, err.Error())
 	}
 	return dive, nil
 }
@@ -29,7 +29,7 @@ func (dive *DiveServiceResponse) EncodeToString() (string, error) {
 
 	encodedBytes, err := json.Marshal(dive)
 	if err != nil {
-		return "", nil
+		return "", WrapMessageToError(ErrDataMarshall, err.Error())
 	}
 
 	return string(encodedBytes), nil

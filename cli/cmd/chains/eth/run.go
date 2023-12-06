@@ -8,30 +8,30 @@ func RunEth(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 	enclaveContext, err := cli.Context().GetEnclaveContext(common.DiveEnclave)
 	if err != nil {
-		return nil, common.Errorc(common.InvalidEnclaveContextError, err.Error())
+		return nil, common.WrapMessageToError(err, "Eth Run Failed")
 	}
 	runConfig := common.GetStarlarkRunConfig(`{}`, common.DiveEthHardhatNodeScript, "start_eth_node")
 
 	response, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, runConfig)
 
 	if err != nil {
-		return nil, common.WrapCodeToError(err, common.KurtosisContextError, "Starlark Run Failed")
+		return nil, common.WrapMessageToErrorf(common.ErrStarlarkRunFailed, "%s. %s", err, "Eth Run Failed")
 	}
 
 	responseData, services, skippedInstructions, err := common.GetSerializedData(cli, response)
 
 	if err != nil {
-		err = cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
 		if err != nil {
-			return nil, common.Errorc(common.InvalidEnclaveContextError, err.Error())
+			return nil, common.WrapMessageToError(errRemove, "Eth Run Failed ")
 		}
 
-		return nil, common.Errorc(common.KurtosisContextError, err.Error())
+		return nil, common.WrapMessageToError(err, "Eth Run Failed ")
 
 	}
 
 	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
-		return nil, common.Errorc(common.KurtosisContextError, "Already Running")
+		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Already Running")
 	}
 
 	ethResponseData := &common.DiveServiceResponse{}
@@ -39,12 +39,12 @@ func RunEth(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	result, err := ethResponseData.Decode([]byte(responseData))
 
 	if err != nil {
-		err = cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
 		if err != nil {
-			return nil, common.Errorc(common.InvalidEnclaveContextError, err.Error())
+			return nil, common.WrapMessageToError(errRemove, "Eth Run Failed ")
 		}
 
-		return nil, common.Errorc(common.KurtosisContextError, err.Error())
+		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Eth Run Failed ")
 	}
 
 	return result, nil

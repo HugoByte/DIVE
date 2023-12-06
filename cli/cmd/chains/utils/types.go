@@ -31,7 +31,7 @@ func (cs *CosmosServiceConfig) EncodeToString() (string, error) {
 
 	data, err := json.Marshal(cs)
 	if err != nil {
-		return "", err
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
 	}
 
 	return string(data), nil
@@ -41,7 +41,7 @@ func (cs *CosmosServiceConfig) LoadConfigFromFile(cliContext *common.Cli, filePa
 
 	err := cliContext.FileHandler().ReadJson(filePath, cs)
 	if err != nil {
-		return err
+		return common.WrapMessageToError(err, "Failed To Load Configuration")
 	}
 	return nil
 }
@@ -66,7 +66,7 @@ func (sc *IconServiceConfig) LoadDefaultConfig() {
 func (sc *IconServiceConfig) EncodeToString() (string, error) {
 	encodedBytes, err := json.Marshal(sc)
 	if err != nil {
-		return "", nil
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
 	}
 
 	return string(encodedBytes), nil
@@ -75,7 +75,7 @@ func (sc *IconServiceConfig) EncodeToString() (string, error) {
 func (sc *IconServiceConfig) LoadConfigFromFile(cliContext *common.Cli, filePath string) error {
 	err := cliContext.FileHandler().ReadJson(filePath, sc)
 	if err != nil {
-		return err
+		return common.WrapMessageToError(err, "Failed To Load Configuration")
 	}
 	return nil
 }

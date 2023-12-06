@@ -10,7 +10,7 @@ func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	enclaveContext, err := cli.Context().GetEnclaveContext(common.DiveEnclave)
 
 	if err != nil {
-		return nil, err
+		return nil, common.WrapMessageToError(err, "Archway Run Failed")
 	}
 
 	var serviceConfig = &utils.CosmosServiceConfig{}
@@ -23,7 +23,7 @@ func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	encodedServiceConfigDataString, err := serviceConfig.EncodeToString()
 
 	if err != nil {
-		return nil, common.Errorc(common.InvalidEnclaveConfigError, err.Error())
+		return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
 	}
 
 	runConfig := common.GetStarlarkRunConfig(encodedServiceConfigDataString, common.DiveArchwayDefaultNodeScript, runArchwayNodeWithDefaultConfigFunctionName)
@@ -31,23 +31,23 @@ func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	response, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, runConfig)
 
 	if err != nil {
-		return nil, common.Errorc(common.FileError, err.Error())
+		return nil, common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
 	}
 
 	responseData, services, skippedInstructions, err := common.GetSerializedData(cli, response)
 
 	if err != nil {
 
-		err = cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
-		if err != nil {
-			return nil, common.Errorc(common.InvalidEnclaveContextError, err.Error())
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		if errRemove != nil {
+			return nil, common.WrapMessageToError(errRemove, "Archway Run Failed ")
 		}
 
-		return nil, common.Errorc(common.KurtosisContextError, err.Error())
+		return nil, common.WrapMessageToError(err, "Archway Run Failed ")
 	}
 
 	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
-		return nil, common.Errorc(common.KurtosisContextError, "Already Running")
+		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Already Running")
 	}
 
 	archwayResponseData := &common.DiveServiceResponse{}
@@ -55,7 +55,13 @@ func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 	if err != nil {
 
-		return nil, common.Errorc(common.KurtosisContextError, err.Error())
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		if errRemove != nil {
+			return nil, common.WrapMessageToError(errRemove, "Archway Run Failed ")
+		}
+
+		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Archway Run Failed ")
+
 	}
 
 	return result, nil

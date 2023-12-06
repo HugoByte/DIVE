@@ -15,7 +15,7 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	enclaveContext, err := cli.Context().GetEnclaveContext(common.DiveEnclave)
 
 	if err != nil {
-		return nil, err
+		return nil, common.WrapMessageToError(err, "Icon Run Failed")
 	}
 	var serviceConfig = &utils.IconServiceConfig{}
 	err = common.LoadConfig(cli, serviceConfig, configFilePath)
@@ -25,7 +25,7 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 	genesisHandler, err := genesismanager(enclaveContext)
 	if err != nil {
-		return nil, common.Errorc(common.FileError, err.Error())
+		return nil, common.WrapMessageToError(common.ErrInvalidFile, err.Error())
 	}
 	params := fmt.Sprintf(`{"private_port":%d, "public_port":%d, "p2p_listen_address": %s, "p2p_address":%s, "cid": "%s","uploaded_genesis":%s,"genesis_file_path":"%s","genesis_file_name":"%s"}`, serviceConfig.Port, serviceConfig.PublicPort, serviceConfig.P2PListenAddress, serviceConfig.P2PAddress, serviceConfig.Cid, genesisHandler.uploadedFiles, genesisHandler.genesisPath, genesisHandler.genesisFile)
 	starlarkConfig := common.GetStarlarkRunConfig(params, common.DiveIconNodeScript, "start_icon_node")
@@ -33,23 +33,23 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	iconData, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
-		return nil, common.Errorc(common.FileError, err.Error())
+		return nil, common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
 	}
 
 	response, services, skippedInstructions, err := common.GetSerializedData(cli, iconData)
 
 	if err != nil {
 
-		err = cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
-		if err != nil {
-			return nil, common.Errorc(common.InvalidEnclaveContextError, err.Error())
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		if errRemove != nil {
+			return nil, common.WrapMessageToError(errRemove, "Icon Run Failed ")
 		}
 
-		return nil, common.Errorc(common.KurtosisContextError, err.Error())
+		return nil, common.WrapMessageToError(err, "Icon Run Failed ")
 	}
 
 	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
-		return nil, common.Errorc(common.KurtosisContextError, "Already Running")
+		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Already Running")
 	}
 
 	iconResponseData := &common.DiveServiceResponse{}
@@ -58,7 +58,13 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 	if err != nil {
 
-		return nil, common.Errorc(common.KurtosisContextError, err.Error())
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		if errRemove != nil {
+			return nil, common.WrapMessageToError(errRemove, "Icon Run Failed ")
+		}
+
+		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Icon Run Failed ")
+
 	}
 
 	return result, nil
@@ -69,27 +75,27 @@ func RunDecentralization(cli *common.Cli, params string) error {
 	kurtosisEnclaveContext, err := cli.Context().GetEnclaveContext(common.DiveEnclave)
 
 	if err != nil {
-		return common.Errorc(common.KurtosisContextError, err.Error())
+		return common.WrapMessageToError(err, "Icon Decentralization Failed")
 	}
 	starlarkConfig := common.GetStarlarkRunConfig(params, common.DiveIconDecentraliseScript, "configure_node")
 	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
-		return common.Errorc(common.KurtosisContextError, err.Error())
+		return common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
 	}
 
 	_, services, skippedInstructions, err := common.GetSerializedData(cli, data)
 	if err != nil {
 
-		err = cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
-		if err != nil {
-			return common.Errorc(common.InvalidEnclaveContextError, err.Error())
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		if errRemove != nil {
+			return common.WrapMessageToError(errRemove, "Icon Decentralization Failed ")
 		}
 
-		return common.Errorc(common.KurtosisContextError, err.Error())
+		return common.WrapMessageToError(err, "Icon Decentralization Failed ")
 	}
 	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
-		return common.Errorc(common.KurtosisContextError, "Decentralization Already  Completed ")
+		return common.WrapMessageToError(common.ErrStarlarkResponse, "Already Running")
 	}
 
 	return nil
@@ -111,12 +117,12 @@ func genesismanager(enclaveContext *enclaves.EnclaveContext) (*genesisHandler, e
 	if genesisFilePath != "" {
 		genesisFileName := filepath.Base(genesisFilePath)
 		if _, err := os.Stat(genesisFilePath); err != nil {
-			return nil, err
+			return nil, common.WrapMessageToError(common.ErrInvalidFile, err.Error())
 		}
 
 		_, d, err := enclaveContext.UploadFiles(genesisFilePath, genesisFileName)
 		if err != nil {
-			return nil, err
+			return nil, common.WrapMessageToError(common.ErrInvalidEnclaveContext, err.Error())
 		}
 
 		gm.uploadedFiles = fmt.Sprintf(`{"file_path":"%s","file_name":"%s"}`, d, genesisFileName)

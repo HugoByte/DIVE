@@ -27,7 +27,7 @@ func neutron(cmd *cobra.Command, args []string) {
 
 	err := common.ValidateArgs(args)
 	if err != nil {
-		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
+		cliContext.Fatalf("Error %s. %s", err, cmd.UsageString())
 	}
 
 	cliContext.Spinner().StartWithMessage("Starting Neutron Node", "green")
@@ -35,15 +35,12 @@ func neutron(cmd *cobra.Command, args []string) {
 	response, err := RunNeutron(cliContext)
 
 	if err != nil {
-		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
+		cliContext.Fatal(err)
 	}
 
 	err = common.WriteServiceResponseData(response.ServiceName, *response, cliContext)
 	if err != nil {
-		cliContext.Spinner().Stop()
-		cliContext.Logger().SetErrorToStderr()
-		cliContext.Logger().Error(common.CodeOf(err), err.Error())
-
+		cliContext.Fatal(err)
 	}
 
 	cliContext.Spinner().StopWithMessage("Neutron Node Started. Please find service details in current working directory(services.json)")
