@@ -76,4 +76,5 @@ const (
 	InvalidPathError
 	InvalidFileError
 	KurtosisServiceError
+	InvalidChain
 )

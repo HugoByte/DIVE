@@ -96,8 +96,10 @@ func (c *Cli) Fatalf(format string, err error, args ...interface{}) {
 
 func (c *Cli) Error(err error) {
 	c.spinner.Stop()
+
 	c.log.SetErrorToStderr()
-	c.log.Error(CodeOf(err), err.Error())
+	actualError, _ := CoderOf(err)
+	c.log.Error(actualError.ErrorCode(), fmt.Sprintf("%s. message: %s", actualError.Error(), err.Error()))
 }
 
 func (c *Cli) Fatal(err error) {
