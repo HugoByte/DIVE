@@ -24,6 +24,7 @@ var rootCmd = common.NewDiveCommandBuilder().
 	AddCommand(chains.ChainCmd).
 	AddCommand(bridge.BridgeCmd).
 	AddBoolPersistentFlag(&common.DiveLogs, "verbose", false, "Prints out logs to Stdout").
+	AddStringPersistentFlag(&common.EnclaveName, "enclaveName", common.DiveEnclave, "Provide Enclave Name To Start Service In Enclave Group").
 	SetRunE(run).
 	Build()
 

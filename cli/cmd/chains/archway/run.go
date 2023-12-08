@@ -7,7 +7,7 @@ import (
 
 func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
-	enclaveContext, err := cli.Context().GetEnclaveContext(common.DiveEnclave)
+	enclaveContext, err := cli.Context().GetEnclaveContext(common.EnclaveName)
 
 	if err != nil {
 		return nil, common.WrapMessageToError(err, "Archway Run Failed")

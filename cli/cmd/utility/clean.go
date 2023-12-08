@@ -12,7 +12,6 @@ var CleanCmd = common.NewDiveCommandBuilder().
 	SetShort("Cleans up Kurtosis leftover artifacts").
 	SetLong("Destroys and removes any running encalves. If no enclaves running to remove it will throw an error").
 	AddBoolFlagP("all", "a", false, "To Clean All the Service in Enclave").
-	AddStringFlagWithShortHand(&common.EnclaveName, "enclaveName", "e", common.DiveEnclave, "Please Provide enclave name to clean").
 	SetRun(clean).Build()
 
 func clean(cmd *cobra.Command, args []string) {

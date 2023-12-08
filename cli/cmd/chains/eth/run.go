@@ -6,7 +6,7 @@ import (
 
 func RunEth(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
-	enclaveContext, err := cli.Context().GetEnclaveContext(common.DiveEnclave)
+	enclaveContext, err := cli.Context().GetEnclaveContext(common.EnclaveName)
 	if err != nil {
 		return nil, common.WrapMessageToError(err, "Eth Run Failed")
 	}
@@ -21,7 +21,7 @@ func RunEth(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	responseData, services, skippedInstructions, err := common.GetSerializedData(cli, response)
 
 	if err != nil {
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if err != nil {
 			return nil, common.WrapMessageToError(errRemove, "Eth Run Failed ")
 		}

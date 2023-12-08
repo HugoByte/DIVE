@@ -19,7 +19,7 @@ func RunIbcRelay(cli *common.Cli) (string, error) {
 		return "", common.WrapMessageToError(common.ErrInvalidChain, err.Error())
 	}
 
-	enclaveContext, err := cli.Context().GetEnclaveContext(common.DiveEnclave)
+	enclaveContext, err := cli.Context().GetEnclaveContext(common.EnclaveName)
 	if err != nil {
 		return "", common.WrapMessageToError(err, "IBC Setup Failed")
 	}

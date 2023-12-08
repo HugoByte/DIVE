@@ -37,7 +37,7 @@ func ibcRelay(cmd *cobra.Command, args []string) {
 	if err != nil {
 		cliContext.Fatalf("Error %s. %s", err, cmd.UsageString())
 	}
-	cliContext.Spinner().StartWithMessage("Starting IBC Setup", "green")
+	cliContext.StartSpinnerIfNotVerbose("Starting IBC Setup", common.DiveLogs)
 	result, err := RunIbcRelay(cliContext)
 	if err != nil {
 		cliContext.Fatal(err)
@@ -48,5 +48,5 @@ func ibcRelay(cmd *cobra.Command, args []string) {
 		cliContext.Fatal(err)
 	}
 
-	cliContext.Spinner().StopWithMessage(fmt.Sprintf("IBC Setup Completed between %s and %s. Please find service details in current working directory(dive.json)", chainA, chainB))
+	cliContext.StopSpinnerIfNotVerbose(fmt.Sprintf("IBC Setup Completed between %s and %s. Please find service details in current working directory(dive.json)", chainA, chainB), common.DiveLogs)
 }
