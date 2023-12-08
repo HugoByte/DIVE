@@ -24,7 +24,7 @@ jobs:
         env:
           KURT_CLI_VERSION: ${{ github.event.inputs.kurtosis_version }}
         run: |
-          go install github.com/goreleaser/goreleaser@latest
+          cd cli/ && go install github.com/goreleaser/goreleaser@latest
 
       - name: Run Goreleaser
         run: |
