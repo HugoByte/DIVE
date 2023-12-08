@@ -30,7 +30,7 @@ brews:
   - name: dive-cli
     ids:
       - cli
-    tap:
+    repository:
       owner: hugobyte
       name: homebrew-tap
     commit_author:
@@ -38,13 +38,15 @@ brews:
     commit_msg_template: "Automated formula update for the CLI, version {{ .Tag }}"
     homepage: "https://hugobyte.com"
     description: "CLI for Dive Package"
+    dependencies:
+      - kurtosis-cli@{{ .Env.KURT_CLI_VERSION }}
     license: "Apache 2.0"
     install: |
       bin.install "dive"
   - name: dive-cli@{{ .Tag }}
     ids:
       - cli
-    tap:
+    repository:
       owner: hugobyte
       name: homebrew-tap
     commit_author:
