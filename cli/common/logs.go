@@ -86,7 +86,7 @@ func (d *diveLogger) Warn(message string) {
 }
 
 func (d *diveLogger) Error(errorCode ErrorCode, errorMessage string) {
-	d.logWithFields(logrus.ErrorLevel, "🛑", "%s", errorMessage)
+	d.logWithFields(logrus.ErrorLevel, "🛑", "Code:%d Error: %s", errorCode, errorMessage)
 }
 
 func (d *diveLogger) Fatal(errorCode ErrorCode, errorMessage string) {
@@ -108,6 +108,7 @@ func (d *diveLogger) Debugf(format string, args ...interface{}) {
 
 func (d *diveLogger) Errorf(errorCode ErrorCode, format string, args ...interface{}) {
 	d.logWithFields(logrus.ErrorLevel, "🛑", format, args...)
+
 }
 
 func (d *diveLogger) Fatalf(errorCode ErrorCode, format string, args ...interface{}) {

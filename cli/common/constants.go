@@ -1,6 +1,7 @@
 package common
 
 var DiveLogs bool
+var EnclaveName string
 
 // !!!!!!!!!!! DO NOT UPDATE! WILL BE UPDATED DURING THE RELEASE PROCESS !!!!!!!!!!!!!!!!!!!!!!
 var DiveVersion = "v0.0.14-beta"
@@ -76,4 +77,5 @@ const (
 	InvalidPathError
 	InvalidFileError
 	KurtosisServiceError
+	InvalidChain
 )

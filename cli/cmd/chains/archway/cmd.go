@@ -32,7 +32,7 @@ func archway(cmd *cobra.Command, args []string) {
 		cliContext.Fatalf("Error %s. %s", err, cmd.UsageString())
 	}
 
-	cliContext.Spinner().StartWithMessage("Starting Archway Node", "green")
+	cliContext.StartSpinnerIfNotVerbose("Starting Archway Node", common.DiveLogs)
 
 	response, err := RunArchway(cliContext)
 
@@ -45,7 +45,6 @@ func archway(cmd *cobra.Command, args []string) {
 		cliContext.Fatal(err)
 
 	}
-
-	cliContext.Spinner().StopWithMessage("Archway Node Started. Please find service details in current working directory(services.json)")
+	cliContext.StopSpinnerIfNotVerbose("Archway Node Started. Please find service details in current working directory(services.json)", common.DiveLogs)
 
 }

@@ -33,6 +33,7 @@ var (
 	ErrPath                    = NewBase(InvalidPathError, "Failed To Resolve Path")
 	ErrInvalidFile             = NewBase(InvalidFileError, "Failed To Resolve to File")
 	ErrKurtosisService         = NewBase(KurtosisServiceError, "Kurtosis Service Error")
+	ErrInvalidChain            = NewBase(InvalidChain, "Not A Valid Chain")
 )
 
 func (c ErrorCode) New(msg string) error {

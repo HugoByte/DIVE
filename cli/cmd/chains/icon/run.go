@@ -12,7 +12,7 @@ import (
 
 func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
-	enclaveContext, err := cli.Context().GetEnclaveContext(common.DiveEnclave)
+	enclaveContext, err := cli.Context().GetEnclaveContext(common.EnclaveName)
 
 	if err != nil {
 		return nil, common.WrapMessageToError(err, "Icon Run Failed")
@@ -72,7 +72,7 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 func RunDecentralization(cli *common.Cli, params string) error {
 
-	kurtosisEnclaveContext, err := cli.Context().GetEnclaveContext(common.DiveEnclave)
+	kurtosisEnclaveContext, err := cli.Context().GetEnclaveContext(common.EnclaveName)
 
 	if err != nil {
 		return common.WrapMessageToError(err, "Icon Decentralization Failed")

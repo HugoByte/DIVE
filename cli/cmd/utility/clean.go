@@ -7,14 +7,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var enclaveName = ""
-
 var CleanCmd = common.NewDiveCommandBuilder().
 	SetUse("clean").
 	SetShort("Cleans up Kurtosis leftover artifacts").
 	SetLong("Destroys and removes any running encalves. If no enclaves running to remove it will throw an error").
 	AddBoolFlagP("all", "a", false, "To Clean All the Service in Enclave").
-	AddStringFlagWithShortHand(&enclaveName, "enclaveName", "e", common.DiveEnclave, "Please Provide enclave name to clean").
 	SetRun(clean).Build()
 
 func clean(cmd *cobra.Command, args []string) {
@@ -57,6 +54,7 @@ func clean(cmd *cobra.Command, args []string) {
 	}
 
 	if cleanAll {
+		cliContext.StartSpinnerIfNotVerbose("Cleaning All Dive Enclaves", common.DiveLogs)
 		enclavesInfo, err := cliContext.Context().CleanEnclaves()
 		if err != nil {
 			cliContext.Logger().SetErrorToStderr()
@@ -66,10 +64,13 @@ func clean(cmd *cobra.Command, args []string) {
 		cliContext.Logger().Info(fmt.Sprintf("Enclaves Cleaned %v", enclavesInfo))
 
 	} else {
-		err = cliContext.Context().CleanEnclaveByName(enclaveName)
+		cliContext.StartSpinnerIfNotVerbose(fmt.Sprintf("Cleaning Dive By Enclave %s", common.EnclaveName), common.DiveLogs)
+		err = cliContext.Context().CleanEnclaveByName(common.EnclaveName)
 		if err != nil {
 			cliContext.Logger().SetErrorToStderr()
 			cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
 		}
 	}
+
+	cliContext.StopSpinnerIfNotVerbose("Clean Completed", common.DiveLogs)
 }

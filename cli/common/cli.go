@@ -96,14 +96,17 @@ func (c *Cli) Fatalf(format string, err error, args ...interface{}) {
 
 func (c *Cli) Error(err error) {
 	c.spinner.Stop()
+
 	c.log.SetErrorToStderr()
-	c.log.Error(CodeOf(err), err.Error())
+	actualError, _ := CoderOf(err)
+	c.log.Error(actualError.ErrorCode(), fmt.Sprintf("%s. message: %s", actualError.Error(), err.Error()))
 }
 
 func (c *Cli) Fatal(err error) {
 	c.spinner.Stop()
 	c.log.SetErrorToStderr()
-	c.log.Fatal(CodeOf(err), err.Error())
+	actualError, _ := CoderOf(err)
+	c.log.Fatal(actualError.ErrorCode(), fmt.Sprintf("%s. message: %s", actualError.Error(), err.Error()))
 }
 
 func (c *Cli) Info(message string) {
@@ -125,4 +128,23 @@ func (c *Cli) Debug(message string) {
 }
 func (c *Cli) Debugf(format string, args ...interface{}) {
 	c.log.Debugf(format, args...)
+}
+
+func (c *Cli) StartSpinnerIfNotVerbose(message string, verbose bool) {
+	if verbose {
+		c.log.SetOutputToStdout()
+		c.log.Info(message)
+
+	} else {
+		c.spinner.StartWithMessage(message, "green")
+	}
+}
+
+func (c *Cli) StopSpinnerIfNotVerbose(message string, verbose bool) {
+	if verbose {
+		c.log.SetOutputToStdout()
+		c.log.Info(message)
+	} else {
+		c.spinner.StopWithMessage(message)
+	}
 }
