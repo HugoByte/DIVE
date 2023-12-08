@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/google/go-github/github"
 	"github.com/hugobyte/dive-core/cli/common"
 	"github.com/spf13/cobra"
@@ -35,9 +38,44 @@ func version(cmd *cobra.Command, args []string) {
 		cli.Logger().Fatal(common.CodeOf(err), err.Error())
 		cli.Context().Exit(1)
 	}
+	latestVersion = GetLatestVersion(cli)
+	currentVer, err := extractVersion(common.DiveVersion)
+	if err != nil {
+		cli.Error(common.WrapMessageToError(common.ErrInitializingCLI, err.Error()))
+	}
+	latestVer, err := extractVersion(latestVersion)
+	if err != nil {
+		cli.Error(common.WrapMessageToError(common.ErrInitializingCLI, err.Error()))
+	}
+	if currentVer < latestVer {
+		cli.Logger().SetOutputToStdout()
+		cli.Logger().Warnf("Update available '%s'. Get the latest version of our DIVE CLI for bug fixes, performance improvements, and new features.", latestVersion)
+		cli.Context().Exit(0)
+	}
+	version := color.New(color.Bold).Sprintf("CLI version - %s", common.DiveVersion)
+	fmt.Println(version)
 
-	fmt.Println(GetLatestVersion(cli))
+}
 
+func extractVersion(versionString string) (int, error) {
+	// Remove the leading 'v' if present
+	versionString = strings.TrimPrefix(versionString, "v")
+
+	// Split the version string by the '-' delimiter (if it exists) and take the first part
+	parts := strings.Split(versionString, "-")
+	versionComponents := strings.Split(parts[0], ".")
+
+	// Parse each component as an integer
+	var versionInt int
+	for _, component := range versionComponents {
+		num, err := strconv.Atoi(component)
+		if err != nil {
+			return 0, err
+		}
+		versionInt = versionInt*100 + num
+	}
+
+	return versionInt, nil
 }
 
 // This function will fetch the latest version from HugoByte/Dive repo
