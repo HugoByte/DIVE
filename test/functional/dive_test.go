@@ -8,7 +8,8 @@ import (
 	"testing"
 
 	dive "github.com/HugoByte/DIVE/test/functional"
-	"github.com/hugobyte/dive/cli/common"
+	"github.com/hugobyte/dive-core/cli/cmd/utility"
+	"github.com/hugobyte/dive-core/cli/common"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 )
@@ -51,7 +52,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			err := cmd.Run()
 			fmt.Println(stdout.String())
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-			latestVersion := common.GetLatestVersion()
+			cli := common.GetCli()
+			latestVersion := utility.GetLatestVersion(cli)
 			gomega.Expect(stdout.String()).To(gomega.ContainSubstring(latestVersion))
 		})
 
