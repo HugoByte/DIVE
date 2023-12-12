@@ -77,7 +77,7 @@ func RunDecentralization(cli *common.Cli, params string) error {
 	if err != nil {
 		return common.WrapMessageToError(err, "Icon Decentralization Failed")
 	}
-	starlarkConfig := common.GetStarlarkRunConfig(params, common.DiveIconDecentraliseScript, "configure_node")
+	starlarkConfig := common.GetStarlarkRunConfig(params, common.DiveIconDecentralizeScript, "configure_node")
 	data, _, err := kurtosisEnclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {

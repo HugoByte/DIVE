@@ -11,18 +11,6 @@ import (
 	"github.com/kurtosis-tech/kurtosis/api/golang/engine/lib/kurtosis_context"
 )
 
-const (
-	removeServiceStarlarkScript = `
-def run(plan,args):
-		plan.remove_service(name=args["service_name"])
-`
-
-	stopServiceStarlarkScript = `
-def run(plan, args):
-	plan.stop_service(name=args["service_name"])
-`
-)
-
 type diveContext struct {
 	mu               sync.Mutex
 	ctx              context.Context

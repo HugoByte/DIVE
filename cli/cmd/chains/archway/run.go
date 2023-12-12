@@ -28,7 +28,7 @@ func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 		return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
 	}
 
-	runConfig := common.GetStarlarkRunConfig(encodedServiceConfigDataString, common.DiveArchwayDefaultNodeScript, runArchwayNodeWithDefaultConfigFunctionName)
+	runConfig := common.GetStarlarkRunConfig(encodedServiceConfigDataString, common.DiveCosmosDefaultNodeScript, runArchwayNodeWithDefaultConfigFunctionName)
 
 	response, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, runConfig)
 
@@ -45,7 +45,7 @@ func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 			return nil, common.WrapMessageToError(errRemove, "Archway Run Failed.")
 		}
 
-		return nil, common.WrapMessageToError(err, "Archway Run Failed. Services Removed ")
+		return nil, common.WrapMessageToErrorf(err, "%s. %s", err, "Archway Run Failed")
 	}
 
 	if cli.Context().CheckSkippedInstructions(skippedInstructions) {

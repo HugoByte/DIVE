@@ -13,6 +13,8 @@ import (
 	"github.com/kurtosis-tech/stacktrace"
 )
 
+// The function "ValidateArgs" checks if the given arguments are empty and returns an error if they are
+// not.
 func ValidateArgs(args []string) error {
 	if len(args) != 0 {
 
@@ -22,6 +24,7 @@ func ValidateArgs(args []string) error {
 	return nil
 }
 
+// The function writes service response data to a JSON file.
 func WriteServiceResponseData(serviceName string, data DiveServiceResponse, cliContext *Cli, fileName string) error {
 	var jsonDataFromFile = Services{}
 	err := cliContext.FileHandler().ReadJson(fileName, &jsonDataFromFile)
@@ -43,6 +46,7 @@ func WriteServiceResponseData(serviceName string, data DiveServiceResponse, cliC
 	return nil
 }
 
+// The OpenFile function opens a file using the appropriate command based on the operating system.
 func OpenFile(URL string) error {
 	var args []string
 	switch runtime.GOOS {
@@ -62,6 +66,8 @@ func OpenFile(URL string) error {
 	return nil
 }
 
+// The function `LoadConfig` loads a configuration either from a default source or from a specified
+// file path.
 func LoadConfig(cliContext *Cli, config ConfigLoader, filePath string) error {
 	if filePath == "" {
 		if err := config.LoadDefaultConfig(); err != nil {
@@ -76,6 +82,7 @@ func LoadConfig(cliContext *Cli, config ConfigLoader, filePath string) error {
 	return nil
 }
 
+// This function returns a StarlarkRunConfig object with the provided parameters.
 func GetStarlarkRunConfig(params string, relativePathToMainFile string, mainFunctionName string) *starlark_run_config.StarlarkRunConfig {
 
 	starlarkConfig := &starlark_run_config.StarlarkRunConfig{
@@ -89,6 +96,8 @@ func GetStarlarkRunConfig(params string, relativePathToMainFile string, mainFunc
 	return starlarkConfig
 }
 
+// The function `GetSerializedData` retrieves serialized data, service information, skipped
+// instructions, and any errors from a given response channel.
 func GetSerializedData(cliContext *Cli, response chan *kurtosis_core_rpc_api_bindings.StarlarkRunResponseLine) (string, map[string]string, map[string]bool, error) {
 
 	var serializedOutputObj string
@@ -153,6 +162,9 @@ func CheckPort(port int) bool {
 	return true
 }
 
+// The function `GetAvailablePort` generates a random port number between 1024 and 65535 and checks if
+// it is available by calling the `CheckPort` function, and returns the first available port or an
+// error if no port is available.
 func GetAvailablePort() (int, error) {
 
 	// Check random ports in the range 1024-65535

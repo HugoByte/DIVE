@@ -1,19 +1,16 @@
 package common
 
-var DiveLogs bool
-var EnclaveName string
-
 // !!!!!!!!!!! DO NOT UPDATE! WILL BE UPDATED DURING THE RELEASE PROCESS !!!!!!!!!!!!!!!!!!!!!!
-var DiveVersion = "v0.0.14-beta"
+const DiveVersion = "v0.0.14-beta"
 
 const (
 	DiveEnclave                  = "dive"
-	DiveRemotePackagePath        = "github.com/hugobyte/dive"
+	DiveRemotePackagePath        = "github.com/hugobyte/dive-packages"
 	DiveIconNodeScript           = "services/jvm/icon/src/node-setup/start_icon_node.star"
-	DiveIconDecentraliseScript   = "services/jvm/icon/src/node-setup/setup_icon_node.star"
+	DiveIconDecentralizeScript   = "services/jvm/icon/src/node-setup/setup_icon_node.star"
 	DiveEthHardhatNodeScript     = "services/evm/eth/src/node-setup/start-eth-node.star"
 	DiveArchwayNodeScript        = "services/cosmvm/archway/src/node-setup/start_node.star"
-	DiveArchwayDefaultNodeScript = "services/cosmvm/archway/archway.star"
+	DiveCosmosDefaultNodeScript  = "services/cosmvm/cosmos_chains.star"
 	DiveNeutronNodeScript        = "services/cosmvm/neutron/src/node-setup/start_node.star"
 	RelayServiceNameIconToCosmos = "ibc-relayer"
 	DiveNeutronDefaultNodeScript = "services/cosmvm/neutron/neutron.star"
@@ -21,18 +18,18 @@ const (
 	DiveBridgeIbcScript          = "/services/bridges/ibc/src/bridge.star"
 	DiveDryRun                   = false
 	DiveDefaultParallelism       = 4
-	DiveEthNodeAlreadyRunning    = "Eth Node Already Running"
-	DiveHardhatNodeAlreadyRuning = "Hardhat Node Already Running"
-	DiveIconNodeAlreadyRunning   = "Icon Node Already Running"
 	DiveLogDirectory             = "/logs/"
 	DiveDitLogFile               = "dive.log"
 	DiveErrorLogFile             = "error.log"
 	DiveOutFile                  = "dive_%s.json"
 	ServiceFilePath              = "services_%s.json"
-	starlarkScript               = `
+	removeServiceStarlarkScript  = `
+def run(plan,args):
+		plan.remove_service(name=args["service_name"])
+`
+	stopServiceStarlarkScript = `
 def run(plan, args):
 	plan.stop_service(name=args["service_name"])
-	plan.print(args["uuid"]) # we add this print of a random UUID to make sure the single stop_service above won't get cached
 `
 )
 
@@ -80,3 +77,6 @@ const (
 	InvalidChain
 	PortError
 )
+
+var DiveLogs bool
+var EnclaveName string

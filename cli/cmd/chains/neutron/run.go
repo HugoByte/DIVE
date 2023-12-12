@@ -29,7 +29,7 @@ func RunNeutron(cli *common.Cli) (*common.DiveServiceResponse, error) {
 		return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
 	}
 
-	runConfig := common.GetStarlarkRunConfig(encodedServiceConfigDataString, common.DiveNeutronDefaultNodeScript, runNeutronNodeWithDefaultConfigFunctionName)
+	runConfig := common.GetStarlarkRunConfig(encodedServiceConfigDataString, common.DiveCosmosDefaultNodeScript, runNeutronNodeWithDefaultConfigFunctionName)
 
 	response, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, runConfig)
 
