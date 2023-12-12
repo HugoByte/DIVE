@@ -26,6 +26,8 @@ func (dc *diveContext) GetContext() context.Context {
 	return dc.ctx
 }
 
+// The `GetKurtosisContext` function is a method of the `diveContext` struct.
+// Used to Get the kurtosis context from the kurtosis engine
 func (dc *diveContext) GetKurtosisContext() (*kurtosis_context.KurtosisContext, error) {
 	dc.mu.Lock()
 	defer dc.mu.Unlock()
@@ -41,6 +43,8 @@ func (dc *diveContext) GetKurtosisContext() (*kurtosis_context.KurtosisContext, 
 	return dc.kurtosisContext, nil
 }
 
+// The `GetEnclaves` function is a method of the `diveContext` struct.
+// Used to Get List Of Enclaves Running / Stopped
 func (dc *diveContext) GetEnclaves() ([]EnclaveInfo, error) {
 	enclavesInfo, err := dc.kurtosisContext.GetEnclaves(dc.ctx)
 
@@ -64,6 +68,8 @@ func (dc *diveContext) GetEnclaves() ([]EnclaveInfo, error) {
 	return enclaves, nil
 }
 
+// The `GetEnclaveContext` function is a method of the `diveContext` struct.
+// Used to Get the Kurtosis Enclave Context
 func (dc *diveContext) GetEnclaveContext(enclaveName string) (*enclaves.EnclaveContext, error) {
 	// check enclave exist
 	enclaveInfo, err := dc.checkEnclaveExist(enclaveName)
@@ -79,6 +85,8 @@ func (dc *diveContext) GetEnclaveContext(enclaveName string) (*enclaves.EnclaveC
 
 }
 
+// The `CleanEnclaves` function is a method of the `diveContext` struct.
+// Used to Cleans given Running Enclaves
 func (dc *diveContext) CleanEnclaves() ([]*EnclaveInfo, error) {
 	enclaves, err := dc.kurtosisContext.Clean(dc.ctx, true)
 
@@ -95,6 +103,8 @@ func (dc *diveContext) CleanEnclaves() ([]*EnclaveInfo, error) {
 	return enclaveInfo, nil
 }
 
+// The `CleanEnclaveByName` function is a method of the `diveContext` struct.
+// Used to Clean given Enclave
 func (dc *diveContext) CleanEnclaveByName(enclaveName string) error {
 
 	enclaveInfo, err := dc.checkEnclaveExist(enclaveName)
@@ -109,11 +119,14 @@ func (dc *diveContext) CleanEnclaveByName(enclaveName string) error {
 	return nil
 }
 
+// The `CheckSkippedInstructions` function is a method of the `diveContext` struct.
+// Used to Check the Skipped Instructions
 func (dc *diveContext) CheckSkippedInstructions(instructions map[string]bool) bool {
 
 	return len(instructions) != 0
 }
 
+// The `StopService` function is a method of the `diveContext` struct. It is used to stop given service name from a specific enclave.
 func (dc *diveContext) StopService(serviceName string, enclaveName string) error {
 
 	enclaveContext, err := dc.GetEnclaveContext(enclaveName)
@@ -131,6 +144,8 @@ func (dc *diveContext) StopService(serviceName string, enclaveName string) error
 	return nil
 }
 
+// The `StopServices` function is a method of the `diveContext` struct. It is used to stop all
+// services from a specific enclave.
 func (dc *diveContext) StopServices(enclaveName string) error {
 
 	enclaveCtx, err := dc.GetEnclaveContext(enclaveName)
@@ -159,6 +174,8 @@ func (dc *diveContext) StopServices(enclaveName string) error {
 	return nil
 }
 
+// The `RemoveServices` function is a method of the `diveContext` struct. It is used to remove all
+// services from a specific enclave.
 func (dc *diveContext) RemoveServices(enclaveName string) error {
 	enclaveCtx, err := dc.GetEnclaveContext(enclaveName)
 
@@ -186,6 +203,8 @@ func (dc *diveContext) RemoveServices(enclaveName string) error {
 	return nil
 }
 
+// The `RemoveService` function is a method of the `diveContext` struct. It is used to remove a
+// specific service from an enclave.
 func (dc *diveContext) RemoveService(serviceName string, enclaveName string) error {
 	enclaveContext, err := dc.GetEnclaveContext(enclaveName)
 	if err != nil {
@@ -202,6 +221,8 @@ func (dc *diveContext) RemoveService(serviceName string, enclaveName string) err
 	return nil
 }
 
+// The `CreateEnclave` function is used to create a new enclave with the specified name. It takes in
+// the name of the enclave as a parameter and returns an `EnclaveContext` object and an error.
 func (dc *diveContext) CreateEnclave(enclaveName string) (*enclaves.EnclaveContext, error) {
 
 	enclaveContext, err := dc.kurtosisContext.CreateEnclave(dc.ctx, enclaveName)
@@ -213,6 +234,9 @@ func (dc *diveContext) CreateEnclave(enclaveName string) (*enclaves.EnclaveConte
 	return enclaveContext, nil
 }
 
+// The `initKurtosisContext` function is responsible for initializing the Kurtosis context by creating
+// a new instance of `KurtosisContext` using the `NewKurtosisContextFromLocalEngine` function from the
+// `kurtosis_context` package. If there is an error during initialization, it returns an error.
 func (dc *diveContext) initKurtosisContext() (*kurtosis_context.KurtosisContext, error) {
 
 	kurtosisContext, err := kurtosis_context.NewKurtosisContextFromLocalEngine()
@@ -242,6 +266,9 @@ func (dc *diveContext) checkEnclaveExist(enclaveName string) (*EnclaveInfo, erro
 	}, nil
 }
 
+// The `RemoveServicesByServiceNames` function is used to remove multiple services from an enclave. It
+// takes in a map of service names and their corresponding IDs, as well as the name of the enclave from
+// which the services should be removed.
 func (dc *diveContext) RemoveServicesByServiceNames(services map[string]string, enclaveName string) error {
 	enclaveCtx, err := dc.GetEnclaveContext(enclaveName)
 
@@ -263,6 +290,8 @@ func (dc *diveContext) RemoveServicesByServiceNames(services map[string]string, 
 	return nil
 }
 
+// The `Exit` function is used to terminate the program with a specified exit status code. It calls the
+// `os.Exit` function, which immediately terminates the program with the given status code.
 func (dc *diveContext) Exit(statusCode int) {
 	os.Exit(statusCode)
 }

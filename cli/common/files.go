@@ -8,13 +8,14 @@ import (
 	"strings"
 )
 
-const appDir = ".dive"
-
 type diveFileHandler struct{}
 
+// The function returns a new instance of the diveFileHandler struct.
 func NewDiveFileHandler() *diveFileHandler {
 	return &diveFileHandler{}
 }
+
+// The `ReadFile` method is responsible for reading the contents of a file given its file path.
 func (df *diveFileHandler) ReadFile(filePath string) ([]byte, error) {
 
 	fileData, err := os.ReadFile(filePath)
@@ -33,6 +34,8 @@ func (df *diveFileHandler) ReadFile(filePath string) ([]byte, error) {
 	return fileData, nil
 }
 
+// The `ReadJson` method is responsible for reading a JSON file and unmarshaling its contents into
+// the provided object.
 func (df *diveFileHandler) ReadJson(fileName string, obj interface{}) error {
 
 	var filePath string
@@ -62,6 +65,9 @@ func (df *diveFileHandler) ReadJson(fileName string, obj interface{}) error {
 
 	return nil
 }
+
+// The `ReadAppFile` method is responsible for reading the contents of a file located in the
+// application directory.
 func (df *diveFileHandler) ReadAppFile(fileName string) ([]byte, error) {
 
 	appFilePath, err := df.GetAppDirPathOrAppFilePath(fileName)
@@ -78,6 +84,8 @@ func (df *diveFileHandler) ReadAppFile(fileName string) ([]byte, error) {
 	return data, nil
 }
 
+// The `WriteAppFile` method is responsible for writing data to a file located in the application
+// directory.
 func (df *diveFileHandler) WriteAppFile(fileName string, data []byte) error {
 
 	appFileDir, err := df.GetAppDirPathOrAppFilePath("")
@@ -112,6 +120,8 @@ func (df *diveFileHandler) WriteAppFile(fileName string, data []byte) error {
 	return nil
 }
 
+// The `WriteFile` method is responsible for writing data to a file. It takes the file name and the
+// data to be written as parameters.
 func (df *diveFileHandler) WriteFile(fileName string, data []byte) error {
 
 	pwd, err := df.GetPwd()
@@ -138,6 +148,8 @@ func (df *diveFileHandler) WriteFile(fileName string, data []byte) error {
 	return nil
 }
 
+// The `WriteJson` method is responsible for serializing the provided data object into JSON format and
+// writing it to a file.
 func (df *diveFileHandler) WriteJson(fileName string, data interface{}) error {
 
 	serializedData, err := json.Marshal(data)
@@ -153,6 +165,10 @@ func (df *diveFileHandler) WriteJson(fileName string, data interface{}) error {
 	return nil
 }
 
+// The `GetPwd()` function is a method of the `diveFileHandler` struct. It is responsible for
+// retrieving the present working directory (PWD) and returning it as a string. It uses the
+// `os.Getwd()` function to get the PWD and returns it along with any error that occurred during the
+// process.
 func (df *diveFileHandler) GetPwd() (string, error) {
 
 	pwd, err := os.Getwd()
@@ -162,6 +178,8 @@ func (df *diveFileHandler) GetPwd() (string, error) {
 	return pwd, err
 }
 
+// The `MkdirAll` function is a method of the `diveFileHandler` struct. It is responsible for creating
+// a directory at the specified `dirPath` if it does not already exist.
 func (df *diveFileHandler) MkdirAll(dirPath string, permission fs.FileMode) error {
 
 	_, err := os.Stat(dirPath)
@@ -177,6 +195,10 @@ func (df *diveFileHandler) MkdirAll(dirPath string, permission fs.FileMode) erro
 	return nil
 }
 
+// The `OpenFile` method is responsible for opening a file given its file path, file open mode, and
+// permission. It uses the `os.OpenFile` function to open the file with the specified mode and
+// permission. If there is an error during the file opening process, it returns an error with a wrapped
+// message. Otherwise, it returns the opened file.
 func (df *diveFileHandler) OpenFile(filePath string, fileOpenMode string, permission int) (*os.File, error) {
 	mode := parseFileOpenMode(fileOpenMode)
 	file, err := os.OpenFile(filePath, mode, fs.FileMode(permission))
@@ -188,6 +210,10 @@ func (df *diveFileHandler) OpenFile(filePath string, fileOpenMode string, permis
 
 }
 
+// The `GetHomeDir()` function is a method of the `diveFileHandler` struct. It is responsible for
+// retrieving the user's home directory and returning it as a string. It uses the `os.UserHomeDir()`
+// function to get the home directory and returns it along with any error that occurred during the
+// process.
 func (df *diveFileHandler) GetHomeDir() (string, error) {
 
 	uhd, err := os.UserHomeDir()
@@ -197,6 +223,8 @@ func (df *diveFileHandler) GetHomeDir() (string, error) {
 	return uhd, err
 }
 
+// The function `parseFileOpenMode` takes a string representing file open modes separated by "|" and
+// returns the corresponding integer value.
 func parseFileOpenMode(fileOpenMode string) int {
 	modes := strings.Split(fileOpenMode, "|")
 
@@ -222,6 +250,8 @@ func parseFileOpenMode(fileOpenMode string) int {
 	return mode
 }
 
+// The `RemoveFile` function is a method of the `diveFileHandler` struct. It is responsible for
+// removing a file from the file system.
 func (df *diveFileHandler) RemoveFile(fileName string) error {
 
 	pwd, err := df.GetPwd()
@@ -244,6 +274,8 @@ func (df *diveFileHandler) RemoveFile(fileName string) error {
 	return nil
 }
 
+// The `RemoveFiles` function is a method of the `diveFileHandler` struct. It is responsible for
+// removing multiple files from the file system.
 func (df *diveFileHandler) RemoveFiles(fileNames []string) error {
 
 	pwd, err := df.GetPwd()
@@ -266,6 +298,8 @@ func (df *diveFileHandler) RemoveFiles(fileNames []string) error {
 	return nil
 }
 
+// The `GetAppDirPathOrAppFilePath` function is a method of the `diveFileHandler` struct. It is
+// responsible for returning the file path of a file located in the application directory.
 func (df *diveFileHandler) GetAppDirPathOrAppFilePath(fileName string) (string, error) {
 
 	var path string
@@ -274,9 +308,9 @@ func (df *diveFileHandler) GetAppDirPathOrAppFilePath(fileName string) (string, 
 		return "", WrapMessageToErrorf(err, "Failed To Write App File %s", fileName)
 	}
 	if fileName == "" {
-		path = filepath.Join(uhd, appDir)
+		path = filepath.Join(uhd, DiveAppDir)
 	} else {
-		path = filepath.Join(uhd, appDir, fileName)
+		path = filepath.Join(uhd, DiveAppDir, fileName)
 	}
 
 	return path, nil

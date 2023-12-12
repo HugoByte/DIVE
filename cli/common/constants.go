@@ -23,6 +23,7 @@ const (
 	DiveErrorLogFile             = "error.log"
 	DiveOutFile                  = "dive_%s.json"
 	ServiceFilePath              = "services_%s.json"
+	DiveAppDir                   = ".dive"
 	removeServiceStarlarkScript  = `
 def run(plan,args):
 		plan.remove_service(name=args["service_name"])

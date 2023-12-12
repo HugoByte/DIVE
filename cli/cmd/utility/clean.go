@@ -29,11 +29,6 @@ func clean(cmd *cobra.Command, args []string) {
 		cliContext.Logger().Error(common.InvalidCommandError, err.Error())
 	}
 
-	if err != nil {
-		cliContext.Logger().SetErrorToStderr()
-		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
-	}
-
 	enclaves, err := cliContext.Context().GetEnclaves()
 	if err != nil {
 		cliContext.Logger().SetErrorToStderr()
