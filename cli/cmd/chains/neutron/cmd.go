@@ -1,6 +1,8 @@
 package neutron
 
 import (
+	"fmt"
+
 	"github.com/hugobyte/dive-core/cli/common"
 	"github.com/spf13/cobra"
 )
@@ -37,8 +39,9 @@ func neutron(cmd *cobra.Command, args []string) {
 	if err != nil {
 		cliContext.Fatal(err)
 	}
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)
 
-	err = common.WriteServiceResponseData(response.ServiceName, *response, cliContext)
+	err = common.WriteServiceResponseData(response.ServiceName, *response, cliContext, serviceFileName)
 	if err != nil {
 		cliContext.Fatal(err)
 	}

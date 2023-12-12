@@ -85,13 +85,15 @@ func (c *Cli) Errorf(format string, err error, args ...interface{}) {
 
 	c.spinner.Stop()
 	c.log.SetErrorToStderr()
-	c.log.Errorf(CodeOf(err), format, args)
+	actualError, _ := CoderOf(err)
+	c.log.Errorf(actualError.ErrorCode(), "%s. message: %s", actualError.Error(), err.Error())
 }
 
 func (c *Cli) Fatalf(format string, err error, args ...interface{}) {
 	c.spinner.Stop()
 	c.log.SetErrorToStderr()
-	c.log.Fatalf(CodeOf(err), format, args)
+	actualError, _ := CoderOf(err)
+	c.log.Fatalf(actualError.ErrorCode(), "%s. message: %s", actualError.Error(), err.Error())
 }
 
 func (c *Cli) Error(err error) {

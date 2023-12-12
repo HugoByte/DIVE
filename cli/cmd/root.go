@@ -32,6 +32,11 @@ func run(cmd *cobra.Command, args []string) error {
 	styles.RenderBanner()
 	cmd.Help()
 
+	err := cmd.ParseFlags(args)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

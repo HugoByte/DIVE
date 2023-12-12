@@ -17,15 +17,35 @@ type CosmosServiceConfig struct {
 	PublicRPC  *int    `json:"public_rpc"`
 }
 
-func (cs *CosmosServiceConfig) LoadDefaultConfig() {
+func (cs *CosmosServiceConfig) LoadDefaultConfig() error {
 	cs.ChainID = nil
 	cs.Key = nil
 	cs.Password = nil
-	cs.PublicGrpc = nil
-	cs.PublicHTTP = nil
-	cs.PublicRPC = nil
-	cs.PublicTCP = nil
-	cs.Password = nil
+	publicGrpc, err := common.GetAvailablePort()
+	if err != nil {
+		return common.WrapMessageToError(err, "error getting available gRPC port")
+	}
+	cs.PublicGrpc = &publicGrpc
+
+	publicHTTP, err := common.GetAvailablePort()
+	if err != nil {
+		return common.WrapMessageToError(err, "error getting available HTTP port")
+	}
+	cs.PublicHTTP = &publicHTTP
+
+	publicRPC, err := common.GetAvailablePort()
+	if err != nil {
+		return common.WrapMessageToError(err, "error getting available Rpc port")
+	}
+	cs.PublicRPC = &publicRPC
+
+	publicTCP, err := common.GetAvailablePort()
+	if err != nil {
+		return common.WrapMessageToError(err, "error getting available Tcp port")
+	}
+	cs.PublicTCP = &publicTCP
+
+	return nil
 }
 
 func (cs *CosmosServiceConfig) EncodeToString() (string, error) {
@@ -55,12 +75,23 @@ type IconServiceConfig struct {
 	Cid              string `json:"cid"`
 }
 
-func (sc *IconServiceConfig) LoadDefaultConfig() {
+func (sc *IconServiceConfig) LoadDefaultConfig() error {
 	sc.Port = 9080
-	sc.PublicPort = 8090
 	sc.P2PListenAddress = "7080"
 	sc.P2PAddress = "8080"
 	sc.Cid = "0xacbc4e"
+
+	if common.CheckPort(8090) {
+		sc.PublicPort = 8090
+	} else {
+		availablePort, err := common.GetAvailablePort()
+		if err != nil {
+			return err
+		}
+		sc.PublicPort = availablePort
+	}
+
+	return nil
 
 }
 

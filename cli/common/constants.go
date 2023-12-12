@@ -25,10 +25,10 @@ const (
 	DiveHardhatNodeAlreadyRuning = "Hardhat Node Already Running"
 	DiveIconNodeAlreadyRunning   = "Icon Node Already Running"
 	DiveLogDirectory             = "/logs/"
-	DiveDitLogFile               = "divelog.log"
+	DiveDitLogFile               = "dive.log"
 	DiveErrorLogFile             = "error.log"
-	DiveOutFile                  = "dive.json"
-	ServiceFilePath              = "services.json"
+	DiveOutFile                  = "dive_%s.json"
+	ServiceFilePath              = "services_%s.json"
 	starlarkScript               = `
 def run(plan, args):
 	plan.stop_service(name=args["service_name"])
@@ -78,4 +78,5 @@ const (
 	InvalidFileError
 	KurtosisServiceError
 	InvalidChain
+	PortError
 )

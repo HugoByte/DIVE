@@ -34,12 +34,6 @@ func clean(cmd *cobra.Command, args []string) {
 		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
 	}
 
-	err = cliContext.FileHandler().RemoveFiles([]string{common.DiveOutFile, common.ServiceFilePath})
-	if err != nil {
-		cliContext.Logger().SetErrorToStderr()
-		cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
-	}
-
 	enclaves, err := cliContext.Context().GetEnclaves()
 	if err != nil {
 		cliContext.Logger().SetErrorToStderr()
@@ -60,12 +54,24 @@ func clean(cmd *cobra.Command, args []string) {
 			cliContext.Logger().SetErrorToStderr()
 			cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
 		}
+		for _, enclave := range enclaves {
+			err = cliContext.FileHandler().RemoveFiles([]string{fmt.Sprintf(common.DiveOutFile, enclave.Name), fmt.Sprintf(common.ServiceFilePath, enclave.Name)})
+			if err != nil {
+				cliContext.Logger().SetErrorToStderr()
+				cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
+			}
+		}
 
 		cliContext.Logger().Info(fmt.Sprintf("Enclaves Cleaned %v", enclavesInfo))
 
 	} else {
 		cliContext.StartSpinnerIfNotVerbose(fmt.Sprintf("Cleaning Dive By Enclave %s", common.EnclaveName), common.DiveLogs)
 		err = cliContext.Context().CleanEnclaveByName(common.EnclaveName)
+		if err != nil {
+			cliContext.Logger().SetErrorToStderr()
+			cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
+		}
+		err = cliContext.FileHandler().RemoveFiles([]string{fmt.Sprintf(common.DiveOutFile, common.EnclaveName), fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)})
 		if err != nil {
 			cliContext.Logger().SetErrorToStderr()
 			cliContext.Logger().Fatal(common.CodeOf(err), err.Error())

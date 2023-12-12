@@ -44,6 +44,6 @@ type EnclaveInfo struct {
 }
 
 type ConfigLoader interface {
-	LoadDefaultConfig()
+	LoadDefaultConfig() error
 	LoadConfigFromFile(cliContext *Cli, filePath string) error
 }

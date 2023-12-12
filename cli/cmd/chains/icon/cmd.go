@@ -1,6 +1,8 @@
 package icon
 
 import (
+	"fmt"
+
 	"github.com/hugobyte/dive-core/cli/common"
 	"github.com/spf13/cobra"
 )
@@ -81,8 +83,9 @@ func icon(cmd *cobra.Command, args []string) {
 		}
 
 	}
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)
 
-	err = common.WriteServiceResponseData(response.ServiceName, *response, cliContext)
+	err = common.WriteServiceResponseData(response.ServiceName, *response, cliContext, serviceFileName)
 	if err != nil {
 		cliContext.Error(err)
 		cliContext.Context().Exit(1)

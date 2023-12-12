@@ -1,6 +1,9 @@
 package common
 
 import (
+	"fmt"
+	"math/rand"
+	"net"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -19,12 +22,12 @@ func ValidateArgs(args []string) error {
 	return nil
 }
 
-func WriteServiceResponseData(serviceName string, data DiveServiceResponse, cliContext *Cli) error {
+func WriteServiceResponseData(serviceName string, data DiveServiceResponse, cliContext *Cli, fileName string) error {
 	var jsonDataFromFile = Services{}
-	err := cliContext.FileHandler().ReadJson("services.json", &jsonDataFromFile)
+	err := cliContext.FileHandler().ReadJson(fileName, &jsonDataFromFile)
 
 	if err != nil {
-		return WrapMessageToErrorf(err, "Failed To Read %s", "services.json")
+		return WrapMessageToErrorf(err, "Failed To Read %s", fileName)
 	}
 
 	_, ok := jsonDataFromFile[serviceName]
@@ -32,9 +35,9 @@ func WriteServiceResponseData(serviceName string, data DiveServiceResponse, cliC
 		jsonDataFromFile[serviceName] = &data
 
 	}
-	err = cliContext.FileHandler().WriteJson("services.json", jsonDataFromFile)
+	err = cliContext.FileHandler().WriteJson(fileName, jsonDataFromFile)
 	if err != nil {
-		return WrapMessageToErrorf(err, "Failed To Write %s", "services.json")
+		return WrapMessageToErrorf(err, "Failed To Write %s", fileName)
 	}
 
 	return nil
@@ -61,7 +64,9 @@ func OpenFile(URL string) error {
 
 func LoadConfig(cliContext *Cli, config ConfigLoader, filePath string) error {
 	if filePath == "" {
-		config.LoadDefaultConfig()
+		if err := config.LoadDefaultConfig(); err != nil {
+			return err
+		}
 	} else {
 		err := config.LoadConfigFromFile(cliContext, filePath)
 		if err != nil {
@@ -135,4 +140,28 @@ func GetSerializedData(cliContext *Cli, response chan *kurtosis_core_rpc_api_bin
 	}
 
 	return serializedOutputObj, services, skippedInstruction, nil
+}
+
+// Check if a port is available
+func CheckPort(port int) bool {
+
+	ln, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+	if err != nil {
+		return false
+	}
+	defer ln.Close()
+	return true
+}
+
+func GetAvailablePort() (int, error) {
+
+	// Check random ports in the range 1024-65535
+	for i := 0; i < 1000; i++ {
+		port := rand.Intn(64511) + 1024
+		if CheckPort(port) {
+			return port, nil
+		}
+	}
+
+	return 0, ErrPortAllocation
 }

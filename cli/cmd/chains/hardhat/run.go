@@ -7,7 +7,7 @@ func RunHardhat(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	enclaveContext, err := cli.Context().GetEnclaveContext(common.EnclaveName)
 
 	if err != nil {
-		return nil, common.WrapMessageToError(err, "Hardhat Run Failed")
+		return nil, common.WrapMessageToError(err, "Hardhat Run Failed While Getting Enclave Context")
 	}
 
 	runConfig := common.GetStarlarkRunConfig(`{}`, common.DiveEthHardhatNodeScript, "start_hardhat_node")
@@ -15,14 +15,14 @@ func RunHardhat(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	response, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, runConfig)
 
 	if err != nil {
-		return nil, common.WrapMessageToErrorf(common.ErrStarlarkRunFailed, "%s. %s", err, "Hardhat Run Failed")
+		return nil, common.WrapMessageToErrorf(common.ErrStarlarkRunFailed, "%s. %s", err, "Hardhat Run Failed While Executing Starlark Package.")
 	}
 
 	responseData, services, skippedInstructions, err := common.GetSerializedData(cli, response)
 	if err != nil {
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
-			return nil, common.WrapMessageToError(errRemove, "Hardhat Run Failed ")
+			return nil, common.WrapMessageToError(errRemove, "Hardhat Run Failed .Services Removed")
 		}
 
 		return nil, common.WrapMessageToError(err, "Hardhat Run Failed ")

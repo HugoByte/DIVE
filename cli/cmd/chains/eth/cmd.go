@@ -1,6 +1,7 @@
 package eth
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/hugobyte/dive-core/cli/common"
@@ -36,8 +37,8 @@ func eth(cmd *cobra.Command, args []string) {
 			cliContext.Fatal(err)
 		}
 	}
-
-	err = common.WriteServiceResponseData(responseData.ServiceName, *responseData, cliContext)
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)
+	err = common.WriteServiceResponseData(responseData.ServiceName, *responseData, cliContext, serviceFileName)
 
 	if err != nil {
 		cliContext.Fatal(err)

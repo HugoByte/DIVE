@@ -55,7 +55,9 @@ func (chains *Chains) GetServicesResponse(cli *common.Cli) (string, string, erro
 
 	var serviceConfig = common.Services{}
 
-	err := cli.FileHandler().ReadJson("services.json", &serviceConfig)
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)
+
+	err := cli.FileHandler().ReadJson(serviceFileName, &serviceConfig)
 
 	if err != nil {
 		return "", "", err

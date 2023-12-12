@@ -34,6 +34,7 @@ var (
 	ErrInvalidFile             = NewBase(InvalidFileError, "Failed To Resolve to File")
 	ErrKurtosisService         = NewBase(KurtosisServiceError, "Kurtosis Service Error")
 	ErrInvalidChain            = NewBase(InvalidChain, "Not A Valid Chain")
+	ErrPortAllocation          = NewBase(PortError, "Failed To Allocate Port")
 )
 
 func (c ErrorCode) New(msg string) error {

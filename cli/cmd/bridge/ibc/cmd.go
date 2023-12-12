@@ -43,7 +43,9 @@ func ibcRelay(cmd *cobra.Command, args []string) {
 		cliContext.Fatal(err)
 	}
 
-	err = cliContext.FileHandler().WriteFile("dive.json", []byte(result))
+	serviceFileName := fmt.Sprintf(common.DiveOutFile, common.EnclaveName)
+
+	err = cliContext.FileHandler().WriteFile(serviceFileName, []byte(result))
 	if err != nil {
 		cliContext.Fatal(err)
 	}

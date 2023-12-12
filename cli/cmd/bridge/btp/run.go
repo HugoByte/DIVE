@@ -128,7 +128,8 @@ func runBtpSetupWhenChainsAreNotIcon(cli *common.Cli, enclaveContext *enclaves.E
 func runBtpSetupWhenSingleChainRunning(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, chains *utils.Chains, bridge bool) (string, error) {
 	var chainAServiceResponse, chainBServiceResponse, chainAServiceName, chainBServiceName, response string
 	var services = common.Services{}
-	err := cli.FileHandler().ReadJson("services.json", &services)
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)
+	err := cli.FileHandler().ReadJson(serviceFileName, &services)
 
 	if err != nil {
 		return "", common.WrapMessageToError(err, fmt.Sprintf("BTP Setup Failed For ChainA %s and ChainB %s", chains.ChainA, chains.ChainB))
