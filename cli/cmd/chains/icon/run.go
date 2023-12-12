@@ -33,7 +33,7 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	iconData, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
-		return nil, common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
+		return nil, common.WrapMessageToErrorf(common.ErrStarlarkRunFailed, "%s. %s", err, "Icon Run Failed")
 	}
 
 	response, services, skippedInstructions, err := common.GetSerializedData(cli, iconData)

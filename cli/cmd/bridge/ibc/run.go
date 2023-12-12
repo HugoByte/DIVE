@@ -58,7 +58,7 @@ func startIbcRelayIconToCosmos(cli *common.Cli, enclaveContext *enclaves.Enclave
 	executionData, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
-		return "", common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
+		return "", common.WrapMessageToErrorf(common.ErrStarlarkRunFailed, "%s. %s", err, "IBC Run Failed")
 	}
 
 	executionSerializedData, services, _, err := common.GetSerializedData(cli, executionData)
@@ -83,7 +83,7 @@ func startCosmosChainsAndSetupIbcRelay(cli *common.Cli, enclaveCtx *enclaves.Enc
 	executionResult, err := runStarlarkPackage(cli, enclaveCtx, params, "run_cosmos_ibc_setup")
 
 	if err != nil {
-		return "", err
+		return "", common.WrapMessageToErrorf(common.ErrStarlarkRunFailed, "%s. %s", err, "IBC Run Failed")
 	}
 
 	return executionResult, nil
@@ -96,7 +96,7 @@ func setupIbcRelayforAlreadyRunningCosmosChain(cli *common.Cli, enclaveCtx *encl
 	executionResult, err := runStarlarkPackage(cli, enclaveCtx, params, "run_cosmos_ibc_relay_for_already_running_chains")
 
 	if err != nil {
-		return "", err
+		return "", common.WrapMessageToErrorf(common.ErrStarlarkRunFailed, "%s. %s", err, "IBC Run Failed")
 	}
 
 	return executionResult, nil

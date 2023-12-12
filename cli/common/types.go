@@ -38,9 +38,11 @@ func (dive *DiveServiceResponse) EncodeToString() (string, error) {
 type Services map[string]*DiveServiceResponse
 
 type EnclaveInfo struct {
-	Name      string
-	Uuid      string
-	ShortUuid string
+	Name        string
+	Uuid        string
+	ShortUuid   string
+	CreatedTime string
+	Status      string
 }
 
 type ConfigLoader interface {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
@@ -63,7 +64,13 @@ func (dc *diveContext) GetEnclaves() ([]EnclaveInfo, error) {
 	for _, enclaveInfoList := range enclaveMap {
 		for _, enclaveInfo := range enclaveInfoList {
 
-			enclaves = append(enclaves, EnclaveInfo{Name: enclaveInfo.Name, Uuid: enclaveInfo.EnclaveUuid, ShortUuid: enclaveInfo.ShortenedUuid})
+			enclaves = append(enclaves, EnclaveInfo{
+				Name:        enclaveInfo.Name,
+				Uuid:        enclaveInfo.EnclaveUuid,
+				ShortUuid:   enclaveInfo.ShortenedUuid,
+				Status:      strings.Replace(enclaveInfo.ContainersStatus.String(), "EnclaveContainersStatus_", "", -1),
+				CreatedTime: enclaveInfo.CreationTime.AsTime().String()},
+			)
 		}
 	}
 	return enclaves, nil

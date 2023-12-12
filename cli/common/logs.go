@@ -90,7 +90,7 @@ func (d *diveLogger) Error(errorCode ErrorCode, errorMessage string) {
 }
 
 func (d *diveLogger) Fatal(errorCode ErrorCode, errorMessage string) {
-	d.logWithFields(logrus.FatalLevel, "💀", "%s", errorMessage)
+	d.logWithFields(logrus.FatalLevel, "💀", "Code:%d Error: %s", errorCode, errorMessage)
 	d.log.Exit(1)
 }
 

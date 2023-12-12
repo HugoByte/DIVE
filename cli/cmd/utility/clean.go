@@ -78,5 +78,5 @@ func clean(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	cliContext.StopSpinnerIfNotVerbose("Clean Completed", common.DiveLogs)
+	cliContext.StopSpinnerIfNotVerbose("Clean Completed\n", common.DiveLogs)
 }

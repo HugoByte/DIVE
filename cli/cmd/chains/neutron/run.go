@@ -16,7 +16,7 @@ func RunNeutron(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	var serviceConfig = &utils.CosmosServiceConfig{}
 	chainName := "neutron"
 	serviceConfig.ChainName = &chainName
-	
+
 	err = common.LoadConfig(cli, serviceConfig, configFilePath)
 
 	if err != nil {
@@ -34,7 +34,7 @@ func RunNeutron(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	response, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, runConfig)
 
 	if err != nil {
-		return nil, common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
+		return nil, common.WrapMessageToErrorf(common.ErrStarlarkRunFailed, "%s. %s", err, "Neutron Run Failed")
 	}
 
 	responseData, services, skippedInstructions, err := common.GetSerializedData(cli, response)

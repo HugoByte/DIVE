@@ -23,6 +23,7 @@ var rootCmd = common.NewDiveCommandBuilder().
 	AddCommand(social.TwitterCmd).
 	AddCommand(chains.ChainCmd).
 	AddCommand(bridge.BridgeCmd).
+	AddCommand(utility.EnclavesCmd).
 	AddBoolPersistentFlag(&common.DiveLogs, "verbose", false, "Prints out logs to Stdout").
 	AddStringPersistentFlag(&common.EnclaveName, "enclaveName", common.DiveEnclave, "Provide Enclave Name To Start Service In Enclave Group").
 	SetRunE(run).

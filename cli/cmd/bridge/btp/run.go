@@ -199,7 +199,7 @@ func runBtpSetupByRunningNodes(cli *common.Cli, enclaveCtx *enclaves.EnclaveCont
 	executionData, _, err := enclaveCtx.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
-		return "", common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
+		return "", common.WrapMessageToErrorf(common.ErrStarlarkRunFailed, "%s. %s", err, "BTP Run Failed")
 	}
 	executionSerializedData, services, skippedInstructions, err := common.GetSerializedData(cli, executionData)
 	if err != nil {
@@ -225,7 +225,7 @@ func runBtpSetupForAlreadyRunningNodes(cli *common.Cli, enclaveCtx *enclaves.Enc
 	executionData, _, err := enclaveCtx.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, starlarkConfig)
 
 	if err != nil {
-		return "", common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
+		return "", common.WrapMessageToErrorf(common.ErrStarlarkRunFailed, "%s. %s", err, "BTP Run Failed")
 	}
 	executionSerializedData, services, skippedInstructions, err := common.GetSerializedData(cli, executionData)
 	if err != nil {

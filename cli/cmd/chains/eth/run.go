@@ -8,7 +8,7 @@ func RunEth(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 	enclaveContext, err := cli.Context().GetEnclaveContext(common.EnclaveName)
 	if err != nil {
-		return nil, common.WrapMessageToError(err, "Eth Run Failed")
+		return nil, common.WrapMessageToError(err, "Eth Run Failed while getting Enclave Context")
 	}
 	runConfig := common.GetStarlarkRunConfig(`{}`, common.DiveEthHardhatNodeScript, "start_eth_node")
 
