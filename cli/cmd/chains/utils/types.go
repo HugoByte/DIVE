@@ -8,6 +8,7 @@ import (
 
 type CosmosServiceConfig struct {
 	ChainID    *string `json:"chain_id"`
+	ChainName  *string `json:"chain_name"`
 	Key        *string `json:"key"`
 	Password   *string `json:"password"`
 	PublicGrpc *int    `json:"public_grpc"`
