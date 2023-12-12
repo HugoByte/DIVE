@@ -14,7 +14,9 @@ func RunNeutron(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	}
 
 	var serviceConfig = &utils.CosmosServiceConfig{}
-
+	chainName := "neutron"
+	serviceConfig.ChainName = &chainName
+	
 	err = common.LoadConfig(cli, serviceConfig, configFilePath)
 
 	if err != nil {

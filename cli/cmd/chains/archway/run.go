@@ -14,6 +14,8 @@ func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	}
 
 	var serviceConfig = &utils.CosmosServiceConfig{}
+	chainName := "archway"
+	serviceConfig.ChainName = &chainName
 
 	err = common.LoadConfig(cli, serviceConfig, configFilePath)
 	if err != nil {
