@@ -60,7 +60,7 @@ func RunNeutron(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
 		if errRemove != nil {
-			return nil, common.WrapMessageToError(errRemove, "Neutron Run Failed ")
+			return nil, common.WrapMessageToErrorf(errRemove, "%s.%s", errRemove, "Neutron Run Failed ")
 		}
 
 		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Neutron Run Failed ")
