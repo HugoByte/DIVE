@@ -45,6 +45,7 @@ func neutron(cmd *cobra.Command, args []string) {
 	if err != nil {
 		cliContext.Fatal(err)
 	}
+	stopMessage := fmt.Sprintf("Neutron Node Started. Please find service details in current working directory(%s)", serviceFileName)
+	cliContext.Spinner().StopWithMessage(stopMessage)
 
-	cliContext.Spinner().StopWithMessage("Neutron Node Started. Please find service details in current working directory(services.json)")
 }

@@ -49,6 +49,8 @@ func archway(cmd *cobra.Command, args []string) {
 		cliContext.Fatal(err)
 
 	}
-	cliContext.StopSpinnerIfNotVerbose("Archway Node Started. Please find service details in current working directory(services.json)", common.DiveLogs)
+
+	stopMessage := fmt.Sprintf("Archway Node Started. Please find service details in current working directory(%s)", serviceFileName)
+	cliContext.StopSpinnerIfNotVerbose(stopMessage, common.DiveLogs)
 
 }

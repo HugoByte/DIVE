@@ -1,6 +1,9 @@
 package hardhat
 
-import "github.com/hugobyte/dive-core/cli/common"
+import (
+	"github.com/hugobyte/dive-core/cli/cmd/chains/utils"
+	"github.com/hugobyte/dive-core/cli/common"
+)
 
 func RunHardhat(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
@@ -10,7 +13,19 @@ func RunHardhat(cli *common.Cli) (*common.DiveServiceResponse, error) {
 		return nil, common.WrapMessageToError(err, "Hardhat Run Failed While Getting Enclave Context")
 	}
 
-	runConfig := common.GetStarlarkRunConfig(`{}`, common.DiveEthHardhatNodeScript, "start_hardhat_node")
+	var serviceConfig = &utils.HardhatServiceConfig{}
+	err = serviceConfig.LoadDefaultConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	encodedServiceConfigDataString, err := serviceConfig.EncodeToString()
+
+	if err != nil {
+		return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+	}
+
+	runConfig := common.GetStarlarkRunConfig(encodedServiceConfigDataString, common.DiveEthHardhatNodeScript, "start_hardhat_node")
 
 	response, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, runConfig)
 
@@ -22,7 +37,7 @@ func RunHardhat(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	if err != nil {
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
-			return nil, common.WrapMessageToError(errRemove, "Hardhat Run Failed .Services Removed")
+			return nil, common.WrapMessageToError(errRemove, "Hardhat Run Failed. Services Removed")
 		}
 
 		return nil, common.WrapMessageToError(err, "Hardhat Run Failed ")
@@ -37,7 +52,7 @@ func RunHardhat(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	result, err := hardhatResponseData.Decode([]byte(responseData))
 
 	if err != nil {
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if err != nil {
 			return nil, common.WrapMessageToError(errRemove, "Hardhat Run Failed ")
 		}

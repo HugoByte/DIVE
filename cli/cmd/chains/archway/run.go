@@ -40,7 +40,7 @@ func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 	if err != nil {
 
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
 			return nil, common.WrapMessageToError(errRemove, "Archway Run Failed.")
 		}
@@ -57,7 +57,7 @@ func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 	if err != nil {
 
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
 			return nil, common.WrapMessageToError(errRemove, "Archway Run Failed ")
 		}
