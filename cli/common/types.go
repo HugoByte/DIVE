@@ -17,11 +17,24 @@ type DiveServiceResponse struct {
 	ChainKey        string `json:"chain_key,omitempty"`
 }
 
+type DiveMultipleServiceResponse struct {
+	Dive map[string]*DiveServiceResponse
+}
+
 // The `Decode` function is a method of the `DiveServiceResponse` struct. It takes a byte slice
 // `responseData` as input and attempts to decode it into a `DiveServiceResponse` object.
 func (dive *DiveServiceResponse) Decode(responseData []byte) (*DiveServiceResponse, error) {
 
 	err := json.Unmarshal(responseData, &dive)
+	if err != nil {
+		return nil, WrapMessageToError(ErrDataUnMarshall, err.Error())
+	}
+	return dive, nil
+}
+
+func (dive *DiveMultipleServiceResponse) Decode(responseData []byte) (*DiveMultipleServiceResponse, error) {
+
+	err := json.Unmarshal(responseData, &dive.Dive)
 	if err != nil {
 		return nil, WrapMessageToError(ErrDataUnMarshall, err.Error())
 	}

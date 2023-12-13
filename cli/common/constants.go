@@ -4,27 +4,31 @@ package common
 const DiveVersion = "v0.0.14-beta"
 
 const (
-	DiveEnclave                  = "dive"
-	DiveRemotePackagePath        = "github.com/hugobyte/dive-packages"
-	DiveIconNodeScript           = "services/jvm/icon/src/node-setup/start_icon_node.star"
-	DiveIconDecentralizeScript   = "services/jvm/icon/src/node-setup/setup_icon_node.star"
-	DiveEthHardhatNodeScript     = "services/evm/eth/src/node-setup/start-eth-node.star"
-	DiveArchwayNodeScript        = "services/cosmvm/archway/src/node-setup/start_node.star"
-	DiveCosmosDefaultNodeScript  = "services/cosmvm/cosmos_chains.star"
-	DiveNeutronNodeScript        = "services/cosmvm/neutron/src/node-setup/start_node.star"
-	RelayServiceNameIconToCosmos = "ibc-relayer"
-	DiveNeutronDefaultNodeScript = "services/cosmvm/neutron/neutron.star"
-	DiveBridgeBtpScript          = "/services/bridges/btp/src/bridge.star"
-	DiveBridgeIbcScript          = "/services/bridges/ibc/src/bridge.star"
-	DiveDryRun                   = false
-	DiveDefaultParallelism       = 4
-	DiveLogDirectory             = "/logs/"
-	DiveDitLogFile               = "dive.log"
-	DiveErrorLogFile             = "error.log"
-	DiveOutFile                  = "dive_%s.json"
-	ServiceFilePath              = "services_%s.json"
-	DiveAppDir                   = ".dive"
-	removeServiceStarlarkScript  = `
+	DiveEnclave                        = "dive"
+	DiveRemotePackagePath              = "github.com/hugobyte/dive-packages"
+	DiveIconNodeScript                 = "services/jvm/icon/src/node-setup/start_icon_node.star"
+	DiveIconDecentralizeScript         = "services/jvm/icon/src/node-setup/setup_icon_node.star"
+	DiveEthHardhatNodeScript           = "services/evm/eth/src/node-setup/start-eth-node.star"
+	DiveArchwayNodeScript              = "services/cosmvm/archway/src/node-setup/start_node.star"
+	DiveCosmosDefaultNodeScript        = "services/cosmvm/cosmos_chains.star"
+	DiveNeutronNodeScript              = "services/cosmvm/neutron/src/node-setup/start_node.star"
+	RelayServiceNameIconToCosmos       = "ibc-relayer"
+	DiveNeutronDefaultNodeScript       = "services/cosmvm/neutron/neutron.star"
+	DiveBridgeBtpScript                = "/services/bridges/btp/src/bridge.star"
+	DiveBridgeIbcScript                = "/services/bridges/ibc/src/bridge.star"
+	PolkadotRemotePackagePath          = "/Users/abhishekharde/Desktop/hugobyte/polkadot-kurtosis-package/"
+	DivePolkadotDefaultNodeSetupScript = "main.star"
+	DivePolkadotRelayNodeSetupScript   = "/relaychain/relay-chain.star"
+
+	DiveDryRun                  = false
+	DiveDefaultParallelism      = 4
+	DiveLogDirectory            = "/logs/"
+	DiveDitLogFile              = "dive.log"
+	DiveErrorLogFile            = "error.log"
+	DiveOutFile                 = "dive_%s.json"
+	ServiceFilePath             = "services_%s.json"
+	DiveAppDir                  = ".dive"
+	removeServiceStarlarkScript = `
 def run(plan,args):
 		plan.remove_service(name=args["service_name"])
 `
