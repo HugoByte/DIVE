@@ -40,7 +40,7 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 	if err != nil {
 
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
 			return nil, common.WrapMessageToError(errRemove, "Icon Run Failed ")
 		}
@@ -58,7 +58,7 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 	if err != nil {
 
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
 			return nil, common.WrapMessageToError(errRemove, "Icon Run Failed ")
 		}
@@ -87,7 +87,7 @@ func RunDecentralization(cli *common.Cli, params string) error {
 	_, services, skippedInstructions, err := common.GetSerializedData(cli, data)
 	if err != nil {
 
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
 			return common.WrapMessageToError(errRemove, "Icon Decentralization Failed ")
 		}

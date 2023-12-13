@@ -43,6 +43,7 @@ func hardhat(cmd *cobra.Command, args []string) {
 		cliContext.Fatal(err)
 	}
 
-	cliContext.Spinner().StopWithMessage("Hardhat Node Started. Please find service details in current working directory(services.json)")
+	stopMessage := fmt.Sprintf("Hardhat Node Started. Please find service details in current working directory(%s)", serviceFileName)
+	cliContext.Spinner().StopWithMessage(stopMessage)
 
 }

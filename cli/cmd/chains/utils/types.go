@@ -111,3 +111,31 @@ func (sc *IconServiceConfig) LoadConfigFromFile(cliContext *common.Cli, filePath
 	}
 	return nil
 }
+
+type HardhatServiceConfig struct {
+	PublicPort int `json:"public_port"`
+}
+
+func (sc *HardhatServiceConfig) LoadDefaultConfig() error {
+	sc.PublicPort = 8545
+	if common.CheckPort(8545) {
+		sc.PublicPort = 8545
+	} else {
+		availablePort, err := common.GetAvailablePort()
+		if err != nil {
+			return err
+		}
+		sc.PublicPort = availablePort
+	}
+
+	return nil
+}
+
+func (sc *HardhatServiceConfig) EncodeToString() (string, error) {
+	encodedBytes, err := json.Marshal(sc)
+	if err != nil {
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+	}
+
+	return string(encodedBytes), nil
+}

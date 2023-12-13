@@ -39,7 +39,7 @@ func RunEth(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	result, err := ethResponseData.Decode([]byte(responseData))
 
 	if err != nil {
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if err != nil {
 			return nil, common.WrapMessageToError(errRemove, "Eth Run Failed ")
 		}

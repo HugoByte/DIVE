@@ -44,5 +44,7 @@ func eth(cmd *cobra.Command, args []string) {
 		cliContext.Fatal(err)
 	}
 
-	cliContext.Spinner().StopWithMessage("ETH Node Started. Please find service details in current working directory(services.json)")
+	stopMessage := fmt.Sprintf("ETH Node Started. Please find service details in current working directory(%s)", serviceFileName)
+	cliContext.Spinner().StopWithMessage(stopMessage)
+
 }

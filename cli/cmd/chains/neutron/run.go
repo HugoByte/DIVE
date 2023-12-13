@@ -41,7 +41,7 @@ func RunNeutron(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 	if err != nil {
 
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
 			return nil, common.WrapMessageToError(errRemove, "Neutron Run Failed ")
 		}
@@ -58,7 +58,7 @@ func RunNeutron(cli *common.Cli) (*common.DiveServiceResponse, error) {
 
 	if err != nil {
 
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
 			return nil, common.WrapMessageToErrorf(errRemove, "%s.%s", errRemove, "Neutron Run Failed ")
 		}
