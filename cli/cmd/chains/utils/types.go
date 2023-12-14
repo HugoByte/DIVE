@@ -139,3 +139,67 @@ func (sc *HardhatServiceConfig) EncodeToString() (string, error) {
 
 	return string(encodedBytes), nil
 }
+
+// This code is for polkadot config file
+
+type NodeConfig struct {
+	Name       string `json:"name"`
+	NodeType   string `json:"node-type"`
+	Port       int    `json:"port"`
+	Prometheus bool   `json:"prometheus"`
+}
+
+type RelayChainConfig struct {
+	Name  string       `json:"name"`
+	Nodes []NodeConfig `json:"nodes"`
+}
+
+type ParaNodeConfig struct {
+	Name  string       `json:"name"`
+	Nodes []NodeConfig `json:"nodes"`
+}
+
+type PolkadotServiceConfig struct {
+	ChainType  string           `json:"chain-type"`
+	RelayChain RelayChainConfig `json:"relaychain"`
+	Para       []ParaNodeConfig `json:"para"`
+	Explorer   bool             `json:"explorer"`
+}
+
+func (sc *PolkadotServiceConfig) EncodeToString() (string, error) {
+	encodedBytes, err := json.Marshal(sc)
+	if err != nil {
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+	}
+
+	return string(encodedBytes), nil
+}
+
+func (sc *PolkadotServiceConfig) LoadConfigFromFile(cliContext *common.Cli, filePath string) error {
+	err := cliContext.FileHandler().ReadJson(filePath, sc)
+	if err != nil {
+		return common.WrapMessageToError(err, "Failed To Load Configuration")
+	}
+	return nil
+}
+
+func (sc *PolkadotServiceConfig) LoadDefaultConfig() error {
+	sc.ChainType = "local"
+	sc.Explorer = false
+	sc.RelayChain.Name = "rococo-local"
+	sc.RelayChain.Nodes = []NodeConfig{
+		{Name: "bob", NodeType: "full", Port: 9944, Prometheus: false},
+		{Name: "alice", NodeType: "validator", Port: 9955, Prometheus: false},
+	}
+	sc.Para = []ParaNodeConfig{
+		{
+			Name: "",
+			Nodes: []NodeConfig{
+				{Name: "alice", NodeType: "full", Prometheus: false},
+				{Name: "bob", NodeType: "collator", Prometheus: false},
+			},
+		},
+	}
+
+	return nil
+}

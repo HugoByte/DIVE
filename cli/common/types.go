@@ -5,16 +5,24 @@ import (
 )
 
 type DiveServiceResponse struct {
-	ServiceName     string `json:"service_name,omitempty"`
-	PublicEndpoint  string `json:"endpoint_public,omitempty"`
-	PrivateEndpoint string `json:"endpoint,omitempty"`
-	KeyPassword     string `json:"keypassword,omitempty"`
-	KeystorePath    string `json:"keystore_path,omitempty"`
-	Network         string `json:"network,omitempty"`
-	NetworkName     string `json:"network_name,omitempty"`
-	NetworkId       string `json:"nid,omitempty"`
-	ChainId         string `json:"chain_id,omitempty"`
-	ChainKey        string `json:"chain_key,omitempty"`
+	ServiceName        string `json:"service_name,omitempty"`
+	PublicEndpoint     string `json:"endpoint_public,omitempty"`
+	PrivateEndpoint    string `json:"endpoint,omitempty"`
+	KeyPassword        string `json:"keypassword,omitempty"`
+	KeystorePath       string `json:"keystore_path,omitempty"`
+	Network            string `json:"network,omitempty"`
+	NetworkName        string `json:"network_name,omitempty"`
+	NetworkId          string `json:"nid,omitempty"`
+	ChainId            string `json:"chain_id,omitempty"`
+	ChainKey           string `json:"chain_key,omitempty"`
+	PrometheusEndpoint string `json:"endpoint_prometheus,omitempty"`
+	Prometheus         bool   `json:"prometheus,omitempty"`
+	IpAddress          string `json:"ip_address,omitempty"`
+	Node               string `json:"node,omitempty"`
+}
+
+type DiveMultipleServiceResponse struct {
+	Dive map[string]*DiveServiceResponse
 }
 
 // The `Decode` function is a method of the `DiveServiceResponse` struct. It takes a byte slice
@@ -22,6 +30,15 @@ type DiveServiceResponse struct {
 func (dive *DiveServiceResponse) Decode(responseData []byte) (*DiveServiceResponse, error) {
 
 	err := json.Unmarshal(responseData, &dive)
+	if err != nil {
+		return nil, WrapMessageToError(ErrDataUnMarshall, err.Error())
+	}
+	return dive, nil
+}
+
+func (dive *DiveMultipleServiceResponse) Decode(responseData []byte) (*DiveMultipleServiceResponse, error) {
+
+	err := json.Unmarshal(responseData, &dive.Dive)
 	if err != nil {
 		return nil, WrapMessageToError(ErrDataUnMarshall, err.Error())
 	}
