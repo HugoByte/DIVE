@@ -68,7 +68,6 @@ func RunPolkadot(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 	polkadotResponseData := &common.DiveMultipleServiceResponse{}
 	result, err := polkadotResponseData.Decode([]byte(responseData))
 
-
 	if err != nil {
 
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
@@ -107,8 +106,11 @@ func configureService(serviceConfig *utils.PolkadotServiceConfig) {
 }
 
 func configureMetrics(serviceConfig *utils.PolkadotServiceConfig) {
-	for _, node := range append(serviceConfig.RelayChain.Nodes, serviceConfig.Para[0].Nodes...) {
-		node.Prometheus = true
+	for i := range serviceConfig.RelayChain.Nodes {
+		serviceConfig.RelayChain.Nodes[i].Prometheus = true
+	}
+	for i := range serviceConfig.Para[0].Nodes {
+		serviceConfig.Para[0].Nodes[i].Prometheus = true
 	}
 }
 
