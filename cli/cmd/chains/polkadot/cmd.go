@@ -18,7 +18,7 @@ var (
 )
 
 const (
-	runPolkadotFunctionName       = "run"
+	runPolkadotFunctionName       = "run_polkadot_setup"
 	runPolkadotRelayLocal         = "start_relay_chains_local"
 	runPolkadotRelayTestnetMainet = "start_test_main_net_relay_nodes"
 )

@@ -5,16 +5,20 @@ import (
 )
 
 type DiveServiceResponse struct {
-	ServiceName     string `json:"service_name,omitempty"`
-	PublicEndpoint  string `json:"endpoint_public,omitempty"`
-	PrivateEndpoint string `json:"endpoint,omitempty"`
-	KeyPassword     string `json:"keypassword,omitempty"`
-	KeystorePath    string `json:"keystore_path,omitempty"`
-	Network         string `json:"network,omitempty"`
-	NetworkName     string `json:"network_name,omitempty"`
-	NetworkId       string `json:"nid,omitempty"`
-	ChainId         string `json:"chain_id,omitempty"`
-	ChainKey        string `json:"chain_key,omitempty"`
+	ServiceName        string `json:"service_name,omitempty"`
+	PublicEndpoint     string `json:"endpoint_public,omitempty"`
+	PrivateEndpoint    string `json:"endpoint,omitempty"`
+	KeyPassword        string `json:"keypassword,omitempty"`
+	KeystorePath       string `json:"keystore_path,omitempty"`
+	Network            string `json:"network,omitempty"`
+	NetworkName        string `json:"network_name,omitempty"`
+	NetworkId          string `json:"nid,omitempty"`
+	ChainId            string `json:"chain_id,omitempty"`
+	ChainKey           string `json:"chain_key,omitempty"`
+	PrometheusEndpoint string `json:"endpoint_prometheus,omitempty"`
+	Prometheus         bool   `json:"prometheus,omitempty"`
+	IpAddress          string `json:"ip_address,omitempty"`
+	Node               string `json:"node,omitempty"`
 }
 
 type DiveMultipleServiceResponse struct {

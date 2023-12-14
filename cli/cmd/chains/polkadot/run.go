@@ -33,7 +33,9 @@ func RunPolkadot(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 
 	encodedServiceConfigDataString, err := serviceConfig.EncodeToString()
 
-	para := fmt.Sprintf("{args: %s}", encodedServiceConfigDataString)
+	para := fmt.Sprintf(`{"args": %s}`, encodedServiceConfigDataString)
+
+	fmt.Print(para)
 
 	if err != nil {
 		return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
@@ -66,7 +68,6 @@ func RunPolkadot(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 	polkadotResponseData := &common.DiveMultipleServiceResponse{}
 	result, err := polkadotResponseData.Decode([]byte(responseData))
 
-	fmt.Print(result)
 
 	if err != nil {
 
