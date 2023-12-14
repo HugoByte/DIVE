@@ -41,9 +41,9 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		cmd.Stderr = &testWriter{}
 	})
 
-	ginkgo.AfterEach(func() {
-		dive.Clean()
-	})
+	// ginkgo.AfterEach(func() {
+	// 	dive.Clean()
+	// })
 
 	ginkgo.Describe("Smoke Tests", func() {
 		ginkgo.It("should display the correct version", func() {
@@ -76,7 +76,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		})
 
 		ginkgo.It("should start bridge between icon and eth", func() {
-			dive.Clean()
+			// dive.Clean()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth")
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -434,10 +434,10 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 	})
 
 	ginkgo.Describe("Other commands", func() {
-		ginkgo.It("should handle error when trying to clean if no enclaves are running", func() {
-			dive.Clean()
-			dive.Clean()
-		})
+		// ginkgo.It("should handle error when trying to clean if no enclaves are running", func() {
+		// 	dive.Clean()
+		// 	dive.Clean()
+		// })
 
 		ginkgo.It("should handle error when trying to clean if kurtosis engine is not running", func() {
 			cmd1 := exec.Command("kurtosis", "engine", "stop")
@@ -458,10 +458,12 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 	})
 
 	ginkgo.Describe("Icon chain commands", func() {
-		ginkgo.It("should run single icon node", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon")
+		ginkgo.It("should run single icon node testing", func() {
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "chain", "icon", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should run single icon node with verbose flag enabled", func() {

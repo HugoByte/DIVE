@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/google/uuid"
 	"github.com/onsi/gomega"
 )
 
@@ -21,11 +22,18 @@ func GetBinPath() string {
 	return binaryPath
 }
 
+// function to generate random enclave name
+func GenerateRandomName() string {
+	id := uuid.New()
+	return id.String()
+}
+
 // function to test and clean encalve created by DIVE
-func Clean() {
+func Clean(enclaveName string) {
 	var stdout bytes.Buffer
 	cmd := GetBinaryCommand()
-	cmd.Args = append(cmd.Args, "clean")
+	cmd.Args = append(cmd.Args, "clean", "--enclaveName", enclaveName)
+	fmt.Println(cmd.Args)
 	cmd.Stdout = &stdout
 	err := cmd.Run()
 	fmt.Println(stdout.String())
@@ -34,6 +42,7 @@ func Clean() {
 
 func RunIconNode() {
 	cmd := GetBinaryCommand()
+	// enclaveName := generateRandomName()
 	cmd.Args = append(cmd.Args, "chain", "icon")
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
