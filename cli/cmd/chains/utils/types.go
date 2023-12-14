@@ -81,15 +81,11 @@ func (sc *IconServiceConfig) LoadDefaultConfig() error {
 	sc.P2PAddress = "8080"
 	sc.Cid = "0xacbc4e"
 
-	if common.CheckPort(8090) {
-		sc.PublicPort = 8090
-	} else {
-		availablePort, err := common.GetAvailablePort()
-		if err != nil {
-			return err
-		}
-		sc.PublicPort = availablePort
+	availablePort, err := common.GetAvailablePort()
+	if err != nil {
+		return err
 	}
+	sc.PublicPort = availablePort
 
 	return nil
 
@@ -117,17 +113,11 @@ type HardhatServiceConfig struct {
 }
 
 func (sc *HardhatServiceConfig) LoadDefaultConfig() error {
-	sc.PublicPort = 8545
-	if common.CheckPort(8545) {
-		sc.PublicPort = 8545
-	} else {
-		availablePort, err := common.GetAvailablePort()
-		if err != nil {
-			return err
-		}
-		sc.PublicPort = availablePort
+	availablePort, err := common.GetAvailablePort()
+	if err != nil {
+		return err
 	}
-
+	sc.PublicPort = availablePort
 	return nil
 }
 
