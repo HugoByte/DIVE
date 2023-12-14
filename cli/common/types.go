@@ -18,7 +18,7 @@ type DiveServiceResponse struct {
 	PrometheusEndpoint string `json:"endpoint_prometheus,omitempty"`
 	Prometheus         bool   `json:"prometheus,omitempty"`
 	IpAddress          string `json:"ip_address,omitempty"`
-	Node               string `json:"node,omitempty"`
+	Node               string `json:"node-type,omitempty"`
 }
 
 type DiveMultipleServiceResponse struct {
