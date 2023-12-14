@@ -4,9 +4,26 @@ import (
 	"fmt"
 
 	"github.com/hugobyte/dive-core/cli/cmd/bridge/utils"
+	"github.com/hugobyte/dive-core/cli/cmd/chains/archway"
+	"github.com/hugobyte/dive-core/cli/cmd/chains/icon"
+	"github.com/hugobyte/dive-core/cli/cmd/chains/neutron"
 	"github.com/hugobyte/dive-core/cli/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 )
+
+var runChain = map[string]func(cli *common.Cli) (*common.DiveServiceResponse, error){
+	"icon": func(cli *common.Cli) (*common.DiveServiceResponse, error) {
+		return icon.RunIconNode(cli)
+	},
+	"archway": func(cli *common.Cli) (*common.DiveServiceResponse, error) {
+		return archway.RunArchway(cli)
+
+	},
+	"neutron": func(cli *common.Cli) (*common.DiveServiceResponse, error) {
+
+		return neutron.RunNeutron(cli)
+	},
+}
 
 func RunIbcRelay(cli *common.Cli) (string, error) {
 	var starlarkExecutionResponse string
@@ -78,15 +95,32 @@ func startIbcRelayIconToCosmos(cli *common.Cli, enclaveContext *enclaves.Enclave
 
 func startCosmosChainsAndSetupIbcRelay(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, chains *utils.Chains) (string, error) {
 
-	params := chains.GetIbcRelayParams()
-
-	executionResult, err := runStarlarkPackage(cli, enclaveCtx, params, "run_cosmos_ibc_setup")
-
+	srcChainServiceResponse, err := runChain[chains.ChainA](cli)
 	if err != nil {
-		return "", common.WrapMessageToErrorf(common.ErrStarlarkRunFailed, "%s. %s", err, "IBC Run Failed")
+		return "", common.WrapMessageToError(err, fmt.Sprintf("IBC Setup Failed Due To ChainA %s Run Failed ", chains.ChainA))
 	}
 
-	return executionResult, nil
+	srcChainServiceResponseString, err := srcChainServiceResponse.EncodeToString()
+	if err != nil {
+		return "", err
+	}
+
+	dstChainServiceResponse, err := runChain[chains.ChainB](cli)
+	if err != nil {
+		return "", common.WrapMessageToError(err, fmt.Sprintf("IBC Setup Failed Due To ChainB %s Run Failed ", chains.ChainB))
+	}
+
+	dstChainServiceResponseString, err := dstChainServiceResponse.EncodeToString()
+	if err != nil {
+		return "", err
+	}
+
+	starlarkExecutionResponse, err := setupIbcRelayforAlreadyRunningCosmosChain(cli, enclaveCtx, chains.ChainA, chains.ChainB, srcChainServiceResponseString, dstChainServiceResponseString)
+	if err != nil {
+		return "", err
+	}
+
+	return starlarkExecutionResponse, nil
 }
 
 func setupIbcRelayforAlreadyRunningCosmosChain(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, chainA, chainB, chainAServiceResponse, chainBServiceResponse string) (string, error) {

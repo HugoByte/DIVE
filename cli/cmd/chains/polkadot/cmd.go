@@ -64,6 +64,6 @@ func polkadot(cmd *cobra.Command, args []string) {
 			cliContext.Fatal(err)
 		}
 	}
-	stopMessage := fmt.Sprintf("Polkadot Node Started. Please find the service details in current working directory (%s)", serviceFileName)
+	stopMessage := fmt.Sprintf("Polkadot Node Started. Please find service details in current working directory(%s)", serviceFileName)
 	cliContext.StopSpinnerIfNotVerbose(stopMessage, common.DiveLogs)
 }
