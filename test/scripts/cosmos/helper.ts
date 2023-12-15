@@ -2,6 +2,7 @@ import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
 import { exec } from "child_process";
 import fs from "fs";
 import { Secp256k1HdWallet } from "@cosmjs/launchpad";
+import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 const defaultGasPrice = GasPrice.fromString("0stake");
 
@@ -9,7 +10,7 @@ export async function CreateSigningClient(
   mnemonic: string,
   prefix: string,
   endpoint: string
-): Promise<[SigningStargateClient, string]> {
+): Promise<[SigningCosmWasmClient, string]> {
 
   const wallet = await Secp256k1HdWallet.fromMnemonic(mnemonic, { prefix: prefix });
 
@@ -18,7 +19,7 @@ export async function CreateSigningClient(
   const accountAddress = accounts[0].address;
 
   // Create an signing client with created wallet
-  const signingClient = await SigningStargateClient.connectWithSigner(
+  const signingClient = await SigningCosmWasmClient.connectWithSigner(
     endpoint,
     wallet,
     {
@@ -29,7 +30,7 @@ export async function CreateSigningClient(
 }
 
 export async function getHeight(
-  client: SigningStargateClient,
+  client: SigningCosmWasmClient,
   chainId: string
 ) {
   // To Check if the client is connected to local chain
@@ -107,7 +108,7 @@ export async function getContainerIdByPartialName(chainName: string): Promise<st
 }
 
 export async function getBalance(
-  client: SigningStargateClient,
+  client: SigningCosmWasmClient,
   address: string
 ) {
   const balance = await client.getBalance(address, "stake");
