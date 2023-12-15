@@ -62,5 +62,5 @@ func btpRelay(cmd *cobra.Command, args []string) {
 	if err != nil {
 		cliContext.Fatal(err)
 	}
-	cliContext.StopSpinnerIfNotVerbose(fmt.Sprintf("BTP Setup Completed between %s and %s. Please find service details in current working directory(dive.json)", chainA, chainB), common.DiveLogs)
+	cliContext.StopSpinnerIfNotVerbose(fmt.Sprintf("BTP Setup Completed between %s and %s. Please find service details in current working directory(%s)", chainA, chainB, serviceFileName), common.DiveLogs)
 }
