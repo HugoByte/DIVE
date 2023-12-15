@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"testing"
+	"time"
 
 	dive "github.com/HugoByte/DIVE/test/functional"
 	"github.com/hugobyte/dive-core/cli/cmd/utility"
@@ -22,6 +23,12 @@ type testWriter struct {
 func TestCLIApp(t *testing.T) {
 	gomega.RegisterFailHandler(ginkgo.Fail)
 	ginkgo.RunSpecs(t, "DIVE CLI App Suite")
+	// ginkgo.AfterSuite(func() {
+	// 	dive.Clean("all")
+	// })
+	// ginkgo.AfterAll(func ()  {
+	// 	dive.Clean("all")
+	// })
 }
 
 func (w *testWriter) Write(p []byte) (n int, err error) {
@@ -41,9 +48,9 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		cmd.Stderr = &testWriter{}
 	})
 
-	// ginkgo.AfterEach(func() {
-	// 	dive.Clean()
-	// })
+	
+
+	
 
 	ginkgo.Describe("Smoke Tests", func() {
 		ginkgo.It("should display the correct version", func() {
@@ -163,7 +170,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		})
 
 		ginkgo.It("should start bridge between icon and eth by running icon node first and then decentralising it", func() {
-			dive.RunIconNode()
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
 			dive.DecentralizeIconNode()
 			dive.RunEthNode()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "el-1-geth-lighthouse")
@@ -172,7 +180,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		})
 
 		ginkgo.It("should start bridge between icon and hardhat by running icon node first and then decentralising it", func() {
-			dive.RunIconNode()
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
 			dive.DecentralizeIconNode()
 			dive.RunHardhatNode()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "hardhat-node")
@@ -198,7 +207,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		})
 
 		ginkgo.It("should start bridge between icon and icon by running one icon chain and later decentralsing it. Running another custom icon chain and then decentralising it", func() {
-			dive.RunIconNode()
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
 			dive.DecentralizeIconNode()
 			dive.RunCustomIconNode()
 			dive.DecentralizeCustomIconNode()
@@ -334,7 +344,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		})
 
 		ginkgo.It("should start IBC relay between already running icon and archway chain", func() {
-			dive.RunIconNode()
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
 			dive.RunArchwayNode()
 			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "archway", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "node-service-constantine-3")
 			err := cmd.Run()
@@ -342,7 +353,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		})
 
 		ginkgo.It("should start IBC relay between already running icon and neutron chain", func() {
-			dive.RunIconNode()
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
 			dive.RunNeutronNode()
 			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "neutron", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "neutron-node-test-chain1")
 			err := cmd.Run()
@@ -350,7 +362,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		})
 
 		ginkgo.It("should start IBC relay between already running icon and custom archway chain", func() {
-			dive.RunIconNode()
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
 			dive.RunCustomArchwayNode0()
 			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "archway", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "node-service-archway-node-0")
 			err := cmd.Run()
@@ -358,7 +371,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		})
 
 		ginkgo.It("should start IBC relay between already running icon and custom neutron chain", func() {
-			dive.RunIconNode()
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
 			dive.RunCustomNeutronNode0()
 			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "neutron", "--chainAServiceName", "icon-node-0xacbc4e", "--chainBServiceName", "neutron-node-test-chain2")
 			err := cmd.Run()
@@ -459,6 +473,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 
 	ginkgo.Describe("Icon chain commands", func() {
 		ginkgo.It("should run single icon node testing", func() {
+			time.Sleep(1 * time.Second)
 			enclaveName := dive.GenerateRandomName()
 			cmd.Args = append(cmd.Args, "chain", "icon", "--enclaveName", enclaveName)
 			err := cmd.Run()
@@ -467,119 +482,169 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		})
 
 		ginkgo.It("should run single icon node with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "--verbose")
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "chain", "icon", "--verbose", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should run single icon node along with decentralisation", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-d")
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "chain", "icon", "-d", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should run single icon node along with decentralisation with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-d", "--verbose")
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "chain", "icon", "-d", "--verbose", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
-		ginkgo.It("should run custom Icon node", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-0.zip")
+		ginkgo.It("should run custom Icon node-0", func() {
+			filepath := "../../cli/sample-jsons/config0.json"
+			updated_path := dive.UpdatePublicPort(filepath)
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", "./config/genesis-icon-0.zip","--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			defer os.Remove(updated_path)
+			dive.Clean(enclaveName)
 		})
 
-		ginkgo.It("should run custom Icon node  with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-0.zip", "--verbose")
+		ginkgo.It("should run custom Icon node-0  with verbose flag enabled", func() {
+			time.Sleep(3 * time.Second)
+			filepath := "../../cli/sample-jsons/config0.json"
+			updated_path := dive.UpdatePublicPort(filepath)
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", "./config/genesis-icon-0.zip", "--verbose", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			defer os.Remove(updated_path)
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should run custom Icon node-1", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config1.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-1.zip")
+			filepath := "../../cli/sample-jsons/config1.json"
+			updated_path := dive.UpdatePublicPort(filepath)
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", "./config/genesis-icon-1.zip", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			defer os.Remove(updated_path)
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should run custom Icon node-1  with verbose flag enabled", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config1.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-1.zip", "--verbose")
+			filepath := "../../cli/sample-jsons/config1.json"
+			time.Sleep(6 * time.Second)
+			updated_path := dive.UpdatePublicPort(filepath)
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config1.json", "-g", "./config/genesis-icon-1.zip", "--verbose", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			defer os.Remove(updated_path)
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should run icon node first and then decentralise it", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
+			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should run icon node first and then decentralise it with verbose flag enabled", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e", "--verbose")
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
+			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e", "--verbose", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should handle invalid input for chain command", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "invalid.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-0.zip")
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "invalid.json", "-g", "./config/genesis-icon-0.zip", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should handle invalid input for chain command", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "../../services/jvm/icon/static-files/config/invalid-icon-3.zip")
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "./config/invalid-icon-3.zip", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should handle invalid input for chain command", func() {
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/invalid_config.json", "-g", "../../services/jvm/icon/static-files/config/invalid-icon-3.zip")
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/invalid_config.json", "-g", "./config/invalid-icon-3.zip", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should handle invalid input for chain command", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "invalidPassword", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
+			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "invalidPassword", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should handle invalid input for chain command", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/invalid.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
+			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/invalid.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should handle invalid input for chain command", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x9", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
+			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x9", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should handle invalid input for chain command", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9081/api/v3/icon_dex", "-s", "icon-node-0xacbc4e")
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
+			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9081/api/v3/icon_dex", "-s", "icon-node-0xacbc4e", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should handle invalid input for chain command", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node")
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
+			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should output user that chain is already running when trying to run icon chain that is already running", func() {
-			dive.RunIconNode()
-			cmd.Args = append(cmd.Args, "chain", "icon")
+			enclaveName := dive.GenerateRandomName()
+			dive.RunIconNode(enclaveName)
+			cmd.Args = append(cmd.Args, "chain", "icon", "--enclaveName", enclaveName)
 			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(err).To(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
 		})
 
 	})
