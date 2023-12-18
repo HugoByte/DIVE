@@ -21,6 +21,7 @@ func (cs *CosmosServiceConfig) LoadDefaultConfig() error {
 	cs.ChainID = nil
 	cs.Key = nil
 	cs.Password = nil
+	cs.ChainName = nil
 	publicGrpc, err := common.GetAvailablePort()
 	if err != nil {
 		return common.WrapMessageToError(err, "error getting available gRPC port")

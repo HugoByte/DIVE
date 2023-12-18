@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
+	chainutil "github.com/hugobyte/dive-core/cli/cmd/chains/utils"
+
 	"github.com/hugobyte/dive-core/cli/cmd/bridge/utils"
 	"github.com/hugobyte/dive-core/cli/cmd/chains/eth"
 	"github.com/hugobyte/dive-core/cli/cmd/chains/hardhat"
@@ -194,42 +196,86 @@ func runBtpSetupWhenSingleChainRunning(cli *common.Cli, enclaveContext *enclaves
 }
 
 func runBtpSetupByRunningNodes(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, chains *utils.Chains, bridge bool) (string, error) {
+	var chainAServiceResponse, chainBServiceResponse string
+	var err error
 
-	var runFunction string
+	cidChainA := "0xacbc4e"
+	cidChainB := "0x42f1f3"
 
-	srcResponseData, err := runChain[chains.ChainA](cli)
-	if err != nil {
-		return "", common.WrapMessageToError(err, fmt.Sprintf("BTP Setup Failed Due To ChainA %s Run Failed ", chains.ChainA))
-	}
-
-	chainAServiceResponse, err := srcResponseData.EncodeToString()
-	if err != nil {
-		return "", err
-	}
-
-	dstResponseData, err := runChain[chains.ChainB](cli)
-	if err != nil {
-		return "", common.WrapMessageToError(err, fmt.Sprintf("BTP Setup Failed Due To ChainB %s Run Failed ", chains.ChainB))
-	}
-
-	chainBServiceResponse, err := dstResponseData.EncodeToString()
+	chainAServiceResponse, err = getServiceConfigForIconChain(cidChainA)
 	if err != nil {
 		return "", err
 	}
 
 	if chains.AreChainsIcon() {
-		runFunction = runBridgeIcon2icon
-	} else {
-		runFunction = runBridgeIcon2EthHardhat
+		chainBServiceResponse, err = getServiceConfigForIconChain(cidChainB)
+		if err != nil {
+			return "", err
+		}
+	} else if chains.ChainA == "hardhat" || chains.ChainB == "hardhat" {
+		chainBServiceResponse, err = getServiceConfigForHardhatChain()
+		if err != nil {
+			return "", err
+		}
+	} else if chains.ChainA == "eth" || chains.ChainB == "eth" {
+		chainBServiceResponse = "{}"
 	}
 
-	starlarkExecutionResponse, err := runBtpSetupForAlreadyRunningNodes(cli, enclaveCtx, runFunction, chains.ChainA, chains.ChainB, bridge, chainAServiceResponse, chainBServiceResponse)
+	params := chains.GetParams(chainAServiceResponse, chainBServiceResponse)
+	starlarkConfig := common.GetStarlarkRunConfig(params, common.DiveBridgeBtpScript, bridgeMainFunction)
+	executionData, _, err := enclaveCtx.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, starlarkConfig)
+
 	if err != nil {
-		return "", common.WrapMessageToError(err, fmt.Sprintf("BTP Setup Failed For ChainA %s and ChainB %s", chains.ChainA, chains.ChainB))
+		return "", common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
+	}
+	executionSerializedData, services, skippedInstructions, err := common.GetSerializedData(cli, executionData)
+	if err != nil {
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		if errRemove != nil {
+			return "", common.WrapMessageToError(errRemove, "BTP Setup Run Failed")
+		}
+
+		return "", common.WrapMessageToError(err, "BTP Setup Run Failed")
+
+	}
+	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
+		return "", common.WrapMessageToError(common.ErrStarlarkResponse, "Already Running")
+	}
+	return executionSerializedData, nil
+}
+
+func getServiceConfigForIconChain(cid string) (string, error) {
+	var serviceConfigChain = &chainutil.IconServiceConfig{}
+
+	err := serviceConfigChain.LoadDefaultConfig()
+	if err != nil {
+		return "", err
 	}
 
-	return starlarkExecutionResponse, nil
+	serviceConfigChain.Cid = cid
 
+	chainServiceResponse, err := serviceConfigChain.EncodeToString()
+	if err != nil {
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+	}
+
+	return chainServiceResponse, nil
+}
+
+func getServiceConfigForHardhatChain() (string, error) {
+	var serviceConfigChain = &chainutil.HardhatServiceConfig{}
+
+	err := serviceConfigChain.LoadDefaultConfig()
+	if err != nil {
+		return "", err
+	}
+
+	chainServiceResponse, err := serviceConfigChain.EncodeToString()
+	if err != nil {
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+	}
+
+	return chainServiceResponse, nil
 }
 
 func runBtpSetupForAlreadyRunningNodes(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, mainFunctionName string, srcChain string, dstChain string, bridge bool, srcChainServiceResponse string, dstChainServiceResponse string) (string, error) {
