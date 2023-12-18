@@ -10,7 +10,7 @@ DEP := solidity node_modules typechain-types
 .DEFAULT_GOAL := run-demo
 
 run-demo:$(FOLDERS)
-	@ echo ">>> Run demo_dapp.ts " ; \
+	@ echo ">>> Run btp demo_dapp.ts " ; \
 	$(HARDHAT) $(NETWORK) run scripts/demo_dapp.ts
 
 .PHONY: $(FOLDERS)
