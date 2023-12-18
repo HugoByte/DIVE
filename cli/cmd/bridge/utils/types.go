@@ -43,12 +43,16 @@ func (c *Chains) AreChainsIcon() bool {
 	return (c.ChainA == "icon" && c.ChainB == "icon")
 }
 
-func (chains *Chains) GetParams() string {
-	return fmt.Sprintf(`{"src_chain": "%s", "dst_chain": "%s", "bridge":"%s"}`, chains.ChainA, chains.ChainB, chains.Bridge)
+func (c *Chains) AreChainsCosmos() bool {
+	return (c.ChainA == "archway" || c.ChainA == "neutron") && (c.ChainB == "archway" || c.ChainB == "neutron")
 }
-func (chains *Chains) GetIbcRelayParams() string {
 
-	return fmt.Sprintf(`{"src_chain": "%s", "dst_chain": "%s"}`, chains.ChainA, chains.ChainB)
+func (chains *Chains) GetParams(src_service_config string, dst_service_config string) string {
+	return fmt.Sprintf(`{"src_chain": "%s", "dst_chain": "%s", "bridge":"%s", "src_service_config": %s, "dst_service_config": %s}`, chains.ChainA, chains.ChainB, chains.Bridge, src_service_config, dst_service_config)
+}
+
+func (chains *Chains) GetIbcRelayParams(src_service_config string, dst_service_config string) string {
+	return fmt.Sprintf(`{"src_chain": "%s", "dst_chain": "%s", "src_service_config": %s, "dst_service_config": %s}`, chains.ChainA, chains.ChainB, src_service_config, dst_service_config)
 }
 
 func (chains *Chains) GetServicesResponse(cli *common.Cli) (string, string, error) {

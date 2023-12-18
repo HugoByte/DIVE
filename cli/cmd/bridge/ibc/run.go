@@ -3,6 +3,8 @@ package ibc
 import (
 	"fmt"
 
+	chainutil "github.com/hugobyte/dive-core/cli/cmd/chains/utils"
+
 	"github.com/hugobyte/dive-core/cli/cmd/bridge/utils"
 	"github.com/hugobyte/dive-core/cli/cmd/chains/archway"
 	"github.com/hugobyte/dive-core/cli/cmd/chains/icon"
@@ -20,7 +22,6 @@ var runChain = map[string]func(cli *common.Cli) (*common.DiveServiceResponse, er
 
 	},
 	"neutron": func(cli *common.Cli) (*common.DiveServiceResponse, error) {
-
 		return neutron.RunNeutron(cli)
 	},
 }
@@ -94,33 +95,71 @@ func startIbcRelayIconToCosmos(cli *common.Cli, enclaveContext *enclaves.Enclave
 }
 
 func startCosmosChainsAndSetupIbcRelay(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, chains *utils.Chains) (string, error) {
+	var chainAServiceResponse, chainBServiceResponse string
+	var err error
+	if chains.AreChainsCosmos() {
+		chainAServiceResponse, err = getServiceConfigForCosmosChains(chains.ChainA)
+		if err != nil {
+			return "", err
+		}
 
-	srcChainServiceResponse, err := runChain[chains.ChainA](cli)
-	if err != nil {
-		return "", common.WrapMessageToError(err, fmt.Sprintf("IBC Setup Failed Due To ChainA %s Run Failed ", chains.ChainA))
+		chainBServiceResponse, err = getServiceConfigForCosmosChains(chains.ChainB)
+		if err != nil {
+			return "", err
+		}
+
+	} else {
+		chainAServiceResponse, err = getServiceConfigForIconChain()
+		if err != nil {
+			return "", err
+		}
+
+		chainBServiceResponse, err = getServiceConfigForCosmosChains(chains.ChainB)
+		if err != nil {
+			return "", err
+		}
+
 	}
 
-	srcChainServiceResponseString, err := srcChainServiceResponse.EncodeToString()
+	params := chains.GetIbcRelayParams(chainAServiceResponse, chainBServiceResponse)
+	executionResult, err := runStarlarkPackage(cli, enclaveCtx, params, "run_cosmos_ibc_setup")
+	if err != nil {
+		return "", common.WrapMessageToErrorf(common.ErrStarlarkRunFailed, "%s. %s", err, "IBC Run Failed")
+	}
+
+	return executionResult, nil
+}
+
+func getServiceConfigForCosmosChains(chain string) (string, error) {
+	var serviceConfigChain = &chainutil.CosmosServiceConfig{}
+	serviceConfigChain.ChainName = &chain
+	err := serviceConfigChain.LoadDefaultConfig()
 	if err != nil {
 		return "", err
 	}
 
-	dstChainServiceResponse, err := runChain[chains.ChainB](cli)
+	chainServiceResponse, err := serviceConfigChain.EncodeToString()
 	if err != nil {
-		return "", common.WrapMessageToError(err, fmt.Sprintf("IBC Setup Failed Due To ChainB %s Run Failed ", chains.ChainB))
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
 	}
 
-	dstChainServiceResponseString, err := dstChainServiceResponse.EncodeToString()
+	return chainServiceResponse, nil
+}
+
+func getServiceConfigForIconChain() (string, error) {
+	var serviceConfigChain = &chainutil.IconServiceConfig{}
+
+	err := serviceConfigChain.LoadDefaultConfig()
 	if err != nil {
 		return "", err
 	}
 
-	starlarkExecutionResponse, err := setupIbcRelayforAlreadyRunningCosmosChain(cli, enclaveCtx, chains.ChainA, chains.ChainB, srcChainServiceResponseString, dstChainServiceResponseString)
+	chainServiceResponse, err := serviceConfigChain.EncodeToString()
 	if err != nil {
-		return "", err
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
 	}
 
-	return starlarkExecutionResponse, nil
+	return chainServiceResponse, nil
 }
 
 func setupIbcRelayforAlreadyRunningCosmosChain(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, chainA, chainB, chainAServiceResponse, chainBServiceResponse string) (string, error) {
