@@ -21,7 +21,7 @@ func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	
 	encodedServiceConfigDataString, err := serviceConfig.EncodeToString()
 
 	if err != nil {

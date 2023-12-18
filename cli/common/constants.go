@@ -16,19 +16,18 @@ const (
 	DiveNeutronDefaultNodeScript       = "services/cosmvm/neutron/neutron.star"
 	DiveBridgeBtpScript                = "/services/bridges/btp/src/bridge.star"
 	DiveBridgeIbcScript                = "/services/bridges/ibc/src/bridge.star"
-	PolkadotRemotePackagePath          = "/Users/abhishekharde/Desktop/hugobyte/polkadot-kurtosis-package/"
+	PolkadotRemotePackagePath          = "github.com/hugobyte/polkadot-kurtosis-package/"
 	DivePolkadotDefaultNodeSetupScript = "main.star"
 	DivePolkadotRelayNodeSetupScript   = "/relaychain/relay-chain.star"
-
-	DiveDryRun                  = false
-	DiveDefaultParallelism      = 4
-	DiveLogDirectory            = "/logs/"
-	DiveDitLogFile              = "dive.log"
-	DiveErrorLogFile            = "error.log"
-	DiveOutFile                 = "dive_%s.json"
-	ServiceFilePath             = "services_%s.json"
-	DiveAppDir                  = ".dive"
-	removeServiceStarlarkScript = `
+	DiveDryRun                         = false
+	DiveDefaultParallelism             = 4
+	DiveLogDirectory                   = "/logs/"
+	DiveDitLogFile                     = "dive.log"
+	DiveErrorLogFile                   = "error.log"
+	DiveOutFile                        = "dive_%s.json"
+	ServiceFilePath                    = "services_%s.json"
+	DiveAppDir                         = ".dive"
+	removeServiceStarlarkScript        = `
 def run(plan,args):
 		plan.remove_service(name=args["service_name"])
 `
@@ -81,6 +80,8 @@ const (
 	KurtosisServiceError
 	InvalidChain
 	PortError
+	EmptyFileError
+	EmptyFieldsError
 )
 
 var DiveLogs bool

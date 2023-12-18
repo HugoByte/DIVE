@@ -21,7 +21,6 @@ func (cs *CosmosServiceConfig) LoadDefaultConfig() error {
 	cs.ChainID = nil
 	cs.Key = nil
 	cs.Password = nil
-	cs.ChainName = nil
 	publicGrpc, err := common.GetAvailablePort()
 	if err != nil {
 		return common.WrapMessageToError(err, "error getting available gRPC port")
@@ -65,6 +64,20 @@ func (cs *CosmosServiceConfig) LoadConfigFromFile(cliContext *common.Cli, filePa
 	if err != nil {
 		return common.WrapMessageToError(err, "Failed To Load Configuration")
 	}
+
+	err = cs.IsEmpty()
+	if err != nil {
+		return common.WrapMessageToError(err, "Failed To Load Configuration")
+	}
+	return nil
+}
+
+func (cc *CosmosServiceConfig) IsEmpty() error {
+	if cc.ChainID == nil || cc.Key == nil || cc.Password == nil ||
+		cc.PublicGrpc == nil || cc.PublicHTTP == nil || cc.PublicTCP == nil || cc.PublicRPC == nil {
+		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In The Config File")
+	}
+
 	return nil
 }
 
@@ -105,6 +118,18 @@ func (sc *IconServiceConfig) LoadConfigFromFile(cliContext *common.Cli, filePath
 	err := cliContext.FileHandler().ReadJson(filePath, sc)
 	if err != nil {
 		return common.WrapMessageToError(err, "Failed To Load Configuration")
+	}
+	err = sc.IsEmpty()
+	if err != nil {
+		return common.WrapMessageToError(err, "Failed To Load Configuration")
+	}
+
+	return nil
+}
+
+func (sc *IconServiceConfig) IsEmpty() error {
+	if sc.Port == 0 || sc.PublicPort == 0 || sc.P2PListenAddress == "" || sc.P2PAddress == "" || sc.Cid == "" {
+		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In The Config File")
 	}
 	return nil
 }
@@ -171,6 +196,11 @@ func (sc *PolkadotServiceConfig) LoadConfigFromFile(cliContext *common.Cli, file
 	if err != nil {
 		return common.WrapMessageToError(err, "Failed To Load Configuration")
 	}
+
+	err = sc.IsEmpty()
+	if err != nil {
+		return common.WrapMessageToError(err, "Failed To Load Configuration")
+	}
 	return nil
 }
 
@@ -178,9 +208,14 @@ func (sc *PolkadotServiceConfig) LoadDefaultConfig() error {
 	sc.ChainType = "local"
 	sc.Explorer = false
 	sc.RelayChain.Name = "rococo-local"
+	Port1, err := common.GetAvailablePort()
+	if err != nil {
+		return err
+	}
+	Port2 := Port1 + 1
 	sc.RelayChain.Nodes = []NodeConfig{
-		{Name: "bob", NodeType: "full", Port: 9944, Prometheus: false},
-		{Name: "alice", NodeType: "validator", Port: 9955, Prometheus: false},
+		{Name: "bob", NodeType: "full", Port: Port1, Prometheus: false},
+		{Name: "alice", NodeType: "validator", Port: Port2, Prometheus: false},
 	}
 	sc.Para = []ParaNodeConfig{
 		{
@@ -192,5 +227,58 @@ func (sc *PolkadotServiceConfig) LoadDefaultConfig() error {
 		},
 	}
 
+	return nil
+}
+
+func (psc *PolkadotServiceConfig) IsEmpty() error {
+	if psc == nil || psc.ChainType == "" || psc.Explorer {
+		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In PolkadotServiceConfig")
+	}
+
+	if err := psc.RelayChain.IsEmpty(); err != nil {
+		return err
+	}
+
+	for _, para := range psc.Para {
+		if err := para.IsEmpty(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (rcc *RelayChainConfig) IsEmpty() error {
+	if rcc == nil || rcc.Name == "" || len(rcc.Nodes) == 0 {
+		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In RelayChainConfig")
+	}
+
+	for _, node := range rcc.Nodes {
+		if err := node.IsEmpty(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (pnc *ParaNodeConfig) IsEmpty() error {
+	if pnc == nil || pnc.Name == "" || len(pnc.Nodes) == 0 {
+		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In ParaNodeConfig")
+	}
+
+	for _, node := range pnc.Nodes {
+		if err := node.IsEmpty(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (nc *NodeConfig) IsEmpty() error {
+	if nc == nil || nc.Name == "" || nc.NodeType == "" || nc.Port == 0 {
+		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In NodeConfig")
+	}
 	return nil
 }

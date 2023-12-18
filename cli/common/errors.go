@@ -35,6 +35,8 @@ var (
 	ErrKurtosisService         = NewBase(KurtosisServiceError, "Kurtosis Service Error")
 	ErrInvalidChain            = NewBase(InvalidChain, "Not A Valid Chain")
 	ErrPortAllocation          = NewBase(PortError, "Failed To Allocate Port")
+	ErrEmptyFile               = NewBase(EmptyFileError, "Cannot Load Config From Empty File")
+	ErrEmptyFields             = NewBase(EmptyFieldsError, "Missing Fields In The Config File")
 )
 
 func (c ErrorCode) New(msg string) error {

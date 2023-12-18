@@ -82,7 +82,7 @@ func startIbcRelayIconToCosmos(cli *common.Cli, enclaveContext *enclaves.Enclave
 	executionSerializedData, services, _, err := common.GetSerializedData(cli, executionData)
 
 	if err != nil {
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
 			return "", common.WrapMessageToError(errRemove, "IBC Setup Run Failed")
 		}
@@ -186,7 +186,7 @@ func runStarlarkPackage(cli *common.Cli, enclaveContext *enclaves.EnclaveContext
 	executionSerializedData, services, skippedInstructions, err := common.GetSerializedData(cli, executionData)
 
 	if err != nil {
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
 			return "", common.WrapMessageToError(errRemove, "IBC Setup Run Failed")
 		}
