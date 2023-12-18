@@ -1,8 +1,8 @@
-import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
-import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { GasPrice } from "@cosmjs/stargate";
+import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
 import { exec } from "child_process";
 import fs from "fs";
+import { Secp256k1HdWallet } from "@cosmjs/launchpad";
+import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 const defaultGasPrice = GasPrice.fromString("0stake");
 
@@ -11,11 +11,10 @@ export async function CreateSigningClient(
   prefix: string,
   endpoint: string
 ): Promise<[SigningCosmWasmClient, string]> {
-  const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-    prefix: prefix,
-  });
 
-  // Print account address
+  const wallet = await Secp256k1HdWallet.fromMnemonic(mnemonic, { prefix: prefix });
+
+  // Get account address
   const accounts = await wallet.getAccounts();
   const accountAddress = accounts[0].address;
 
@@ -41,7 +40,6 @@ export async function getHeight(
 
 export async function getStake(testaddress: string, destaddress: string, chainName: string) {
   const dockerID = await getContainerIdByPartialName(chainName);
-  console.log(dockerID);
   
   let command = "";
   
@@ -50,7 +48,7 @@ export async function getStake(testaddress: string, destaddress: string, chainNa
     --chain-id constantine-3 -y`;
   } else if (chainName == "neutron"){
     command = `docker exec ${dockerID} neutrond tx bank send ${testaddress} ${destaddress} 9000000stake --keyring-backend test \
-    --chain-id test-chain1 -y`;
+    --chain-id test-chain1 --home ./data/test-chain1 -y`;
   }
 
   exec(command, (error, stdout, stderr) => {
@@ -71,7 +69,7 @@ export async function getTestAccountWithStake(chainName: string): Promise<string
   if (chainName == "archway") {
     command = `docker exec ${dockerID} archwayd keys list --keyring-backend test |  grep 'address:'`;
   } else if (chainName == "neutron"){
-    command = `docker exec ${dockerID} neutrond keys list --keyring-backend test --home ./data/test-chain1 | grep -A 4 "name: test-key" | awk '/address:/ {print $2}' | cut -d':' -f2`;
+    command = `docker exec ${dockerID} neutrond keys list --keyring-backend test --home ./data/test-chain1 | grep -A 4 "name: test-key" | awk '/address:/ {print $2}'`;
   }
 
   return new Promise<string>((resolve, reject) => {
@@ -93,7 +91,7 @@ export async function getContainerIdByPartialName(chainName: string): Promise<st
   if (chainName == "archway") {
     command = 'docker ps -aqf "name=constantine-3"';
   } else if (chainName == "neutron"){
-    command = 'docker ps -aqf "name=neutron"';
+    command = 'docker ps -aqf "name=neutron-node-test-chain1"';
   }
 
   return new Promise<string>((resolve, reject) => {

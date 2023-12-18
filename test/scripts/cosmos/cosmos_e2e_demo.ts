@@ -9,14 +9,14 @@ import {
   getTestAccountWithStake,
 } from "./helper";
 
-
 if (process.argv.length < 3) {
-  console.error('Usage: ts-node cosmos_e2e_demo.ts <chainName, eg "archway"/"neutron">');
+  console.error(
+    'Usage: ts-node cosmos_e2e_demo.ts <chainName, eg "archway"/"neutron">'
+  );
   process.exit(1);
 }
 
 const chainName = process.argv[2];
-
 
 // configure dotenv
 dotenv.config();
@@ -25,13 +25,13 @@ async function main() {
   // Chain Constants, modify as required
   let chain1;
   let chain2;
-  if (chainName == "archway"){
+  if (chainName == "archway") {
     chain1 = {
       chainId: "archway-node-0",
       endpoint: "http://localhost:4564",
       prefix: "archway",
     };
-  
+
     chain2 = {
       chainId: "archway-node-1",
       endpoint: "http://localhost:4566",
@@ -43,16 +43,14 @@ async function main() {
       "Demo on Sending token transfer over IBC from archway to archway"
     );
     console.log("*".repeat(63));
-
-  } else{
-
-      chain1 = {
+  } else {
+    chain1 = {
       chainId: "test-chain1",
       endpoint: "http://localhost:26669",
       prefix: "neutron",
     };
-  
-      chain2 = {
+
+    chain2 = {
       chainId: "test-chain2",
       endpoint: "http://localhost:26653",
       prefix: "neutron",
@@ -65,9 +63,6 @@ async function main() {
     console.log("*".repeat(63));
   }
 
-
- 
-
   // *****************************************************************
   // Setting up account on chain 1 by getting mnemonics from env file
   const mnemonic1 = process.env.MNEMONIC1 as string;
@@ -78,13 +73,19 @@ async function main() {
     chain1.prefix,
     chain1.endpoint
   );
+  console.log("Account on Chain A: ", accountAddress);
 
   // To Check if the client is connected to local chain
   getHeight(signingClient, chain1.chainId);
 
   // Get Test Account with stake
   const testAccount = await getTestAccountWithStake(chainName);
-  const testAddress = testAccount.substring(8, testAccount.length).trim();
+  let testAddress;
+  if (chainName == "archway") {
+    testAddress = testAccount.substring(8, testAccount.length).trim();
+  } else {
+    testAddress = testAccount;
+  }
 
   // To Get balance of given account address and transfer balance if 0
   const bal = await signingClient.getBalance(accountAddress, "stake");
@@ -96,7 +97,6 @@ async function main() {
   }
   await new Promise((f) => setTimeout(f, 5000));
   await getBalance(signingClient, accountAddress);
-
 
   // *****************************************************************
   // Setting up account on chain 1 by getting mnemonics from env file
@@ -141,6 +141,7 @@ async function main() {
       ),
     },
   };
+
   const broadcastResult = await signingClient.signAndBroadcast(
     accountAddress,
     [msgIBCTransfer],
