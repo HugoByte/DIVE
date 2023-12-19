@@ -161,7 +161,6 @@ func (sc *HardhatServiceConfig) EncodeToString() (string, error) {
 type NodeConfig struct {
 	Name       string `json:"name"`
 	NodeType   string `json:"node-type"`
-	Port       int    `json:"port"`
 	Prometheus bool   `json:"prometheus"`
 }
 
@@ -208,14 +207,9 @@ func (sc *PolkadotServiceConfig) LoadDefaultConfig() error {
 	sc.ChainType = "local"
 	sc.Explorer = false
 	sc.RelayChain.Name = "rococo-local"
-	Port1, err := common.GetAvailablePort()
-	if err != nil {
-		return err
-	}
-	Port2 := Port1 + 1
 	sc.RelayChain.Nodes = []NodeConfig{
-		{Name: "bob", NodeType: "full", Port: Port1, Prometheus: false},
-		{Name: "alice", NodeType: "validator", Port: Port2, Prometheus: false},
+		{Name: "bob", NodeType: "full", Prometheus: false},
+		{Name: "alice", NodeType: "validator", Prometheus: false},
 	}
 	sc.Para = []ParaNodeConfig{
 		{
@@ -277,7 +271,7 @@ func (pnc *ParaNodeConfig) IsEmpty() error {
 }
 
 func (nc *NodeConfig) IsEmpty() error {
-	if nc == nil || nc.Name == "" || nc.NodeType == "" || nc.Port == 0 {
+	if nc == nil || nc.Name == "" || nc.NodeType == "" {
 		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In NodeConfig")
 	}
 	return nil
