@@ -17,14 +17,15 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	if err != nil {
 		return nil, common.WrapMessageToError(err, "Icon Run Failed")
 	}
+
+	if configFilePath != "" && genesis == "" {
+		return nil, common.WrapMessageToError(common.ErrMissingFlags, "Missing genesis flag")
+	}
+
 	var serviceConfig = &utils.IconServiceConfig{}
 	err = common.LoadConfig(cli, serviceConfig, configFilePath)
 	if err != nil {
 		return nil, err
-	}
-
-	if configFilePath != "" && genesis == "" {
-		return nil, common.WrapMessageToError(common.ErrMissingFlags, "Missing genesis flag")
 	}
 
 	genesisHandler, err := genesismanager(enclaveContext)
