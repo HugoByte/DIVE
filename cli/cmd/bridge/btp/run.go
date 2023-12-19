@@ -230,7 +230,7 @@ func runBtpSetupByRunningNodes(cli *common.Cli, enclaveCtx *enclaves.EnclaveCont
 	}
 	executionSerializedData, services, skippedInstructions, err := common.GetSerializedData(cli, executionData)
 	if err != nil {
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
 			return "", common.WrapMessageToError(errRemove, "BTP Setup Run Failed")
 		}
@@ -289,7 +289,7 @@ func runBtpSetupForAlreadyRunningNodes(cli *common.Cli, enclaveCtx *enclaves.Enc
 	}
 	executionSerializedData, services, skippedInstructions, err := common.GetSerializedData(cli, executionData)
 	if err != nil {
-		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.DiveEnclave)
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
 			return "", common.WrapMessageToError(errRemove, "BTP Setup Run Failed")
 		}

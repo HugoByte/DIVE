@@ -8,6 +8,7 @@ import (
 	"github.com/hugobyte/dive-core/cli/cmd/chains/eth"
 	"github.com/hugobyte/dive-core/cli/cmd/chains/hardhat"
 	"github.com/hugobyte/dive-core/cli/cmd/chains/icon"
+	"github.com/hugobyte/dive-core/cli/cmd/chains/kusama"
 	"github.com/hugobyte/dive-core/cli/cmd/chains/neutron"
 	"github.com/hugobyte/dive-core/cli/cmd/chains/polkadot"
 	"github.com/hugobyte/dive-core/cli/common"
@@ -28,6 +29,7 @@ maintenance within the specified blockchain ecosystem.`,
 	AddCommand(archway.ArchwayCmd).
 	AddCommand(neutron.NeutronCmd).
 	AddCommand(polkadot.PolkadotCmd).
+	AddCommand(kusama.KusamaCmd).
 	SetRun(chains).
 	Build()
 
