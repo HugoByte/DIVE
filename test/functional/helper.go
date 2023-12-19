@@ -81,7 +81,6 @@ func Clean(enclaveName string) {
 
 func RunIconNode(enclaveName string) {
 	cmd := GetBinaryCommand()
-	// enclaveName := generateRandomName()
 	cmd.Args = append(cmd.Args, "chain", "icon", "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -112,7 +111,7 @@ func RunDecentralizedCustomIconNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
 	filepath := "../../cli/sample-jsons/config1.json"
 	updated_path := UpdatePublicPort(filepath)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", "../../services/jvm/icon/static-files/config/genesis-icon-1.zip", "-d", "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", "./config/genesis-icon-1.zip", "-d", "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -121,7 +120,7 @@ func RunCustomIconNode(enclaveName string) {
 	cmd := GetBinaryCommand()
 	filepath := "../../cli/sample-jsons/config0.json"
 	updated_path := UpdatePublicPort(filepath)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", "../../services/jvm/icon/static-files/config/genesis-icon-0.zip", "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", "./config/genesis-icon-0.zip", "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -155,7 +154,7 @@ func RunCustomNeutronNode1(enclaveName string) {
 
 func RunCustomNeutronNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	filepath2 := "../../cli/sample-jsons/neutron0.json"
+	filepath2 := "../../cli/sample-jsons/neutron.json"
 	updated_path2 := UpdateNeutronPublicPorts(filepath2)
 	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", updated_path2,"--enclaveName", enclaveName)
 	err := cmd.Run()
@@ -194,14 +193,14 @@ func RunDecentralizedCustomIconNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
 	filepath := "../../cli/sample-jsons/config0.json"
 	updated_path := UpdatePublicPort(filepath)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", "../../services/jvm/icon/static-files/config/genesis-icon-0.zip", "-d", "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", "./config/genesis-icon-0.zip", "-d", "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 func RunCustomIconNode_0() {
 	cmd := GetBinaryCommand()
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "../../services/jvm/icon/static-files/config/genesis-icon-0.zip")
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "./config/genesis-icon-0.zip")
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
