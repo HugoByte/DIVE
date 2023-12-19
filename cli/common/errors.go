@@ -37,6 +37,7 @@ var (
 	ErrPortAllocation          = NewBase(PortError, "Failed To Allocate Port")
 	ErrEmptyFile               = NewBase(EmptyFileError, "Cannot Load Config From Empty File")
 	ErrEmptyFields             = NewBase(EmptyFieldsError, "Missing Fields In The Config File")
+	ErrMissingFlags            = NewBase(MissingFlagsError, "Missing Flags")
 )
 
 func (c ErrorCode) New(msg string) error {

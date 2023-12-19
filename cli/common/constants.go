@@ -82,6 +82,7 @@ const (
 	PortError
 	EmptyFileError
 	EmptyFieldsError
+	MissingFlagsError
 )
 
 var DiveLogs bool

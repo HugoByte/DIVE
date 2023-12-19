@@ -23,6 +23,10 @@ func RunIconNode(cli *common.Cli) (*common.DiveServiceResponse, error) {
 		return nil, err
 	}
 
+	if configFilePath != "" && genesis == "" {
+		return nil, common.WrapMessageToError(common.ErrMissingFlags, "Missing genesis flag")
+	}
+
 	genesisHandler, err := genesismanager(enclaveContext)
 	if err != nil {
 		return nil, common.WrapMessageToError(common.ErrInvalidFile, err.Error())
