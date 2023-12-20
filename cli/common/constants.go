@@ -19,6 +19,7 @@ const (
 	PolkadotRemotePackagePath          = "github.com/hugobyte/polkadot-kurtosis-package/"
 	DivePolkadotDefaultNodeSetupScript = "main.star"
 	DivePolkadotRelayNodeSetupScript   = "/relaychain/relay-chain.star"
+	DivePolkaDotUtilsPath              = "package_io/utils.star"
 	DiveDryRun                         = false
 	DiveDefaultParallelism             = 4
 	DiveLogDirectory                   = "/logs/"
@@ -80,9 +81,9 @@ const (
 	KurtosisServiceError
 	InvalidChain
 	PortError
-	EmptyFileError
 	EmptyFieldsError
 	MissingFlagsError
+	InvalidFlagError
 )
 
 var DiveLogs bool

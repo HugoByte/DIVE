@@ -11,8 +11,7 @@ import (
 )
 
 const (
-	localChain       = "local"
-	configsDirectory = "/home/riya/polakadot-kurtosis-package/parachain/static_files/configs"
+	localChain = "local"
 )
 
 func RunKusama(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
@@ -24,16 +23,29 @@ func RunKusama(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 
 	var serviceConfig = &utils.PolkadotServiceConfig{}
 
+	err = flagCheck()
+	if err != nil {
+		return nil, err
+	}
+
 	err = common.LoadConfig(cli, serviceConfig, configFilePath)
 	if err != nil {
 		return nil, err
 	}
 
-	configureService(serviceConfig)
+	err = configureService(serviceConfig)
+	if err != nil {
+		return nil, err
+	}
 
 	encodedServiceConfigDataString, err := serviceConfig.EncodeToString()
 	if err != nil {
 		return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+	}
+
+	err = uploadFiles(cli, enclaveContext)
+	if err != nil {
+		return nil, err
 	}
 
 	para := fmt.Sprintf(`{"args": %s}`, encodedServiceConfigDataString)
@@ -76,17 +88,21 @@ func RunKusama(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 	return result, nil
 }
 
-func configureService(serviceConfig *utils.PolkadotServiceConfig) {
+func configureService(serviceConfig *utils.PolkadotServiceConfig) error {
 	if paraChain != "" {
-		serviceConfig.Para[0].Name = paraChain
+		serviceConfig.Para = []utils.ParaNodeConfig{}
+		serviceConfig.Para = append(serviceConfig.Para, utils.ParaNodeConfig{
+			Name: paraChain,
+			Nodes: []utils.NodeConfig{
+				{Name: "alice", NodeType: "full", Prometheus: false},
+			},
+		})
 	}
 
 	if network != "" {
 		serviceConfig.ChainType = network
-		if network == "testnet" {
-			serviceConfig.RelayChain.Name = "rococo"
-		} else if network == "mainnet" {
-			serviceConfig.RelayChain.Name = "kusama"
+		if network == "testnet" || network == "mainnet" {
+			configureFullNodes(serviceConfig)
 		}
 	}
 
@@ -97,6 +113,29 @@ func configureService(serviceConfig *utils.PolkadotServiceConfig) {
 	if metrics {
 		configureMetrics(serviceConfig)
 	}
+
+	if noRelay && serviceConfig.ChainType == "local" {
+		return common.WrapMessageToError(common.ErrInvalidFlag, "Cannot pass --no-relay flag with local network")
+	} else if noRelay && serviceConfig.ChainType != "local" {
+		serviceConfig.RelayChain = utils.RelayChainConfig{}
+	}
+
+	return nil
+}
+
+func configureFullNodes(serviceConfig *utils.PolkadotServiceConfig) {
+	if network == "testnet" {
+		serviceConfig.RelayChain.Name = "rococo"
+	} else if network == "mainnet" {
+		serviceConfig.RelayChain.Name = "kusama"
+	}
+
+	serviceConfig.RelayChain.Nodes = []utils.NodeConfig{}
+	serviceConfig.RelayChain.Nodes = append(serviceConfig.RelayChain.Nodes, utils.NodeConfig{
+		Name:       "alice",
+		NodeType:   "full",
+		Prometheus: false,
+	})
 }
 
 func configureMetrics(serviceConfig *utils.PolkadotServiceConfig) {
@@ -108,16 +147,40 @@ func configureMetrics(serviceConfig *utils.PolkadotServiceConfig) {
 	}
 }
 
+func flagCheck() error {
+	if configFilePath != "" {
+		if paraChain != "" || network != "" || explorer || metrics {
+			return common.WrapMessageToError(common.ErrInvalidFlag, "Additional Flags Found")
+		}
+	}
+
+	if noRelay && (network == "testnet" || network == "mainnet") {
+		if paraChain == "" {
+			return common.WrapMessageToError(common.ErrMissingFlags, "Missing Parachain Flag")
+		}
+	}
+	return nil
+}
+
 func getKusamaRunConfig(serviceConfig *utils.PolkadotServiceConfig, enclaveContext *enclaves.EnclaveContext, para string) *starlark_run_config.StarlarkRunConfig {
-	if serviceConfig.Para[0].Name != "" {
+	if len(serviceConfig.Para) != 0 && serviceConfig.Para[0].Name != "" {
 		return common.GetStarlarkRunConfig(para, common.DivePolkadotDefaultNodeSetupScript, runKusamaFunctionName)
 	} else {
 		if serviceConfig.ChainType == localChain {
-			enclaveContext.UploadFiles(configsDirectory, "configs")
 			return common.GetStarlarkRunConfig(para, common.DivePolkadotRelayNodeSetupScript, runKusamaRelayLocal)
 		} else {
 			return common.GetStarlarkRunConfig(para, common.DivePolkadotRelayNodeSetupScript, runKusamaRelayTestnetMainet)
 		}
 
 	}
+}
+
+func uploadFiles(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext) error {
+	runConfig := common.GetStarlarkRunConfig("{}", common.DivePolkaDotUtilsPath, runUploadFiles)
+	_, _, err := enclaveCtx.RunStarlarkRemotePackage(cli.Context().GetContext(), common.PolkadotRemotePackagePath, runConfig)
+	if err != nil {
+		return common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
+	}
+
+	return nil
 }
