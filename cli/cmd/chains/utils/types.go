@@ -181,6 +181,15 @@ type PolkadotServiceConfig struct {
 	Explorer   bool             `json:"explorer"`
 }
 
+func (sc *ParaNodeConfig) EncodeToString() (string, error) {
+	encodedBytes, err := json.Marshal(sc)
+	if err != nil {
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+	}
+
+	return string(encodedBytes), nil
+}
+
 func (sc *PolkadotServiceConfig) EncodeToString() (string, error) {
 	encodedBytes, err := json.Marshal(sc)
 	if err != nil {

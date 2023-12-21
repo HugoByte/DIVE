@@ -18,10 +18,12 @@ var (
 )
 
 const (
-	runKusamaFunctionName       = "run_polkadot_setup"
-	runKusamaRelayLocal         = "start_relay_chains_local"
-	runKusamaRelayTestnetMainet = "start_test_main_net_relay_nodes"
-	runUploadFiles              = "upload_files"
+	runKusamaFunctionName             = "run_polkadot_setup"
+	runKusamaRelayLocal               = "start_relay_chains_local"
+	runKusamaRelayTestnetMainet       = "start_test_main_net_relay_nodes"
+	runUploadFiles                    = "upload_files"
+	runKusamaParaLocalFunctionName    = "start_nodes"
+	runKusamaParaTestMainFunctionName = "run_testnet_mainnet"
 )
 
 var KusamaCmd = common.NewDiveCommandBuilder().
