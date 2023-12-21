@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  functional_test:
+  functional_test_icon:
     name: Icon Chain Functional Testing
     runs-on: "ubuntu-latest"
 
