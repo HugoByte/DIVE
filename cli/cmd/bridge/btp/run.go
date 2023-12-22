@@ -72,7 +72,7 @@ func RunBtpSetup(cli *common.Cli, chains *utils.Chains, bridge bool) (string, er
 
 func runBtpSetupWhenChainsAreIcon(cli *common.Cli, chains *utils.Chains, enclaveContext *enclaves.EnclaveContext, bridge bool) (string, error) {
 
-	if chains.ChainAServiceName != "" && chains.ChainBServiceName == "" {
+	if chains.ChainAServiceName != "" && chains.ChainBServiceName != "" {
 		srcChainServiceResponse, dstChainServiceResponse, err := chains.GetServicesResponse(cli)
 		if err != nil {
 			return "", common.WrapMessageToError(err, "BTP Setup run Failed For Icon Chains")
@@ -80,6 +80,12 @@ func runBtpSetupWhenChainsAreIcon(cli *common.Cli, chains *utils.Chains, enclave
 		response, err := runBtpSetupForAlreadyRunningNodes(cli, enclaveContext, runBridgeIcon2icon, chains.ChainA, chains.ChainB, bridge, srcChainServiceResponse, dstChainServiceResponse)
 		if err != nil {
 			return "", common.WrapMessageToError(err, "BTP Setup run Failed For Icon Chains")
+		}
+		return response, nil
+	} else if (chains.ChainAServiceName == "" && chains.ChainBServiceName != "") || (chains.ChainAServiceName != "" && chains.ChainBServiceName == "") {
+		response, err := runBtpSetupWhenSingleChainRunning(cli, enclaveContext, chains, bridge)
+		if err != nil {
+			return "", common.WrapMessageToError(err, fmt.Sprintf("BTP Setup Failed For ChainA %s and ChainB %s", chains.ChainA, chains.ChainB))
 		}
 		return response, nil
 	} else {
@@ -180,7 +186,12 @@ func runBtpSetupWhenSingleChainRunning(cli *common.Cli, enclaveContext *enclaves
 
 	}
 
-	if chains.ChainB == "icon" {
+	if chains.AreChainsIcon() {
+		response, err = runBtpSetupForAlreadyRunningNodes(cli, enclaveContext, runBridgeIcon2icon, chains.ChainA, chains.ChainB, bridge, chainAServiceResponse, chainBServiceResponse)
+		if err != nil {
+			return "", common.WrapMessageToError(err, fmt.Sprintf("BTP Setup Failed For ChainA %s and ChainB %s", chains.ChainA, chains.ChainB))
+		}
+	} else if chains.ChainB == "icon" {
 		response, err = runBtpSetupForAlreadyRunningNodes(cli, enclaveContext, runBridgeIcon2EthHardhat, chains.ChainB, chains.ChainA, bridge, chainBServiceResponse, chainAServiceResponse)
 		if err != nil {
 			return "", common.WrapMessageToError(err, fmt.Sprintf("BTP Setup Failed For ChainA %s and ChainB %s", chains.ChainA, chains.ChainB))
