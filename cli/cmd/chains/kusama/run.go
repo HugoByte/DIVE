@@ -282,7 +282,7 @@ func getKusamaRunConfig(serviceConfig *utils.PolkadotServiceConfig, enclaveConte
 
 func uploadFiles(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext) error {
 	runConfig := common.GetStarlarkRunConfig("{}", common.DivePolkaDotUtilsPath, runUploadFiles)
-	_, _, err := enclaveCtx.RunStarlarkPackage(cli.Context().GetContext(), "/home/riya/polakadot-kurtosis-package", runConfig)
+	_, err := enclaveCtx.RunStarlarkRemotePackageBlocking(cli.Context().GetContext(), common.PolkadotRemotePackagePath, runConfig)
 	if err != nil {
 		return common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
 	}
