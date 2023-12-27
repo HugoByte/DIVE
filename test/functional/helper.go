@@ -110,26 +110,31 @@ func RunDecentralizedIconNode(enclaveName string) {
 
 func RunDecentralizedCustomIconNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
-	filepath := "../../cli/sample-jsons/config1.json"
-	updated_path := UpdatePublicPort(filepath)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", "./config/genesis-icon-1.zip", "-d", "--enclaveName", enclaveName)
+	updated_path := UpdatePublicPort(enclaveName, ICON_CONFIG1)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", ICON_GENESIS1, "-d", "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
-func RunCustomIconNode(enclaveName string) {
+func RunCustomIconNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	filepath := "../../cli/sample-jsons/config0.json"
-	updated_path := UpdatePublicPort(filepath)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", "./config/genesis-icon-0.zip", "--enclaveName", enclaveName)
+	updated_path := UpdatePublicPort(enclaveName, ICON_CONFIG0)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", ICON_GENESIS0, "--enclaveName", enclaveName)
+	err := cmd.Run()
+	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+}
+
+func RunCustomIconNode1(enclaveName string) {
+	cmd := GetBinaryCommand()
+	updated_path := UpdatePublicPort(enclaveName, ICON_CONFIG1)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", ICON_GENESIS1, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 func RunCustomArchwayNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
-	filepath1 := "../../cli/sample-jsons/archway1.json"
-	updated_path1 := UpdatePublicPorts(filepath1)
+	updated_path1 := UpdatePublicPorts(ARCHWAY_CONFIG1)
 	cmd.Args = append(cmd.Args, "chain", "archway", "-c", updated_path1, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -137,8 +142,7 @@ func RunCustomArchwayNode1(enclaveName string) {
 
 func RunCustomArchwayNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	filepath1 := "../../cli/sample-jsons/archway.json"
-	updated_path1 := UpdatePublicPorts(filepath1)
+	updated_path1 := UpdatePublicPorts(ARCHWAY_CONFIG0)
 	cmd.Args = append(cmd.Args, "chain", "archway", "-c", updated_path1, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -146,8 +150,7 @@ func RunCustomArchwayNode0(enclaveName string) {
 
 func RunCustomNeutronNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
-	filepath2 := "../../cli/sample-jsons/neutron1.json"
-	updated_path2 := UpdateNeutronPublicPorts(filepath2)
+	updated_path2 := UpdateNeutronPublicPorts(NEUTRON_CONFIG1)
 	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", updated_path2, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -155,23 +158,15 @@ func RunCustomNeutronNode1(enclaveName string) {
 
 func RunCustomNeutronNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	filepath2 := "../../cli/sample-jsons/neutron.json"
-	updated_path2 := UpdateNeutronPublicPorts(filepath2)
+	updated_path2 := UpdateNeutronPublicPorts(NEUTRON_CONFIG0)
 	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", updated_path2, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
-func DecentralizeCustomIconNode() {
+func DecentralizeCustomIconNode(nid string, endpoint string, serviceName string, enclaveName string) {
 	cmd := GetBinaryCommand()
-	cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x101", "-e", "http://172.16.0.4:9081/api/v3/icon_dex", "-s", "icon-node-0x42f1f3", "--verbose")
-	err := cmd.Run()
-	gomega.Expect(err).NotTo(gomega.HaveOccurred())
-}
-
-func DecentralizeIconNode(enclaveName string) {
-	cmd := GetBinaryCommand()
-	cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e", "--verbose", "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", nid, "-e", endpoint, "-s", serviceName, "--verbose", "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -192,30 +187,18 @@ func RunHardhatNode(enclaveName string) {
 
 func RunDecentralizedCustomIconNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	filepath := "../../cli/sample-jsons/config0.json"
-	updated_path := UpdatePublicPort(filepath)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", "./config/genesis-icon-0.zip", "-d", "--enclaveName", enclaveName)
-	err := cmd.Run()
-	gomega.Expect(err).NotTo(gomega.HaveOccurred())
-}
-
-func RunCustomIconNode_0() {
-	cmd := GetBinaryCommand()
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/config0.json", "-g", "./config/genesis-icon-0.zip")
-	err := cmd.Run()
-	gomega.Expect(err).NotTo(gomega.HaveOccurred())
-}
-
-func DecentralizeCustomIconNode_0() {
-	cmd := GetBinaryCommand()
-	cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x3", "-e", "http://172.16.0.3:9080/api/v3/icon_dex", "-s", "icon-node-0xacbc4e", "--verbose")
+	updated_path := UpdatePublicPort(enclaveName, ICON_CONFIG0)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", ICON_GENESIS0, "-d", "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 var mutex = &sync.Mutex{}
+var mutex1 = &sync.Mutex{}
+var mutex2 = &sync.Mutex{}
+var mutex3 = &sync.Mutex{}
 
-func UpdatePublicPort(filePath string) string {
+func UpdatePublicPort(enclaveName string, filePath string) string {
 	mutex.Lock()
 	defer mutex.Unlock()
 	fileContent, err := os.ReadFile(filePath)
@@ -234,19 +217,12 @@ func UpdatePublicPort(filePath string) string {
 		panic(err)
 	}
 	config.PublicPort = availablePort
-	// config.CID =  "0xacbc4e"
-	// config.P2PAddress = "8080"
-	// config.P2PListenAddress = "7080"
-	// config.PrivatePort = 9080
-
 	updatedJSON, err := json.MarshalIndent(config, "", "    ")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(updatedJSON))
 
-	name := GenerateRandomName()
-	tmpfile, err := os.Create(fmt.Sprintf("updated-config-%s.json", name))
+	tmpfile, err := os.Create(fmt.Sprintf("updated-config-%s.json", enclaveName))
 	if err != nil {
 		panic(err)
 	}
@@ -261,19 +237,11 @@ func UpdatePublicPort(filePath string) string {
 	return tmpfile.Name()
 }
 
-// // Write the updated JSON back to the same file
-// err = os.WriteFile(filePath, updatedJSON, 0644)
-// if err != nil {
-// 	panic(err)
-// }
-
-//var mutex = &sync.Mutex{}
-
 // Assuming Archway struct is defined as mentioned earlier
 
 func UpdatePublicPorts(filePath1 string) string {
-	mutex.Lock()
-	defer mutex.Unlock()
+	mutex1.Lock()
+	defer mutex1.Unlock()
 
 	// Read the content of the existing JSON file
 	fileContent1, err := os.ReadFile(filePath1)
@@ -338,8 +306,8 @@ func UpdatePublicPorts(filePath1 string) string {
 }
 
 func UpdateNeutronPublicPorts(filePath2 string) string {
-	mutex.Lock()
-	defer mutex.Unlock()
+	mutex2.Lock()
+	defer mutex2.Unlock()
 
 	// Read the content of the existing JSON file
 	fileContent2, err := os.ReadFile(filePath2)
@@ -401,6 +369,39 @@ func UpdateNeutronPublicPorts(filePath2 string) string {
 	}
 
 	return tmpfile.Name()
+}
+
+type NodeInfo struct {
+	ServiceName    string `json:"service_name"`
+	EndpointPublic string `json:"endpoint"`
+	Nid            string `json:"nid"`
+}
+
+func GetServiceDetails(servicesJson string, service string) (serviceName string, endpoint string, nid string) {
+	var data map[string]NodeInfo
+	mutex3.Lock()
+	defer mutex3.Unlock()
+
+	fileContent2, err := os.ReadFile(servicesJson)
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(fileContent2, &data)
+	if err != nil {
+		panic(err)
+	}
+
+	for key, value := range data {
+		if key == service {
+			serviceName = value.ServiceName
+			endpoint = value.EndpointPublic
+			nid = value.Nid
+		}
+
+	}
+	return serviceName, endpoint, nid
+
 }
 
 // type Configuration1 struct {

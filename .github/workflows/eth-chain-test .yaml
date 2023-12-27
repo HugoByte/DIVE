@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  functional_test:
+  functional_test_eth:
     name: Eth Chain Functional Testing
     runs-on: "ubuntu-latest"
 

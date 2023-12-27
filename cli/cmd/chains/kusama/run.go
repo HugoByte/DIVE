@@ -11,8 +11,7 @@ import (
 )
 
 const (
-	localChain       = "local"
-	configsDirectory = "/home/riya/polakadot-kurtosis-package/parachain/static_files/configs"
+	localChain = "local"
 )
 
 func RunKusama(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
@@ -24,21 +23,48 @@ func RunKusama(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 
 	var serviceConfig = &utils.PolkadotServiceConfig{}
 
+	err = flagCheck()
+	if err != nil {
+		return nil, err
+	}
+
 	err = common.LoadConfig(cli, serviceConfig, configFilePath)
 	if err != nil {
 		return nil, err
 	}
 
-	configureService(serviceConfig)
+	err = configureService(serviceConfig)
+	if err != nil {
+		return nil, err
+	}
 
 	encodedServiceConfigDataString, err := serviceConfig.EncodeToString()
 	if err != nil {
 		return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
 	}
 
-	para := fmt.Sprintf(`{"args": %s}`, encodedServiceConfigDataString)
-	runConfig := getKusamaRunConfig(serviceConfig, enclaveContext, para)
+	err = uploadFiles(cli, enclaveContext)
+	if err != nil {
+		return nil, err
+	}
 
+	result, err := startRelayAndParaChain(cli, enclaveContext, serviceConfig, encodedServiceConfigDataString)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+
+}
+
+func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, serviceConfig *utils.PolkadotServiceConfig, para string) (*common.DiveMultipleServiceResponse, error) {
+
+	param := fmt.Sprintf(`{"args": %s}`, para)
+
+	KusamaResponseData := &common.DiveMultipleServiceResponse{}
+	paraResult := &common.DiveMultipleServiceResponse{}
+
+	runConfig := getKusamaRunConfig(serviceConfig, enclaveContext, param)
 	response, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.PolkadotRemotePackagePath, runConfig)
 	if err != nil {
 		return nil, common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
@@ -46,47 +72,147 @@ func RunKusama(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 
 	responseData, services, skippedInstructions, err := common.GetSerializedData(cli, response)
 	if err != nil {
-
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
 			return nil, common.WrapMessageToError(errRemove, "Kusama Run Failed ")
 		}
-
 		return nil, common.WrapMessageToError(err, "Kusama Run Failed ")
 	}
 
-	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
-		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Kusama already Running")
-	}
-
-	KusamaResponseData := &common.DiveMultipleServiceResponse{}
-
 	result, err := KusamaResponseData.Decode([]byte(responseData))
 	if err != nil {
-
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
 			return nil, common.WrapMessageToError(errRemove, "Kusama Run Failed ")
 		}
-
 		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Kusama Run Failed ")
+	}
+
+	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
+		if len(serviceConfig.Para) != 0 && serviceConfig.Para[0].Name != "" {
+			ipAddress, err := GetIPAddress(cli, serviceConfig, true, result)
+			if err != nil {
+				return nil, err
+			}
+			paraResult, err = startParaChains(cli, enclaveContext, serviceConfig, para, ipAddress)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Kusama Already Running")
+		}
+	} else {
+		if len(serviceConfig.Para) != 0 && serviceConfig.Para[0].Name != "" {
+			ipAddress, err := GetIPAddress(cli, serviceConfig, false, result)
+			if err != nil {
+				return nil, err
+			}
+			paraResult, err = startParaChains(cli, enclaveContext, serviceConfig, para, ipAddress)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	finalResult := ConcatenateDiveResults(result, paraResult)
+
+	return finalResult, nil
+}
+
+func startParaChains(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, serviceConfig *utils.PolkadotServiceConfig, para string, ipAddress string) (*common.DiveMultipleServiceResponse, error) {
+	paraResult := &common.DiveMultipleServiceResponse{}
+	var err error
+
+	if serviceConfig.ChainType == localChain {
+		param := fmt.Sprintf(`{"args": %s, "relay_chain_ip":"%s"}`, para, ipAddress)
+		paraResult, err = runParaChain(cli, enclaveContext, serviceConfig, param)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		for _, paraNode := range serviceConfig.Para {
+			paraChainConfig, err := paraNode.EncodeToString()
+			if err != nil {
+				return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+			}
+			param := fmt.Sprintf(`{"parachain":%s, "args":%s}`, paraChainConfig, para)
+			paraResult, err = runParaChain(cli, enclaveContext, serviceConfig, param)
+			if err != nil {
+				return nil, err
+			}
+		}
 
 	}
 
-	return result, nil
+	return paraResult, nil
 }
 
-func configureService(serviceConfig *utils.PolkadotServiceConfig) {
+func runParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, serviceConfig *utils.PolkadotServiceConfig, para string) (*common.DiveMultipleServiceResponse, error) {
+
+	runParaConfig := getParaRunConfig(serviceConfig, enclaveContext, para)
+	paraResponse, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.PolkadotRemotePackagePath, runParaConfig)
+	if err != nil {
+		return nil, common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
+	}
+
+	paraResponseData, paraServices, skippedParaInstructions, err := common.GetSerializedData(cli, paraResponse)
+	if err != nil {
+		errRemove := cli.Context().RemoveServicesByServiceNames(paraServices, common.EnclaveName)
+		if errRemove != nil {
+			return nil, common.WrapMessageToError(errRemove, "ParaChain Run Failed ")
+		}
+		return nil, common.WrapMessageToError(err, "ParaChain Run Failed ")
+	}
+
+	if cli.Context().CheckSkippedInstructions(skippedParaInstructions) {
+		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "ParaChain Already Running")
+	}
+
+	KusamaParaResponseData := &common.DiveMultipleServiceResponse{}
+	resultPara, err := KusamaParaResponseData.Decode([]byte(paraResponseData))
+	if err != nil {
+		errRemove := cli.Context().RemoveServicesByServiceNames(paraServices, common.EnclaveName)
+		if errRemove != nil {
+			return nil, common.WrapMessageToError(errRemove, "ParaChain Run Failed ")
+		}
+		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "ParaChain Run Failed ")
+
+	}
+
+	return resultPara, nil
+}
+
+func ConcatenateDiveResults(result, paraResult *common.DiveMultipleServiceResponse) *common.DiveMultipleServiceResponse {
+	concatenatedResult := &common.DiveMultipleServiceResponse{
+		Dive: make(map[string]*common.DiveServiceResponse),
+	}
+
+	for key, value := range result.Dive {
+		concatenatedResult.Dive[key] = value
+	}
+
+	for key, value := range paraResult.Dive {
+		concatenatedResult.Dive[key] = value
+	}
+
+	return concatenatedResult
+}
+
+func configureService(serviceConfig *utils.PolkadotServiceConfig) error {
 	if paraChain != "" {
-		serviceConfig.Para[0].Name = paraChain
+		serviceConfig.Para = []utils.ParaNodeConfig{}
+		serviceConfig.Para = append(serviceConfig.Para, utils.ParaNodeConfig{
+			Name: paraChain,
+			Nodes: []utils.NodeConfig{
+				{Name: "alice", NodeType: "full", Prometheus: false},
+			},
+		})
 	}
 
 	if network != "" {
 		serviceConfig.ChainType = network
-		if network == "testnet" {
-			serviceConfig.RelayChain.Name = "rococo"
-		} else if network == "mainnet" {
-			serviceConfig.RelayChain.Name = "kusama"
+		if network == "testnet" || network == "mainnet" {
+			configureFullNodes(serviceConfig)
 		}
 	}
 
@@ -97,6 +223,29 @@ func configureService(serviceConfig *utils.PolkadotServiceConfig) {
 	if metrics {
 		configureMetrics(serviceConfig)
 	}
+
+	if noRelay && serviceConfig.ChainType == "local" {
+		return common.WrapMessageToError(common.ErrInvalidFlag, "Cannot pass --no-relay flag with local network")
+	} else if noRelay && serviceConfig.ChainType != "local" {
+		serviceConfig.RelayChain = utils.RelayChainConfig{}
+	}
+
+	return nil
+}
+
+func configureFullNodes(serviceConfig *utils.PolkadotServiceConfig) {
+	if network == "testnet" {
+		serviceConfig.RelayChain.Name = "rococo"
+	} else if network == "mainnet" {
+		serviceConfig.RelayChain.Name = "kusama"
+	}
+
+	serviceConfig.RelayChain.Nodes = []utils.NodeConfig{}
+	serviceConfig.RelayChain.Nodes = append(serviceConfig.RelayChain.Nodes, utils.NodeConfig{
+		Name:       "alice",
+		NodeType:   "full",
+		Prometheus: false,
+	})
 }
 
 func configureMetrics(serviceConfig *utils.PolkadotServiceConfig) {
@@ -108,16 +257,78 @@ func configureMetrics(serviceConfig *utils.PolkadotServiceConfig) {
 	}
 }
 
-func getKusamaRunConfig(serviceConfig *utils.PolkadotServiceConfig, enclaveContext *enclaves.EnclaveContext, para string) *starlark_run_config.StarlarkRunConfig {
-	if serviceConfig.Para[0].Name != "" {
-		return common.GetStarlarkRunConfig(para, common.DivePolkadotDefaultNodeSetupScript, runKusamaFunctionName)
-	} else {
-		if serviceConfig.ChainType == localChain {
-			enclaveContext.UploadFiles(configsDirectory, "configs")
-			return common.GetStarlarkRunConfig(para, common.DivePolkadotRelayNodeSetupScript, runKusamaRelayLocal)
-		} else {
-			return common.GetStarlarkRunConfig(para, common.DivePolkadotRelayNodeSetupScript, runKusamaRelayTestnetMainet)
+func flagCheck() error {
+	if configFilePath != "" {
+		if paraChain != "" || network != "" || explorer || metrics {
+			return common.WrapMessageToError(common.ErrInvalidFlag, "Additional Flags Found")
 		}
-
 	}
+
+	if noRelay && (network == "testnet" || network == "mainnet") {
+		if paraChain == "" {
+			return common.WrapMessageToError(common.ErrMissingFlags, "Missing Parachain Flag")
+		}
+	}
+	return nil
+}
+
+func getKusamaRunConfig(serviceConfig *utils.PolkadotServiceConfig, enclaveContext *enclaves.EnclaveContext, para string) *starlark_run_config.StarlarkRunConfig {
+	if serviceConfig.ChainType == localChain {
+		return common.GetStarlarkRunConfig(para, common.DivePolkadotRelayNodeSetupScript, runKusamaRelayLocal)
+	} else {
+		return common.GetStarlarkRunConfig(para, common.DivePolkadotRelayNodeSetupScript, runKusamaRelayTestnetMainet)
+	}
+}
+
+func uploadFiles(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext) error {
+	runConfig := common.GetStarlarkRunConfig("{}", common.DivePolkaDotUtilsPath, runUploadFiles)
+	_, err := enclaveCtx.RunStarlarkRemotePackageBlocking(cli.Context().GetContext(), common.PolkadotRemotePackagePath, runConfig)
+	if err != nil {
+		return common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
+	}
+
+	return nil
+}
+
+func getParaRunConfig(serviceConfig *utils.PolkadotServiceConfig, enclaveContext *enclaves.EnclaveContext, para string) *starlark_run_config.StarlarkRunConfig {
+	if len(serviceConfig.Para) != 0 && serviceConfig.Para[0].Name != "" {
+		if serviceConfig.ChainType == localChain {
+			return common.GetStarlarkRunConfig(para, common.DivePolkadotParachainNodeSetup, runKusamaParaLocalFunctionName)
+
+		} else {
+			return common.GetStarlarkRunConfig(para, common.DivePolkadotParachainNodeSetup, runKusamaParaTestMainFunctionName)
+
+		}
+	}
+	return nil
+}
+
+func GetIPAddress(cli *common.Cli, serviceConfig *utils.PolkadotServiceConfig, relayReRun bool, result *common.DiveMultipleServiceResponse) (string, error) {
+	var nodename string
+	if serviceConfig.ChainType == localChain {
+		if relayReRun {
+			nodename = serviceConfig.RelayChain.Nodes[0].Name
+			var services = common.Services{}
+			serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)
+
+			err := cli.FileHandler().ReadJson(serviceFileName, &serviceConfig)
+			if err != nil {
+				return "", err
+			}
+
+			ChainServiceName := fmt.Sprintf("rococo-local-%s", nodename)
+			chainServiceResponse, OK := services[ChainServiceName]
+			if !OK {
+				return "", fmt.Errorf("service name not found")
+			}
+
+			ipAddress := chainServiceResponse.IpAddress
+			return ipAddress, nil
+		} else {
+			servicename := fmt.Sprintf("rococo-local-%s", serviceConfig.RelayChain.Nodes[0].Name)
+			ipAddress := result.Dive[servicename].IpAddress
+			return ipAddress, nil
+		}
+	}
+	return "", nil
 }

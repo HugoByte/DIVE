@@ -165,8 +165,8 @@ type NodeConfig struct {
 }
 
 type RelayChainConfig struct {
-	Name  string       `json:"name"`
-	Nodes []NodeConfig `json:"nodes"`
+	Name  string       `json:"name,omitempty"`
+	Nodes []NodeConfig `json:"nodes,omitempty"`
 }
 
 type ParaNodeConfig struct {
@@ -179,6 +179,15 @@ type PolkadotServiceConfig struct {
 	RelayChain RelayChainConfig `json:"relaychain"`
 	Para       []ParaNodeConfig `json:"para"`
 	Explorer   bool             `json:"explorer"`
+}
+
+func (sc *ParaNodeConfig) EncodeToString() (string, error) {
+	encodedBytes, err := json.Marshal(sc)
+	if err != nil {
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+	}
+
+	return string(encodedBytes), nil
 }
 
 func (sc *PolkadotServiceConfig) EncodeToString() (string, error) {
@@ -211,22 +220,20 @@ func (sc *PolkadotServiceConfig) LoadDefaultConfig() error {
 		{Name: "bob", NodeType: "full", Prometheus: false},
 		{Name: "alice", NodeType: "validator", Prometheus: false},
 	}
-	sc.Para = []ParaNodeConfig{
-		{
-			Name: "",
-			Nodes: []NodeConfig{
-				{Name: "alice", NodeType: "full", Prometheus: false},
-				{Name: "bob", NodeType: "collator", Prometheus: false},
-			},
-		},
-	}
+
+	sc.Para = []ParaNodeConfig{}
 
 	return nil
 }
 
 func (psc *PolkadotServiceConfig) IsEmpty() error {
-	if psc == nil || psc.ChainType == "" || psc.Explorer {
-		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In PolkadotServiceConfig")
+
+	if psc == nil || psc.ChainType == "" {
+		return common.WrapMessageToError(common.ErrEmptyFields, "Missing Fields In PolkadotServiceConfig")
+	}
+
+	if psc.Explorer != true && psc.Explorer != false {
+		return common.WrapMessageToError(common.ErrEmptyFields, "Missing Fields In PolkadotServiceConfig")
 	}
 
 	if err := psc.RelayChain.IsEmpty(); err != nil {
@@ -243,8 +250,9 @@ func (psc *PolkadotServiceConfig) IsEmpty() error {
 }
 
 func (rcc *RelayChainConfig) IsEmpty() error {
+
 	if rcc == nil || rcc.Name == "" || len(rcc.Nodes) == 0 {
-		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In RelayChainConfig")
+		return common.WrapMessageToError(common.ErrEmptyFields, "Missing Fields In RelayChainConfig")
 	}
 
 	for _, node := range rcc.Nodes {
@@ -257,8 +265,9 @@ func (rcc *RelayChainConfig) IsEmpty() error {
 }
 
 func (pnc *ParaNodeConfig) IsEmpty() error {
+
 	if pnc == nil || pnc.Name == "" || len(pnc.Nodes) == 0 {
-		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In ParaNodeConfig")
+		return common.WrapMessageToError(common.ErrEmptyFields, "Missing Fields In ParaNodeConfig")
 	}
 
 	for _, node := range pnc.Nodes {
@@ -271,8 +280,14 @@ func (pnc *ParaNodeConfig) IsEmpty() error {
 }
 
 func (nc *NodeConfig) IsEmpty() error {
+
 	if nc == nil || nc.Name == "" || nc.NodeType == "" {
-		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In NodeConfig")
+		return common.WrapMessageToError(common.ErrEmptyFields, "Missing Fields In NodeConfig")
 	}
+
+	if nc.Prometheus != true && nc.Prometheus != false {
+		return common.WrapMessageToError(common.ErrEmptyFields, "Missing Fields In PolkadotServiceConfig")
+	}
+
 	return nil
 }
