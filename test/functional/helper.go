@@ -3,6 +3,7 @@ package dive
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"fmt"
 	"os"
 	"os/exec"
@@ -129,7 +130,7 @@ func RunCustomArchwayNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
 	filepath1 := "../../cli/sample-jsons/archway1.json"
 	updated_path1 := UpdatePublicPorts(filepath1)
-	cmd.Args = append(cmd.Args, "chain", "archway", "-c", updated_path1,"--enclaveName", enclaveName )
+	cmd.Args = append(cmd.Args, "chain", "archway", "-c", updated_path1, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -138,7 +139,7 @@ func RunCustomArchwayNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
 	filepath1 := "../../cli/sample-jsons/archway.json"
 	updated_path1 := UpdatePublicPorts(filepath1)
-	cmd.Args = append(cmd.Args, "chain", "archway", "-c",updated_path1,"--enclaveName", enclaveName )
+	cmd.Args = append(cmd.Args, "chain", "archway", "-c", updated_path1, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -147,7 +148,7 @@ func RunCustomNeutronNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
 	filepath2 := "../../cli/sample-jsons/neutron1.json"
 	updated_path2 := UpdateNeutronPublicPorts(filepath2)
-	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", updated_path2,"--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", updated_path2, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -156,7 +157,7 @@ func RunCustomNeutronNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
 	filepath2 := "../../cli/sample-jsons/neutron.json"
 	updated_path2 := UpdateNeutronPublicPorts(filepath2)
-	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", updated_path2,"--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", updated_path2, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -400,4 +401,120 @@ func UpdateNeutronPublicPorts(filePath2 string) string {
 	}
 
 	return tmpfile.Name()
+}
+
+// type Configuration1 struct {
+// 	ChainType  string `json:"chain-type"`
+// 	RelayChain struct {
+// 		Name  string `json:"name"`
+// 		Nodes []struct {
+// 			Name       string `json:"name"`
+// 			NodeType   string `json:"node-type"`
+// 			Prometheus bool   `json:"prometheus"`
+// 		} `json:"nodes"`
+// 	} `json:"relaychain"`
+// 	Para []struct {
+// 		Name  string `json:"name"`
+// 		Nodes []struct {
+// 			Name       string `json:"name"`
+// 			NodeType   string `json:"node-type"`
+// 			Prometheus bool   `json:"prometheus"`
+// 		} `json:"nodes"`
+// 	} `json:"para"`
+// 	Explorer bool `json:"explorer"`
+// }
+
+// func NewConfigurationWithChainType(chainType string) Configuration1 {
+// 	return Configuration1{
+// 		ChainType: chainType,
+// 	}
+// }
+
+type Configuration1 struct {
+	ChainType  string `json:"chain-type"`
+	RelayChain struct {
+	   Name  string `json:"name"`
+	   Nodes []struct {
+		  Name       string `json:"name"`
+		  NodeType   string `json:"node-type"`
+		  Prometheus bool   `json:"prometheus"`
+	   } `json:"nodes"`
+	} `json:"relaychain"`
+	Para     []struct {
+	   Name  string `json:"name"`
+	   Nodes []struct {
+		  Name       string `json:"name"`
+		  NodeType   string `json:"node-type"`
+		  Prometheus bool   `json:"prometheus"`
+	   } `json:"nodes"`
+	} `json:"para"`
+	Explorer bool `json:"explorer"`
+	Unknown  json.RawMessage
+ }
+ 
+
+func NewConfigurationWithChainType(chainType string) Configuration1 {
+	return Configuration1{
+		ChainType: chainType,
+		RelayChain: struct {
+			Name  string `json:"name"`
+			Nodes []struct {
+				Name       string `json:"name"`
+				NodeType   string `json:"node-type"`
+				Prometheus bool   `json:"prometheus"`
+			} `json:"nodes"`
+		}{},
+		Para: []struct {
+			Name  string `json:"name"`
+			Nodes []struct {
+				Name       string `json:"name"`
+				NodeType   string `json:"node-type"`
+				Prometheus bool   `json:"prometheus"`
+			} `json:"nodes"`
+		}{},
+		Explorer: false,
+	}
+}
+
+func main() {
+	filePath := "local.json"
+	config, err := LoadConfigFromFile(filePath)
+	if err != nil {
+		fmt.Println("Error loading configuration:", err)
+		return
+	}
+
+	fmt.Println("Configuration loaded successfully:")
+	fmt.Printf("%+v\n", config)
+}
+
+func LoadConfigFromFile(filePath string) (Configuration1, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return Configuration1{}, err
+	}
+	defer file.Close()
+
+	// Read the content of the file
+	fileBytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return Configuration1{}, err
+	}
+
+	// Print the content of the JSON file
+	fmt.Println("JSON Content:", string(fileBytes))
+
+	// Rewind the file reader to the beginning
+	_, err = file.Seek(0, 0)
+	if err != nil {
+		return Configuration1{}, err
+	}
+
+	var config Configuration1
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&config); err != nil {
+		return Configuration1{}, err
+	}
+
+	return config, nil
 }
