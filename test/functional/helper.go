@@ -3,7 +3,6 @@ package dive
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"fmt"
 	"os"
 	"os/exec"
@@ -404,118 +403,181 @@ func GetServiceDetails(servicesJson string, service string) (serviceName string,
 
 }
 
-// type Configuration1 struct {
-// 	ChainType  string `json:"chain-type"`
-// 	RelayChain struct {
-// 		Name  string `json:"name"`
-// 		Nodes []struct {
-// 			Name       string `json:"name"`
-// 			NodeType   string `json:"node-type"`
-// 			Prometheus bool   `json:"prometheus"`
-// 		} `json:"nodes"`
-// 	} `json:"relaychain"`
-// 	Para []struct {
-// 		Name  string `json:"name"`
-// 		Nodes []struct {
-// 			Name       string `json:"name"`
-// 			NodeType   string `json:"node-type"`
-// 			Prometheus bool   `json:"prometheus"`
-// 		} `json:"nodes"`
-// 	} `json:"para"`
-// 	Explorer bool `json:"explorer"`
-// }
-
-// func NewConfigurationWithChainType(chainType string) Configuration1 {
-// 	return Configuration1{
-// 		ChainType: chainType,
-// 	}
-// }
-
 type Configuration1 struct {
 	ChainType  string `json:"chain-type"`
 	RelayChain struct {
-	   Name  string `json:"name"`
-	   Nodes []struct {
-		  Name       string `json:"name"`
-		  NodeType   string `json:"node-type"`
-		  Prometheus bool   `json:"prometheus"`
-	   } `json:"nodes"`
+		Name  string `json:"name"`
+		Nodes []struct {
+			Name       string `json:"name"`
+			NodeType   string `json:"node-type"`
+			Prometheus bool   `json:"prometheus"`
+		} `json:"nodes"`
 	} `json:"relaychain"`
-	Para     []struct {
-	   Name  string `json:"name"`
-	   Nodes []struct {
-		  Name       string `json:"name"`
-		  NodeType   string `json:"node-type"`
-		  Prometheus bool   `json:"prometheus"`
-	   } `json:"nodes"`
+	Para []struct {
+		Name  string `json:"name"`
+		Nodes []struct {
+			Name       string `json:"name"`
+			NodeType   string `json:"node-type"`
+			Prometheus bool   `json:"prometheus"`
+		} `json:"nodes"`
 	} `json:"para"`
 	Explorer bool `json:"explorer"`
 	Unknown  json.RawMessage
- }
- 
-
-func NewConfigurationWithChainType(chainType string) Configuration1 {
-	return Configuration1{
-		ChainType: chainType,
-		RelayChain: struct {
-			Name  string `json:"name"`
-			Nodes []struct {
-				Name       string `json:"name"`
-				NodeType   string `json:"node-type"`
-				Prometheus bool   `json:"prometheus"`
-			} `json:"nodes"`
-		}{},
-		Para: []struct {
-			Name  string `json:"name"`
-			Nodes []struct {
-				Name       string `json:"name"`
-				NodeType   string `json:"node-type"`
-				Prometheus bool   `json:"prometheus"`
-			} `json:"nodes"`
-		}{},
-		Explorer: false,
-	}
 }
 
-func main() {
-	filePath := "local.json"
-	config, err := LoadConfigFromFile(filePath)
+func UpdateRelayChain(filePath, newChainType, newRelayChainName string, newExplorer, newPrometheus bool) string {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	fileContent, err := os.ReadFile(filePath)
 	if err != nil {
-		fmt.Println("Error loading configuration:", err)
-		return
+		panic(err)
 	}
 
-	fmt.Println("Configuration loaded successfully:")
-	fmt.Printf("%+v\n", config)
+	var local Configuration1
+	err = json.Unmarshal(fileContent, &local)
+	if err != nil {
+		panic(err)
+	}
+
+	// Update ChainType and RelayChain Name
+	local.ChainType = newChainType
+	local.RelayChain.Name = newRelayChainName
+	// Update Explorer
+	local.Explorer = newExplorer
+
+	for i := range local.RelayChain.Nodes {
+		local.RelayChain.Nodes[i].Prometheus = newPrometheus
+	}
+
+	// Update Prometheus for Para Nodes
+	for i := range local.Para {
+		for j := range local.Para[i].Nodes {
+			local.Para[i].Nodes[j].Prometheus = newPrometheus
+		}
+	}
+
+	updatedJSON, err := json.MarshalIndent(local, "", "    ")
+	if err != nil {
+		panic(err)
+	}
+
+	tmpfile, err := os.Create("updated-local.json")
+	if err != nil {
+		panic(err)
+	}
+	defer tmpfile.Close()
+
+	_, err = tmpfile.Write(updatedJSON)
+	if err != nil {
+		panic(err)
+	}
+
+	return tmpfile.Name()
 }
 
-func LoadConfigFromFile(filePath string) (Configuration1, error) {
-	file, err := os.Open(filePath)
+
+func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bool) string {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	fileContent, err := os.ReadFile(filePath)
 	if err != nil {
-		return Configuration1{}, err
+		panic(err)
 	}
-	defer file.Close()
 
-	// Read the content of the file
-	fileBytes, err := ioutil.ReadAll(file)
+	var local Configuration1
+	err = json.Unmarshal(fileContent, &local)
 	if err != nil {
-		return Configuration1{}, err
+		panic(err)
 	}
 
-	// Print the content of the JSON file
-	fmt.Println("JSON Content:", string(fileBytes))
+	// Remove content inside RelayChain 
+	local.RelayChain = struct {
+		Name  string `json:"name"`
+		Nodes []struct {
+			Name       string `json:"name"`
+			NodeType   string `json:"node-type"`
+			Prometheus bool   `json:"prometheus"`
+		} `json:"nodes"`
+	}{}
 
-	// Rewind the file reader to the beginning
-	_, err = file.Seek(0, 0)
+	// Update Name and Prometheus for Para Nodes
+	for i := range local.Para {
+		local.Para[i].Name = newParaName
+		for j := range local.Para[i].Nodes {
+			local.Para[i].Nodes[j].Prometheus = newPrometheus
+		}
+	}
+
+	updatedJSON, err := json.MarshalIndent(local, "", "    ")
 	if err != nil {
-		return Configuration1{}, err
+		panic(err)
 	}
 
-	var config Configuration1
-	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&config); err != nil {
-		return Configuration1{}, err
+	tmpfile, err := os.Create("updated-local.json")
+	if err != nil {
+		panic(err)
+	}
+	defer tmpfile.Close()
+
+	_, err = tmpfile.Write(updatedJSON)
+	if err != nil {
+		panic(err)
 	}
 
-	return config, nil
+	return tmpfile.Name()
 }
+
+func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName string, newExplorer, newPrometheus bool) string {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	fileContent, err := os.ReadFile(filePath)
+	if err != nil {
+		panic(err)
+	}
+
+	var local Configuration1
+	err = json.Unmarshal(fileContent, &local)
+	if err != nil {
+		panic(err)
+	}
+
+	// Update ChainType and RelayChain Name
+	local.ChainType = newChainType
+	local.RelayChain.Name = newRelayChainName
+	// Update Explorer
+	local.Explorer = newExplorer
+
+	for i := range local.RelayChain.Nodes {
+		local.RelayChain.Nodes[i].Prometheus = newPrometheus
+	}
+
+	// Update Name and Prometheus for Para Nodes
+	for i := range local.Para {
+		local.Para[i].Name = newParaName
+		for j := range local.Para[i].Nodes {
+			local.Para[i].Nodes[j].Prometheus = newPrometheus
+		}
+	}
+
+	updatedJSON, err := json.MarshalIndent(local, "", "    ")
+	if err != nil {
+		panic(err)
+	}
+
+	tmpfile, err := os.Create("updated-local.json")
+	if err != nil {
+		panic(err)
+	}
+	defer tmpfile.Close()
+
+	_, err = tmpfile.Write(updatedJSON)
+	if err != nil {
+		panic(err)
+	}
+
+	return tmpfile.Name()
+}
+

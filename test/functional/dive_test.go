@@ -2,8 +2,8 @@ package dive_test
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"testing"
@@ -42,17 +42,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 	var cmd *exec.Cmd
 	var stdout bytes.Buffer
 
-	//    var runKusama bool
-	//     var runPolkadot bool
-
-	// BeforeSuite hook
-	// ginkgo.BeforeSuite(func() {
-	//     flag.BoolVar(&runKusama, "kusama", false, "Run tests for Kusama")
-	//     flag.BoolVar(&runPolkadot, "polkadot", false, "Run tests for Polkadot")
-	//     flag.Parse()
-	// })
-
-	// run clean before each test
 	ginkgo.BeforeEach(func() {
 		cmd = dive.GetBinaryCommand()
 		cmd.Stdout = &testWriter{}
@@ -209,7 +198,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			dive.DecentralizeCustomIconNode(nid0, endpoint0, serviceName0, enclaveName)
 
 			dive.RunEthNode(enclaveName)
-			
+
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--chainAServiceName", dive.ICON_CONFIG0_SERVICENAME, "--chainBServiceName", dive.ETH_SERVICENAME, "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -247,9 +236,9 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			dive.RunDecentralizedIconNode(enclaveName)
 			dive.RunCustomIconNode1(enclaveName)
 
-			serviceName, endpoint, nid := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG1_SERVICENAME)		
+			serviceName, endpoint, nid := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG1_SERVICENAME)
 			dive.DecentralizeCustomIconNode(nid, endpoint, serviceName, enclaveName)
-			
+
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", dive.ICON_CONFIG0_SERVICENAME, "--chainBServiceName", dive.ICON_CONFIG1_SERVICENAME, "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -268,7 +257,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			serviceName1, endpoint1, nid1 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG1_SERVICENAME)
 			dive.DecentralizeCustomIconNode(nid1, endpoint1, serviceName1, enclaveName)
 
-			
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", dive.ICON_CONFIG0_SERVICENAME, "--chainBServiceName", dive.ICON_CONFIG1_SERVICENAME, "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -297,7 +285,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			serviceName1, endpoint1, nid1 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG1_SERVICENAME)
 			dive.DecentralizeCustomIconNode(nid1, endpoint1, serviceName1, enclaveName)
 
-
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", dive.ICON_CONFIG0_SERVICENAME, "--chainBServiceName", dive.ICON_CONFIG1_SERVICENAME, "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -310,7 +297,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			dive.RunDecentralizedIconNode(enclaveName)
 			dive.RunEthNode(enclaveName)
 			dive.RunHardhatNode(enclaveName)
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--chainAServiceName", dive.ICON_CONFIG0_SERVICENAME, "--chainBServiceName", dive.ETH_SERVICENAME , "--enclaveName", enclaveName)
+			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--chainAServiceName", dive.ICON_CONFIG0_SERVICENAME, "--chainBServiceName", dive.ETH_SERVICENAME, "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			dive.Clean(enclaveName)
@@ -490,7 +477,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 
 		ginkgo.It("should start IBC relay between already running custom icon and archway chain", func() {
 			enclaveName := dive.GenerateRandomName()
-			dive.RunCustomIconNode0(enclaveName )
+			dive.RunCustomIconNode0(enclaveName)
 			dive.RunArchwayNode(enclaveName)
 			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "icon", "--chainB", "archway", "--chainAServiceName", dive.ICON_CONFIG0_SERVICENAME, "--chainBServiceName", dive.DEFAULT_ARCHWAY_SERVICENAME, "--enclaveName", enclaveName)
 			err := cmd.Run()
@@ -659,7 +646,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should run custom Icon node-1", func() {
 			enclaveName := dive.GenerateRandomName()
 			filepath := dive.ICON_CONFIG1
-			updated_path := dive.UpdatePublicPort(enclaveName,filepath)
+			updated_path := dive.UpdatePublicPort(enclaveName, filepath)
 			cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", dive.ICON_GENESIS1, "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -756,7 +743,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should handle invalid input for chain command", func() {
 			enclaveName := dive.GenerateRandomName()
 			dive.RunIconNode(enclaveName)
-			serviceName0, _ , nid0 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
+			serviceName0, _, nid0 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
 			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", nid0, "-e", "http://172.16.0.3:9081/api/v3/icon_dex", "-s", serviceName0, "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
@@ -766,7 +753,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should handle invalid input for chain command", func() {
 			enclaveName := dive.GenerateRandomName()
 			dive.RunIconNode(enclaveName)
-			_ , endpoint0, nid0 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
+			_, endpoint0, nid0 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
 			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", nid0, "-e", endpoint0, "-s", "icon-node", "--enclaveName", enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
@@ -959,21 +946,27 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 
 	ginkgo.Describe("Relaychain commands", func() {
 		var selectedChain string
-
-		if envChain := os.Getenv("relayChainName"); envChain != "" {
+		if envChain := os.Getenv("relayChain"); envChain != "" {
 			selectedChain = envChain
 		} else {
 			selectedChain = "default" // Provide a default value if not set
 		}
-
 		relayChainNames := []string{"kusama", "polkadot"}
 
+		// Add a flag to check if the selected chain is valid
+		validChainSelected := false
+
 		for _, relayChainName := range relayChainNames {
-			if selectedChain != "default" && selectedChain != relayChainName {
-				continue // Skip tests if the selected chain doesn't match the loop chain
-			}
 
 			relayChainName := relayChainName // Capture the loop variable
+
+			if selectedChain != "default" && selectedChain != relayChainName {
+				// Skip tests for other chains
+				continue
+			}
+
+			// Set the flag to indicate that a valid chain is selected
+			validChainSelected = true
 
 			ginkgo.It("should run single relaychain with verbose flag enabled for "+relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
@@ -1009,19 +1002,30 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 
 			ginkgo.It("should run custom relaychain in localnet with verbose enabled for "+relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
-				config := dive.NewConfigurationWithChainType("local")
-
-				// Convert the config struct to a JSON-formatted string
-				configString, err := json.Marshal(config)
-				gomega.Expect(err).NotTo(gomega.HaveOccurred())
-
-				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", string(configString), "--verbose", "--enclaveName", enclaveName)
-				err = cmd.Run()
+				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "local", "rococo-local", false, false)
+				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--verbose", "--enclaveName", enclaveName)
+				err := cmd.Run()
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 				dive.Clean(enclaveName)
 			})
 
-			
+			ginkgo.It("should run custom relaychain in testnet"+relayChainName, func() {
+				enclaveName := dive.GenerateRandomName()
+				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "testnet", "rococo", false, false)
+				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
+				err := cmd.Run()
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				dive.Clean(enclaveName)
+			})
+
+			ginkgo.It("should run custom relaychain in testnet"+relayChainName, func() {
+				enclaveName := dive.GenerateRandomName()
+				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "testnet", "kusama", false, false)
+				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
+				err := cmd.Run()
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				dive.Clean(enclaveName)
+			})
 
 			ginkgo.It("should run single relaychain with explorer service for "+relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
@@ -1039,37 +1043,51 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				dive.Clean(enclaveName)
 			})
 
-			ginkgo.It("should run custom relaychain with explorer service for "+relayChainName, func() {
+			ginkgo.It("should run custom relaychain with explorer service in testnet for "+relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
-				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", "./sample-jsons/local.json", "--enclaveName", enclaveName)
+				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "testnet", "rococo", true, false)
+				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 				err := cmd.Run()
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 				dive.Clean(enclaveName)
 			})
 
-			ginkgo.It("should run custom relaychain with metrics service for "+relayChainName, func() {
+			ginkgo.It("should run custom relaychain with metrics service in testnet for "+relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
-				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", "./sample-jsons/local.json", "--enclaveName", enclaveName)
+				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "testnet", "rococo", false, true)
+				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 				err := cmd.Run()
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 				dive.Clean(enclaveName)
 			})
+			ginkgo.It("should run custom relaychain with explorer services and metrics service in testnet for "+relayChainName, func() {
+				enclaveName := dive.GenerateRandomName()
+				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "testnet", "rococo", true, true)
+				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
+				err := cmd.Run()
+				gomega.Expect(err).NotTo(gomega.HaveOccurred())
+				dive.Clean(enclaveName)
+			})
+
+		}
+		if !validChainSelected && selectedChain != "default" {
+			// Print an error message if an invalid chain is selected
+			fmt.Printf("Error: Invalid relayChain selected: %s. Expected 'kusama' or 'polkadot'\n", selectedChain)
+			log.Fatal("Tests cannot be run because an invalid relayChain is selected.")
 		}
 	})
-
-	
 
 	ginkgo.Describe("Parachain commands", func() {
 		var selectedRelayChain string
 		var selectedParaChain string
 
-		if envChain := os.Getenv("relayChainName"); envChain != "" {
+		if envChain := os.Getenv("relayChain"); envChain != "" {
 			selectedRelayChain = envChain
 		} else {
 			selectedRelayChain = "default" // Provide a default value if not set
 		}
 
-		if envSelectedParaChain := os.Getenv("paraChainName"); envSelectedParaChain != "" {
+		if envSelectedParaChain := os.Getenv("paraChain"); envSelectedParaChain != "" {
 			selectedParaChain = envSelectedParaChain
 		} else {
 			// If not provided, set a default value
@@ -1077,6 +1095,21 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		}
 
 		relayChainNames := []string{"kusama", "polkadot"}
+
+		if selectedRelayChain != "default" {
+			validRelayChain := false
+			for _, relayChainName := range relayChainNames {
+				if selectedRelayChain == relayChainName {
+					validRelayChain = true
+					break
+				}
+			}
+			if !validRelayChain {
+				fmt.Printf("Error: Invalid relayChain selected: %s. Expected one of %v\n", selectedRelayChain, relayChainNames)
+				log.Fatal("Tests cannot be run because an invalid relayChain is selected.")
+			}
+		}
+
 		for _, relayChainName := range relayChainNames {
 			if selectedRelayChain != "default" && selectedRelayChain != relayChainName {
 				continue // Skip tests if the selected chain doesn't match the loop chain
@@ -1087,21 +1120,38 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			var paraChainNames []string
 
 			if relayChainName == "kusama" {
-				paraChainNames = []string{"Karura", "Kintsugi-BTC", "Altair", "Bifrost", "Mangata", "Robonomics", "Turing Network", "Encointer Network", "Bajun Networkc", "Calamari", "Khala Network", "Litmus", "Moonriver", "subzero"}
+				paraChainNames = []string{"karura", "kintsugi-BTC", "altair", "bifrost", "mangata", "robonomics", "turing-network", "encointer-network", "bajun-networkc", "calamari", "Khala-network", "litmus", "moonriver", "subzero"}
 			} else if relayChainName == "polkadot" {
-				paraChainNames = []string{"Polkadex", "Zeitgeist", "Acala", "Bifrost", "Clover", "Integritee Shell", "Integritee Shell", "Litentry", "Moonbeam", "Nodle", "Pendulum", "Ajuna Network", "Centrifuge", "Frequency", "Interlay", "Kylin", "Manta", "Moonsama", "Parallel", "Phala Network", "Subsocial"}
+				paraChainNames = []string{"polkadex", "zeitgeist", "acala", "bifrost", "clover", "integritee-shell", "integritee-shell", "litentry", "moonbeam", "nodle", "pendulum", "ajuna-network", "centrifuge", "frequency", "interlay", "kylin", "manta", "moonsama", "parallel", "phala-network", "subsocial"}
 			} else {
-				paraChainNames = []string{"Polkadex", "Zeitgeist", "Karura", "Kintsugi-BTC", "Altair", "Bifrost", "Mangata", "Robonomics", "Turing Network", "Encointer Network", "Bajun Networkc", "Calamari", "Khala Network", "Litmus", "Moonriver", "subzero", "Acala", "Bifrost", "Clover", "Integritee Shell", "Integritee Shell", "Litentry", "Moonbeam", "Nodle", "Pendulum", "Ajuna Network", "Centrifuge", "Frequency", "Interlay", "Kylin", "Manta", "Moonsama", "Parallel", "Phala Network", "Subsocial"}
+				paraChainNames = []string{"polkadex", "zeitgeist", "karura", "kintsugi-BTC", "altair", "bifrost", "mangata", "robonomics", "turing-network", "encointer-network", "bajun-networkc", "calamari", "khala-network", "litmus", "moonriver", "subzero", "acala", "bifrost", "clover", "integritee-shell", "integritee-shell", "litentry", "moonbeam", "nodle", "pendulum", "ajuna-network", "centrifuge", "frequency", "interlay", "kylin", "manta", "moonsama", "parallel", "phala-network", "subsocial"}
+			}
+
+			// Validate paraChain before running tests
+			if selectedParaChain != "default" {
+				validParaChain := false
+				for _, paraChainName := range paraChainNames {
+					if selectedParaChain == paraChainName {
+						validParaChain = true
+						break
+					}
+				}
+				if !validParaChain {
+					fmt.Printf("Error: Invalid paraChain selected: %s. Expected a valid parachain name\n", selectedParaChain)
+					log.Fatal("Tests cannot be run because an invalid paraChain is selected.")
+				}
 			}
 
 			for _, paraChainName := range paraChainNames {
 				if selectedParaChain != "default" && selectedParaChain != paraChainName {
-					continue // Skip tests if the selected parachain doesn't match the loop parachain
+					continue
 				}
+
+				paraChainName := paraChainName
 
 				ginkgo.It("should run single parachain  in testnet with verbose flag enabled for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-n", "testnet", "--vebose", "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-n", "testnet", "--verbose", "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
@@ -1129,28 +1179,40 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				})
 				ginkgo.It("should run custom parachain in testnet with verbose flag enabled for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", "./sample-jsons/local.json", "--enclaveName", enclaveName)
+					config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "karura", false, false)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
 				})
 				ginkgo.It("should run custom parachain in mainnet for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", "./sample-jsons/local.json", "--enclaveName", enclaveName)
+					config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "karura", false, false)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
 				})
-				ginkgo.It("should run custom parachain in mainnet  with explorer services for "+relayChainName+" and "+paraChainName, func() {
+				ginkgo.It("should run custom parachain in mainnet with explorer services for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", "./sample-jsons/local.json", "--enclaveName", enclaveName)
+					config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "karura", true, false)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
 				})
-				ginkgo.It("should run custom parachain in mainnet  with metrics services for "+relayChainName+" and "+paraChainName, func() {
+				ginkgo.It("should run custom parachain in mainnet with metrics services for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", "./sample-jsons/local.json", "--enclaveName", enclaveName)
+					config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "karura", false, true)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
+					err := cmd.Run()
+					gomega.Expect(err).NotTo(gomega.HaveOccurred())
+					dive.Clean(enclaveName)
+				})
+				ginkgo.It("should run custom parachain in mainnet with explorer and metrics services for "+relayChainName+" and "+paraChainName, func() {
+					enclaveName := dive.GenerateRandomName()
+					config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "karura",true, true)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
@@ -1160,16 +1222,17 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 	})
 
 	ginkgo.Describe("Relaychain and parachain commands", func() {
+
 		var selectedRelayChain string
 		var selectedParaChain string
 
-		if envChain := os.Getenv("relayChainName"); envChain != "" {
+		if envChain := os.Getenv("relayChain"); envChain != "" {
 			selectedRelayChain = envChain
 		} else {
 			selectedRelayChain = "default" // Provide a default value if not set
 		}
 
-		if envSelectedParaChain := os.Getenv("paraChainName"); envSelectedParaChain != "" {
+		if envSelectedParaChain := os.Getenv("paraChain"); envSelectedParaChain != "" {
 			selectedParaChain = envSelectedParaChain
 		} else {
 			// If not provided, set a default value
@@ -1177,9 +1240,33 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		}
 
 		relayChainNames := []string{"kusama", "polkadot"}
+
+		// Validate relayChain before running tests
+		if selectedRelayChain != "default" {
+			validRelayChain := false
+			for _, relayChainName := range relayChainNames {
+				if selectedRelayChain == relayChainName {
+					validRelayChain = true
+					break
+				}
+			}
+			if !validRelayChain {
+				fmt.Printf("Error: Invalid relayChain selected: %s. Expected one of %v\n", selectedRelayChain, relayChainNames)
+				log.Fatal("Tests cannot be run because an invalid relayChain is selected.")
+			}
+		}
+
+		//Validate paraChain before running tests
+		if selectedParaChain == "default" && selectedRelayChain == "default" {
+			fmt.Println("Error: Atleast relay chain should be given. ")
+			log.Fatal("Tests cannot be run because relayChain is missing.")
+			return // Added return to stop further execution
+		}
+
 		for _, relayChainName := range relayChainNames {
 			if selectedRelayChain != "default" && selectedRelayChain != relayChainName {
 				continue // Skip tests if the selected chain doesn't match the loop chain
+
 			}
 
 			relayChainName := relayChainName // Capture the loop variable
@@ -1187,21 +1274,38 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			var paraChainNames []string
 
 			if relayChainName == "kusama" {
-				paraChainNames = []string{"Karura", "Kintsugi-BTC", "Altair", "Bifrost", "Mangata", "Robonomics", "Turing Network", "Encointer Network", "Bajun Networkc", "Calamari", "Khala Network", "Litmus", "Moonriver", "subzero"}
+				paraChainNames = []string{"karura", "kintsugi-BTC", "altair", "bifrost", "mangata", "robonomics", "turing-network", "encointer-Network", "bajun-networkc", "calamari", "khala-network", "litmus", "moonriver", "subzero"}
 			} else if relayChainName == "polkadot" {
-				paraChainNames = []string{"Polkadex", "Zeitgeist", "Acala", "Bifrost", "Clover", "Integritee Shell", "Integritee Shell", "Litentry", "Moonbeam", "Nodle", "Pendulum", "Ajuna Network", "Centrifuge", "Frequency", "Interlay", "Kylin", "Manta", "Moonsama", "Parallel", "Phala Network", "Subsocial"}
+				paraChainNames = []string{"Polkadex", "zeitgeist", "acala", "bifrost", "clover", "integritee-shell", "integritee-shell", "litentry", "moonbeam", "nodle", "pendulum", "ajuna-network", "centrifuge", "frequency", "interlay", "kylin", "manta", "moonsama", "parallel", "phala-network", "subsocial"}
 			} else {
-				paraChainNames = []string{"Polkadex", "Zeitgeist", "Karura", "Kintsugi-BTC", "Altair", "Bifrost", "Mangata", "Robonomics", "Turing Network", "Encointer Network", "Bajun Networkc", "Calamari", "Khala Network", "Litmus", "Moonriver", "subzero", "Acala", "Bifrost", "Clover", "Integritee Shell", "Integritee Shell", "Litentry", "Moonbeam", "Nodle", "Pendulum", "Ajuna Network", "Centrifuge", "Frequency", "Interlay", "Kylin", "Manta", "Moonsama", "Parallel", "Phala Network", "Subsocial"}
+				paraChainNames = []string{"polkadex", "zeitgeist", "karura", "kintsugi-btc", "altair", "bifrost", "mangata", "robonomics", "turing-network", "encointer-network", "bajun-networkc", "calamari", "khala-network", "litmus", "moonriver", "subzero", "acala", "bifrost", "clover", "integritee-shell", "integritee-shell", "litentry", "moonbeam", "nodle", "pendulum", "ajuna-network", "centrifuge", "frequency", "interlay", "kylin", "manta", "moonsama", "parallel", "phala-network", "subsocial"}
+			}
+
+			// Validate paraChain before running tests
+			if selectedParaChain != "default" {
+				validParaChain := false
+				for _, paraChainName := range paraChainNames {
+					if selectedParaChain == paraChainName {
+						validParaChain = true
+						break
+					}
+				}
+				if !validParaChain {
+					fmt.Printf("Error: Invalid paraChain selected: %s. Expected a valid parachain name\n", selectedParaChain)
+					log.Fatal("Tests cannot be run because an invalid paraChain is selected.")
+				}
 			}
 
 			for _, paraChainName := range paraChainNames {
 				if selectedParaChain != "default" && selectedParaChain != paraChainName {
-					continue // Skip tests if the selected parachain doesn't match the loop parachain
+					continue
 				}
 
+				paraChainName := paraChainName
 				ginkgo.It("should run single relaychain and parachain  in testnet with verbose flag enabled for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-n", "testnet", "--vebose", "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-n", "testnet", "--verbose", "--enclaveName", enclaveName)
+					fmt.Println(cmd)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
@@ -1222,7 +1326,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				})
 				ginkgo.It("should run single relaychain and parachain in mainnet with explorer services for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName,  "-n", "mainnet", "--explorer", "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-n", "mainnet", "--explorer", "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
@@ -1236,35 +1340,48 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				})
 				ginkgo.It("should run custom relaychain and parachain in testnet with verbose flag enabled for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", "./sample-jsons/local.json", "--enclaveName", enclaveName)
+					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "testnet", "rococo","karura", false, false)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
 				})
 				ginkgo.It("should run custom relaychain and  parachain in mainnet for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", "./sample-jsons/local.json", "--enclaveName", enclaveName)
+					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "mainnet", "polkadot","karura", false, false)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
 				})
 				ginkgo.It("should run custom relaychain and  parachain in local for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", "./sample-jsons/local.json", "--enclaveName", enclaveName)
+					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "local", "rococo-local","karura", false, false)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
 				})
 				ginkgo.It("should run custom relaychain and  parachain in mainnet  with explorer services for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", "./sample-jsons/local.json", "--enclaveName", enclaveName)
+					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "mainnet", "polkadot","frequency", true, false)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
 				})
 				ginkgo.It("should run custom relaychain and parachain in mainnet  with metrics services for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", "./sample-jsons/local.json", "--enclaveName", enclaveName)
+					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "mainnet", "polkadot","frequency", true, false)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", config, "--enclaveName", enclaveName)
+					err := cmd.Run()
+					gomega.Expect(err).NotTo(gomega.HaveOccurred())
+					dive.Clean(enclaveName)
+				})
+				ginkgo.It("should run custom relaychain and parachain in mainnet with explorer and metrics services for "+relayChainName+" and "+paraChainName, func() {
+					enclaveName := dive.GenerateRandomName()
+					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "mainnet", "polkadot","frequency", true, true)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
@@ -1273,5 +1390,3 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		}
 	})
 })
-
-
