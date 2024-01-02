@@ -976,14 +976,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				dive.Clean(enclaveName)
 			})
 
-			ginkgo.It("should run single relaychain in localnet for "+relayChainName, func() {
-				enclaveName := dive.GenerateRandomName()
-				cmd.Args = append(cmd.Args, "chain", relayChainName, "-n", "local", "--enclaveName", enclaveName)
-				err := cmd.Run()
-				gomega.Expect(err).NotTo(gomega.HaveOccurred())
-				dive.Clean(enclaveName)
-			})
-
 			ginkgo.It("should run single relaychain in mainnet for "+relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
 				cmd.Args = append(cmd.Args, "chain", relayChainName, "-n", "mainnet", "--enclaveName", enclaveName)
@@ -1000,17 +992,17 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				dive.Clean(enclaveName)
 			})
 
-			ginkgo.It("should run custom relaychain in localnet with verbose enabled for "+relayChainName, func() {
+			ginkgo.It("should run custom relaychain in localnet for "+relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
 				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "local", "rococo-local", false, false)
-				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--verbose", "--enclaveName", enclaveName)
+				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 				err := cmd.Run()
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 				defer os.Remove(config)
 				dive.Clean(enclaveName)
 			})
 
-			ginkgo.It("should run custom relaychain in testnet"+relayChainName, func() {
+			ginkgo.It("should run custom relaychain in testnet"  +relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
 				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "testnet", "rococo", false, false)
 				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
@@ -1020,9 +1012,9 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				dive.Clean(enclaveName)
 			})
 
-			ginkgo.It("should run custom relaychain in testnet"+relayChainName, func() {
+			ginkgo.It("should run custom relaychain in mainnet"  +relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
-				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "testnet", "kusama", false, false)
+				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "mainnet", "kusama", false, false)
 				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 				err := cmd.Run()
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -1030,39 +1022,11 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				dive.Clean(enclaveName)
 			})
 
-			ginkgo.It("should run single relaychain with explorer service for "+relayChainName, func() {
+			ginkgo.It("should run single relaychain with explorer and metrix service for "+relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
-				cmd.Args = append(cmd.Args, "chain", relayChainName, "--explorer", "--enclaveName", enclaveName)
+				cmd.Args = append(cmd.Args, "chain", relayChainName, "--explorer","--metrics", "--enclaveName", enclaveName)
 				err := cmd.Run()
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
-				dive.Clean(enclaveName)
-			})
-
-			ginkgo.It("should run single relaychain with metrics service for "+relayChainName, func() {
-				enclaveName := dive.GenerateRandomName()
-				cmd.Args = append(cmd.Args, "chain", relayChainName, "--metrics", "--enclaveName", enclaveName)
-				err := cmd.Run()
-				gomega.Expect(err).NotTo(gomega.HaveOccurred())
-				dive.Clean(enclaveName)
-			})
-
-			ginkgo.It("should run custom relaychain with explorer service in testnet for "+relayChainName, func() {
-				enclaveName := dive.GenerateRandomName()
-				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "testnet", "rococo", true, false)
-				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
-				err := cmd.Run()
-				gomega.Expect(err).NotTo(gomega.HaveOccurred())
-				defer os.Remove(config)
-				dive.Clean(enclaveName)
-			})
-
-			ginkgo.It("should run custom relaychain with metrics service in testnet for "+relayChainName, func() {
-				enclaveName := dive.GenerateRandomName()
-				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "testnet", "rococo", false, true)
-				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
-				err := cmd.Run()
-				gomega.Expect(err).NotTo(gomega.HaveOccurred())
-				defer os.Remove(config)
 				dive.Clean(enclaveName)
 			})
 			ginkgo.It("should run custom relaychain with explorer services and metrics service in testnet for "+relayChainName, func() {
@@ -1186,7 +1150,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom parachain in testnet with verbose flag enabled for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "karura", false, false)
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					defer os.Remove(config)
@@ -1195,7 +1159,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom parachain in mainnet for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "karura", false, false)
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					defer os.Remove(config)
@@ -1204,7 +1168,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom parachain in mainnet with explorer services for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "karura", true, false)
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					defer os.Remove(config)
@@ -1213,7 +1177,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom parachain in mainnet with metrics services for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "karura", false, true)
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					defer os.Remove(config)
@@ -1222,7 +1186,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom parachain in mainnet with explorer and metrics services for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "karura",true, true)
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					defer os.Remove(config)
@@ -1351,7 +1315,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom relaychain and parachain in testnet with verbose flag enabled for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "testnet", "rococo","karura", false, false)
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", config, "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					defer os.Remove(config)
@@ -1360,7 +1324,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom relaychain and  parachain in mainnet for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "mainnet", "polkadot","karura", false, false)
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", config, "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName,  "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					defer os.Remove(config)
@@ -1369,7 +1333,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom relaychain and  parachain in local for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "local", "rococo-local","karura", false, false)
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", config, "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					defer os.Remove(config)
@@ -1378,7 +1342,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom relaychain and  parachain in mainnet  with explorer services for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "mainnet", "polkadot","frequency", true, false)
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", config, "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName,"-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					defer os.Remove(config)
@@ -1387,7 +1351,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom relaychain and parachain in mainnet  with metrics services for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "mainnet", "polkadot","frequency", true, false)
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", config, "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					defer os.Remove(config)
@@ -1396,7 +1360,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom relaychain and parachain in mainnet with explorer and metrics services for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "mainnet", "polkadot","frequency", true, true)
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-c", config, "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName,  "-c", config, "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					defer os.Remove(config)
