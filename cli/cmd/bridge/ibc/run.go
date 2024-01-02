@@ -6,25 +6,9 @@ import (
 	chainutil "github.com/hugobyte/dive-core/cli/cmd/chains/utils"
 
 	"github.com/hugobyte/dive-core/cli/cmd/bridge/utils"
-	"github.com/hugobyte/dive-core/cli/cmd/chains/archway"
-	"github.com/hugobyte/dive-core/cli/cmd/chains/icon"
-	"github.com/hugobyte/dive-core/cli/cmd/chains/neutron"
 	"github.com/hugobyte/dive-core/cli/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 )
-
-var runChain = map[string]func(cli *common.Cli) (*common.DiveServiceResponse, error){
-	"icon": func(cli *common.Cli) (*common.DiveServiceResponse, error) {
-		return icon.RunIconNode(cli)
-	},
-	"archway": func(cli *common.Cli) (*common.DiveServiceResponse, error) {
-		return archway.RunArchway(cli)
-
-	},
-	"neutron": func(cli *common.Cli) (*common.DiveServiceResponse, error) {
-		return neutron.RunNeutron(cli)
-	},
-}
 
 func RunIbcRelay(cli *common.Cli) (string, error) {
 	var starlarkExecutionResponse string

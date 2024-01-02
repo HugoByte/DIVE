@@ -39,13 +39,26 @@ func neutron(cmd *cobra.Command, args []string) {
 	if err != nil {
 		cliContext.Fatal(err)
 	}
-	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)
+
+	enclaves, err := cliContext.Context().GetEnclaves()
+	if err != nil {
+		cliContext.Fatal(err)
+	}
+
+	var ShortUuid string
+	for _, enclave := range enclaves {
+		if enclave.Name == common.EnclaveName {
+			ShortUuid = enclave.ShortUuid
+		}
+	}
+
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, ShortUuid)
 
 	err = common.WriteServiceResponseData(response.ServiceName, *response, cliContext, serviceFileName)
 	if err != nil {
 		cliContext.Fatal(err)
 	}
-	stopMessage := fmt.Sprintf("Neutron Node Started. Please find service details in current working directory(%s)", serviceFileName)
+	stopMessage := fmt.Sprintf("Neutron Node Started. Please find service details in current working directory(%s)\n", serviceFileName)
 	cliContext.Spinner().StopWithMessage(stopMessage)
 
 }

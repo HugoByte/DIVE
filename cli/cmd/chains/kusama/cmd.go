@@ -24,6 +24,9 @@ const (
 	runUploadFiles                    = "upload_files"
 	runKusamaParaLocalFunctionName    = "start_nodes"
 	runKusamaParaTestMainFunctionName = "run_testnet_mainnet"
+	runKusamaExplorer                 = "run_pokadot_js_app"
+	runKusamaPrometheus               = "launch_prometheus"
+	runKusamaGrafana                  = "launch_grafana"
 )
 
 var KusamaCmd = common.NewDiveCommandBuilder().
@@ -59,7 +62,19 @@ func kusama(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)
+	enclaves, err := cliContext.Context().GetEnclaves()
+	if err != nil {
+		cliContext.Fatal(err)
+	}
+
+	var ShortUuid string
+	for _, enclave := range enclaves {
+		if enclave.Name == common.EnclaveName {
+			ShortUuid = enclave.ShortUuid
+		}
+	}
+
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, ShortUuid)
 
 	for serviceName := range response.Dive {
 		err = common.WriteServiceResponseData(response.Dive[serviceName].ServiceName, *response.Dive[serviceName], cliContext, serviceFileName)
@@ -67,6 +82,6 @@ func kusama(cmd *cobra.Command, args []string) {
 			cliContext.Fatal(err)
 		}
 	}
-	stopMessage := fmt.Sprintf("Kusama Node Started. Please find service details in current working directory(%s)", serviceFileName)
+	stopMessage := fmt.Sprintf("Kusama Node Started. Please find service details in current working directory(%s)\n", serviceFileName)
 	cliContext.Spinner().StopWithMessage(stopMessage)
 }

@@ -19,6 +19,7 @@ type DiveServiceResponse struct {
 	Prometheus         bool   `json:"prometheus,omitempty"`
 	IpAddress          string `json:"ip_address,omitempty"`
 	Node               string `json:"node-type,omitempty"`
+	PrometheusPort     int    `json:"prometheus_port,omitempty"`
 }
 
 type DiveMultipleServiceResponse struct {
@@ -50,6 +51,16 @@ func (dive *DiveMultipleServiceResponse) Decode(responseData []byte) (*DiveMulti
 func (dive *DiveServiceResponse) EncodeToString() (string, error) {
 
 	encodedBytes, err := json.Marshal(dive)
+	if err != nil {
+		return "", WrapMessageToError(ErrDataMarshall, err.Error())
+	}
+
+	return string(encodedBytes), nil
+}
+
+func (dive *DiveMultipleServiceResponse) EncodeToString() (string, error) {
+
+	encodedBytes, err := json.Marshal(&dive.Dive)
 	if err != nil {
 		return "", WrapMessageToError(ErrDataMarshall, err.Error())
 	}

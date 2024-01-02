@@ -21,13 +21,16 @@ const (
 	DivePolkadotParachainNodeSetup     = "/parachain/parachain.star"
 	DivePolkadotRelayNodeSetupScript   = "/relaychain/relay-chain.star"
 	DivePolkaDotUtilsPath              = "/package_io/utils.star"
+	DivePolkaDotExplorerPath           = "/package_io/polkadot_js_app.star"
+	DivePolkaDotPrometheusPath         = "/package_io/promethues.star"
+	DivePolkaDotGrafanaPath            = "/package_io/grafana.star"
 	DiveDryRun                         = false
 	DiveDefaultParallelism             = 4
 	DiveLogDirectory                   = "/logs/"
 	DiveDitLogFile                     = "dive.log"
 	DiveErrorLogFile                   = "error.log"
-	DiveOutFile                        = "dive_%s.json"
-	ServiceFilePath                    = "services_%s.json"
+	DiveOutFile                        = "dive_%s_%s.json"
+	ServiceFilePath                    = "services_%s_%s.json"
 	DiveAppDir                         = ".dive"
 	removeServiceStarlarkScript        = `
 def run(plan,args):

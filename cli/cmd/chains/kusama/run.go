@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
+	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/starlark_run_config"
 
 	"github.com/hugobyte/dive-core/cli/cmd/chains/utils"
 	"github.com/hugobyte/dive-core/cli/common"
-	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/starlark_run_config"
 )
 
 const (
@@ -63,6 +63,9 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 
 	KusamaResponseData := &common.DiveMultipleServiceResponse{}
 	paraResult := &common.DiveMultipleServiceResponse{}
+	finalResult := &common.DiveMultipleServiceResponse{}
+	explorerResult := &common.DiveMultipleServiceResponse{}
+	metricsResult := &common.DiveMultipleServiceResponse{}
 
 	runConfig := getKusamaRunConfig(serviceConfig, enclaveContext, param)
 	response, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.PolkadotRemotePackagePath, runConfig)
@@ -88,6 +91,8 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Kusama Run Failed ")
 	}
 
+	finalResult = result
+
 	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
 		if len(serviceConfig.Para) != 0 && serviceConfig.Para[0].Name != "" {
 			ipAddress, err := GetIPAddress(cli, serviceConfig, true, result)
@@ -98,6 +103,8 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 			if err != nil {
 				return nil, err
 			}
+			finalResult = ConcatenateDiveResults(result, paraResult)
+
 		} else {
 			return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Kusama Already Running")
 		}
@@ -111,10 +118,25 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 			if err != nil {
 				return nil, err
 			}
+			finalResult = ConcatenateDiveResults(result, paraResult)
 		}
 	}
 
-	finalResult := ConcatenateDiveResults(result, paraResult)
+	if metrics {
+		metricsResult, err = startMetrics(cli, enclaveContext, para, finalResult)
+		finalResult = ConcatenateDiveResults(finalResult, metricsResult)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if explorer {
+		explorerResult, err = startExplorer(cli, enclaveContext)
+		if err != nil {
+			return nil, err
+		}
+		finalResult = ConcatenateDiveResults(finalResult, explorerResult)
+	}
 
 	return finalResult, nil
 }
@@ -182,16 +204,22 @@ func runParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, serv
 	return resultPara, nil
 }
 
-func ConcatenateDiveResults(result, paraResult *common.DiveMultipleServiceResponse) *common.DiveMultipleServiceResponse {
+func ConcatenateDiveResults(result1, result2 *common.DiveMultipleServiceResponse) *common.DiveMultipleServiceResponse {
+	if result1 == nil {
+		return result2
+	} else if result2 == nil {
+		return result1
+	}
+
 	concatenatedResult := &common.DiveMultipleServiceResponse{
 		Dive: make(map[string]*common.DiveServiceResponse),
 	}
 
-	for key, value := range result.Dive {
+	for key, value := range result1.Dive {
 		concatenatedResult.Dive[key] = value
 	}
 
-	for key, value := range paraResult.Dive {
+	for key, value := range result2.Dive {
 		concatenatedResult.Dive[key] = value
 	}
 
@@ -252,8 +280,10 @@ func configureMetrics(serviceConfig *utils.PolkadotServiceConfig) {
 	for i := range serviceConfig.RelayChain.Nodes {
 		serviceConfig.RelayChain.Nodes[i].Prometheus = true
 	}
-	for i := range serviceConfig.Para[0].Nodes {
-		serviceConfig.Para[0].Nodes[i].Prometheus = true
+	if len(serviceConfig.Para) != 0 {
+		for i := range serviceConfig.Para[0].Nodes {
+			serviceConfig.Para[0].Nodes[i].Prometheus = true
+		}
 	}
 }
 
@@ -280,16 +310,6 @@ func getKusamaRunConfig(serviceConfig *utils.PolkadotServiceConfig, enclaveConte
 	}
 }
 
-func uploadFiles(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext) error {
-	runConfig := common.GetStarlarkRunConfig("{}", common.DivePolkaDotUtilsPath, runUploadFiles)
-	_, err := enclaveCtx.RunStarlarkRemotePackageBlocking(cli.Context().GetContext(), common.PolkadotRemotePackagePath, runConfig)
-	if err != nil {
-		return common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
-	}
-
-	return nil
-}
-
 func getParaRunConfig(serviceConfig *utils.PolkadotServiceConfig, enclaveContext *enclaves.EnclaveContext, para string) *starlark_run_config.StarlarkRunConfig {
 	if len(serviceConfig.Para) != 0 && serviceConfig.Para[0].Name != "" {
 		if serviceConfig.ChainType == localChain {
@@ -309,9 +329,21 @@ func GetIPAddress(cli *common.Cli, serviceConfig *utils.PolkadotServiceConfig, r
 		if relayReRun {
 			nodename = serviceConfig.RelayChain.Nodes[0].Name
 			var services = common.Services{}
-			serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)
 
-			err := cli.FileHandler().ReadJson(serviceFileName, &serviceConfig)
+			enclaves, err := cli.Context().GetEnclaves()
+			if err != nil {
+				cli.Fatal(err)
+			}
+
+			var ShortUuid string
+			for _, enclave := range enclaves {
+				if enclave.Name == common.EnclaveName {
+					ShortUuid = enclave.ShortUuid
+				}
+			}
+			serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, ShortUuid)
+
+			err = cli.FileHandler().ReadJson(serviceFileName, &services)
 			if err != nil {
 				return "", err
 			}
@@ -331,4 +363,120 @@ func GetIPAddress(cli *common.Cli, serviceConfig *utils.PolkadotServiceConfig, r
 		}
 	}
 	return "", nil
+}
+
+func uploadFiles(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext) error {
+	runConfig := common.GetStarlarkRunConfig("{}", common.DivePolkaDotUtilsPath, runUploadFiles)
+	_, err := enclaveCtx.RunStarlarkRemotePackageBlocking(cli.Context().GetContext(), common.PolkadotRemotePackagePath, runConfig)
+	if err != nil {
+		return common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
+	}
+
+	return nil
+}
+
+func startExplorer(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext) (*common.DiveMultipleServiceResponse, error) {
+	explorerResponseData := &common.DiveMultipleServiceResponse{}
+
+	para := `{"ws_url":"ws://127.0.0.1:9944"}`
+	runConfig := common.GetStarlarkRunConfig(para, common.DivePolkaDotExplorerPath, runKusamaExplorer)
+	explorerResponse, _, err := enclaveCtx.RunStarlarkRemotePackage(cli.Context().GetContext(), common.PolkadotRemotePackagePath, runConfig)
+	if err != nil {
+		return nil, common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
+	}
+
+	responseData, services, skippedInstructions, err := common.GetSerializedData(cli, explorerResponse)
+	if err != nil {
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
+		if errRemove != nil {
+			return nil, common.WrapMessageToError(errRemove, "Explorer Run Failed ")
+		}
+		return nil, common.WrapMessageToError(err, "Explorer Run Failed ")
+	}
+
+	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
+		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Explorer Already Running")
+	}
+
+	result, err := explorerResponseData.Decode([]byte(responseData))
+	if err != nil {
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
+		if errRemove != nil {
+			return nil, common.WrapMessageToError(errRemove, "Explorer Run Failed ")
+		}
+		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Explorer Run Failed ")
+	}
+
+	return result, nil
+}
+
+func startMetrics(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, para string, final_result *common.DiveMultipleServiceResponse) (*common.DiveMultipleServiceResponse, error) {
+	prometheus := &common.DiveMultipleServiceResponse{}
+	grafana := &common.DiveMultipleServiceResponse{}
+
+	service_details, err := final_result.EncodeToString()
+	if err != nil {
+		return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+	}
+
+	paraPrometheus := fmt.Sprintf(`{"args":%s, "service_details":%s}`, para, service_details)
+	runConfig := common.GetStarlarkRunConfig(paraPrometheus, common.DivePolkaDotPrometheusPath, runKusamaPrometheus)
+	prometheusResponse, _, err := enclaveCtx.RunStarlarkRemotePackage(cli.Context().GetContext(), common.PolkadotRemotePackagePath, runConfig)
+	if err != nil {
+		return nil, common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
+	}
+
+	prometheusResponseData, services, skippedInstructions, err := common.GetSerializedData(cli, prometheusResponse)
+	if err != nil {
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
+		if errRemove != nil {
+			return nil, common.WrapMessageToError(errRemove, "Prometheus Run Failed ")
+		}
+		return nil, common.WrapMessageToError(err, "Prometheus Run Failed ")
+	}
+
+	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
+		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Prometheus Already Running")
+	}
+
+	prometheusResult, err := prometheus.Decode([]byte(prometheusResponseData))
+	if err != nil {
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
+		if errRemove != nil {
+			return nil, common.WrapMessageToError(errRemove, "Prometheus Run Failed ")
+		}
+		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Prometheus Run Failed ")
+	}
+
+	paraGrafana := `{"args":{}}`
+	runConfigGrafana := common.GetStarlarkRunConfig(paraGrafana, common.DivePolkaDotGrafanaPath, runKusamaGrafana)
+	grafanaResponse, _, err := enclaveCtx.RunStarlarkRemotePackage(cli.Context().GetContext(), common.PolkadotRemotePackagePath, runConfigGrafana)
+	if err != nil {
+		return nil, common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
+	}
+
+	grafanaResponseData, services, skippedInstructions, err := common.GetSerializedData(cli, grafanaResponse)
+	if err != nil {
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
+		if errRemove != nil {
+			return nil, common.WrapMessageToError(errRemove, "Grafana Run Failed ")
+		}
+		return nil, common.WrapMessageToError(err, "Grafana Run Failed ")
+	}
+
+	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
+		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Grafana Already Running")
+	}
+
+	grafanaResult, err := grafana.Decode([]byte(grafanaResponseData))
+	if err != nil {
+		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
+		if errRemove != nil {
+			return nil, common.WrapMessageToError(errRemove, "Grafana Run Failed ")
+		}
+		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Grafana Run Failed ")
+	}
+
+	result := ConcatenateDiveResults(prometheusResult, grafanaResult)
+	return result, nil
 }
