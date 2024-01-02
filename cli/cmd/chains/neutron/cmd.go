@@ -40,19 +40,12 @@ func neutron(cmd *cobra.Command, args []string) {
 		cliContext.Fatal(err)
 	}
 
-	enclaves, err := cliContext.Context().GetEnclaves()
+	shortUuid, err := cliContext.Context().GetShortUuid(common.EnclaveName)
 	if err != nil {
 		cliContext.Fatal(err)
 	}
 
-	var ShortUuid string
-	for _, enclave := range enclaves {
-		if enclave.Name == common.EnclaveName {
-			ShortUuid = enclave.ShortUuid
-		}
-	}
-
-	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, ShortUuid)
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, shortUuid)
 
 	err = common.WriteServiceResponseData(response.ServiceName, *response, cliContext, serviceFileName)
 	if err != nil {

@@ -43,19 +43,12 @@ func ibcRelay(cmd *cobra.Command, args []string) {
 		cliContext.Fatal(err)
 	}
 
-	enclaves, err := cliContext.Context().GetEnclaves()
+	shortUuid, err := cliContext.Context().GetShortUuid(common.EnclaveName)
 	if err != nil {
 		cliContext.Fatal(err)
 	}
 
-	var ShortUuid string
-	for _, enclave := range enclaves {
-		if enclave.Name == common.EnclaveName {
-			ShortUuid = enclave.ShortUuid
-		}
-	}
-
-	serviceFileName := fmt.Sprintf(common.DiveOutFile, common.EnclaveName, ShortUuid)
+	serviceFileName := fmt.Sprintf(common.DiveOutFile, common.EnclaveName, shortUuid)
 
 	err = cliContext.FileHandler().WriteFile(serviceFileName, []byte(result))
 	if err != nil {

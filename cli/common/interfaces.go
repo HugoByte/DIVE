@@ -116,6 +116,9 @@ type Context interface {
 	// CreateEnclave creates a new enclave with the specified name and returns its context.
 	CreateEnclave(enclaveName string) (*enclaves.EnclaveContext, error)
 
+	// Get the short UUID of the given enclave.
+	GetShortUuid(enclaveName string) (string, error)
+
 	// Exit terminates the execution of the context with the given status code.
 	Exit(statusCode int)
 }

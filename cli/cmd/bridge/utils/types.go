@@ -58,18 +58,13 @@ func (chains *Chains) GetIbcRelayParams(src_service_config string, dst_service_c
 func (chains *Chains) GetServicesResponse(cli *common.Cli) (string, string, error) {
 
 	var serviceConfig = common.Services{}
-	enclaves, err := cli.Context().GetEnclaves()
+	
+	shortUuid, err := cli.Context().GetShortUuid(common.EnclaveName)
 	if err != nil {
-		cli.Fatal(err)
+		return "", "", fmt.Errorf("failed to get short uuid of enclave")
 	}
 
-	var ShortUuid string
-	for _, enclave := range enclaves {
-		if enclave.Name == common.EnclaveName {
-			ShortUuid = enclave.ShortUuid
-		}
-	}
-	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, ShortUuid)
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, shortUuid)
 
 	err = cli.FileHandler().ReadJson(serviceFileName, &serviceConfig)
 

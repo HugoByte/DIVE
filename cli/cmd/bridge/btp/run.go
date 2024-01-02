@@ -139,18 +139,12 @@ func runBtpSetupWhenSingleChainRunning(cli *common.Cli, enclaveContext *enclaves
 	var chainAServiceResponse, chainBServiceResponse, response string
 	var services = common.Services{}
 
-	enclaves, err := cli.Context().GetEnclaves()
+	shortUuid, err := cli.Context().GetShortUuid(common.EnclaveName)
 	if err != nil {
-		cli.Fatal(err)
+		return "", common.WrapMessageToError(err, "Failed to get enclave UUID")
 	}
 
-	var ShortUuid string
-	for _, enclave := range enclaves {
-		if enclave.Name == common.EnclaveName {
-			ShortUuid = enclave.ShortUuid
-		}
-	}
-	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, ShortUuid)
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, shortUuid)
 
 	err = cli.FileHandler().ReadJson(serviceFileName, &services)
 

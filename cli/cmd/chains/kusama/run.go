@@ -330,18 +330,11 @@ func GetIPAddress(cli *common.Cli, serviceConfig *utils.PolkadotServiceConfig, r
 			nodename = serviceConfig.RelayChain.Nodes[0].Name
 			var services = common.Services{}
 
-			enclaves, err := cli.Context().GetEnclaves()
+			shortUuid, err := cli.Context().GetShortUuid(common.EnclaveName)
 			if err != nil {
-				cli.Fatal(err)
+				return "", fmt.Errorf("failed to get uuid of enclave")
 			}
-
-			var ShortUuid string
-			for _, enclave := range enclaves {
-				if enclave.Name == common.EnclaveName {
-					ShortUuid = enclave.ShortUuid
-				}
-			}
-			serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, ShortUuid)
+			serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, shortUuid)
 
 			err = cli.FileHandler().ReadJson(serviceFileName, &services)
 			if err != nil {
