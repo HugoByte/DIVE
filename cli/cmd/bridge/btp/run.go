@@ -298,7 +298,7 @@ func getServiceConfigForHardhatChain() (string, error) {
 
 func runBtpSetupForAlreadyRunningNodes(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, mainFunctionName string, srcChain string, dstChain string, bridge bool, srcChainServiceResponse string, dstChainServiceResponse string) (string, error) {
 
-	params := fmt.Sprintf(`{"src_chain":"%s","dst_chain":"%s", "src_chain_config":%s, "dst_chain_config":%s, "bridge":%s}`, chainA, chainB, srcChainServiceResponse, dstChainServiceResponse, strconv.FormatBool(bridge))
+	params := fmt.Sprintf(`{"src_chain":"%s","dst_chain":"%s", "src_chain_config":%s, "dst_chain_config":%s, "bridge":%s}`, srcChain, dstChain, srcChainServiceResponse, dstChainServiceResponse, strconv.FormatBool(bridge))
 	starlarkConfig := common.GetStarlarkRunConfig(params, common.DiveBridgeBtpScript, mainFunctionName)
 	executionData, _, err := enclaveCtx.RunStarlarkRemotePackage(cli.Context().GetContext(), common.DiveRemotePackagePath, starlarkConfig)
 
