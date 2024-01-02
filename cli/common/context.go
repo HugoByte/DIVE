@@ -295,3 +295,19 @@ func (dc *diveContext) RemoveServicesByServiceNames(services map[string]string, 
 func (dc *diveContext) Exit(statusCode int) {
 	os.Exit(statusCode)
 }
+
+func (dc *diveContext) GetShortUuid(enclaveName string) (string, error) {
+	enclaves, err := dc.GetEnclaves()
+	if err != nil {
+		return "", err
+	}
+
+	var shortUuid string
+	for _, enclave := range enclaves {
+		if enclave.Name == enclaveName {
+			shortUuid = enclave.ShortUuid
+		}
+	}
+	
+	return shortUuid, nil
+}

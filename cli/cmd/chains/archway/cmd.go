@@ -42,7 +42,12 @@ func archway(cmd *cobra.Command, args []string) {
 		cliContext.Fatal(err)
 	}
 
-	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)
+	shortUuid, err := cliContext.Context().GetShortUuid(common.EnclaveName)
+	if err != nil {
+		cliContext.Fatal(err)
+	}
+
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, shortUuid)
 
 	err = common.WriteServiceResponseData(response.ServiceName, *response, cliContext, serviceFileName)
 	if err != nil {
@@ -50,7 +55,7 @@ func archway(cmd *cobra.Command, args []string) {
 
 	}
 
-	stopMessage := fmt.Sprintf("Archway Node Started. Please find service details in current working directory(%s)", serviceFileName)
+	stopMessage := fmt.Sprintf("Archway Node Started. Please find service details in current working directory(%s)\n", serviceFileName)
 	cliContext.StopSpinnerIfNotVerbose(stopMessage, common.DiveLogs)
 
 }

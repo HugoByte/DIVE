@@ -54,7 +54,12 @@ func polkadot(cmd *cobra.Command, args []string) {
 		cliContext.Fatal(err)
 	}
 
-	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)
+	shortUuid, err := cliContext.Context().GetShortUuid(common.EnclaveName)
+	if err != nil {
+		cliContext.Fatal(err)
+	}
+
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, shortUuid)
 
 	fmt.Print(response.Dive)
 	for serviceName := range response.Dive {
@@ -64,6 +69,6 @@ func polkadot(cmd *cobra.Command, args []string) {
 			cliContext.Fatal(err)
 		}
 	}
-	stopMessage := fmt.Sprintf("Polkadot Node Started. Please find service details in current working directory(%s)", serviceFileName)
+	stopMessage := fmt.Sprintf("Polkadot Node Started. Please find service details in current working directory(%s)\n", serviceFileName)
 	cliContext.StopSpinnerIfNotVerbose(stopMessage, common.DiveLogs)
 }

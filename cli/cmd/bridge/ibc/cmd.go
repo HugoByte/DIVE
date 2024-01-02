@@ -43,12 +43,17 @@ func ibcRelay(cmd *cobra.Command, args []string) {
 		cliContext.Fatal(err)
 	}
 
-	serviceFileName := fmt.Sprintf(common.DiveOutFile, common.EnclaveName)
+	shortUuid, err := cliContext.Context().GetShortUuid(common.EnclaveName)
+	if err != nil {
+		cliContext.Fatal(err)
+	}
+
+	serviceFileName := fmt.Sprintf(common.DiveOutFile, common.EnclaveName, shortUuid)
 
 	err = cliContext.FileHandler().WriteFile(serviceFileName, []byte(result))
 	if err != nil {
 		cliContext.Fatal(err)
 	}
 
-	cliContext.StopSpinnerIfNotVerbose(fmt.Sprintf("IBC Setup Completed between %s and %s. Please find service details in current working directory(%s)", chainA, chainB, serviceFileName), common.DiveLogs)
+	cliContext.StopSpinnerIfNotVerbose(fmt.Sprintf("IBC Setup Completed between %s and %s. Please find service details in current working directory(%s)\n", chainA, chainB, serviceFileName), common.DiveLogs)
 }

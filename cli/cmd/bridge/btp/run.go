@@ -138,8 +138,15 @@ func runBtpSetupWhenChainsAreNotIcon(cli *common.Cli, enclaveContext *enclaves.E
 func runBtpSetupWhenSingleChainRunning(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, chains *utils.Chains, bridge bool) (string, error) {
 	var chainAServiceResponse, chainBServiceResponse, response string
 	var services = common.Services{}
-	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)
-	err := cli.FileHandler().ReadJson(serviceFileName, &services)
+
+	shortUuid, err := cli.Context().GetShortUuid(common.EnclaveName)
+	if err != nil {
+		return "", common.WrapMessageToError(err, "Failed to get enclave UUID")
+	}
+
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, shortUuid)
+
+	err = cli.FileHandler().ReadJson(serviceFileName, &services)
 
 	if err != nil {
 		return "", common.WrapMessageToError(err, fmt.Sprintf("BTP Setup Failed For ChainA %s and ChainB %s", chains.ChainA, chains.ChainB))

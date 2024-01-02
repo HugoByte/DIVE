@@ -83,7 +83,13 @@ func icon(cmd *cobra.Command, args []string) {
 		}
 
 	}
-	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName)
+
+	shortUuid, err := cliContext.Context().GetShortUuid(common.EnclaveName)
+	if err != nil {
+		cliContext.Fatal(err)
+	}
+
+	serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, shortUuid)
 
 	err = common.WriteServiceResponseData(response.ServiceName, *response, cliContext, serviceFileName)
 	if err != nil {
@@ -92,7 +98,7 @@ func icon(cmd *cobra.Command, args []string) {
 
 	}
 
-	stopMessage := fmt.Sprintf("Icon Node Started. Please find service details in current working directory(%s)", serviceFileName)
+	stopMessage := fmt.Sprintf("Icon Node Started. Please find service details in current working directory(%s)\n", serviceFileName)
 	cliContext.Spinner().StopWithMessage(stopMessage)
 
 }
