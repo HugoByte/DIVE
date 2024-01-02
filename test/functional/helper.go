@@ -8,7 +8,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sync"
-
 	"github.com/google/uuid"
 	"github.com/onsi/gomega"
 
@@ -402,3 +401,182 @@ func GetServiceDetails(servicesJson string, service string) (serviceName string,
 	return serviceName, endpoint, nid
 
 }
+
+type Configuration1 struct {
+	ChainType  string `json:"chain-type"`
+	RelayChain struct {
+		Name  string `json:"name"`
+		Nodes []struct {
+			Name       string `json:"name"`
+			NodeType   string `json:"node-type"`
+			Prometheus bool   `json:"prometheus"`
+		} `json:"nodes"`
+	} `json:"relaychain"`
+	Para []struct {
+		Name  string `json:"name"`
+		Nodes []struct {
+			Name       string `json:"name"`
+			NodeType   string `json:"node-type"`
+			Prometheus bool   `json:"prometheus"`
+		} `json:"nodes"`
+	} `json:"para"`
+	Explorer bool `json:"explorer"`
+	Unknown  json.RawMessage
+}
+
+func UpdateRelayChain(filePath, newChainType, newRelayChainName string, newExplorer, newPrometheus bool) string {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	fileContent, err := os.ReadFile(filePath)
+	if err != nil {
+		panic(err)
+	}
+
+	var local Configuration1
+	err = json.Unmarshal(fileContent, &local)
+	if err != nil {
+		panic(err)
+	}
+
+	// Update ChainType and RelayChain Name
+	local.ChainType = newChainType
+	local.RelayChain.Name = newRelayChainName
+	// Update Explorer
+	local.Explorer = newExplorer
+
+	for i := range local.RelayChain.Nodes {
+		local.RelayChain.Nodes[i].Prometheus = newPrometheus
+	}
+
+	// Update Prometheus for Para Nodes
+	for i := range local.Para {
+		for j := range local.Para[i].Nodes {
+			local.Para[i].Nodes[j].Prometheus = newPrometheus
+		}
+	}
+
+	updatedJSON, err := json.MarshalIndent(local, "", "    ")
+	if err != nil {
+		panic(err)
+	}
+
+	tmpfile, err := os.Create("updated-local.json")
+	if err != nil {
+		panic(err)
+	}
+	defer tmpfile.Close()
+
+	_, err = tmpfile.Write(updatedJSON)
+	if err != nil {
+		panic(err)
+	}
+
+	return tmpfile.Name()
+}
+
+
+func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bool) string {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	fileContent, err := os.ReadFile(filePath)
+	if err != nil {
+		panic(err)
+	}
+
+	var local Configuration1
+	err = json.Unmarshal(fileContent, &local)
+	if err != nil {
+		panic(err)
+	}
+
+	// Remove content inside RelayChain 
+	local.RelayChain = struct {
+		Name  string `json:"name"`
+		Nodes []struct {
+			Name       string `json:"name"`
+			NodeType   string `json:"node-type"`
+			Prometheus bool   `json:"prometheus"`
+		} `json:"nodes"`
+	}{}
+
+	// Update Name and Prometheus for Para Nodes
+	for i := range local.Para {
+		local.Para[i].Name = newParaName
+		for j := range local.Para[i].Nodes {
+			local.Para[i].Nodes[j].Prometheus = newPrometheus
+		}
+	}
+
+	updatedJSON, err := json.MarshalIndent(local, "", "    ")
+	if err != nil {
+		panic(err)
+	}
+
+	tmpfile, err := os.Create("updated-local.json")
+	if err != nil {
+		panic(err)
+	}
+	defer tmpfile.Close()
+
+	_, err = tmpfile.Write(updatedJSON)
+	if err != nil {
+		panic(err)
+	}
+
+	return tmpfile.Name()
+}
+
+func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName string, newExplorer, newPrometheus bool) string {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	fileContent, err := os.ReadFile(filePath)
+	if err != nil {
+		panic(err)
+	}
+
+	var local Configuration1
+	err = json.Unmarshal(fileContent, &local)
+	if err != nil {
+		panic(err)
+	}
+
+	// Update ChainType and RelayChain Name
+	local.ChainType = newChainType
+	local.RelayChain.Name = newRelayChainName
+	// Update Explorer
+	local.Explorer = newExplorer
+
+	for i := range local.RelayChain.Nodes {
+		local.RelayChain.Nodes[i].Prometheus = newPrometheus
+	}
+
+	// Update Name and Prometheus for Para Nodes
+	for i := range local.Para {
+		local.Para[i].Name = newParaName
+		for j := range local.Para[i].Nodes {
+			local.Para[i].Nodes[j].Prometheus = newPrometheus
+		}
+	}
+
+	updatedJSON, err := json.MarshalIndent(local, "", "    ")
+	if err != nil {
+		panic(err)
+	}
+
+	tmpfile, err := os.Create("updated-local.json")
+	if err != nil {
+		panic(err)
+	}
+	defer tmpfile.Close()
+
+	_, err = tmpfile.Write(updatedJSON)
+	if err != nil {
+		panic(err)
+	}
+
+	return tmpfile.Name()
+}
+
