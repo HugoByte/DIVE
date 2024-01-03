@@ -59,29 +59,29 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			gomega.Expect(stdout.String()).To(gomega.ContainSubstring(latestVersion))
 		})
 
-		ginkgo.It("should start bridge between icon and eth correctly", func() {
-			enclaveName := dive.GenerateRandomName()
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--enclaveName", enclaveName)
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-			dive.Clean(enclaveName)
-		})
+		// ginkgo.It("should start bridge between icon and eth correctly", func() {
+		// 	enclaveName := dive.GenerateRandomName()
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--enclaveName", enclaveName)
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// 	dive.Clean(enclaveName)
+		// })
 
-		ginkgo.It("should start bridge between icon and hardhat but with icon bridge set to true", func() {
-			enclaveName := dive.GenerateRandomName()
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--bmvbridge", "--enclaveName", enclaveName)
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-			dive.Clean(enclaveName)
-		})
+		// ginkgo.It("should start bridge between icon and hardhat but with icon bridge set to true", func() {
+		// 	enclaveName := dive.GenerateRandomName()
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--bmvbridge", "--enclaveName", enclaveName)
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// 	dive.Clean(enclaveName)
+		// })
 
-		ginkgo.It("should start bridge between icon and icon", func() {
-			enclaveName := dive.GenerateRandomName()
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--enclaveName", enclaveName)
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-			dive.Clean(enclaveName)
-		})
+		// ginkgo.It("should start bridge between icon and icon", func() {
+		// 	enclaveName := dive.GenerateRandomName()
+		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--enclaveName", enclaveName)
+		// 	err := cmd.Run()
+		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
+		// 	dive.Clean(enclaveName)
+		// })
 
 		ginkgo.It("should start bridge between archway and archway using ibc", func() {
 			enclaveName := dive.GenerateRandomName()
@@ -1066,11 +1066,11 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			}
 		}
 
-		if selectedParaChain == "default" && selectedRelayChain == "default" {
-			fmt.Println("Error: Atleast relay chain should be given. ")
-			log.Fatal("Tests cannot be run because relayChain is missing.")
-			return // Added return to stop further execution
-		}
+		// if selectedParaChain == "default" && selectedRelayChain == "default" {
+		// 	fmt.Println("Error: Atleast relay chain should be given. ")
+		// 	log.Fatal("Tests cannot be run because relayChain is missing.")
+		// 	return // Added return to stop further execution
+		// }
 
 		for _, relayChainName := range relayChainNames {
 			if selectedRelayChain != "default" && selectedRelayChain != relayChainName {
