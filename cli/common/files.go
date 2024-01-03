@@ -47,8 +47,13 @@ func (df *diveFileHandler) ReadJson(fileName string, obj interface{}) error {
 		if err != nil {
 			return WrapMessageToErrorf(ErrPath, "Failed to get present working dir %s", err.Error())
 		}
+		outputDirPath := filepath.Join(pwd, DiveOutFileDirectory, EnclaveName)
 
-		filePath = filepath.Join(pwd, fileName)
+		err = df.MkdirAll(outputDirPath, 0755)
+		if err != nil {
+			return WrapMessageToError(err, "Failed to Create Output Directory")
+		}
+		filePath = filepath.Join(outputDirPath, fileName)
 
 	}
 
@@ -129,7 +134,14 @@ func (df *diveFileHandler) WriteFile(fileName string, data []byte) error {
 	if err != nil {
 		return WrapMessageToErrorf(ErrWriteFile, "%s .Failed to Write File %s", err, fileName)
 	}
-	filePath := filepath.Join(pwd, fileName)
+	outputDirPath := filepath.Join(pwd, DiveOutFileDirectory, EnclaveName)
+
+	filePath := filepath.Join(outputDirPath, fileName)
+
+	err = df.MkdirAll(outputDirPath, 0755)
+	if err != nil {
+		return WrapMessageToError(err, "Failed to Create Output Directory")
+	}
 
 	file, err := df.OpenFile(filePath, "write|append|create|truncate", 0644)
 
@@ -295,6 +307,50 @@ func (df *diveFileHandler) RemoveFiles(fileNames []string) error {
 		}
 
 	}
+	return nil
+}
+
+// The `RemoveDir` function is a method of the `diveFileHandler` struct. It is responsible for
+// removing output directories from the file system.
+func (df *diveFileHandler) RemoveDir(enclaveName string) error {
+
+	pwd, err := df.GetPwd()
+
+	if err != nil {
+		return WrapMessageToErrorf(ErrPath, "Failed To Remove Directory")
+	}
+	dirPath := filepath.Join(pwd, DiveOutFileDirectory, enclaveName)
+
+	_, err = os.Stat(dirPath)
+	if err == nil {
+		err = os.RemoveAll(dirPath)
+		if err != nil {
+			return WrapMessageToErrorf(ErrInvalidFile, "%s Failed To Remove Directory %s", err, enclaveName)
+		}
+	}
+
+	return nil
+}
+
+// The `RemoveAllDir` function is a method of the `diveFileHandler` struct. It is responsible for
+// removing all output directories from the file system.
+func (df *diveFileHandler) RemoveAllDir() error {
+
+	pwd, err := df.GetPwd()
+
+	if err != nil {
+		return WrapMessageToErrorf(ErrPath, "Failed To Remove Directory")
+	}
+	dirPath := filepath.Join(pwd, DiveOutFileDirectory)
+
+	_, err = os.Stat(dirPath)
+	if err == nil {
+		err = os.RemoveAll(dirPath)
+		if err != nil {
+			return WrapMessageToErrorf(ErrInvalidFile, "%s Failed To Remove Output Directory", err)
+		}
+	}
+
 	return nil
 }
 

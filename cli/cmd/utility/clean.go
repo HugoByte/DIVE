@@ -15,7 +15,7 @@ var CleanCmd = common.NewDiveCommandBuilder().
 	SetRun(clean).Build()
 
 func clean(cmd *cobra.Command, args []string) {
-	cliContext := common.GetCliWithKurtosisContext()
+	cliContext := common.GetCliWithKurtosisContext(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 
@@ -49,22 +49,17 @@ func clean(cmd *cobra.Command, args []string) {
 			cliContext.Logger().SetErrorToStderr()
 			cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
 		}
-		for _, enclave := range enclaves {
-			err = cliContext.FileHandler().RemoveFiles([]string{fmt.Sprintf(common.DiveOutFile, enclave.Name, enclave.ShortUuid), fmt.Sprintf(common.ServiceFilePath, enclave.Name, enclave.ShortUuid)})
-			if err != nil {
-				cliContext.Logger().SetErrorToStderr()
-				cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
-			}
+
+		err = cliContext.FileHandler().RemoveAllDir()
+		if err != nil {
+			cliContext.Logger().SetErrorToStderr()
+			cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
 		}
 
 		cliContext.Logger().Info(fmt.Sprintf("Enclaves Cleaned %v", enclavesInfo))
 
 	} else {
 		cliContext.StartSpinnerIfNotVerbose(fmt.Sprintf("Cleaning Dive By Enclave %s", common.EnclaveName), common.DiveLogs)
-		shortUuid, err := cliContext.Context().GetShortUuid(common.EnclaveName)
-		if err != nil {
-			cliContext.Fatal(err)
-		}
 
 		err = cliContext.Context().CleanEnclaveByName(common.EnclaveName)
 		if err != nil {
@@ -72,7 +67,7 @@ func clean(cmd *cobra.Command, args []string) {
 			cliContext.Logger().Fatal(common.CodeOf(err), err.Error())
 		}
 
-		err = cliContext.FileHandler().RemoveFiles([]string{fmt.Sprintf(common.DiveOutFile, common.EnclaveName, shortUuid), fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, shortUuid)})
+		err = cliContext.FileHandler().RemoveDir(common.EnclaveName)
 		if err != nil {
 			cliContext.Logger().SetErrorToStderr()
 			cliContext.Logger().Fatal(common.CodeOf(err), err.Error())

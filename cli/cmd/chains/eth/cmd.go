@@ -18,7 +18,7 @@ It establishes a connection to the Ethereum network and allows the node in execu
 
 func eth(cmd *cobra.Command, args []string) {
 
-	cliContext := common.GetCliWithKurtosisContext()
+	cliContext := common.GetCliWithKurtosisContext(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 

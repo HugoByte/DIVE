@@ -17,7 +17,7 @@ It establishes a connection to the hardhat network and allows the node in execut
 	Build()
 
 func hardhat(cmd *cobra.Command, args []string) {
-	cliContext := common.GetCliWithKurtosisContext()
+	cliContext := common.GetCliWithKurtosisContext(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 

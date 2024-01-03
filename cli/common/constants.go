@@ -26,9 +26,10 @@ const (
 	DivePolkaDotGrafanaPath            = "/package_io/grafana.star"
 	DiveDryRun                         = false
 	DiveDefaultParallelism             = 4
-	DiveLogDirectory                   = "/logs/"
+	DiveLogDirectory                   = "/logs/%s"
 	DiveDitLogFile                     = "dive.log"
 	DiveErrorLogFile                   = "error.log"
+	DiveOutFileDirectory               = "/output/"
 	DiveOutFile                        = "dive_%s_%s.json"
 	ServiceFilePath                    = "services_%s_%s.json"
 	DiveAppDir                         = ".dive"

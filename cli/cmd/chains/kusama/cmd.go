@@ -43,7 +43,7 @@ var KusamaCmd = common.NewDiveCommandBuilder().
 	Build()
 
 func kusama(cmd *cobra.Command, args []string) {
-	cliContext := common.GetCliWithKurtosisContext()
+	cliContext := common.GetCliWithKurtosisContext(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 	if err != nil {

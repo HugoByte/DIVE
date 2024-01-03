@@ -16,7 +16,7 @@ var EnclavesCmd = common.NewDiveCommandBuilder().
 	SetRun(enclave).Build()
 
 func enclave(cmd *cobra.Command, args []string) {
-	cliContext := common.GetCliWithKurtosisContext()
+	cliContext := common.GetCliWithKurtosisContext(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 	if err != nil {

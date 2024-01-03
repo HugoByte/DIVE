@@ -41,11 +41,6 @@ func run(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func init() {
-	common.GetCli()
-
-}
-
 func Execute() {
 	err := rootCmd.Execute()
 

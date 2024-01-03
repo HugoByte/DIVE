@@ -20,7 +20,7 @@ community, and follow our social media presence directly from the Twitter homepa
 
 func twitter(cmd *cobra.Command, args []string) {
 
-	cli := common.GetCli()
+	cli := common.GetCli(common.EnclaveName)
 
 	cli.Logger().SetOutputToStdout()
 	err := common.ValidateArgs(args)

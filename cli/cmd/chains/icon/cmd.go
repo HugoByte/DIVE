@@ -46,7 +46,7 @@ var IconDecentralizeCmd = common.NewDiveCommandBuilder().
 
 func icon(cmd *cobra.Command, args []string) {
 
-	cliContext := common.GetCliWithKurtosisContext()
+	cliContext := common.GetCliWithKurtosisContext(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 	if err != nil {
@@ -105,7 +105,7 @@ func icon(cmd *cobra.Command, args []string) {
 
 func iconDecentralization(cmd *cobra.Command, args []string) {
 
-	cliContext := common.GetCliWithKurtosisContext()
+	cliContext := common.GetCliWithKurtosisContext(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 

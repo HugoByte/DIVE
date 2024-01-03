@@ -46,6 +46,34 @@ func WriteServiceResponseData(serviceName string, data DiveServiceResponse, cliC
 	return nil
 }
 
+// The function writes bridge response data to a JSON file.
+func WriteBridgeResponseData(serviceName string, data string, cliContext *Cli, fileName string) error {
+	bridgeResponse := DiveBridgeResponse{}
+	diveBridgeResponse, err := bridgeResponse.Decode([]byte(data))
+	if err != nil {
+		return WrapMessageToErrorf(ErrDataUnMarshall, "Failed To Unmarshall data")
+	}
+
+	var jsonDataFromFile = BridgeServices{}
+	err = cliContext.FileHandler().ReadJson(fileName, &jsonDataFromFile)
+
+	if err != nil {
+		return WrapMessageToErrorf(err, "Failed To Read %s", fileName)
+	}
+
+	_, ok := jsonDataFromFile[serviceName]
+	if !ok {
+		jsonDataFromFile[serviceName] = diveBridgeResponse
+	}
+
+	err = cliContext.FileHandler().WriteJson(fileName, jsonDataFromFile)
+	if err != nil {
+		return WrapMessageToErrorf(err, "Failed To Write %s", fileName)
+	}
+
+	return nil
+}
+
 // The OpenFile function opens a file using the appropriate command based on the operating system.
 func OpenFile(URL string) error {
 	var args []string

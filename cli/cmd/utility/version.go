@@ -29,7 +29,7 @@ var VersionCmd = common.NewDiveCommandBuilder().
 
 func version(cmd *cobra.Command, args []string) {
 
-	cli := common.GetCli()
+	cli := common.GetCli(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 
