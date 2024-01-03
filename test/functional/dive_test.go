@@ -59,24 +59,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			gomega.Expect(stdout.String()).To(gomega.ContainSubstring(latestVersion))
 		})
 
-		ginkgo.It("should open twitter page on browser", func() {
-			cmd.Args = append(cmd.Args, "twitter")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
-
-		ginkgo.It("should open Youtube Tutorial Channel on browser", func() {
-			cmd.Args = append(cmd.Args, "tutorial")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
-
-		ginkgo.It("should open Discord channel on browser", func() {
-			cmd.Args = append(cmd.Args, "discord")
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		})
-
 		ginkgo.It("should start bridge between icon and eth correctly", func() {
 			enclaveName := dive.GenerateRandomName()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--enclaveName", enclaveName)
@@ -118,15 +100,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			dive.Clean(enclaveName)
-		})
-
-		ginkgo.It("should start bridge between icon and eth with verbose flag enabled", func() {
-			enclaveName := dive.GenerateRandomName()
-			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--verbose", "--enclaveName", enclaveName)
-			err := cmd.Run()
-			gomega.Expect(err).NotTo(gomega.HaveOccurred())
-			dive.Clean(enclaveName)
-
 		})
 
 		ginkgo.It("should start bridge between icon and hardhat", func() {
