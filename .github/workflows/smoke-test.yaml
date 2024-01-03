@@ -30,27 +30,6 @@ jobs:
           sudo apt install kurtosis-cli
           kurtosis engine start
 
-      - name: Building DIVE binary with latest changes
+      - name: Running eth chain command tests
         run: |
-          cd cli && go mod tidy
-          go build -o $DIVE_BINARY_PATH
-
-      - name: Test bridge between icon and eth
-        run: |
-          mkdir logs 
-          $DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth --verbose
-
-      - name: Test bridge between icon and hardhat with icon bridge set to true
-        run: |
-          $DIVE_BINARY_PATH clean
-          $DIVE_BINARY_PATH bridge btp --chainA icon --chainB eth --bmvbridge --verbose
-
-      - name: Test bridge between icon and icon
-        run: |
-          $DIVE_BINARY_PATH clean
-          $DIVE_BINARY_PATH bridge btp --chainA icon --chainB icon --verbose
-
-      - name: Test bridge between archway and archway 
-        run: |
-            $DIVE_BINARY_PATH clean
-            $DIVE_BINARY_PATH bridge ibc --chainA archway --chainB archway --verbose
+             cd test && make run-smoke

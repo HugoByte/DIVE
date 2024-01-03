@@ -69,6 +69,7 @@ func Clean(enclaveName string) {
 	cmd := GetBinaryCommand()
 	if enclaveName == "all" {
 		cmd.Args = append(cmd.Args, "clean", "-a")
+		fmt.Println("In Cleaning All")
 	} else {
 		cmd.Args = append(cmd.Args, "clean", "--enclaveName", enclaveName)
 	}
