@@ -25,7 +25,7 @@ func hardhat(cmd *cobra.Command, args []string) {
 		cliContext.Fatalf("Error %s. %s", err, cmd.UsageString())
 	}
 
-	cliContext.Spinner().StartWithMessage("Starting Hardhat Node", "green")
+	cliContext.StartSpinnerIfNotVerbose("Starting Hardhat Node", common.DiveLogs)
 
 	responseData, err := RunHardhat(cliContext)
 	if err != nil {
@@ -50,6 +50,6 @@ func hardhat(cmd *cobra.Command, args []string) {
 	}
 
 	stopMessage := fmt.Sprintf("Hardhat Node Started. Please find service details in current working directory(%s)\n", serviceFileName)
-	cliContext.Spinner().StopWithMessage(stopMessage)
+	cliContext.StopSpinnerIfNotVerbose(stopMessage, common.DiveLogs)
 
 }
