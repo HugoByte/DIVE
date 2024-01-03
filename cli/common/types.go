@@ -70,14 +70,12 @@ func (dive *DiveMultipleServiceResponse) EncodeToString() (string, error) {
 
 type Services map[string]*DiveServiceResponse
 
-type DiveBridgeResponse struct {
-	Responses map[string]interface{} `json:"bridge-response"`
-}
+type DiveBridgeResponse map[string]interface{}
 
 type BridgeServices map[string]*DiveBridgeResponse
 
 func (dive *DiveBridgeResponse) Decode(responseData []byte) (*DiveBridgeResponse, error) {
-	err := json.Unmarshal(responseData, &dive.Responses)
+	err := json.Unmarshal(responseData, &dive)
 	if err != nil {
 		return nil, WrapMessageToError(ErrDataUnMarshall, err.Error())
 	}
