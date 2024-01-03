@@ -30,7 +30,7 @@ Along with that setup and starts the ibc relayer to establish communication betw
 
 func ibcRelay(cmd *cobra.Command, args []string) {
 
-	cliContext := common.GetCliWithKurtosisContext()
+	cliContext := common.GetCliWithKurtosisContext(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 
@@ -50,10 +50,12 @@ func ibcRelay(cmd *cobra.Command, args []string) {
 
 	serviceFileName := fmt.Sprintf(common.DiveOutFile, common.EnclaveName, shortUuid)
 
-	err = cliContext.FileHandler().WriteFile(serviceFileName, []byte(result))
+	serviceName := fmt.Sprintf("ibc-bridge-%s-%s", chainA, chainB)
+
+	err = common.WriteBridgeResponseData(serviceName, result, cliContext, serviceFileName)
 	if err != nil {
 		cliContext.Fatal(err)
 	}
-
+	
 	cliContext.StopSpinnerIfNotVerbose(fmt.Sprintf("IBC Setup Completed between %s and %s. Please find service details in current working directory(%s)\n", chainA, chainB, serviceFileName), common.DiveLogs)
 }

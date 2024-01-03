@@ -21,7 +21,7 @@ This will create an relay to connect two different chains and pass any messages 
 	Build()
 
 func bridge(cmd *cobra.Command, args []string) {
-	cli := common.GetCli()
+	cli := common.GetCli(common.EnclaveName)
 	validArgs := cmd.ValidArgs
 	for _, c := range cmd.Commands() {
 		validArgs = append(validArgs, c.Name())

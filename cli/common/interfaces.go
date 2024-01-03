@@ -163,6 +163,12 @@ type FileHandler interface {
 	// RemoveFiles removes multiple files specified by the fileNames.
 	RemoveFiles(fileNames []string) error
 
+	// RemoveDir removes the output directories by enclaveName.
+	RemoveDir(enclaveName string) error
+
+	// RemoveDir removes all the output directories.
+	RemoveAllDir() error
+
 	// GetAppDirPathOrAppFilePath returns the path to the application directory or a specific file within it
 	// based on the provided fileName.
 	GetAppDirPathOrAppFilePath(fileName string) (string, error)

@@ -18,15 +18,14 @@ It establishes a connection to the Ethereum network and allows the node in execu
 
 func eth(cmd *cobra.Command, args []string) {
 
-	cliContext := common.GetCliWithKurtosisContext()
+	cliContext := common.GetCliWithKurtosisContext(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 
 	if err != nil {
 		cliContext.Fatalf("Error %s. %s", err, cmd.UsageString())
 	}
-
-	cliContext.Spinner().StartWithMessage("Starting ETH Node", "green")
+	cliContext.StartSpinnerIfNotVerbose("Starting ETH Node", common.DiveLogs)
 
 	responseData, err := RunEth(cliContext)
 	if err != nil {
@@ -51,6 +50,6 @@ func eth(cmd *cobra.Command, args []string) {
 	}
 
 	stopMessage := fmt.Sprintf("ETH Node Started. Please find service details in current working directory(%s)\n", serviceFileName)
-	cliContext.Spinner().StopWithMessage(stopMessage)
+	cliContext.StopSpinnerIfNotVerbose(stopMessage, common.DiveLogs)
 
 }

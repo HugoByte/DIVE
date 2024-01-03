@@ -25,14 +25,14 @@ var NeutronCmd = common.NewDiveCommandBuilder().
 
 func neutron(cmd *cobra.Command, args []string) {
 
-	cliContext := common.GetCliWithKurtosisContext()
+	cliContext := common.GetCliWithKurtosisContext(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 	if err != nil {
 		cliContext.Fatalf("Error %s. %s", err, cmd.UsageString())
 	}
 
-	cliContext.Spinner().StartWithMessage("Starting Neutron Node", "green")
+	cliContext.StartSpinnerIfNotVerbose("Starting Neutron Node", common.DiveLogs)
 
 	response, err := RunNeutron(cliContext)
 
@@ -52,6 +52,6 @@ func neutron(cmd *cobra.Command, args []string) {
 		cliContext.Fatal(err)
 	}
 	stopMessage := fmt.Sprintf("Neutron Node Started. Please find service details in current working directory(%s)\n", serviceFileName)
-	cliContext.Spinner().StopWithMessage(stopMessage)
+	cliContext.StopSpinnerIfNotVerbose(stopMessage, common.DiveLogs)
 
 }

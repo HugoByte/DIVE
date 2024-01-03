@@ -20,7 +20,7 @@ var TutorialCmd = common.NewDiveCommandBuilder().
 
 func tutorial(cmd *cobra.Command, args []string) {
 
-	cli := common.GetCli()
+	cli := common.GetCli(common.EnclaveName)
 
 	cli.Logger().SetOutputToStdout()
 

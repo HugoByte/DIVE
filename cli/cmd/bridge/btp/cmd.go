@@ -35,7 +35,7 @@ var BtpRelayCmd = common.NewDiveCommandBuilder().
 
 func btpRelay(cmd *cobra.Command, args []string) {
 
-	cliContext := common.GetCli()
+	cliContext := common.GetCli(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 	if err != nil {
@@ -62,10 +62,12 @@ func btpRelay(cmd *cobra.Command, args []string) {
 	}
 
 	serviceFileName := fmt.Sprintf(common.DiveOutFile, common.EnclaveName, shortUuid)
+	serviceName := fmt.Sprintf("btp-bridge-%s-%s", chainA, chainB)
 
-	err = cliContext.FileHandler().WriteFile(serviceFileName, []byte(result))
+	err = common.WriteBridgeResponseData(serviceName, result, cliContext, serviceFileName)
 	if err != nil {
 		cliContext.Fatal(err)
 	}
+
 	cliContext.StopSpinnerIfNotVerbose(fmt.Sprintf("BTP Setup Completed between %s and %s. Please find service details in current working directory(%s)\n", chainA, chainB, serviceFileName), common.DiveLogs)
 }

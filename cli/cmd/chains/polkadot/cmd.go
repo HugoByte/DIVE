@@ -43,7 +43,7 @@ var PolkadotCmd = common.NewDiveCommandBuilder().
 	Build()
 
 func polkadot(cmd *cobra.Command, args []string) {
-	cliContext := common.GetCliWithKurtosisContext()
+	cliContext := common.GetCliWithKurtosisContext(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 	if err != nil {

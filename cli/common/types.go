@@ -70,6 +70,19 @@ func (dive *DiveMultipleServiceResponse) EncodeToString() (string, error) {
 
 type Services map[string]*DiveServiceResponse
 
+type DiveBridgeResponse map[string]interface{}
+
+type BridgeServices map[string]*DiveBridgeResponse
+
+func (dive *DiveBridgeResponse) Decode(responseData []byte) (*DiveBridgeResponse, error) {
+	err := json.Unmarshal(responseData, &dive)
+	if err != nil {
+		return nil, WrapMessageToError(ErrDataUnMarshall, err.Error())
+	}
+
+	return dive, nil
+}
+
 // The EnclaveInfo type represents information about an enclave, including its name, UUID, short UUID,
 // creation time, and status.
 // @property {string} Name - The name of the enclave.

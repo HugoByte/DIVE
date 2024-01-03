@@ -21,8 +21,7 @@ var runChain = map[string]func(cli *common.Cli) (*common.DiveServiceResponse, er
 			return nil, err
 		}
 		params := icon.GetDecentralizeParams(nodeResponse.ServiceName, nodeResponse.PrivateEndpoint, nodeResponse.KeystorePath, nodeResponse.KeyPassword, nodeResponse.NetworkId)
-
-		cli.Spinner().StartWithMessage("Starting Decentralization", "green")
+		cli.StartSpinnerIfNotVerbose("Starting Decentralization", common.DiveLogs)
 		err = icon.RunDecentralization(cli, params)
 		if err != nil {
 			return nil, err

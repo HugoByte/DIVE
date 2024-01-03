@@ -15,7 +15,7 @@ var DiscordCmd = common.NewDiveCommandBuilder().
 
 func discord(cmd *cobra.Command, args []string) {
 
-	cli := common.GetCli()
+	cli := common.GetCli(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 	if err != nil {

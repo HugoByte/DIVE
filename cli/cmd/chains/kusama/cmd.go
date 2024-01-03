@@ -43,14 +43,13 @@ var KusamaCmd = common.NewDiveCommandBuilder().
 	Build()
 
 func kusama(cmd *cobra.Command, args []string) {
-	cliContext := common.GetCliWithKurtosisContext()
+	cliContext := common.GetCliWithKurtosisContext(common.EnclaveName)
 
 	err := common.ValidateArgs(args)
 	if err != nil {
 		cliContext.Fatalf("Error %s. %s", err, cmd.UsageString())
 	}
-
-	cliContext.Spinner().StartWithMessage("Starting Kusama Node", "green")
+	cliContext.StartSpinnerIfNotVerbose("Starting Kusama Node", common.DiveLogs)
 
 	response, err := RunKusama(cliContext)
 	if err != nil {
@@ -76,5 +75,6 @@ func kusama(cmd *cobra.Command, args []string) {
 		}
 	}
 	stopMessage := fmt.Sprintf("Kusama Node Started. Please find service details in current working directory(%s)\n", serviceFileName)
-	cliContext.Spinner().StopWithMessage(stopMessage)
+	cliContext.StopSpinnerIfNotVerbose(stopMessage, common.DiveLogs)
+
 }
