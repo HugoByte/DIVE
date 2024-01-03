@@ -1,0 +1,39 @@
+{
+    "chain-type": "local",
+    "relaychain": {
+      "name": "rococo-local",
+      "nodes": [
+        {
+          "name": "alice",
+          "node-type": "validator",
+          "prometheus": false
+        },
+        {
+          "name": "bob",
+          "node-type": "full",
+          "prometheus": true
+  
+        }
+      ]
+    },
+  
+    "para": [
+      {
+        "name":"mangata",
+        "nodes": [
+          {
+            "name": "alice",
+            "node-type": "validator",
+            "prometheus": false
+  
+          },
+          {
+            "name": "bob",
+            "node-type": "full",
+            "prometheus": true
+          }
+        ]
+      }
+    ],
+    "explorer": true
+  }
