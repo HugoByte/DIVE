@@ -18,17 +18,19 @@ func RunKusama(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 
 	enclaveContext, err := cli.Context().GetEnclaveContext(common.EnclaveName)
 	if err != nil {
-		return nil, common.WrapMessageToError(err, "Kusama Run Failed")
+		return nil, common.WrapMessageToError(err, "Failed to retrieve the enclave context for Kusama.")
 	}
 
 	var serviceConfig = &utils.PolkadotServiceConfig{}
 
 	err = flagCheck()
+
 	if err != nil {
 		return nil, err
 	}
 
 	err = common.LoadConfig(cli, serviceConfig, configFilePath)
+
 	if err != nil {
 		return nil, err
 	}
@@ -39,13 +41,15 @@ func RunKusama(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 	}
 
 	encodedServiceConfigDataString, err := serviceConfig.EncodeToString()
+
 	if err != nil {
 		return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
 	}
 
 	err = uploadFiles(cli, enclaveContext)
+
 	if err != nil {
-		return nil, err
+		return nil, common.WrapMessageToError(err, "Failed to upload the configuration files.")
 	}
 
 	result, err := startRelayAndParaChain(cli, enclaveContext, serviceConfig, encodedServiceConfigDataString)
@@ -61,41 +65,43 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 
 	param := fmt.Sprintf(`{"args": %s}`, para)
 
-	KusamaResponseData := &common.DiveMultipleServiceResponse{}
+	kusamaResponseData := &common.DiveMultipleServiceResponse{}
 	paraResult := &common.DiveMultipleServiceResponse{}
 	finalResult := &common.DiveMultipleServiceResponse{}
 	explorerResult := &common.DiveMultipleServiceResponse{}
 	metricsResult := &common.DiveMultipleServiceResponse{}
 
 	runConfig := getKusamaRunConfig(serviceConfig, enclaveContext, param)
+
 	response, _, err := enclaveContext.RunStarlarkRemotePackage(cli.Context().GetContext(), common.PolkadotRemotePackagePath, runConfig)
 	if err != nil {
 		return nil, common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
 	}
 
 	responseData, services, skippedInstructions, err := common.GetSerializedData(cli, response)
+
 	if err != nil {
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
-			return nil, common.WrapMessageToError(errRemove, "Kusama Run Failed ")
+			return nil, common.WrapMessageToError(errRemove, "Kusama relaychain run failed. Failed to clean up services.")
 		}
-		return nil, common.WrapMessageToError(err, "Kusama Run Failed ")
+		return nil, common.WrapMessageToError(err, "Kusama relaychain run failed. Failed to serialize the response data.")
 	}
 
-	result, err := KusamaResponseData.Decode([]byte(responseData))
+	result, err := kusamaResponseData.Decode([]byte(responseData))
 	if err != nil {
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
-			return nil, common.WrapMessageToError(errRemove, "Kusama Run Failed ")
+			return nil, common.WrapMessageToError(errRemove, "Kusama relaychain run failed. Failed to clean up services.")
 		}
-		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Kusama Run Failed ")
+		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Kusama relaychain run failed. Failed to decode reponse data.")
 	}
 
 	finalResult = result
 
 	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
 		if len(serviceConfig.Para) != 0 && serviceConfig.Para[0].Name != "" {
-			ipAddress, err := GetIPAddress(cli, serviceConfig, true, result)
+			ipAddress, err := getIPAddress(cli, serviceConfig, true, result)
 			if err != nil {
 				return nil, err
 			}
@@ -103,14 +109,14 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 			if err != nil {
 				return nil, err
 			}
-			finalResult = ConcatenateDiveResults(result, paraResult)
+			finalResult = concatenateDiveResults(result, paraResult)
 
 		} else {
-			return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Kusama Already Running")
+			return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Kusama is already Running.")
 		}
 	} else {
 		if len(serviceConfig.Para) != 0 && serviceConfig.Para[0].Name != "" {
-			ipAddress, err := GetIPAddress(cli, serviceConfig, false, result)
+			ipAddress, err := getIPAddress(cli, serviceConfig, false, result)
 			if err != nil {
 				return nil, err
 			}
@@ -118,13 +124,13 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 			if err != nil {
 				return nil, err
 			}
-			finalResult = ConcatenateDiveResults(result, paraResult)
+			finalResult = concatenateDiveResults(result, paraResult)
 		}
 	}
 
 	if metrics {
 		metricsResult, err = startMetrics(cli, enclaveContext, para, finalResult)
-		finalResult = ConcatenateDiveResults(finalResult, metricsResult)
+		finalResult = concatenateDiveResults(finalResult, metricsResult)
 		if err != nil {
 			return nil, err
 		}
@@ -135,7 +141,7 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 		if err != nil {
 			return nil, err
 		}
-		finalResult = ConcatenateDiveResults(finalResult, explorerResult)
+		finalResult = concatenateDiveResults(finalResult, explorerResult)
 	}
 
 	return finalResult, nil
@@ -181,13 +187,13 @@ func runParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, serv
 	if err != nil {
 		errRemove := cli.Context().RemoveServicesByServiceNames(paraServices, common.EnclaveName)
 		if errRemove != nil {
-			return nil, common.WrapMessageToError(errRemove, "ParaChain Run Failed ")
+			return nil, common.WrapMessageToError(errRemove, "Failed to clean up services.")
 		}
-		return nil, common.WrapMessageToError(err, "ParaChain Run Failed ")
+		return nil, common.WrapMessageToError(err, "Failed to serialize the response data.")
 	}
 
 	if cli.Context().CheckSkippedInstructions(skippedParaInstructions) {
-		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "ParaChain Already Running")
+		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Parachain is already running.")
 	}
 
 	KusamaParaResponseData := &common.DiveMultipleServiceResponse{}
@@ -195,38 +201,17 @@ func runParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, serv
 	if err != nil {
 		errRemove := cli.Context().RemoveServicesByServiceNames(paraServices, common.EnclaveName)
 		if errRemove != nil {
-			return nil, common.WrapMessageToError(errRemove, "ParaChain Run Failed ")
+			return nil, common.WrapMessageToError(errRemove, "Failed to clean up services.")
 		}
-		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "ParaChain Run Failed ")
+		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Failed to decode reponse data.")
 
 	}
 
 	return resultPara, nil
 }
 
-func ConcatenateDiveResults(result1, result2 *common.DiveMultipleServiceResponse) *common.DiveMultipleServiceResponse {
-	if result1 == nil {
-		return result2
-	} else if result2 == nil {
-		return result1
-	}
-
-	concatenatedResult := &common.DiveMultipleServiceResponse{
-		Dive: make(map[string]*common.DiveServiceResponse),
-	}
-
-	for key, value := range result1.Dive {
-		concatenatedResult.Dive[key] = value
-	}
-
-	for key, value := range result2.Dive {
-		concatenatedResult.Dive[key] = value
-	}
-
-	return concatenatedResult
-}
-
 func configureService(serviceConfig *utils.PolkadotServiceConfig) error {
+
 	if paraChain != "" {
 		serviceConfig.Para = []utils.ParaNodeConfig{}
 		serviceConfig.Para = append(serviceConfig.Para, utils.ParaNodeConfig{
@@ -253,15 +238,18 @@ func configureService(serviceConfig *utils.PolkadotServiceConfig) error {
 	}
 
 	if noRelay && serviceConfig.ChainType == "local" {
-		return common.WrapMessageToError(common.ErrInvalidFlag, "Cannot pass --no-relay flag with local network")
-	} else if noRelay && serviceConfig.ChainType != "local" {
-		serviceConfig.RelayChain = utils.RelayChainConfig{}
+		if serviceConfig.ChainType == "local" {
+			return common.WrapMessageToError(common.ErrInvalidFlag, "The '--no-relay' flag cannot be used with a 'local' network. This flag is only applicable for 'testnet' and 'mainnet' networks.")
+		} else {
+			serviceConfig.RelayChain = utils.RelayChainConfig{}
+		}
 	}
 
 	return nil
 }
 
 func configureFullNodes(serviceConfig *utils.PolkadotServiceConfig) {
+
 	if network == "testnet" {
 		serviceConfig.RelayChain.Name = "rococo"
 	} else if network == "mainnet" {
@@ -269,6 +257,7 @@ func configureFullNodes(serviceConfig *utils.PolkadotServiceConfig) {
 	}
 
 	serviceConfig.RelayChain.Nodes = []utils.NodeConfig{}
+
 	serviceConfig.RelayChain.Nodes = append(serviceConfig.RelayChain.Nodes, utils.NodeConfig{
 		Name:       "alice",
 		NodeType:   "full",
@@ -288,15 +277,16 @@ func configureMetrics(serviceConfig *utils.PolkadotServiceConfig) {
 }
 
 func flagCheck() error {
+
 	if configFilePath != "" {
 		if paraChain != "" || network != "" || explorer || metrics {
-			return common.WrapMessageToError(common.ErrInvalidFlag, "Additional Flags Found")
+			return common.WrapMessageToError(common.ErrInvalidFlag, "The '-c' flag does not allow additional flags.")
 		}
 	}
 
 	if noRelay && (network == "testnet" || network == "mainnet") {
 		if paraChain == "" {
-			return common.WrapMessageToError(common.ErrMissingFlags, "Missing Parachain Flag")
+			return common.WrapMessageToError(common.ErrMissingFlags, "The '-p' flag is required when using '--no-relay' flag. Please provide the '-p' flag with the parachain name.")
 		}
 	}
 	return nil
@@ -323,7 +313,7 @@ func getParaRunConfig(serviceConfig *utils.PolkadotServiceConfig, enclaveContext
 	return nil
 }
 
-func GetIPAddress(cli *common.Cli, serviceConfig *utils.PolkadotServiceConfig, relayReRun bool, result *common.DiveMultipleServiceResponse) (string, error) {
+func getIPAddress(cli *common.Cli, serviceConfig *utils.PolkadotServiceConfig, relayReRun bool, result *common.DiveMultipleServiceResponse) (string, error) {
 	var nodename string
 	if serviceConfig.ChainType == localChain {
 		if relayReRun {
@@ -332,7 +322,7 @@ func GetIPAddress(cli *common.Cli, serviceConfig *utils.PolkadotServiceConfig, r
 
 			shortUuid, err := cli.Context().GetShortUuid(common.EnclaveName)
 			if err != nil {
-				return "", fmt.Errorf("failed to get uuid of enclave")
+				return "", fmt.Errorf("Failed to retrieve the UUID of the enclave.")
 			}
 			serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, shortUuid)
 
@@ -341,10 +331,10 @@ func GetIPAddress(cli *common.Cli, serviceConfig *utils.PolkadotServiceConfig, r
 				return "", err
 			}
 
-			ChainServiceName := fmt.Sprintf("rococo-local-%s", nodename)
-			chainServiceResponse, OK := services[ChainServiceName]
+			chainServiceName := fmt.Sprintf("rococo-local-%s", nodename)
+			chainServiceResponse, OK := services[chainServiceName]
 			if !OK {
-				return "", fmt.Errorf("service name not found")
+				return "", fmt.Errorf("Service name '%s' not found", chainServiceName)
 			}
 
 			ipAddress := chainServiceResponse.IpAddress
@@ -364,7 +354,6 @@ func uploadFiles(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext) error {
 	if err != nil {
 		return common.WrapMessageToError(common.ErrStarlarkRunFailed, err.Error())
 	}
-
 	return nil
 }
 
@@ -382,22 +371,23 @@ func startExplorer(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext) (*commo
 	if err != nil {
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
-			return nil, common.WrapMessageToError(errRemove, "Explorer Run Failed ")
+			return nil, common.WrapMessageToError(errRemove, "Explorer Run Failed. Cleanup of services failed.")
 		}
-		return nil, common.WrapMessageToError(err, "Explorer Run Failed ")
+		return nil, common.WrapMessageToError(err, "Explorer Run Failed. Failed to serilize response data.")
 	}
 
 	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
-		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Explorer Already Running")
+		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Explorer is already running.")
 	}
 
 	result, err := explorerResponseData.Decode([]byte(responseData))
+
 	if err != nil {
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
-			return nil, common.WrapMessageToError(errRemove, "Explorer Run Failed ")
+			return nil, common.WrapMessageToError(errRemove, "Explorer Run Failed. Cleanup of services failed.")
 		}
-		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Explorer Run Failed ")
+		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Explorer Run Failed. Failed to decode response data.")
 	}
 
 	return result, nil
@@ -423,22 +413,22 @@ func startMetrics(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, para str
 	if err != nil {
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
-			return nil, common.WrapMessageToError(errRemove, "Prometheus Run Failed ")
+			return nil, common.WrapMessageToError(errRemove, "Prometheus Run Failed. Cleanup of services failed.")
 		}
-		return nil, common.WrapMessageToError(err, "Prometheus Run Failed ")
+		return nil, common.WrapMessageToError(err, "Prometheus Run Failed. Failed to serilize response data.")
 	}
 
 	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
-		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Prometheus Already Running")
+		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Prometheus is already Running.")
 	}
 
 	prometheusResult, err := prometheus.Decode([]byte(prometheusResponseData))
 	if err != nil {
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
-			return nil, common.WrapMessageToError(errRemove, "Prometheus Run Failed ")
+			return nil, common.WrapMessageToError(errRemove, "Prometheus Run Failed. Cleanup of services failed.")
 		}
-		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Prometheus Run Failed ")
+		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Prometheus Run Failed. Failed to decode reponse data.")
 	}
 
 	paraGrafana := `{"args":{}}`
@@ -452,24 +442,46 @@ func startMetrics(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, para str
 	if err != nil {
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
-			return nil, common.WrapMessageToError(errRemove, "Grafana Run Failed ")
+			return nil, common.WrapMessageToError(errRemove, "Grafana Run Failed. Cleanup of services failed.")
 		}
-		return nil, common.WrapMessageToError(err, "Grafana Run Failed ")
+		return nil, common.WrapMessageToError(err, "Grafana Run Failed. Failed to serialize response data.")
 	}
 
 	if cli.Context().CheckSkippedInstructions(skippedInstructions) {
-		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Grafana Already Running")
+		return nil, common.WrapMessageToError(common.ErrStarlarkResponse, "Grafana is already running.")
 	}
 
 	grafanaResult, err := grafana.Decode([]byte(grafanaResponseData))
 	if err != nil {
 		errRemove := cli.Context().RemoveServicesByServiceNames(services, common.EnclaveName)
 		if errRemove != nil {
-			return nil, common.WrapMessageToError(errRemove, "Grafana Run Failed ")
+			return nil, common.WrapMessageToError(errRemove, "Grafana Run Failed. Cleanup of services failed.")
 		}
-		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Grafana Run Failed ")
+		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Grafana Run Failed. Failed to decode response data.")
 	}
 
-	result := ConcatenateDiveResults(prometheusResult, grafanaResult)
+	result := concatenateDiveResults(prometheusResult, grafanaResult)
 	return result, nil
+}
+
+func concatenateDiveResults(result1, result2 *common.DiveMultipleServiceResponse) *common.DiveMultipleServiceResponse {
+	if result1 == nil {
+		return result2
+	} else if result2 == nil {
+		return result1
+	}
+
+	concatenatedResult := &common.DiveMultipleServiceResponse{
+		Dive: make(map[string]*common.DiveServiceResponse),
+	}
+
+	for key, value := range result1.Dive {
+		concatenatedResult.Dive[key] = value
+	}
+
+	for key, value := range result2.Dive {
+		concatenatedResult.Dive[key] = value
+	}
+
+	return concatenatedResult
 }
