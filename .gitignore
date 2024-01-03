@@ -31,3 +31,5 @@ doc/tags
 
 # log dir
 logs/
+
+node_modules/
