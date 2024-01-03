@@ -23,12 +23,6 @@ type testWriter struct {
 func TestCLIApp(t *testing.T) {
 	gomega.RegisterFailHandler(ginkgo.Fail)
 	ginkgo.RunSpecs(t, "DIVE CLI App Suite")
-	// ginkgo.AfterSuite(func() {
-	// 	dive.Clean("all")
-	// })
-	// ginkgo.AfterAll(func ()  {
-	// 	dive.Clean("all")
-	// })
 }
 
 func (w *testWriter) Write(p []byte) (n int, err error) {
@@ -36,6 +30,11 @@ func (w *testWriter) Write(p []byte) (n int, err error) {
 	os.Stdout.Write(p)
 	return len(p), nil
 }
+
+var _ = ginkgo.AfterSuite(func() {
+    fmt.Println("Cleaning any leftover enclaves...")
+	dive.Clean("all")
+})
 
 var _ = ginkgo.Describe("DIVE CLI App", func() {
 	var cmd *exec.Cmd
