@@ -60,6 +60,10 @@ run-archway: BINARY
 	@echo "Running archway chain commands test cases"
 	@cd $(CURDIR)/functional && ginkgo --focus="Archway chain commands" -v -p -timeout=3h
 
+run-relaychain-kusama: BINARY
+	@echo "Running relaychain chain commands test cases"
+	@cd $(CURDIR)/functional && relayChain=kusama ginkgo --focus="Relaychain commands" -v -p -timeout=3h
+
 run-misc: BINARY
 	@echo "Running other test cases"
 	@cd $(CURDIR)/functional && ginkgo --focus="Other commands" -v -p -timeout=3h
