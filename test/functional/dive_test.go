@@ -31,11 +31,6 @@ func (w *testWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-var _ = ginkgo.AfterSuite(func() {
-    fmt.Println("Cleaning any leftover enclaves...")
-	dive.Clean("all")
-})
-
 var _ = ginkgo.Describe("DIVE CLI App", func() {
 	var cmd *exec.Cmd
 	var stdout bytes.Buffer
@@ -58,29 +53,29 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			gomega.Expect(stdout.String()).To(gomega.ContainSubstring(latestVersion))
 		})
 
-		// ginkgo.It("should start bridge between icon and eth correctly", func() {
-		// 	enclaveName := dive.GenerateRandomName()
-		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--enclaveName", enclaveName)
-		// 	err := cmd.Run()
-		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		// 	dive.Clean(enclaveName)
-		// })
+		ginkgo.It("should start bridge between icon and eth correctly", func() {
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "eth", "--enclaveName", enclaveName)
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
+		})
 
-		// ginkgo.It("should start bridge between icon and hardhat but with icon bridge set to true", func() {
-		// 	enclaveName := dive.GenerateRandomName()
-		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--bmvbridge", "--enclaveName", enclaveName)
-		// 	err := cmd.Run()
-		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		// 	dive.Clean(enclaveName)
-		// })
+		ginkgo.It("should start bridge between icon and hardhat but with icon bridge set to true", func() {
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "hardhat", "--bmvbridge", "--enclaveName", enclaveName)
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
+		})
 
-		// ginkgo.It("should start bridge between icon and icon", func() {
-		// 	enclaveName := dive.GenerateRandomName()
-		// 	cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--enclaveName", enclaveName)
-		// 	err := cmd.Run()
-		// 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
-		// 	dive.Clean(enclaveName)
-		// })
+		ginkgo.It("should start bridge between icon and icon", func() {
+			enclaveName := dive.GenerateRandomName()
+			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--enclaveName", enclaveName)
+			err := cmd.Run()
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			dive.Clean(enclaveName)
+		})
 
 		ginkgo.It("should start bridge between archway and archway using ibc", func() {
 			enclaveName := dive.GenerateRandomName()
@@ -828,7 +823,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 
 			ginkgo.It("should run custom relaychain in localnet for "+relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
-				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "local", "rococo-local", false, false)
+				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "local", "rococo-local", enclaveName, false, false)
 				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 				err := cmd.Run()
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -836,9 +831,9 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				dive.Clean(enclaveName)
 			})
 
-			ginkgo.It("should run custom relaychain in testnet"+relayChainName, func() {
+			ginkgo.It("should run custom relaychain in testnet "+relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
-				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "testnet", "rococo", false, false)
+				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "testnet", "rococo", enclaveName, false, false)
 				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 				err := cmd.Run()
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -848,7 +843,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 
 			ginkgo.It("should run custom relaychain in mainnet"+relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
-				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "mainnet", "kusama", false, false)
+				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "mainnet", "kusama", enclaveName, false, false)
 				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 				err := cmd.Run()
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -863,9 +858,10 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
 				dive.Clean(enclaveName)
 			})
+
 			ginkgo.It("should run custom relaychain with explorer services and metrics service in testnet for "+relayChainName, func() {
 				enclaveName := dive.GenerateRandomName()
-				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "testnet", "rococo", true, true)
+				config := dive.UpdateRelayChain(dive.LOCAL_CONFIG0, "testnet", "rococo", enclaveName, true, true)
 				cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 				err := cmd.Run()
 				gomega.Expect(err).NotTo(gomega.HaveOccurred())
