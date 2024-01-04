@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
+	"github.com/onsi/gomega"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"sync"
-	"github.com/google/uuid"
-	"github.com/onsi/gomega"
 
 	"github.com/hugobyte/dive-core/cli/common"
 )
@@ -69,7 +69,6 @@ func Clean(enclaveName string) {
 	cmd := GetBinaryCommand()
 	if enclaveName == "all" {
 		cmd.Args = append(cmd.Args, "clean", "-a")
-		fmt.Println("In Cleaning All")
 	} else {
 		cmd.Args = append(cmd.Args, "clean", "--enclaveName", enclaveName)
 	}
@@ -422,10 +421,9 @@ type Configuration1 struct {
 		} `json:"nodes"`
 	} `json:"para"`
 	Explorer bool `json:"explorer"`
-	Unknown  json.RawMessage
 }
 
-func UpdateRelayChain(filePath, newChainType, newRelayChainName string, newExplorer, newPrometheus bool) string {
+func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName string, newExplorer, newPrometheus bool) string {
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -462,7 +460,7 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName string, newExplo
 		panic(err)
 	}
 
-	tmpfile, err := os.Create("updated-local.json")
+	tmpfile, err := os.Create(fmt.Sprintf("updated-config-%s.json", enclaveName))
 	if err != nil {
 		panic(err)
 	}
@@ -475,7 +473,6 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName string, newExplo
 
 	return tmpfile.Name()
 }
-
 
 func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bool) string {
 	mutex.Lock()
@@ -492,7 +489,7 @@ func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bo
 		panic(err)
 	}
 
-	// Remove content inside RelayChain 
+	// Remove content inside RelayChain
 	local.RelayChain = struct {
 		Name  string `json:"name"`
 		Nodes []struct {
@@ -580,4 +577,3 @@ func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName stri
 
 	return tmpfile.Name()
 }
-
