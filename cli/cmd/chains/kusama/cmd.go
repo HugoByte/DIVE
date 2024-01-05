@@ -10,7 +10,7 @@ import (
 
 var (
 	configFilePath string
-	paraChain      string
+	paraChain      []string
 	network        string
 	noRelay        bool
 	explorer       bool
@@ -34,7 +34,7 @@ var KusamaCmd = common.NewDiveCommandBuilder().
 	SetShort("Build, initialize and start a Kusama node").
 	SetLong("The command starts the kusama relay chain and kusama parachain if -p flag is given").
 	SetRun(kusama).
-	AddStringFlagWithShortHand(&paraChain, "parachain", "p", "", "specify the parachain to spawn parachain node").
+	AddStringSliceFlagWithShortHand(&paraChain, "parachain", "p", []string{}, "specify the parachain to spawn parachain node").
 	AddStringFlagWithShortHand(&network, "network", "n", "", "specify the network to run (local/testnet/mainnet). Default will be local.").
 	AddBoolFlag(&noRelay, "no-relay", false, "specify the bool flag to run parachain only (only for testnet and mainnet)").
 	AddStringFlagWithShortHand(&configFilePath, "config", "c", "", "path to custom config json file to start kusama relaychain and parachain nodes.").

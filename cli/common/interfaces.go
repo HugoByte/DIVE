@@ -197,6 +197,9 @@ type CommandBuilder interface {
 	// Add StringFlag adds a string flag to the command that persists with short hand
 	AddStringFlagWithShortHand(stringV *string, name string, shorthand string, value string, usage string) CommandBuilder
 
+	// Add StringSliceFlag adds a slice of string flag to the command that persists with short hand
+	AddStringSliceFlagWithShortHand(stringV *[]string, name string, shorthand string, value []string, usage string) CommandBuilder
+
 	// Add BooFlag adds a boolean flag to the command that persists
 	AddBoolFlag(boolV *bool, name string, value bool, usage string) CommandBuilder
 

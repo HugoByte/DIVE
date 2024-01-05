@@ -52,9 +52,17 @@ func RunKusama(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 		return nil, common.WrapMessageToError(err, "Failed to upload the configuration files.")
 	}
 
-	result, err := startRelayAndParaChain(cli, enclaveContext, serviceConfig, encodedServiceConfigDataString)
-	if err != nil {
-		return nil, err
+	result := &common.DiveMultipleServiceResponse{}
+	if noRelay {
+		result, err = startParaChains(cli, enclaveContext, serviceConfig, encodedServiceConfigDataString, "")
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		result, err = startRelayAndParaChain(cli, enclaveContext, serviceConfig, encodedServiceConfigDataString)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return result, nil
@@ -149,6 +157,8 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 
 func startParaChains(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, serviceConfig *utils.PolkadotServiceConfig, para string, ipAddress string) (*common.DiveMultipleServiceResponse, error) {
 	paraResult := &common.DiveMultipleServiceResponse{}
+	allParaResult := &common.DiveMultipleServiceResponse{}
+
 	var err error
 
 	if serviceConfig.ChainType == localChain {
@@ -157,6 +167,7 @@ func startParaChains(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, s
 		if err != nil {
 			return nil, err
 		}
+		allParaResult = concatenateDiveResults(allParaResult, paraResult)
 	} else {
 		for _, paraNode := range serviceConfig.Para {
 			paraChainConfig, err := paraNode.EncodeToString()
@@ -168,11 +179,11 @@ func startParaChains(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, s
 			if err != nil {
 				return nil, err
 			}
+			allParaResult = concatenateDiveResults(allParaResult, paraResult)
 		}
-
 	}
 
-	return paraResult, nil
+	return allParaResult, nil
 }
 
 func runParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, serviceConfig *utils.PolkadotServiceConfig, para string) (*common.DiveMultipleServiceResponse, error) {
@@ -206,20 +217,23 @@ func runParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, serv
 		return nil, common.WrapMessageToErrorf(common.ErrDataUnMarshall, "%s.%s", err, "Failed to decode reponse data.")
 
 	}
-
 	return resultPara, nil
 }
 
 func configureService(serviceConfig *utils.PolkadotServiceConfig) error {
 
-	if paraChain != "" {
+	if len(paraChain) != 0 {
 		serviceConfig.Para = []utils.ParaNodeConfig{}
-		serviceConfig.Para = append(serviceConfig.Para, utils.ParaNodeConfig{
-			Name: paraChain,
-			Nodes: []utils.NodeConfig{
-				{Name: "alice", NodeType: "full", Prometheus: false},
-			},
-		})
+		for _, value := range paraChain {
+			if value != "" {
+				serviceConfig.Para = append(serviceConfig.Para, utils.ParaNodeConfig{
+					Name: value,
+					Nodes: []utils.NodeConfig{
+						{Name: "alice", NodeType: "full", Prometheus: false},
+					},
+				})
+			}
+		}
 	}
 
 	if network != "" {
@@ -238,11 +252,9 @@ func configureService(serviceConfig *utils.PolkadotServiceConfig) error {
 	}
 
 	if noRelay && serviceConfig.ChainType == "local" {
-		if serviceConfig.ChainType == "local" {
-			return common.WrapMessageToError(common.ErrInvalidFlag, "The '--no-relay' flag cannot be used with a 'local' network. This flag is only applicable for 'testnet' and 'mainnet' networks.")
-		} else {
-			serviceConfig.RelayChain = utils.RelayChainConfig{}
-		}
+		return common.WrapMessageToError(common.ErrInvalidFlag, "The '--no-relay' flag cannot be used with a 'local' network. This flag is only applicable for 'testnet' and 'mainnet' networks.")
+	} else if noRelay && serviceConfig.ChainType != "local" {
+		serviceConfig.RelayChain = utils.RelayChainConfig{}
 	}
 
 	return nil
@@ -279,13 +291,13 @@ func configureMetrics(serviceConfig *utils.PolkadotServiceConfig) {
 func flagCheck() error {
 
 	if configFilePath != "" {
-		if paraChain != "" || network != "" || explorer || metrics {
+		if len(paraChain) != 0 || network != "" || explorer || metrics {
 			return common.WrapMessageToError(common.ErrInvalidFlag, "The '-c' flag does not allow additional flags.")
 		}
 	}
 
 	if noRelay && (network == "testnet" || network == "mainnet") {
-		if paraChain == "" {
+		if len(paraChain) == 0 {
 			return common.WrapMessageToError(common.ErrMissingFlags, "The '-p' flag is required when using '--no-relay' flag. Please provide the '-p' flag with the parachain name.")
 		}
 	}
@@ -322,7 +334,7 @@ func getIPAddress(cli *common.Cli, serviceConfig *utils.PolkadotServiceConfig, r
 
 			shortUuid, err := cli.Context().GetShortUuid(common.EnclaveName)
 			if err != nil {
-				return "", fmt.Errorf("Failed to retrieve the UUID of the enclave.")
+				return "", fmt.Errorf("failed to retrieve the UUID of the enclave")
 			}
 			serviceFileName := fmt.Sprintf(common.ServiceFilePath, common.EnclaveName, shortUuid)
 
@@ -334,7 +346,7 @@ func getIPAddress(cli *common.Cli, serviceConfig *utils.PolkadotServiceConfig, r
 			chainServiceName := fmt.Sprintf("rococo-local-%s", nodename)
 			chainServiceResponse, OK := services[chainServiceName]
 			if !OK {
-				return "", fmt.Errorf("Service name '%s' not found", chainServiceName)
+				return "", fmt.Errorf("service name '%s' not found", chainServiceName)
 			}
 
 			ipAddress := chainServiceResponse.IpAddress

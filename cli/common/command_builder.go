@@ -55,6 +55,12 @@ func (dc *diveCommandBuilder) AddStringFlagWithShortHand(stringV *string, name s
 	return dc
 }
 
+// Add StringSliceFlag adds a slice of string flag to the command that persists with short hand
+func (dc *diveCommandBuilder) AddStringSliceFlagWithShortHand(stringV *[]string, name string, shorthand string, value []string, usage string) CommandBuilder {
+	dc.cmd.Flags().StringSliceVarP(stringV, name, shorthand, value, usage)
+	return dc
+}
+
 // Add BooFlag adds a boolean flag to the command that persists
 func (dc *diveCommandBuilder) AddBoolFlag(boolV *bool, name string, value bool, usage string) CommandBuilder {
 	dc.cmd.Flags().BoolVar(boolV, name, value, usage)
