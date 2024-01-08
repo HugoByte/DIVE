@@ -53,7 +53,8 @@ func RunKusama(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 	}
 
 	result := &common.DiveMultipleServiceResponse{}
-	if noRelay {
+
+	if serviceConfig.RelayChain.Name == "" {
 		result, err = startParaChains(cli, enclaveContext, serviceConfig, encodedServiceConfigDataString, "")
 		if err != nil {
 			return nil, err
@@ -255,6 +256,10 @@ func configureService(serviceConfig *utils.PolkadotServiceConfig) error {
 		return common.WrapMessageToError(common.ErrInvalidFlag, "The '--no-relay' flag cannot be used with a 'local' network. This flag is only applicable for 'testnet' and 'mainnet' networks.")
 	} else if noRelay && serviceConfig.ChainType != "local" {
 		serviceConfig.RelayChain = utils.RelayChainConfig{}
+	}
+
+	if serviceConfig.ChainType == localChain && serviceConfig.RelayChain.Name == "" && len(serviceConfig.Para) != 0 {
+		return common.WrapMessageToError(common.ErrEmptyFields, "Cannot start a Parachain in local without Relay Chain")
 	}
 
 	return nil
