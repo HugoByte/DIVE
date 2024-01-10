@@ -17,6 +17,7 @@ import {
   verifyRollbackMessageEventCosmos,
 } from "./cosmos";
 import { GetDataInBytes, GetDest, GetSrc, strToHex } from "./helper";
+import { Deployments } from "../setup/config";
 import {
   executeCallIcon,
   executeRollbackIcon,
@@ -63,6 +64,7 @@ async function sendCallMessage(
   msgData?: string,
   needRollback?: boolean
 ) {
+
   const testName = sendCallMessage.name + (needRollback ? "WithRollback" : "");
   console.log(`\n### ${testName}: ${src} => ${dst}`);
   if (!msgData) {
@@ -78,7 +80,7 @@ async function sendCallMessage(
   const sendMessageReceipt: any = await sendMessageFromDApp(
     src,
     msgData,
-    rollbackData
+    rollbackData,
   );
   const sn = await verifyCallMessageSent(src, sendMessageReceipt!);
 
@@ -119,13 +121,13 @@ async function sendCallMessage(
 async function sendMessageFromDApp(
   src: string,
   msg: string,
-  rollback?: string
+  rollback?: string,
 ) {
   const isRollback = rollback ? true : false;
-  if (src === "icon") {
+  if (src.includes("icon")) {
     const hexMsg = strToHex(msg);
     return sendMessageFromDAppIcon(hexMsg, chainName, rollback, isRollback);
-  } else if (src === "archway") {
+  } else if (src.includes("constantine-3") || src.includes("neutron-node-test-chain1")) {
     const bytesData = GetDataInBytes(msg);
     return await sendMessageFromDAppCosmos(bytesData, chainName, rollback);
   } else {
@@ -135,16 +137,16 @@ async function sendMessageFromDApp(
 
 async function verifyCallMessageSent(src: string, sendMessageReceipt: string) {
   console.log("**** Verify CallMessageSent Event ****");
-  if (src === "icon") {
+  if (src.includes("icon")) {
     await verifyCallMessageSentEventIcon(sendMessageReceipt);
-  } else if (src === "archway") {
+  } else if (src.includes("constantine-3") || src.includes("neutron-node-test-chain1")) {
     await verifyCallMessageSentEventCosmos(sendMessageReceipt);
   }
 }
 
 async function checkCallMessage(dst: string) {
   console.log("**** CallMessage Event ****");
-  if (dst === "archway") {
+  if (dst.includes("constantine-3")|| dst.includes("neutron-node-test-chain1")) {
     const eventLogs = await verifyCallMessageEventCosmos(chainName);
     console.log(eventLogs);
     const reqIdObject = eventLogs?.attributes.find(
@@ -154,7 +156,7 @@ async function checkCallMessage(dst: string) {
       (item) => item.key === "data"
     );
     return [reqIdObject!.value, dataObject!.value];
-  } else if (dst === "icon") {
+  } else if (dst.includes("icon")) {
     const eventLogs = await verifyCallMessageEventIcon();
     return [eventLogs!._reqId, eventLogs!._data];
   }
@@ -162,9 +164,9 @@ async function checkCallMessage(dst: string) {
 
 async function invokeExecuteCall(dst: string, reqId: any, callData: any) {
   console.log("**** Execute Call ****");
-  if (dst === "archway") {
+  if (dst.includes("constantine-3")|| dst.includes("neutron-node-test-chain1")) {
     console.log(await executeCallCosmos(reqId, callData, chainName));
-  } else if (dst === "icon") {
+  } else if (dst.includes("icon")) {
     console.log(await executeCallIcon(reqId, callData, chainName));
   }
 }
@@ -175,9 +177,9 @@ async function checkCallExecuted(
   reqId: any
 ) {
   console.log("**** Verify CallExecuted Event ****");
-  if (dst === "archway") {
+  if (dst.includes("constantine-3")|| dst.includes("neutron-node-test-chain1")) {
     return await verifyCallExecutedEventCosmos();
-  } else if (dst === "icon") {
+  } else if (dst.includes("icon")) {
     return await verifyCallExecutedEventIcon();
   }
 }
@@ -188,9 +190,9 @@ async function verifyMessageReceived(
   msgData: string
 ) {
   let executedMsg:string | undefined;
-  if (dst === "archway") {
+  if (dst.includes("constantine-3")|| dst.includes("neutron-node-test-chain1")) {
     executedMsg = await verifyReceivedMessageCosmos(height!);
-  } else if (dst === "icon") {
+  } else if (dst.includes("icon")) {
     executedMsg = await verifyReceivedMessageIcon(height)
   }  
   if (executedMsg! === msgData) {
@@ -207,10 +209,10 @@ async function checkResponseMessage(
   expectRevert: boolean
 ): Promise<[number, any] | undefined> {
   console.log("**** Verify ResponseMessage Event ****");
-  if (src === "icon") {
+  if (src.includes("icon")) {
     const [seqNo, height] = await verifyResponseMessageEventIcon();
     return [height, seqNo];
-  } else if (src === "archway") {
+  } else if (src.includes("constantine-3") || src.includes("neutron-node-test-chain1")) {
     const [seqNo, height] = await verifyResponseMessageEventCosmos();
     return [height, seqNo];
   }
@@ -218,27 +220,27 @@ async function checkResponseMessage(
 
 async function checkRollbackMessage(src: string, height: number) {
   console.log("**** Verify RollbackMessage Event ****");
-  if (src === "icon") {
+  if (src.includes("icon")) {
     await verifyRollbackMessageEventIcon(height);
-  } else if (src === "archway") {
+  } else if (src.includes("constantine-3") || src.includes("neutron-node-test-chain1")) {
     await verifyRollbackMessageEventCosmos(height);
   }
 }
 
 async function invokeExecuteRollback(src: string, seqNo: number) {
   console.log("**** Execute Rollback ****");
-  if (src === "icon") {
+  if (src.includes("icon")) {
     await executeRollbackIcon(seqNo, chainName);
-  } else if (src === "archway") {
+  } else if (src.includes("constantine-3") || src.includes("neutron-node-test-chain1")) {
     await executeRollbackCosmos(seqNo, chainName);
   }
 }
 
 async function checkRollbackExecuted(src: string) {
   console.log("**** Verify RollbackExecuted event ****");
-  if (src === "icon") {
+  if (src.includes("icon")) {
     await verifyRollbackExecutedEventIcon();
-  } else if (src === "archway") {
+  } else if (src.includes("constantine-3") || src.includes("neutron-node-test-chain1")) {
     await verifyRollbackExecutedEventCosmos();
   }
 }

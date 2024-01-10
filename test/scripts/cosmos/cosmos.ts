@@ -29,9 +29,9 @@ let accountAddress: string;
 async function Setup(chainName: string): Promise<[SigningCosmWasmClient, string]> {
   // Chain Constants, modify as required in contracts.json
   const chain1 = {
-    chainId: GetChainInfo(chainName, "chainId"),
-    endpoint: GetChainInfo(chainName, "endpoint"),
-    prefix: GetChainInfo(chainName, "prefix"),
+    chainId: GetChainInfo(chainName, "chain_id"),
+    endpoint: GetChainInfo(chainName, "endpoint_public"),
+    prefix: chainName,
   };
 
   // Create signing client and account address
@@ -44,7 +44,12 @@ async function Setup(chainName: string): Promise<[SigningCosmWasmClient, string]
 
   // Get Test Account with stake
   const testAccount = await getTestAccountWithStake(chainName);
-  const testAddress = testAccount.substring(8, testAccount.length).trim();
+  let testAddress;
+  if (chainName == "archway") {
+    testAddress = testAccount.substring(8, testAccount.length).trim();
+  } else {
+    testAddress = testAccount;
+  }
 
   // To Get balance of given account address and transfer balance if 0
   const bal = await signingClient.getBalance(accountAddress, "stake");
@@ -80,7 +85,7 @@ async function sendMessageFromDapp(
   chainName: string,
   rbData?: string
 ) {
-  const dapp = await GetCosmosContracts("dapp", chainName);
+  const dapp = await GetCosmosContracts("dapp");
   const iconDappAddress = await GetIconContracts("dapp");
   const DestNetwork = GetIconChainInfo("network");
   const execMsg = rbData
@@ -170,7 +175,7 @@ async function waitForEvent(
 }
 
 export async function executeCallCosmos(reqId: any, data: any, chainName: string) {
-  const xcall = await GetCosmosContracts("xcall", chainName);
+  const xcall = await GetCosmosContracts("xcall");
   const execMsg = {
     execute_call: {
       request_id: reqId.toString(),
@@ -234,7 +239,7 @@ export async function verifyRollbackMessageEventCosmos(height: number) {
 }
 
 export async function executeRollbackCosmos(seqNo: any, chainName: string) {
-  const xcall = await GetCosmosContracts("xcall", chainName);
+  const xcall = await GetCosmosContracts("xcall");
   const execMsg = {
     execute_rollback: {
       sequence_no: seqNo.toString(),
