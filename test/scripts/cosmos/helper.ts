@@ -149,9 +149,12 @@ export function GetChainInfo(chainName:string, args: string){
   }
 }
 
-export function GetNeutronChainInfo(args: string){
-  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
-  return dataArray["neutron"][args];
+export function GetCosmosChainInfo(chainID:string, args: string){
+  if (srcChain.chain_id == chainID){
+    return srcChain[args]
+  } else {
+    return dstChain[args]
+  }
 }
 
 
