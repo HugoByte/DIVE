@@ -17,21 +17,23 @@ export class IconNetwork {
   }
 
   public static getDefault() {
-    return this.getNetwork('icon0');
+    return this.getNetwork("", 'icon0');
   }
 
-  public static getNetwork(target: string) {
+  public static getNetwork(config: any, target: string){
     const entry = this.instances.get(target);
     if (entry) {
       return entry;
     }
-    const config: any = ChainConfig.getChain(target);
     const httpProvider = new HttpProvider(config.endpoint);
     const iconService = new IconService(httpProvider);
-    const keystore = this.readFile(config.keystore);
-    const keypass = config.keysecret
-      ? this.readFile(config.keysecret)
-      : config.keypass;
+    let keystore
+    if (target.includes('icon')){
+      keystore = this.readFile('./config/keystore.json');
+    } else {
+      keystore = this.readFile('./docker/hardhat/keystore0.json');
+    }
+    const keypass = config.keypassword
     const wallet = IconWallet.loadKeystore(keystore, keypass, false);
     const nid = parseInt(config.network.split(".")[0], 16);
     const network = new this(iconService, nid, wallet);
