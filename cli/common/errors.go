@@ -38,6 +38,7 @@ var (
 	ErrEmptyFields             = NewBase(EmptyFieldsError, "Missing Fields In The Config File")
 	ErrMissingFlags            = NewBase(MissingFlagsError, "Missing Flags")
 	ErrInvalidFlag             = NewBase(InvalidFlagError, "Invalid Flag Usage")
+	ErrInvalidConfig           = NewBase(InvalidConfigError, "Invalid Config")
 )
 
 func (c ErrorCode) New(msg string) error {
