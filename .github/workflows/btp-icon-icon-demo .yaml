@@ -28,6 +28,6 @@ jobs:
       - name: Running bridge between icon and icon
         run: |
            cd cli && go build -o dive
-           ./dive bridge btp --chainA icon --chainB icon
-           mv output/dive/*.json ../test/ 
-           cd ../test && make run-demo CONFIG_FILE='"*.json"'
+           ./dive bridge btp --chainA icon --chainB icon --verbose
+           mv output/dive/*.json ../test/dive.json
+           cd ../test && make run-demo CONFIG_FILE=dive.json
