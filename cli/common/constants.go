@@ -3,7 +3,7 @@ package common
 var DiveLogs bool
 
 // !!!!!!!!!!! DO NOT UPDATE! WILL BE UPDATED DURING THE RELEASE PROCESS !!!!!!!!!!!!!!!!!!!!!!
-var DiveVersion = "v0.0.14-beta"
+var DiveVersion = "v0.0.15-beta"
 
 const (
 	DiveEnclave                  = "dive"
