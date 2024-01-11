@@ -1,11 +1,11 @@
-name: Icon-Hardhat btp demo
+name: Icon-Icon btp demo
 
 on:
   workflow_dispatch:
 
 jobs:
-  icon_hardhat_demo:
-    name: btp demo between icon and hardhat
+  icon_icon_demo:
+    name: btp demo between icon and icon
     runs-on: "ubuntu-latest"
 
     steps:
@@ -25,9 +25,9 @@ jobs:
           sudo apt install kurtosis-cli
           kurtosis engine start
 
-      - name: Running bridge between icon and hardhat
+      - name: Running bridge between icon and icon
         run: |
            cd cli && go build -o dive
-           ./dive bridge btp --chainA icon --chainB hardhat
+           ./dive bridge btp --chainA icon --chainB icon
            mv output/dive/*.json ../test/ 
            cd ../test && make run-demo CONFIG_FILE='"*.json"'
