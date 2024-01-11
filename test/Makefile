@@ -11,7 +11,7 @@ DEP := solidity node_modules typechain-types
 
 run-demo:$(FOLDERS)
 	@ echo ">>> Run btp demo_dapp.ts " ; \
-	$(HARDHAT) $(NETWORK) run scripts/demo_dapp.ts
+	$(HARDHAT) $(NETWORK) run scripts/demo_dapp.ts 
 
 .PHONY: $(FOLDERS)
 

@@ -3,6 +3,7 @@ import { exec } from "child_process";
 import fs from "fs";
 import { Secp256k1HdWallet } from "@cosmjs/launchpad";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+import { Deployments } from "../setup/config";
 
 const defaultGasPrice = GasPrice.fromString("0stake");
 
@@ -115,40 +116,62 @@ export async function getBalance(
   return balance.amount;
 }
 
-export function GetCosmosContracts(contract: string, chainName: string) {
-  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"));
-  return dataArray[chainName]["contracts"][contract];
+const config = process.env.CONFIG_FILE || "../*.json";
+const deployments = Deployments.getDefault(config);
+const SRC = deployments.getSrc();
+const DST = deployments.getDst();
+const srcChain = deployments.get(SRC);
+const dstChain = deployments.get(DST);
+const srcContracts = deployments.getContracts(SRC);
+const dstContracts = deployments.getContracts(DST);
+
+export function GetCosmosContracts(contract: string) {
+  if (srcChain.service_name.includes("constantine-3")){
+    return srcContracts[contract]
+  } else {
+    return dstContracts[contract]
+  }
 }
 
 export function GetIconContracts(contract: string) {
-  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"));
-  return dataArray["icon"]["contracts"][contract];
+  if (srcChain.service_name.includes("icon")){
+    return srcContracts[contract]
+  } else {
+    return dstContracts[contract]
+  }
 }
 
-export function GetChainInfo(chainName: string,args: string){
-  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
-  return dataArray[chainName][args];
+export function GetChainInfo(chainName:string, args: string){
+  if (chainName.includes("icon")){
+    return srcChain[args]
+  } else {
+    return dstChain[args]
+  }
 }
 
-export function GetNeutronChainInfo(args: string){
-  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
-  return dataArray["neutron"][args];
+export function GetCosmosChainInfo(chainID:string, args: string){
+  if (srcChain.chain_id == chainID){
+    return srcChain[args]
+  } else {
+    return dstChain[args]
+  }
 }
 
 
 export function GetIconChainInfo(args: string){
-  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
-  return dataArray["icon"][args];
+  if (srcChain.service_name.includes("icon")){
+    return srcChain[args]
+  } else {
+    return dstChain[args]
+  }
 }
 
 export function GetSrc(){
-  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
-  return dataArray["path"]["src"];
+  return SRC
 }
 
 export function GetDest(){
-  var dataArray = JSON.parse(fs.readFileSync("contracts.json", "utf-8"))
-  return dataArray["path"]["dest"];
+  return DST
 }
 
 export function GetDataInBytes(msg: string) {
@@ -177,3 +200,5 @@ export function hexToString(hex: string): string {
   }
   return str;
 }
+
+

@@ -106,7 +106,7 @@ async function sendMessage(
 async function getFee(useRollback = false, chainName: string) {
   try {
     const params = {
-      _net: GetChainInfo(chainName, "network"),
+      _net: GetChainInfo(chainName, "chain_id"),
       _rollback: useRollback ? "0x1" : "0x0",
     };
 
@@ -350,7 +350,7 @@ export async function sendMessageFromDAppIcon(
   rollbackData?: string,
   isRollback?: boolean
 ) {
-  const _to = `${GetChainInfo(chainName, "network")}/${GetCosmosContracts("dapp", chainName)}`;
+  const _to = `${GetChainInfo(chainName, "chain_id")}/${GetCosmosContracts("dapp")}`;
   return await sendMessage(_to, data, chainName, rollbackData, isRollback);
 }
 

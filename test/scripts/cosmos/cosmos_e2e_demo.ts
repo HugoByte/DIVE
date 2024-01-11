@@ -3,6 +3,7 @@ import { fromTendermintEvent } from "@cosmjs/stargate";
 import Long from "long";
 import {
   CreateSigningClient,
+  GetCosmosChainInfo,
   getBalance,
   getHeight,
   getStake,
@@ -25,16 +26,20 @@ async function main() {
   // Chain Constants, modify as required
   let chain1;
   let chain2;
+  const archwaySrcChainID = "constantine-3"
+  const archwayDestChainID = "archway-node-1"
+  const neutronSrcChainID = "test-chain1"
+  const neutronDestChainID = "test-chain2"
   if (chainName == "archway") {
     chain1 = {
-      chainId: "archway-node-0",
-      endpoint: "http://localhost:4564",
+      chainId: archwaySrcChainID,
+      endpoint: GetCosmosChainInfo(archwaySrcChainID, "endpoint_public"),
       prefix: "archway",
     };
 
     chain2 = {
-      chainId: "archway-node-1",
-      endpoint: "http://localhost:4566",
+      chainId: archwayDestChainID,
+      endpoint: GetCosmosChainInfo(archwayDestChainID, "endpoint_public"),
       prefix: "archway",
     };
 
@@ -45,14 +50,14 @@ async function main() {
     console.log("*".repeat(63));
   } else {
     chain1 = {
-      chainId: "test-chain1",
-      endpoint: "http://localhost:26669",
+      chainId: neutronSrcChainID,
+      endpoint: GetCosmosChainInfo(neutronSrcChainID, "endpoint_public"),
       prefix: "neutron",
     };
 
     chain2 = {
-      chainId: "test-chain2",
-      endpoint: "http://localhost:26653",
+      chainId: neutronDestChainID,
+      endpoint: GetCosmosChainInfo(neutronDestChainID, "endpoint_public"),
       prefix: "neutron",
     };
 
