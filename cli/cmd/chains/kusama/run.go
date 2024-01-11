@@ -48,7 +48,7 @@ func RunKusama(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 
 	for _, paraChain := range serviceConfig.Para {
 		if !slices.Contains(kusamaParachains, paraChain.Name) {
-			return nil, common.WrapMessageToErrorf(common.ErrInvalidConfig, "Invalid ParaChain Name for Kusama")
+			return nil, common.WrapMessageToErrorf(common.ErrInvalidConfig, "Invalid Parachain - Parachain %s is not Supported for Kusama", paraChain.Name)
 		}
 	}
 
