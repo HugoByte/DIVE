@@ -89,6 +89,7 @@ const (
 	EmptyFieldsError
 	MissingFlagsError
 	InvalidFlagError
+	InvalidConfigError
 )
 
 var DiveLogs bool

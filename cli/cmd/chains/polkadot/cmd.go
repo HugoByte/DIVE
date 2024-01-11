@@ -29,6 +29,10 @@ const (
 	runPolkadotGrafana                  = "launch_grafana"
 )
 
+var (
+	polkadotParachains = []string{"acala", "ajuna", "bifrost", "centrifuge", "clover", "frequency", "integritee", "interlay", "karura", "kilt", "kylin", "litentry", "manta", "moonbeam", "moonsama", "nodle", "parallel", "pendulum", "phala", "polkadex", "subsocial", "zeitgeist"}
+)
+
 var PolkadotCmd = common.NewDiveCommandBuilder().
 	SetUse("polkadot").
 	SetShort("Build, initialize and start a Polkadot node").

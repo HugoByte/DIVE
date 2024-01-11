@@ -29,6 +29,10 @@ const (
 	runKusamaGrafana                  = "launch_grafana"
 )
 
+var (
+	kusamaParachains                  = []string{"altair", "bajun", "bifrost", "calamari", "encointer", "khala", "kintsugi-btc", "litmus", "mangata", "moonriver", "robonomics", "subzero", "turing"}
+)
+
 var KusamaCmd = common.NewDiveCommandBuilder().
 	SetUse("kusama").
 	SetShort("Build, initialize and start a Kusama node").

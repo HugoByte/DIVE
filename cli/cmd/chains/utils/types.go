@@ -2,6 +2,8 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
+	"slices"
 
 	"github.com/hugobyte/dive-core/cli/common"
 )
@@ -160,8 +162,15 @@ func (sc *HardhatServiceConfig) EncodeToString() (string, error) {
 
 type NodeConfig struct {
 	Name       string `json:"name"`
-	NodeType   string `json:"node-type"`
+	NodeType   string `json:"node_type"`
 	Prometheus bool   `json:"prometheus"`
+	Ports      Ports  `json:"ports"`
+}
+
+type Ports struct {
+	RPCPort        int `json:"rpc_port"`
+	Lib2LibPort    int `json:"lib2lib_port"`
+	PrometheusPort int `json:"prometheus_port,omitempty"`
 }
 
 type RelayChainConfig struct {
@@ -175,14 +184,23 @@ type ParaNodeConfig struct {
 }
 
 type PolkadotServiceConfig struct {
-	ChainType  string           `json:"chain-type"`
+	ChainType  string           `json:"chain_type"`
 	RelayChain RelayChainConfig `json:"relaychain"`
-	Para       []ParaNodeConfig `json:"para"`
+	Para       []ParaNodeConfig `json:"parachains"`
 	Explorer   bool             `json:"explorer"`
 }
 
-func (sc *ParaNodeConfig) EncodeToString() (string, error) {
-	encodedBytes, err := json.Marshal(sc)
+func (pc *ParaNodeConfig) EncodeToString() (string, error) {
+	encodedBytes, err := json.Marshal(pc)
+	if err != nil {
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+	}
+
+	return string(encodedBytes), nil
+}
+
+func (rc *RelayChainConfig) EncodeToString() (string, error) {
+	encodedBytes, err := json.Marshal(rc)
 	if err != nil {
 		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
 	}
@@ -209,6 +227,17 @@ func (sc *PolkadotServiceConfig) LoadConfigFromFile(cliContext *common.Cli, file
 	if err != nil {
 		return common.WrapMessageToError(err, "Failed To Load Configuration")
 	}
+
+	for i := range sc.RelayChain.Nodes {
+		sc.RelayChain.Nodes[i].AssignPorts(sc.RelayChain.Nodes[i].Prometheus)
+	}
+
+	for _, parachain := range sc.Para {
+		for i := range parachain.Nodes {
+			sc.RelayChain.Nodes[i].AssignPorts(sc.RelayChain.Nodes[i].Prometheus)
+		}
+	}
+
 	return nil
 }
 
@@ -217,12 +246,37 @@ func (sc *PolkadotServiceConfig) LoadDefaultConfig() error {
 	sc.Explorer = false
 	sc.RelayChain.Name = "rococo-local"
 	sc.RelayChain.Nodes = []NodeConfig{
-		{Name: "bob", NodeType: "full", Prometheus: false},
+		{Name: "bob", NodeType: "validator", Prometheus: false},
 		{Name: "alice", NodeType: "validator", Prometheus: false},
 	}
 
-	sc.Para = []ParaNodeConfig{}
+	for i := range sc.RelayChain.Nodes {
+		sc.RelayChain.Nodes[i].AssignPorts(sc.RelayChain.Nodes[i].Prometheus)
+	}
 
+	sc.Para = []ParaNodeConfig{}
+	return nil
+}
+
+func (nc *NodeConfig) AssignPorts(prometheus bool) error {
+	var rpcPort, lib2libPort, prometheusPort int
+	var err error
+	rpcPort, err = common.GetAvailablePort()
+	if err != nil {
+		return err
+	}
+
+	lib2libPort, err = common.GetAvailablePort()
+	if err != nil {
+		return err
+	}
+	if prometheus {
+		prometheusPort, err = common.GetAvailablePort()
+		if err != nil {
+			return err
+		}
+	}
+	nc.Ports = Ports{RPCPort: rpcPort, Lib2LibPort: lib2libPort, PrometheusPort: prometheusPort}
 	return nil
 }
 
@@ -290,4 +344,115 @@ func (nc *NodeConfig) IsEmpty() error {
 	}
 
 	return nil
+}
+
+func (sc *PolkadotServiceConfig) HasPrometheus() bool {
+	// Check relay chain nodes
+	if sc.RelayChain.Name != "" {
+		for _, node := range sc.RelayChain.Nodes {
+			if node.Prometheus {
+				return true
+			}
+		}
+	}
+
+	// Check para nodes
+	for _, paraNode := range sc.Para {
+		for _, node := range paraNode.Nodes {
+			if node.Prometheus {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func (sc *PolkadotServiceConfig) ValidateConfig() error {
+	var validChainTypes = []string{"local", "testnet", "mainnet"}
+	var validRelayNodeType = []string{"validator", "full"}
+	var validParaNodeType = []string{"collator", "full"}
+
+	if !slices.Contains(validChainTypes, sc.ChainType) {
+		return fmt.Errorf("invalid Chain Type: %s", sc.ChainType)
+	}
+
+	if sc.ChainType == "local" && sc.RelayChain.Name != "rococo-local" {
+		return fmt.Errorf("invalid Chain Name for local: %s", sc.RelayChain.Name)
+	}
+
+	if sc.RelayChain.Name != "" {
+		if sc.ChainType == "testnet" && !(sc.RelayChain.Name == "rococo" || sc.RelayChain.Name == "westend") {
+			return fmt.Errorf("invalid Chain Name for testnet: %s", sc.RelayChain.Name)
+		}
+
+		if sc.ChainType == "mainnet" && !(sc.RelayChain.Name == "kusama" || sc.RelayChain.Name == "polkadot") {
+			return fmt.Errorf("invalid Chain Name for mainnet: %s", sc.RelayChain.Name)
+		}
+	}
+
+	if sc.ChainType == "local" {
+		for _, node := range sc.RelayChain.Nodes {
+			if node.NodeType != "validator" {
+				return fmt.Errorf("invalid Node Type for Relay Chain Local: %s", node.NodeType)
+			}
+		}
+	} else {
+		for _, node := range sc.RelayChain.Nodes {
+			if !slices.Contains(validRelayNodeType, node.NodeType) {
+				return fmt.Errorf("invalid Node Type for Relay Chain: %s", node.NodeType)
+			}
+		}
+	}
+
+	for _, paraChain := range sc.Para {
+		for _, node := range paraChain.Nodes {
+			if !slices.Contains(validParaNodeType, node.NodeType) {
+				return fmt.Errorf("invalid Node Type for Para Chain: %s", node.NodeType)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (sc *PolkadotServiceConfig) GetParamsForRelay() (string, error) {
+	relay_nodes, err := sc.RelayChain.EncodeToString()
+	if err != nil {
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+	}
+
+	if sc.ChainType == "local" {
+		return fmt.Sprintf(`{"relaychain": %s}`, relay_nodes), nil
+	} else {
+		return fmt.Sprintf(`{"chain_type": "%s", "relaychain": %s}`, sc.ChainType, relay_nodes), nil
+	}
+}
+
+func (sc *PolkadotServiceConfig) ConfigureMetrics() {
+	for i := range sc.RelayChain.Nodes {
+		sc.RelayChain.Nodes[i].Prometheus = true
+	}
+	if len(sc.Para) != 0 {
+		for i := range sc.Para[0].Nodes {
+			sc.Para[0].Nodes[i].Prometheus = true
+		}
+	}
+}
+
+func (sc *PolkadotServiceConfig) ConfigureFullNodes(network string) {
+
+	if network == "testnet" {
+		sc.RelayChain.Name = "rococo"
+	} else if network == "mainnet" {
+		sc.RelayChain.Name = "kusama"
+	}
+
+	sc.RelayChain.Nodes = []NodeConfig{}
+
+	sc.RelayChain.Nodes = append(sc.RelayChain.Nodes, NodeConfig{
+		Name:       "alice",
+		NodeType:   "full",
+		Prometheus: false,
+	})
 }

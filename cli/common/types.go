@@ -5,21 +5,22 @@ import (
 )
 
 type DiveServiceResponse struct {
-	ServiceName        string `json:"service_name,omitempty"`
-	PublicEndpoint     string `json:"endpoint_public,omitempty"`
-	PrivateEndpoint    string `json:"endpoint,omitempty"`
-	KeyPassword        string `json:"keypassword,omitempty"`
-	KeystorePath       string `json:"keystore_path,omitempty"`
-	Network            string `json:"network,omitempty"`
-	NetworkName        string `json:"network_name,omitempty"`
-	NetworkId          string `json:"nid,omitempty"`
-	ChainId            string `json:"chain_id,omitempty"`
-	ChainKey           string `json:"chain_key,omitempty"`
-	PrometheusEndpoint string `json:"endpoint_prometheus,omitempty"`
-	Prometheus         bool   `json:"prometheus,omitempty"`
-	IpAddress          string `json:"ip_address,omitempty"`
-	Node               string `json:"node-type,omitempty"`
-	PrometheusPort     int    `json:"prometheus_port,omitempty"`
+	ServiceName          string `json:"service_name,omitempty"`
+	PublicEndpoint       string `json:"endpoint_public,omitempty"`
+	PrivateEndpoint      string `json:"endpoint,omitempty"`
+	KeyPassword          string `json:"keypassword,omitempty"`
+	KeystorePath         string `json:"keystore_path,omitempty"`
+	Network              string `json:"network,omitempty"`
+	NetworkName          string `json:"network_name,omitempty"`
+	NetworkId            string `json:"nid,omitempty"`
+	ChainId              string `json:"chain_id,omitempty"`
+	ChainKey             string `json:"chain_key,omitempty"`
+	PrometheusEndpoint   string `json:"endpoint_prometheus,omitempty"`
+	Prometheus           bool   `json:"prometheus,omitempty"`
+	IpAddress            string `json:"ip_address,omitempty"`
+	Node                 string `json:"node-type,omitempty"`
+	PrometheusPort       int    `json:"prometheus_port,omitempty"`
+	PrometheusPublicPort int    `json:"prometheus_public_port,omitempty"`
 }
 
 type DiveMultipleServiceResponse struct {
@@ -66,6 +67,29 @@ func (dive *DiveMultipleServiceResponse) EncodeToString() (string, error) {
 	}
 
 	return string(encodedBytes), nil
+}
+
+func (dive *DiveMultipleServiceResponse) ConcatenateDiveResults(result2 *DiveMultipleServiceResponse) *DiveMultipleServiceResponse {
+	result1 := dive
+	if result1 == nil {
+		return result2
+	} else if result2 == nil {
+		return result1
+	}
+
+	concatenatedResult := &DiveMultipleServiceResponse{
+		Dive: make(map[string]*DiveServiceResponse),
+	}
+
+	for key, value := range result1.Dive {
+		concatenatedResult.Dive[key] = value
+	}
+
+	for key, value := range result2.Dive {
+		concatenatedResult.Dive[key] = value
+	}
+
+	return concatenatedResult
 }
 
 type Services map[string]*DiveServiceResponse
