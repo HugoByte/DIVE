@@ -54,7 +54,6 @@ func GetBinaryCommand() *exec.Cmd {
 func GetBinPath() string {
 	workingDir, _ := os.Getwd()
 	binaryPath := filepath.Join(workingDir, "/../../cli/dive")
-	fmt.Println(binaryPath)
 	return binaryPath
 }
 
