@@ -1,6 +1,5 @@
 import fs from 'fs';
 import {IconService, Wallet} from 'icon-sdk-js';
-import {ChainConfig} from "../setup/config";
 
 const {IconWallet, HttpProvider} = IconService;
 

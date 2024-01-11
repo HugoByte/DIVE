@@ -1,7 +1,6 @@
 import fs from 'fs';
 const {PWD} = process.env
 const DEPLOYMENTS_PATH = `${PWD}/deployments.json`
-const CHAIN_CONFIG_PATH = `${PWD}/chain_config.json`
 
 interface InnerObject {
   bridge: string;
@@ -48,7 +47,7 @@ export class Deployments {
       const map = new Map(Object.entries(json));
        // Iterate over map entries to find the first entry with an object value
     let innerObject: InnerObject | undefined;;
-    for (const [key, value] of map.entries()) {
+    for (const [, value] of map.entries()) {
       if (typeof value === 'object' && value !== null) {
         innerObject = value as InnerObject;
         break;
@@ -76,29 +75,3 @@ export class Deployments {
   }
 }
 
-export class ChainConfig {
-  private static map: Map<String, any>;
-
-  public static getProp(key: string) {
-    if (!this.map) {
-      const data = fs.readFileSync("/home/dell/project/dive-core/cli/output/test1/dive_test1_61e3ad04453c.json");
-      const json = JSON.parse(data.toString());
-      this.map = new Map(Object.entries(json));
-    }
-    return this.map.get(key);
-  }
-
-  public static getChain(target: string) {
-    const chains = this.getProp('chains');
-    const config = new Map(Object.entries(chains));
-    return config.get(target);
-  }
-
-  public static getLink() {
-    return this.getProp('link');
-  }
-}
-
-export function chainType(chain: any) {
-  return chain.network.split(".")[1];
-}

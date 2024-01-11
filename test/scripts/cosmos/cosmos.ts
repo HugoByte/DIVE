@@ -6,7 +6,6 @@ import {
   GetDataInBytes,
   GetIconChainInfo,
   GetIconContracts,
-  getHeight,
   getStake,
   getTestAccountWithStake,
 } from "./helper";

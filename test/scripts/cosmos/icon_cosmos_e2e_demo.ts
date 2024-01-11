@@ -17,7 +17,6 @@ import {
   verifyRollbackMessageEventCosmos,
 } from "./cosmos";
 import { GetDataInBytes, GetDest, GetSrc, strToHex } from "./helper";
-import { Deployments } from "../setup/config";
 import {
   executeCallIcon,
   executeRollbackIcon,
