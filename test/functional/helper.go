@@ -54,6 +54,7 @@ func GetBinaryCommand() *exec.Cmd {
 func GetBinPath() string {
 	workingDir, _ := os.Getwd()
 	binaryPath := filepath.Join(workingDir, "/../../cli/dive")
+	fmt.Println(binaryPath)
 	return binaryPath
 }
 
@@ -232,10 +233,6 @@ func UpdatePublicPort(enclaveName string, filePath string) string {
 	if err != nil {
 		panic(err)
 	}
-
-	// Delete the updated temporary file
-    defer os.Remove(tmpfilePath)
-	
 	return tmpfile.Name()
 }
 
@@ -306,9 +303,6 @@ func UpdatePublicPorts(filePath1 string) string {
 		panic(err)
 	}
 
-	 // Delete the updated temporary file
-	 defer os.Remove(tmpfilePath)
-
 	return tmpfile.Name()
 }
 
@@ -376,9 +370,6 @@ func UpdateNeutronPublicPorts(filePath2 string) string {
 	if err != nil {
 		panic(err)
 	}
-
-     // Delete the updated temporary file
-	 defer os.Remove(tmpfilePath) 
 
 	return tmpfile.Name()
 }
@@ -487,9 +478,6 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
         panic(err)
     }
 
-    // Delete the updated temporary file
-    defer os.Remove(tmpfilePath)
-
     return tmpfile.Name()
 }
 
@@ -546,9 +534,6 @@ func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bo
 		panic(err)
 	}
 
-	  // Delete the updated temporary file
-	  defer os.Remove(tmpfilePath)
-
 	return tmpfile.Name()
 }
 
@@ -602,9 +587,6 @@ func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName stri
 	if err != nil {
 		panic(err)
 	}
-
-	 // Delete the updated temporary file
-	 defer os.Remove(tmpfilePath)
 
 	return tmpfile.Name()
 }
