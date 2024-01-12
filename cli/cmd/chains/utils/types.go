@@ -234,7 +234,7 @@ func (sc *PolkadotServiceConfig) LoadConfigFromFile(cliContext *common.Cli, file
 
 	for _, parachain := range sc.Para {
 		for i := range parachain.Nodes {
-			sc.RelayChain.Nodes[i].AssignPorts(sc.RelayChain.Nodes[i].Prometheus)
+			parachain.Nodes[i].AssignPorts(parachain.Nodes[i].Prometheus)
 		}
 	}
 
@@ -288,6 +288,10 @@ func (psc *PolkadotServiceConfig) IsEmpty() error {
 
 	if err := psc.RelayChain.IsEmpty(); err != nil {
 		return err
+	}
+
+	if psc.RelayChain.Name == "" && len(psc.RelayChain.Nodes) == 0 && len(psc.Para) == 0 {
+		return common.WrapMessageToError(common.ErrEmptyFields, "Missing Fields In RelayChainConfig")
 	}
 
 	if len(psc.Para) == 0 {
@@ -372,26 +376,19 @@ func (sc *PolkadotServiceConfig) ValidateConfig() error {
 	var validChainTypes = []string{"local", "testnet", "mainnet"}
 	var validRelayNodeType = []string{"validator", "full"}
 	var validParaNodeType = []string{"collator", "full"}
+	var invalidTestNetParaChains = []string{"parallel", "subzero"}
 
 	if !slices.Contains(validChainTypes, sc.ChainType) {
 		return fmt.Errorf("invalid Chain Type: %s", sc.ChainType)
 	}
 
-	if sc.ChainType == "local" && sc.RelayChain.Name != "rococo-local" {
-		return fmt.Errorf("invalid Chain Name for local: %s", sc.RelayChain.Name)
-	}
-
-	if sc.RelayChain.Name != "" {
-		if sc.ChainType == "testnet" && !(sc.RelayChain.Name == "rococo" || sc.RelayChain.Name == "westend") {
-			return fmt.Errorf("invalid Chain Name for testnet: %s", sc.RelayChain.Name)
-		}
-
-		if sc.ChainType == "mainnet" && !(sc.RelayChain.Name == "kusama" || sc.RelayChain.Name == "polkadot") {
-			return fmt.Errorf("invalid Chain Name for mainnet: %s", sc.RelayChain.Name)
-		}
-	}
-
 	if sc.ChainType == "local" {
+		if sc.RelayChain.Name != "rococo-local" {
+			return fmt.Errorf("invalid Chain Name for local: %s", sc.RelayChain.Name)
+		}
+		if len(sc.RelayChain.Nodes) < 2 {
+			return fmt.Errorf("atleast two nodes required for Relay Chain Local")
+		}
 		for _, node := range sc.RelayChain.Nodes {
 			if node.NodeType != "validator" {
 				return fmt.Errorf("invalid Node Type for Relay Chain Local: %s", node.NodeType)
@@ -401,6 +398,23 @@ func (sc *PolkadotServiceConfig) ValidateConfig() error {
 		for _, node := range sc.RelayChain.Nodes {
 			if !slices.Contains(validRelayNodeType, node.NodeType) {
 				return fmt.Errorf("invalid Node Type for Relay Chain: %s", node.NodeType)
+			}
+		}
+	}
+
+	if sc.RelayChain.Name != "" {
+		if sc.ChainType == "testnet" && !(sc.RelayChain.Name == "rococo" || sc.RelayChain.Name == "westend") {
+			return fmt.Errorf("invalid Chain Name for testnet: %s", sc.RelayChain.Name)
+		}
+		if sc.ChainType == "mainnet" && !(sc.RelayChain.Name == "kusama" || sc.RelayChain.Name == "polkadot") {
+			return fmt.Errorf("invalid Chain Name for mainnet: %s", sc.RelayChain.Name)
+		}
+	}
+
+	if sc.ChainType == "testnet" {
+		for _, paraChain := range sc.Para {
+			if slices.Contains(invalidTestNetParaChains, paraChain.Name) {
+				return fmt.Errorf("no Testnet for Para Chain: %s", paraChain.Name)
 			}
 		}
 	}
