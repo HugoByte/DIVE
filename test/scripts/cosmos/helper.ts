@@ -1,6 +1,5 @@
-import { GasPrice, SigningStargateClient } from "@cosmjs/stargate";
+import { GasPrice } from "@cosmjs/stargate";
 import { exec } from "child_process";
-import fs from "fs";
 import { Secp256k1HdWallet } from "@cosmjs/launchpad";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { Deployments } from "../setup/config";
@@ -116,7 +115,7 @@ export async function getBalance(
   return balance.amount;
 }
 
-const config = process.env.CONFIG_FILE || "../*.json";
+const config = process.env.CONFIG_FILE || "dive.json";
 const deployments = Deployments.getDefault(config);
 const SRC = deployments.getSrc();
 const DST = deployments.getDst();
