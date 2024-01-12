@@ -39,6 +39,7 @@ var (
 	ErrMissingFlags            = NewBase(MissingFlagsError, "Missing Flags")
 	ErrInvalidFlag             = NewBase(InvalidFlagError, "Invalid Flag Usage")
 	ErrInvalidConfig           = NewBase(InvalidConfigError, "Invalid Config")
+	ErrFailedPathConversion    = NewBase(PathConversionError, "Failed To Convert Path to Absolute Path")
 )
 
 func (c ErrorCode) New(msg string) error {

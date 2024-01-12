@@ -90,6 +90,7 @@ const (
 	MissingFlagsError
 	InvalidFlagError
 	InvalidConfigError
+	PathConversionError
 )
 
 var DiveLogs bool

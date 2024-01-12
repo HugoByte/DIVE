@@ -267,7 +267,7 @@ func configureService(serviceConfig *utils.PolkadotServiceConfig) error {
 func flagCheck() error {
 
 	if configFilePath != "" {
-		if len(paraChain) != 0 || network != "" || explorer || metrics {
+		if len(paraChain) != 0 || network != "" || explorer || metrics || noRelay{
 			return common.WrapMessageToError(common.ErrInvalidFlag, "The '-c' flag does not allow additional flags.")
 		}
 	}

@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"net"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -102,7 +103,11 @@ func LoadConfig(cliContext *Cli, config ConfigLoader, filePath string) error {
 			return err
 		}
 	} else {
-		err := config.LoadConfigFromFile(cliContext, filePath)
+		absoluePath, err := GetAbsolutePath(filePath)
+		if err != nil {
+			return err
+		}
+		err = config.LoadConfigFromFile(cliContext, absoluePath)
 		if err != nil {
 			return err
 		}
@@ -204,4 +209,17 @@ func GetAvailablePort() (int, error) {
 	}
 
 	return 0, ErrPortAllocation
+}
+
+// The function returns the absolute path for a given relative path
+func GetAbsolutePath(filePath string) (string, error) {
+	if filepath.IsAbs(filePath) {
+		return filePath, nil
+	} else {
+		absoluePath, err := filepath.Abs(filePath)
+		if err != nil {
+			return "", ErrFailedPathConversion
+		}
+		return absoluePath, nil
+	}
 }
