@@ -220,10 +220,11 @@ func UpdatePublicPort(enclaveName string, filePath string) string {
 		panic(err)
 	}
 
-	tmpfile, err := os.Create(fmt.Sprintf("updated-config-%s.json", enclaveName))
-	if err != nil {
-		panic(err)
-	}
+	tmpfilePath := fmt.Sprintf("updated-config-%s.json", enclaveName)
+    tmpfile, err := os.Create(tmpfilePath)
+    if err != nil {
+        panic(err)
+    }
 	defer tmpfile.Close()
 
 	// Write the updated JSON to the temporary file
@@ -231,7 +232,6 @@ func UpdatePublicPort(enclaveName string, filePath string) string {
 	if err != nil {
 		panic(err)
 	}
-
 	return tmpfile.Name()
 }
 
@@ -288,10 +288,12 @@ func UpdatePublicPorts(filePath1 string) string {
 
 	// Generate a random name for the new file
 	name := GenerateRandomName()
-	tmpfile, err := os.Create(fmt.Sprintf("updated-archway-%s.json", name))
-	if err != nil {
-		panic(err)
-	}
+	tmpfilePath := fmt.Sprintf("updated-archway-%s.json", name)
+    tmpfile, err := os.Create(tmpfilePath)
+    if err != nil {
+        panic(err)
+    }
+
 	defer tmpfile.Close()
 
 	// Write the updated JSON to the temporary file
@@ -354,10 +356,12 @@ func UpdateNeutronPublicPorts(filePath2 string) string {
 
 	// Generate a random name for the new file
 	name := GenerateRandomName()
-	tmpfile, err := os.Create(fmt.Sprintf("updated-neutron-%s.json", name))
-	if err != nil {
-		panic(err)
-	}
+	tmpfilePath := fmt.Sprintf("updated-neutron-%s.json", name)
+    tmpfile, err := os.Create(tmpfilePath)
+    if err != nil {
+        panic(err)
+    }
+
 	defer tmpfile.Close()
 
 	// Write the updated JSON to the temporary file
@@ -423,56 +427,59 @@ type Configuration1 struct {
 	Explorer bool `json:"explorer"`
 }
 
+
 func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName string, newExplorer, newPrometheus bool) string {
-	mutex.Lock()
-	defer mutex.Unlock()
+    mutex.Lock()
+    defer mutex.Unlock()
 
-	fileContent, err := os.ReadFile(filePath)
-	if err != nil {
-		panic(err)
-	}
+    fileContent, err := os.ReadFile(filePath)
+    if err != nil {
+        panic(err)
+    }
 
-	var local Configuration1
-	err = json.Unmarshal(fileContent, &local)
-	if err != nil {
-		panic(err)
-	}
+    var local Configuration1
+    err = json.Unmarshal(fileContent, &local)
+    if err != nil {
+        panic(err)
+    }
 
-	// Update ChainType and RelayChain Name
-	local.ChainType = newChainType
-	local.RelayChain.Name = newRelayChainName
-	// Update Explorer
-	local.Explorer = newExplorer
+    // Update ChainType and RelayChain Name
+    local.ChainType = newChainType
+    local.RelayChain.Name = newRelayChainName
+    // Update Explorer
+    local.Explorer = newExplorer
 
-	for i := range local.RelayChain.Nodes {
-		local.RelayChain.Nodes[i].Prometheus = newPrometheus
-	}
+    for i := range local.RelayChain.Nodes {
+        local.RelayChain.Nodes[i].Prometheus = newPrometheus
+    }
 
-	// Update Prometheus for Para Nodes
-	for i := range local.Para {
-		for j := range local.Para[i].Nodes {
-			local.Para[i].Nodes[j].Prometheus = newPrometheus
-		}
-	}
+    // Update Prometheus for Para Nodes
+    for i := range local.Para {
+        for j := range local.Para[i].Nodes {
+            local.Para[i].Nodes[j].Prometheus = newPrometheus
+        }
+    }
 
-	updatedJSON, err := json.MarshalIndent(local, "", "    ")
-	if err != nil {
-		panic(err)
-	}
+    updatedJSON, err := json.MarshalIndent(local, "", "    ")
+    if err != nil {
+        panic(err)
+    }
 
-	tmpfile, err := os.Create(fmt.Sprintf("updated-config-%s.json", enclaveName))
-	if err != nil {
-		panic(err)
-	}
-	defer tmpfile.Close()
+    tmpfilePath := fmt.Sprintf("updated-config-%s.json", enclaveName)
+    tmpfile, err := os.Create(tmpfilePath)
+    if err != nil {
+        panic(err)
+    }
+    defer tmpfile.Close()
 
-	_, err = tmpfile.Write(updatedJSON)
-	if err != nil {
-		panic(err)
-	}
+    _, err = tmpfile.Write(updatedJSON)
+    if err != nil {
+        panic(err)
+    }
 
-	return tmpfile.Name()
+    return tmpfile.Name()
 }
+
 
 func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bool) string {
 	mutex.Lock()
@@ -512,10 +519,13 @@ func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bo
 		panic(err)
 	}
 
-	tmpfile, err := os.Create("updated-local.json")
-	if err != nil {
-		panic(err)
-	}
+    
+    tmpfilePath := fmt.Sprintf("updated-local.json")
+    tmpfile, err := os.Create(tmpfilePath)
+    if err != nil {
+        panic(err)
+    }
+
 	defer tmpfile.Close()
 
 	_, err = tmpfile.Write(updatedJSON)
@@ -564,10 +574,12 @@ func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName stri
 		panic(err)
 	}
 
-	tmpfile, err := os.Create("updated-local.json")
-	if err != nil {
-		panic(err)
-	}
+	tmpfilePath := fmt.Sprintf("updated-local.json")
+    tmpfile, err := os.Create(tmpfilePath)
+    if err != nil {
+        panic(err)
+    }
+
 	defer tmpfile.Close()
 
 	_, err = tmpfile.Write(updatedJSON)

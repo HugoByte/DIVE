@@ -7,7 +7,7 @@ import {Deployments} from "./setup/config";
 import {TypedEvent, TypedEventFilter} from "../typechain-types/common";
 
 const {IconConverter} = IconService;
-const config = process.env.CONFIG_FILE || "../*.json";
+const config = process.env.CONFIG_FILE || "dive.json";
 const deployments = Deployments.getDefault(config);
 
 function sleep(millis: number) {
