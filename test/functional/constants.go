@@ -15,7 +15,7 @@ const(
 	ARCHWAY_CONFIG1 = "../../cli/sample-jsons/archway1.json"
 	ARCHWAY_CONFIG1_SERVICENAME = "node-service-archway-node-1"
  
-	NEUTRON_CONFIG0 = "/home/sindhu/project/dive/dive-core/cli/sample-jsons/neutron.json"
+	NEUTRON_CONFIG0 = "../../cli/sample-jsons/neutron.json"
 	NEUTRON_CONFIG0_SERVICENAME = "neutron-node-test-chain2"
 
 	NEUTRON_CONFIG1 = "../../cli/sample-jsons/neutron1.json"
