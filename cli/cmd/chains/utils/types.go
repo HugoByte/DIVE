@@ -71,12 +71,36 @@ func (cs *CosmosServiceConfig) LoadConfigFromFile(cliContext *common.Cli, filePa
 	if err != nil {
 		return common.WrapMessageToError(err, "Failed To Load Configuration")
 	}
+
+	publicGrpc, err := common.GetAvailablePort()
+	if err != nil {
+		return common.WrapMessageToError(err, "error getting available gRPC port")
+	}
+	cs.PublicGrpc = &publicGrpc
+
+	publicHTTP, err := common.GetAvailablePort()
+	if err != nil {
+		return common.WrapMessageToError(err, "error getting available HTTP port")
+	}
+	cs.PublicHTTP = &publicHTTP
+
+	publicRPC, err := common.GetAvailablePort()
+	if err != nil {
+		return common.WrapMessageToError(err, "error getting available Rpc port")
+	}
+	cs.PublicRPC = &publicRPC
+
+	publicTCP, err := common.GetAvailablePort()
+	if err != nil {
+		return common.WrapMessageToError(err, "error getting available Tcp port")
+	}
+	cs.PublicTCP = &publicTCP
+
 	return nil
 }
 
 func (cc *CosmosServiceConfig) IsEmpty() error {
-	if cc.ChainID == nil || cc.Key == nil || cc.Password == nil ||
-		cc.PublicGrpc == nil || cc.PublicHTTP == nil || cc.PublicTCP == nil || cc.PublicRPC == nil {
+	if cc.ChainID == nil || cc.Key == nil || cc.Password == nil {
 		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In The Config File")
 	}
 
@@ -126,11 +150,19 @@ func (sc *IconServiceConfig) LoadConfigFromFile(cliContext *common.Cli, filePath
 		return common.WrapMessageToError(err, "Failed To Load Configuration")
 	}
 
+	sc.Port = 9080
+
+	availablePort, err := common.GetAvailablePort()
+	if err != nil {
+		return err
+	}
+	sc.PublicPort = availablePort
+
 	return nil
 }
 
 func (sc *IconServiceConfig) IsEmpty() error {
-	if sc.Port == 0 || sc.PublicPort == 0 || sc.P2PListenAddress == "" || sc.P2PAddress == "" || sc.Cid == "" {
+	if sc.P2PListenAddress == "" || sc.P2PAddress == "" || sc.Cid == "" {
 		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In The Config File")
 	}
 	return nil

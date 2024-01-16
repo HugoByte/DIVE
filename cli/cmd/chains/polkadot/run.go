@@ -48,7 +48,7 @@ func RunPolkadot(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 
 	for _, paraChain := range serviceConfig.Para {
 		if !slices.Contains(polkadotParachains, paraChain.Name) {
-			return nil, common.WrapMessageToErrorf(common.ErrInvalidConfig, "Invalid Parachain - Parachain %s is not Supported for PolkaDot", paraChain.Name)
+			return nil, common.WrapMessageToErrorf(common.ErrInvalidConfig, "Invalid Parachain - Parachain %s is not Supported for Polkadot", paraChain.Name)
 		}
 	}
 
