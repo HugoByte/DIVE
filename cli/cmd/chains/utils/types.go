@@ -446,7 +446,7 @@ func (sc *PolkadotServiceConfig) ValidateConfig() error {
 	if sc.ChainType == "testnet" {
 		for _, paraChain := range sc.Para {
 			if slices.Contains(invalidTestNetParaChains, paraChain.Name) {
-				return fmt.Errorf("no Testnet for Para Chain: %s", paraChain.Name)
+				return fmt.Errorf("no Testnet for Parachain: %s", paraChain.Name)
 			}
 		}
 	}
@@ -454,7 +454,7 @@ func (sc *PolkadotServiceConfig) ValidateConfig() error {
 	for _, paraChain := range sc.Para {
 		for _, node := range paraChain.Nodes {
 			if !slices.Contains(validParaNodeType, node.NodeType) {
-				return fmt.Errorf("invalid Node Type for Para Chain: %s", node.NodeType)
+				return fmt.Errorf("invalid Node Type for Parachain: %s", node.NodeType)
 			}
 		}
 	}
