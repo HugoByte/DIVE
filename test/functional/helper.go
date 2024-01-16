@@ -446,7 +446,7 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
     // Update ChainType and RelayChain Name
     local.ChainType = newChainType
     local.RelayChain.Name = newRelayChainName
-    // Update Explorer
+    // Update Explorer details 
     local.Explorer = newExplorer
 
     for i := range local.RelayChain.Nodes {
