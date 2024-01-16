@@ -1,0 +1,39 @@
+{
+  "chain_type": "local",
+  "relaychain": {
+    "name": "rococo-local",
+    "nodes": [
+      {
+        "name": "alice",
+        "node_type": "validator",
+        "prometheus": false
+      },
+      {
+        "name": "bob",
+        "node_type": "full",
+        "prometheus": true
+
+      }
+    ]
+  },
+
+  "parachains": [
+    {
+      "name":"acala",
+      "nodes": [
+        {
+          "name": "alice",
+          "node_type": "collator",
+          "prometheus": false
+
+        },
+        {
+          "name": "bob",
+          "node_type": "full",
+          "prometheus": true
+        }
+      ]
+    }
+  ],
+  "explorer": true
+}
