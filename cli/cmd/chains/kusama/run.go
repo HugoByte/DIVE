@@ -13,6 +13,7 @@ import (
 
 const (
 	localChain = "local"
+	polkadotJUrl = "http://127.0.0.1:80"
 )
 
 func RunKusama(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
@@ -164,6 +165,13 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 			return nil, err
 		}
 		finalResult = finalResult.ConcatenateDiveResults(explorerResult)
+
+		cli.Logger().Info("Redirecting to Polkadot explorer UI...")
+		if err := common.OpenFile(polkadotJUrl); err != nil {
+			cli.Logger().Fatalf(common.CodeOf(err), "Failed to open HugoByte Polkadot explorer UI with error %v", err)
+		}
+		
+		
 	}
 
 	return finalResult, nil
