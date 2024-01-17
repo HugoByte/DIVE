@@ -407,20 +407,20 @@ func GetServiceDetails(servicesJson string, service string) (serviceName string,
 }
 
 type Configuration1 struct {
-	ChainType  string `json:"chain-type"`
+	ChainType  string `json:"chain_type"`
 	RelayChain struct {
 		Name  string `json:"name"`
 		Nodes []struct {
 			Name       string `json:"name"`
-			NodeType   string `json:"node-type"`
+			NodeType   string `json:"node_type"`
 			Prometheus bool   `json:"prometheus"`
 		} `json:"nodes"`
 	} `json:"relaychain"`
-	Para []struct {
+	Parachains []struct {
 		Name  string `json:"name"`
 		Nodes []struct {
 			Name       string `json:"name"`
-			NodeType   string `json:"node-type"`
+			NodeType   string `json:"node_type"`
 			Prometheus bool   `json:"prometheus"`
 		} `json:"nodes"`
 	} `json:"para"`
@@ -454,9 +454,9 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
     }
 
     // Update Prometheus for Para Nodes
-    for i := range local.Para {
-        for j := range local.Para[i].Nodes {
-            local.Para[i].Nodes[j].Prometheus = newPrometheus
+    for i := range local.Parachains {
+        for j := range local.Parachains[i].Nodes {
+            local.Parachains[i].Nodes[j].Prometheus = newPrometheus
         }
     }
 
@@ -501,16 +501,16 @@ func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bo
 		Name  string `json:"name"`
 		Nodes []struct {
 			Name       string `json:"name"`
-			NodeType   string `json:"node-type"`
+			NodeType   string `json:"node_type"`
 			Prometheus bool   `json:"prometheus"`
 		} `json:"nodes"`
 	}{}
 
 	// Update Name and Prometheus for Para Nodes
-	for i := range local.Para {
-		local.Para[i].Name = newParaName
-		for j := range local.Para[i].Nodes {
-			local.Para[i].Nodes[j].Prometheus = newPrometheus
+	for i := range local.Parachains {
+		local.Parachains[i].Name = newParaName
+		for j := range local.Parachains[i].Nodes {
+			local.Parachains[i].Nodes[j].Prometheus = newPrometheus
 		}
 	}
 
@@ -562,10 +562,10 @@ func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName stri
 	}
 
 	// Update Name and Prometheus for Para Nodes
-	for i := range local.Para {
-		local.Para[i].Name = newParaName
-		for j := range local.Para[i].Nodes {
-			local.Para[i].Nodes[j].Prometheus = newPrometheus
+	for i := range local.Parachains {
+		local.Parachains[i].Name = newParaName
+		for j := range local.Parachains[i].Nodes {
+			local.Parachains[i].Nodes[j].Prometheus = newPrometheus
 		}
 	}
 
