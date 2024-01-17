@@ -34,3 +34,5 @@ logs/
 output/
 
 node_modules/
+
+*.out
