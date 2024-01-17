@@ -546,9 +546,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 
 		ginkgo.It("should run custom Icon node-0", func() {
 			enclaveName := dive.GenerateRandomName()
-			//updated_path := dive.UpdatePublicPort(enclaveName, dive.ICON_CONFIG0)
 			cmd.Args = append(cmd.Args, "chain", "icon", "-c", dive.ICON_CONFIG0, "-g", dive.ICON_GENESIS0, "--enclaveName", enclaveName)
-			//defer os.Remove(updated_path)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -556,10 +554,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 
 		ginkgo.It("should run custom Icon node-1", func() {
 			enclaveName := dive.GenerateRandomName()
-			//filepath := dive.ICON_CONFIG1
-			//updated_path := dive.UpdatePublicPort(enclaveName, filepath)
 			cmd.Args = append(cmd.Args, "chain", "icon", "-c", dive.ICON_CONFIG1, "-g", dive.ICON_GENESIS1, "--enclaveName", enclaveName)
-			//defer os.Remove(updated_path)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -709,11 +704,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		})
 
 		ginkgo.It("should run single custom archway node-1", func() {
-			//filepath1 := "../../cli/sample-jsons/archway.json"
-			//updated_path1 := dive.UpdatePublicPorts(filepath1)
 			enclaveName := dive.GenerateRandomName()
 			cmd.Args = append(cmd.Args, "chain", "archway", "-c",dive.ARCHWAY_CONFIG0, "--enclaveName", enclaveName)
-			//defer os.Remove(updated_path1)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -748,10 +740,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			})
 
 		ginkgo.It("should run single custom neutron node-1", func() {
-			//updated_path2 := dive.UpdateNeutronPublicPorts(dive.NEUTRON_CONFIG0)
 			enclaveName := dive.GenerateRandomName()
 			cmd.Args = append(cmd.Args, "chain", "neutron", "-c", dive.NEUTRON_CONFIG0, "--enclaveName", enclaveName)
-			//defer os.Remove(updated_path2)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -1103,7 +1093,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				})
 				ginkgo.It("should run custom relaychain and parachain in testnet for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "testnet", "westend", paraChainName, false, false,"validator","full")
+					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "testnet", "rococo", paraChainName, false, false,"validator","full")
 					fmt.Println(config)
 					cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 					defer os.Remove(config)

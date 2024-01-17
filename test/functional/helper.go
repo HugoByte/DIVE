@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/hugobyte/dive-core/cli/common"
+	//"github.com/hugobyte/dive-core/cli/common"
 )
 
 type Configuration struct {
@@ -108,40 +108,35 @@ func RunDecentralizedIconNode(enclaveName string) {
 
 func RunDecentralizedCustomIconNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path := UpdatePublicPort(enclaveName, ICON_CONFIG1)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", ICON_GENESIS1, "-d", "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", ICON_CONFIG1, "-g", ICON_GENESIS1, "-d", "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 func RunCustomIconNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path := UpdatePublicPort(enclaveName, ICON_CONFIG0)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", ICON_GENESIS0, "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", ICON_CONFIG0, "-g", ICON_GENESIS0, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 func RunCustomIconNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path := UpdatePublicPort(enclaveName, ICON_CONFIG1)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", ICON_GENESIS1, "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", ICON_CONFIG1, "-g", ICON_GENESIS1, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 func RunCustomArchwayNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path1 := UpdatePublicPorts(ARCHWAY_CONFIG1)
-	cmd.Args = append(cmd.Args, "chain", "archway", "-c", updated_path1, "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "archway", "-c", ARCHWAY_CONFIG1, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 func RunCustomArchwayNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path1 := UpdatePublicPorts(ARCHWAY_CONFIG0)
-	cmd.Args = append(cmd.Args, "chain", "archway", "-c", updated_path1, "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "archway", "-c", ARCHWAY_CONFIG0, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -185,8 +180,7 @@ func RunHardhatNode(enclaveName string) {
 
 func RunDecentralizedCustomIconNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path := UpdatePublicPort(enclaveName, ICON_CONFIG0)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", ICON_GENESIS0, "-d", "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c",ICON_CONFIG0 , "-g", ICON_GENESIS0, "-d", "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -195,183 +189,6 @@ var mutex = &sync.Mutex{}
 var mutex1 = &sync.Mutex{}
 var mutex2 = &sync.Mutex{}
 var mutex3 = &sync.Mutex{}
-
-func UpdatePublicPort(enclaveName string, filePath string) string {
-	mutex.Lock()
-	defer mutex.Unlock()
-	fileContent, err := os.ReadFile(filePath)
-	if err != nil {
-		panic(err)
-	}
-	// Unmarshal JSON into a struct
-	var config Configuration
-	err = json.Unmarshal(fileContent, &config)
-	if err != nil {
-		panic(err)
-	}
-
-	availablePort, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	config.PublicPort = availablePort
-	updatedJSON, err := json.MarshalIndent(config, "", "    ")
-	if err != nil {
-		panic(err)
-	}
-
-	tmpfilePath := fmt.Sprintf("updated-config-%s.json", enclaveName)
-    tmpfile, err := os.Create(tmpfilePath)
-    if err != nil {
-        panic(err)
-    }
-	defer tmpfile.Close()
-
-	// Write the updated JSON to the temporary file
-	_, err = tmpfile.Write(updatedJSON)
-	if err != nil {
-		panic(err)
-	}
-	return tmpfile.Name()
-}
-
-// Assuming Archway struct is defined as mentioned earlier
-
-func UpdatePublicPorts(filePath1 string) string {
-	mutex1.Lock()
-	defer mutex1.Unlock()
-
-	// Read the content of the existing JSON file
-	fileContent1, err := os.ReadFile(filePath1)
-	if err != nil {
-		panic(err)
-	}
-
-	// Unmarshal JSON into a struct
-	var archway Archway
-	err = json.Unmarshal(fileContent1, &archway)
-	if err != nil {
-		panic(err)
-	}
-
-	// Get available ports for PublicGRPC, PublicHTTP, PublicTCP, and PublicRPC
-	availableGRPC, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	availableHTTP, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	availableTCP, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	availableRPC, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-
-	// Update the Public ports fields in the Archway struct
-	archway.PublicGRPC = availableGRPC
-	archway.PublicHTTP = availableHTTP
-	archway.PublicTCP = availableTCP
-	archway.PublicRPC = availableRPC
-
-	// Marshal the updated struct into JSON with indentation
-	updatedJSON1, err := json.MarshalIndent(archway, "", "    ")
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(string(updatedJSON1))
-
-	// Generate a random name for the new file
-	name := GenerateRandomName()
-	tmpfilePath := fmt.Sprintf("updated-archway-%s.json", name)
-    tmpfile, err := os.Create(tmpfilePath)
-    if err != nil {
-        panic(err)
-    }
-
-	defer tmpfile.Close()
-
-	// Write the updated JSON to the temporary file
-	_, err = tmpfile.Write(updatedJSON1)
-	if err != nil {
-		panic(err)
-	}
-
-	return tmpfile.Name()
-}
-
-// func UpdateNeutronPublicPorts(filePath2 string) string {
-// 	mutex2.Lock()
-// 	defer mutex2.Unlock()
-
-// 	// Read the content of the existing JSON file
-// 	fileContent2, err := os.ReadFile(filePath2)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	// Unmarshal JSON into a Neutron struct
-// 	var neutron Neutron
-// 	err = json.Unmarshal(fileContent2, &neutron)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	// // Get available ports for PublicGRPC, PublicHTTP, PublicTCP, and PublicRPC
-// 	// availableGRPC, err := common.GetAvailablePort()
-// 	// if err != nil {
-// 	// 	panic(err)
-// 	// }
-// 	// availableHTTP, err := common.GetAvailablePort()
-// 	// if err != nil {
-// 	// 	panic(err)
-// 	// }
-// 	// availableTCP, err := common.GetAvailablePort()
-// 	// if err != nil {
-// 	// 	panic(err)
-// 	// }
-// 	// availableRPC, err := common.GetAvailablePort()
-// 	// if err != nil {
-// 	// 	panic(err)
-// 	// }
-
-// 	// // Update the Public ports fields in the Neutron struct
-// 	// neutron.PublicGRPC = availableGRPC
-// 	// neutron.PublicHTTP = availableHTTP
-// 	// neutron.PublicTCP = availableTCP
-// 	// neutron.PublicRPC = availableRPC
-
-// 	// Marshal the updated struct into JSON with indentation
-// 	updatedJSON, err := json.MarshalIndent(neutron, "", "    ")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	fmt.Println(string(updatedJSON))
-
-// 	// Generate a random name for the new file
-// 	name := GenerateRandomName()
-// 	tmpfilePath := fmt.Sprintf("updated-neutron-%s.json", name)
-//     tmpfile, err := os.Create(tmpfilePath)
-//     if err != nil {
-//         panic(err)
-//     }
-
-// 	defer tmpfile.Close()
-
-// 	// Write the updated JSON to the temporary file
-// 	_, err = tmpfile.Write(updatedJSON)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	return tmpfile.Name()
-// }
 
 type NodeInfo struct {
 	ServiceName    string `json:"service_name"`
