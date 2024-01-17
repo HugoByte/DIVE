@@ -148,16 +148,16 @@ func RunCustomArchwayNode0(enclaveName string) {
 
 func RunCustomNeutronNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path2 := UpdateNeutronPublicPorts(NEUTRON_CONFIG1)
-	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", updated_path2, "--enclaveName", enclaveName)
+	//updated_path2 := UpdateNeutronPublicPorts(NEUTRON_CONFIG1)
+	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", NEUTRON_CONFIG1, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 func RunCustomNeutronNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path2 := UpdateNeutronPublicPorts(NEUTRON_CONFIG0)
-	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", updated_path2, "--enclaveName", enclaveName)
+	//updated_path2 := UpdateNeutronPublicPorts(NEUTRON_CONFIG0)
+	cmd.Args = append(cmd.Args, "chain", "neutron", "-c",NEUTRON_CONFIG0 , "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -305,73 +305,73 @@ func UpdatePublicPorts(filePath1 string) string {
 	return tmpfile.Name()
 }
 
-func UpdateNeutronPublicPorts(filePath2 string) string {
-	mutex2.Lock()
-	defer mutex2.Unlock()
+// func UpdateNeutronPublicPorts(filePath2 string) string {
+// 	mutex2.Lock()
+// 	defer mutex2.Unlock()
 
-	// Read the content of the existing JSON file
-	fileContent2, err := os.ReadFile(filePath2)
-	if err != nil {
-		panic(err)
-	}
+// 	// Read the content of the existing JSON file
+// 	fileContent2, err := os.ReadFile(filePath2)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	// Unmarshal JSON into a Neutron struct
-	var neutron Neutron
-	err = json.Unmarshal(fileContent2, &neutron)
-	if err != nil {
-		panic(err)
-	}
+// 	// Unmarshal JSON into a Neutron struct
+// 	var neutron Neutron
+// 	err = json.Unmarshal(fileContent2, &neutron)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	// Get available ports for PublicGRPC, PublicHTTP, PublicTCP, and PublicRPC
-	availableGRPC, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	availableHTTP, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	availableTCP, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	availableRPC, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
+// 	// // Get available ports for PublicGRPC, PublicHTTP, PublicTCP, and PublicRPC
+// 	// availableGRPC, err := common.GetAvailablePort()
+// 	// if err != nil {
+// 	// 	panic(err)
+// 	// }
+// 	// availableHTTP, err := common.GetAvailablePort()
+// 	// if err != nil {
+// 	// 	panic(err)
+// 	// }
+// 	// availableTCP, err := common.GetAvailablePort()
+// 	// if err != nil {
+// 	// 	panic(err)
+// 	// }
+// 	// availableRPC, err := common.GetAvailablePort()
+// 	// if err != nil {
+// 	// 	panic(err)
+// 	// }
 
-	// Update the Public ports fields in the Neutron struct
-	neutron.PublicGRPC = availableGRPC
-	neutron.PublicHTTP = availableHTTP
-	neutron.PublicTCP = availableTCP
-	neutron.PublicRPC = availableRPC
+// 	// // Update the Public ports fields in the Neutron struct
+// 	// neutron.PublicGRPC = availableGRPC
+// 	// neutron.PublicHTTP = availableHTTP
+// 	// neutron.PublicTCP = availableTCP
+// 	// neutron.PublicRPC = availableRPC
 
-	// Marshal the updated struct into JSON with indentation
-	updatedJSON, err := json.MarshalIndent(neutron, "", "    ")
-	if err != nil {
-		panic(err)
-	}
+// 	// Marshal the updated struct into JSON with indentation
+// 	updatedJSON, err := json.MarshalIndent(neutron, "", "    ")
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	fmt.Println(string(updatedJSON))
+// 	fmt.Println(string(updatedJSON))
 
-	// Generate a random name for the new file
-	name := GenerateRandomName()
-	tmpfilePath := fmt.Sprintf("updated-neutron-%s.json", name)
-    tmpfile, err := os.Create(tmpfilePath)
-    if err != nil {
-        panic(err)
-    }
+// 	// Generate a random name for the new file
+// 	name := GenerateRandomName()
+// 	tmpfilePath := fmt.Sprintf("updated-neutron-%s.json", name)
+//     tmpfile, err := os.Create(tmpfilePath)
+//     if err != nil {
+//         panic(err)
+//     }
 
-	defer tmpfile.Close()
+// 	defer tmpfile.Close()
 
-	// Write the updated JSON to the temporary file
-	_, err = tmpfile.Write(updatedJSON)
-	if err != nil {
-		panic(err)
-	}
+// 	// Write the updated JSON to the temporary file
+// 	_, err = tmpfile.Write(updatedJSON)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	return tmpfile.Name()
-}
+// 	return tmpfile.Name()
+// }
 
 type NodeInfo struct {
 	ServiceName    string `json:"service_name"`
@@ -423,12 +423,11 @@ type Configuration1 struct {
 			NodeType   string `json:"node_type"`
 			Prometheus bool   `json:"prometheus"`
 		} `json:"nodes"`
-	} `json:"para"`
+	} `json:"Parachains"`
 	Explorer bool `json:"explorer"`
 }
 
-
-func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName string, newExplorer, newPrometheus bool) string {
+func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName string, newExplorer, newPrometheus bool, newNodeType1, newNodeType2 string) string {
     mutex.Lock()
     defer mutex.Unlock()
 
@@ -449,7 +448,13 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
     // Update Explorer details 
     local.Explorer = newExplorer
 
+    // Update NodeType for RelayChain Nodes
     for i := range local.RelayChain.Nodes {
+        if i%2 == 0 {
+            local.RelayChain.Nodes[i].NodeType = newNodeType1
+        } else {
+            local.RelayChain.Nodes[i].NodeType = newNodeType2
+        }
         local.RelayChain.Nodes[i].Prometheus = newPrometheus
     }
 
@@ -481,7 +486,8 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
 }
 
 
-func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bool) string {
+
+func UpdateParaChain(filePath, newChainType, newParaName string, newExplorer, newPrometheus bool) string {
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -495,7 +501,8 @@ func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bo
 	if err != nil {
 		panic(err)
 	}
-
+//update chain type
+	local.ChainType = newChainType
 	// Remove content inside RelayChain
 	local.RelayChain = struct {
 		Name  string `json:"name"`
@@ -536,7 +543,7 @@ func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bo
 	return tmpfile.Name()
 }
 
-func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName string, newExplorer, newPrometheus bool) string {
+func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName string, newExplorer, newPrometheus bool,newNodeType1,newNodeType2 string) string {
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -568,6 +575,15 @@ func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName stri
 			local.Parachains[i].Nodes[j].Prometheus = newPrometheus
 		}
 	}
+	  // Update NodeType for RelayChain Nodes
+	  for i := range local.RelayChain.Nodes {
+        if i%2 == 0 {
+            local.RelayChain.Nodes[i].NodeType = newNodeType1
+        } else {
+            local.RelayChain.Nodes[i].NodeType = newNodeType2
+        }
+        local.RelayChain.Nodes[i].Prometheus = newPrometheus
+    }
 
 	updatedJSON, err := json.MarshalIndent(local, "", "    ")
 	if err != nil {
