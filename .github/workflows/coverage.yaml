@@ -3,10 +3,10 @@ name: Code Coverage with Codecov
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 jobs:
   Coverage:
     runs-on: ubuntu-latest
