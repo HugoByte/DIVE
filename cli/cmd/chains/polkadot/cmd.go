@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hugobyte/dive-core/cli/cmd/chains/utils"
 	"github.com/hugobyte/dive-core/cli/common"
 	"github.com/spf13/cobra"
 )
@@ -43,7 +44,7 @@ var PolkadotCmd = common.NewDiveCommandBuilder().
 	AddBoolFlag(&noRelay, "no-relay", false, "specify the bool flag to run parachain only (only for testnet and mainnet)").
 	AddStringFlagWithShortHand(&configFilePath, "config", "c", "", "path to custom config json file to start polkadot relaychain and parachain nodes.").
 	AddBoolFlag(&explorer, "explorer", false, "specify the bool flag if you want to start polkadot js explorer service").
-	AddBoolFlag(&metrics, "metrics", false, "specify the bool flag if you want to start prometheus metrics service").
+	AddBoolFlag(&metrics, "metrics", false, "specify the bool flag if you want to start prometheus and grafana metrics service").
 	Build()
 
 func polkadot(cmd *cobra.Command, args []string) {
@@ -78,6 +79,11 @@ func polkadot(cmd *cobra.Command, args []string) {
 			cliContext.Fatal(err)
 		}
 	}
-	stopMessage := fmt.Sprintf("Polkadot Node Started. Please find service details in current working directory(%s)\n", serviceFileName)
+
+	stopMessage, err := utils.GetStopMessage(cliContext, configFilePath, "Polkadot", paraChain)
+	if err != nil {
+		cliContext.Fatal(err)
+	}
+	stopMessage = stopMessage + fmt.Sprintf("Please find the service details in the output folder present in current working directory - (output/%s/%s)\n", common.EnclaveName, serviceFileName)
 	cliContext.StopSpinnerIfNotVerbose(stopMessage, common.DiveLogs)
 }

@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/starlark_run_config"
 	"github.com/kurtosis-tech/stacktrace"
@@ -145,9 +144,11 @@ func GetSerializedData(cliContext *Cli, response chan *kurtosis_core_rpc_api_bin
 			serviceUUID := res1[len(res1)-1][1 : len(res1[len(res1)-1])-1]
 			services[serviceName] = serviceUUID
 		}
-
-		cliContext.log.Info(executionResponse.String())
-
+		if strings.Contains(executionResponse.String(), "Error") {
+			cliContext.log.Error(StarlarkResponseError, executionResponse.String())
+		} else {
+			cliContext.log.Info(executionResponse.String())
+		}
 		if executionResponse.GetInstruction().GetIsSkipped() {
 			skippedInstruction[executionResponse.GetInstruction().GetExecutableInstruction()] = executionResponse.GetInstruction().GetIsSkipped()
 			break

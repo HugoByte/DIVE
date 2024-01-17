@@ -10,7 +10,7 @@
       },
       {
         "name": "bob",
-        "node_type": "full",
+        "node_type": "validator",
         "prometheus": true
 
       }

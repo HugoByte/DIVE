@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"slices"
 
 	"github.com/hugobyte/dive-core/cli/common"
@@ -223,6 +224,17 @@ type PolkadotServiceConfig struct {
 }
 
 func (pc *ParaNodeConfig) EncodeToString() (string, error) {
+	encodedBytes, err := json.Marshal(pc)
+	if err != nil {
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+	}
+
+	return string(encodedBytes), nil
+}
+
+type ParaNodeConfigList []ParaNodeConfig
+
+func (pc ParaNodeConfigList) EncodeToString() (string, error) {
 	encodedBytes, err := json.Marshal(pc)
 	if err != nil {
 		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
@@ -501,4 +513,37 @@ func (sc *PolkadotServiceConfig) ConfigureFullNodes(network string) {
 		NodeType:   "full",
 		Prometheus: false,
 	})
+}
+
+func GetStopMessage(cliContext *common.Cli, filePath string, relayName string, paraChain []string) (string, error) {
+	stopMessage := "Parachain Nodes - "
+	serviceConfig := &PolkadotServiceConfig{}
+	var err error
+	if filePath != "" {
+		if !filepath.IsAbs(filePath) {
+			filePath, err = filepath.Abs(filePath)
+			if err != nil {
+				return "", err
+			}
+		}
+		err = cliContext.FileHandler().ReadJson(filePath, serviceConfig)
+		if err != nil {
+			return "", err
+		}
+		if len(serviceConfig.Para) == 0 {
+			return fmt.Sprintf("%s Relay Chain Started. ", relayName), nil
+		}
+		for _, parachain := range serviceConfig.Para {
+			stopMessage = stopMessage + parachain.Name + ", "
+		}
+	} else {
+		if len(paraChain) == 0 {
+			return fmt.Sprintf("%s Relay Chain Started. ", relayName), nil
+		}
+		for _, parachain := range paraChain {
+			stopMessage = stopMessage + parachain + ", "
+		}
+	}
+	stopMessage = stopMessage + fmt.Sprintf("Started For %s Relay Chain. ", relayName)
+	return stopMessage, nil
 }

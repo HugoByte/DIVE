@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	localChain = "local"
+	localChain   = "local"
 	polkadotJUrl = "http://127.0.0.1:80"
 )
 
@@ -170,8 +170,6 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 		if err := common.OpenFile(polkadotJUrl); err != nil {
 			cli.Logger().Fatalf(common.CodeOf(err), "Failed to open HugoByte Polkadot explorer UI with error %v", err)
 		}
-		
-		
 	}
 
 	return finalResult, nil
@@ -180,17 +178,13 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 func startParaChains(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, serviceConfig *utils.PolkadotServiceConfig, para string, ipAddress string) (*common.DiveMultipleServiceResponse, error) {
 	paraResult := &common.DiveMultipleServiceResponse{}
 	allParaResult := &common.DiveMultipleServiceResponse{}
-	var err error
 
 	if serviceConfig.ChainType == localChain {
-		var paraChains []string
-		for _, paraChain := range serviceConfig.Para {
-			paraChainConfig, err := paraChain.EncodeToString()
-			if err != nil {
-				return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
-			}
-
-			paraChains = append(paraChains, paraChainConfig)
+		paraNodeList := utils.ParaNodeConfigList(serviceConfig.Para)
+		var paraChains string
+		paraChains, err := paraNodeList.EncodeToString()
+		if err != nil {
+			return nil, err
 		}
 		param := fmt.Sprintf(`{"chain_type":"%s", "parachains": %s, "relay_chain_ip": "%s"}`, serviceConfig.ChainType, paraChains, ipAddress)
 		runParaConfig := getParaRunConfig(serviceConfig, enclaveContext, param)
@@ -275,7 +269,7 @@ func configureService(serviceConfig *utils.PolkadotServiceConfig) error {
 func flagCheck() error {
 
 	if configFilePath != "" {
-		if len(paraChain) != 0 || network != "" || explorer || metrics || noRelay{
+		if len(paraChain) != 0 || network != "" || explorer || metrics || noRelay {
 			return common.WrapMessageToError(common.ErrInvalidFlag, "The '-c' flag does not allow additional flags.")
 		}
 	}
@@ -370,7 +364,7 @@ func startMetrics(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, final_re
 	}
 
 	paraPrometheus := fmt.Sprintf(`{"service_details":%s}`, service_details)
-	
+
 	runConfigPrometheus := common.GetStarlarkRunConfig(paraPrometheus, common.DivePolkaDotPrometheusPath, runKusamaPrometheus)
 	prometheusResult, err := startService(cli, enclaveCtx, runConfigPrometheus, "Prometheus")
 	if err != nil {

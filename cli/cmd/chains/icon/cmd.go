@@ -97,10 +97,9 @@ func icon(cmd *cobra.Command, args []string) {
 		cliContext.Context().Exit(1)
 
 	}
-
-	stopMessage := fmt.Sprintf("Icon Node Started. Please find service details in current working directory(%s)\n", serviceFileName)
+	
+	stopMessage := fmt.Sprintf("Icon Node Started. Please find the service details in the output folder present in current working directory - (output/%s/%s)\n", common.EnclaveName, serviceFileName)
 	cliContext.StopSpinnerIfNotVerbose(stopMessage, common.DiveLogs)
-
 }
 
 func iconDecentralization(cmd *cobra.Command, args []string) {
