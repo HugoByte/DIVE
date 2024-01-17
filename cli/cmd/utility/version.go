@@ -50,6 +50,8 @@ func version(cmd *cobra.Command, args []string) {
 	if currentVer < latestVer {
 		cli.Logger().SetOutputToStdout()
 		cli.Logger().Warnf("Update available '%s'. Get the latest version of our DIVE CLI for bug fixes, performance improvements, and new features.", latestVersion)
+		version := color.New(color.Bold).Sprintf("CLI version - %s", common.DiveVersion)
+		fmt.Println(version)
 		cli.Context().Exit(0)
 	}
 	version := color.New(color.Bold).Sprintf("CLI version - %s", common.DiveVersion)
