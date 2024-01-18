@@ -14,7 +14,7 @@ import (
 
 const (
 	localChain   = "local"
-	polkadotJUrl = "http://127.0.0.1/?rpc=ws%3A%2F%2F127.0.0.1%3A91941#/explorer"
+	polkadotJUrl = "http://127.0.0.1/?rpc=ws://%s:%s#/explorer"
 	PolkadotJsServiceName = "polkadot-js-explorer"
 )
 
@@ -196,7 +196,7 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 			cli.Logger().Info("Explorer service is already running.")	
 		}
 		
-		url := updatePort(polkadotJUrl, extractPort(publicEndpoint))
+		url := updatePort(polkadotJUrl, "127.0.0.1", extractPort(publicEndpoint))
 		cli.Logger().Info("Redirecting to Polkadote explorer UI...")
 		if err := common.OpenFile(url); err != nil {
 			cli.Logger().Fatalf(common.CodeOf(err), "Failed to open HugoByte Polkadot explorer UI with error %v", err)
@@ -448,9 +448,8 @@ func startService(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, runConfi
 	return result, nil
 }
 
-func updatePort(url string, newPort string) string {
-	re := regexp.MustCompile(`ws%3A%2F%2F127\.0\.0\.1%3A(\d+)`)
-	newUrl := re.ReplaceAllString(url, fmt.Sprintf("ws%%3A%%2F%%2F127.0.0.1%%3A%s", newPort))
+func updatePort(url string, newIp string,newPort string) string {
+    newUrl := fmt.Sprintf(url, newIp, newPort)
 	return newUrl
 }
 
