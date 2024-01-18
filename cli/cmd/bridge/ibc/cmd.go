@@ -57,5 +57,5 @@ func ibcRelay(cmd *cobra.Command, args []string) {
 		cliContext.Fatal(err)
 	}
 	
-	cliContext.StopSpinnerIfNotVerbose(fmt.Sprintf("IBC Setup Completed between %s and %s. Please find service details in current working directory(%s)\n", chainA, chainB, serviceFileName), common.DiveLogs)
+	cliContext.StopSpinnerIfNotVerbose(fmt.Sprintf("IBC Setup Completed between %s and %s. Please find the service details in the output folder present in current working directory - (output/%s/%s)\n", chainA, chainB, common.EnclaveName, serviceFileName), common.DiveLogs)
 }
