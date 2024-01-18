@@ -26,4 +26,4 @@ jobs:
 
       - name: Running Kusama Relay and Parachain command tests
         run: |
-           cd test && make run-relay&parachain-kusama
+           cd test && make run-relay-parachain-kusama

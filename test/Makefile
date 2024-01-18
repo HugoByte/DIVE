@@ -84,15 +84,15 @@ run-parachain-all: BINARY
 	@echo "Running parachain chain commands test cases for polkadot and kusama"
 	@cd $(CURDIR)/functional && ginkgo --focus="Parachain commands" -v -timeout=3h
 
-run-relay&parachain-kusama: BINARY
+run-relay-parachain-kusama: BINARY
 	@echo "Running relay and parachain chain commands test cases for kusama and its parachains"
 	@cd $(CURDIR)/functional && relayChain=kusama ginkgo --focus="Relaychain and parachain commands" -v -timeout=3h
 
-run-relay&parachain-polkadot: BINARY
+run-relay-parachain-polkadot: BINARY
 	@echo "Running relay and parachain chain commands test cases for polkadot and its parachains"
 	@cd $(CURDIR)/functional && relayChain=polkadot ginkgo --focus="Relaychain and parachain commands" -v -timeout=3h
 
-run-relay&parachain-all: BINARY
+run-relay-parachain-all: BINARY
 	@echo "Running relay and parachain chain commands test cases for polkadot and kusama along its respective parachains"
 	@cd $(CURDIR)/functional && ginkgo --focus="Relaychain and parachain commands" -v -timeout=3h
 

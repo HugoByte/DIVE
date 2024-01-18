@@ -26,4 +26,4 @@ jobs:
 
       - name: Running All Relay and Parachain command tests
         run: |
-           cd test && make run-relay&parachain-all
+           cd test && make run-relay-parachain-all
