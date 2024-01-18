@@ -1094,23 +1094,22 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom relaychain and parachain in testnet for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "testnet", "rococo", paraChainName, false, false,"validator","full")
-					fmt.Println(config)
 					cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 					defer os.Remove(config)
 					defer dive.Clean(enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 				})
-				ginkgo.It("should run custom relaychain and  parachain in mainnet for "+relayChainName+" and "+paraChainName, func() {
+				ginkgo.It("should run custom relaychain and parachain in mainnet for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "mainnet", "kusama", paraChainName, false, false,"validator","full")
+					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "mainnet", relayChainName, paraChainName, false, false,"validator","full")
 					cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 					defer os.Remove(config)
 					defer dive.Clean(enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 				})
-				ginkgo.It("should run custom relaychain and  parachain in local for "+relayChainName+" and "+paraChainName, func() {
+				ginkgo.It("should run custom relaychain and parachain in local for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "local", "rococo-local", paraChainName, false, false,"validator","validator")
 					cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
