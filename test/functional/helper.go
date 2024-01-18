@@ -14,6 +14,36 @@ import (
 	//"github.com/hugobyte/dive-core/cli/common"
 )
 
+type NodeInfo struct {
+	ServiceName    string `json:"service_name"`
+	EndpointPublic string `json:"endpoint"`
+	Nid            string `json:"nid"`
+}
+
+type Configuration1 struct {
+	ChainType  string `json:"chain_type"`
+	RelayChain struct {
+		Name  string `json:"name"`
+		Nodes []struct {
+			Name       string `json:"name"`
+			NodeType   string `json:"node_type"`
+			Prometheus bool   `json:"prometheus"`
+		} `json:"nodes"`
+	} `json:"relaychain"`
+	Parachains []struct {
+		Name  string `json:"name"`
+		Nodes []struct {
+			Name       string `json:"name"`
+			NodeType   string `json:"node_type"`
+			Prometheus bool   `json:"prometheus"`
+		} `json:"nodes"`
+	} `json:"Parachains"`
+	Explorer bool `json:"explorer"`
+}
+
+var mutex = &sync.Mutex{}
+var mutex3 = &sync.Mutex{}
+
 func GetBinaryCommand() *exec.Cmd {
 	binaryPath := GetBinPath()
 	return exec.Command(binaryPath)
@@ -153,17 +183,6 @@ func RunDecentralizedCustomIconNode0(enclaveName string) {
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
-var mutex = &sync.Mutex{}
-var mutex1 = &sync.Mutex{}
-var mutex2 = &sync.Mutex{}
-var mutex3 = &sync.Mutex{}
-
-type NodeInfo struct {
-	ServiceName    string `json:"service_name"`
-	EndpointPublic string `json:"endpoint"`
-	Nid            string `json:"nid"`
-}
-
 func GetServiceDetails(servicesJson string, service string) (serviceName string, endpoint string, nid string) {
 	var data map[string]NodeInfo
 	mutex3.Lock()
@@ -189,27 +208,6 @@ func GetServiceDetails(servicesJson string, service string) (serviceName string,
 	}
 	return serviceName, endpoint, nid
 
-}
-
-type Configuration1 struct {
-	ChainType  string `json:"chain_type"`
-	RelayChain struct {
-		Name  string `json:"name"`
-		Nodes []struct {
-			Name       string `json:"name"`
-			NodeType   string `json:"node_type"`
-			Prometheus bool   `json:"prometheus"`
-		} `json:"nodes"`
-	} `json:"relaychain"`
-	Parachains []struct {
-		Name  string `json:"name"`
-		Nodes []struct {
-			Name       string `json:"name"`
-			NodeType   string `json:"node_type"`
-			Prometheus bool   `json:"prometheus"`
-		} `json:"nodes"`
-	} `json:"Parachains"`
-	Explorer bool `json:"explorer"`
 }
 
 func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName string, newExplorer, newPrometheus bool, newNodeType1, newNodeType2 string, relayChain string) string {

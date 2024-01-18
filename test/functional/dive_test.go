@@ -951,7 +951,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom parachain in testnet with for "+relayChainName+" and "+paraChainName, func() {
 					if paraChainName != "parallel" && paraChainName != "subzero" {
 						enclaveName := dive.GenerateRandomName()
-						config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "testnet", "karura", false, false)
+						config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "testnet", paraChainName, false, false)
 						cmd.Args = append(cmd.Args, "chain", relayChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
 						defer os.Remove(config)
 						err := cmd.Run()
@@ -961,7 +961,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				})
 				ginkgo.It("should run custom parachain in mainnet for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "mainnet", "karura", false, false)
+					config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "mainnet", paraChainName, false, false)
 					cmd.Args = append(cmd.Args, "chain", relayChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
 					defer os.Remove(config)
 					err := cmd.Run()
@@ -1091,7 +1091,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom relaychain and parachain in testnet for "+relayChainName+" and "+paraChainName, func() {
 					if paraChainName != "parallel" && paraChainName != "subzero" {
 					enclaveName := dive.GenerateRandomName()
-					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "testnet", "rococo", "karura", false, false, "validator", "full")
+					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "testnet", "rococo", paraChainName, false, false, "validator", "full")
 					cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 					defer os.Remove(config)
 					defer dive.Clean(enclaveName)
@@ -1101,7 +1101,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				})
 				ginkgo.It("should run custom relaychain and  parachain in mainnet for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "mainnet", "polkadot", "karura", false, false, "validator", "full")
+					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "mainnet", "polkadot", paraChainName, false, false, "validator", "full")
 					cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 					defer os.Remove(config)
 					defer dive.Clean(enclaveName)
@@ -1110,7 +1110,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				})
 				ginkgo.It("should run custom relaychain and  parachain in local for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
-					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "local", "rococo-local", "karura", false, false, "validator", "validator")
+					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "local", "rococo-local", paraChainName, false, false, "validator", "validator")
 					cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 					defer os.Remove(config)
 					defer dive.Clean(enclaveName)
