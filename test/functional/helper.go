@@ -210,7 +210,7 @@ func GetServiceDetails(servicesJson string, service string) (serviceName string,
 
 }
 
-func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName string, newExplorer, newPrometheus bool, newNodeType1, newNodeType2 string, relayChain string) string {
+func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName string, newNodeType1, newNodeType2 string, relayChain string) string {
     mutex.Lock()
     defer mutex.Unlock()
 
@@ -228,8 +228,6 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
     // Update ChainType and RelayChain Name
     local.ChainType = newChainType
     local.RelayChain.Name = newRelayChainName
-    // Update Explorer details 
-    local.Explorer = newExplorer
 
     // Update NodeType for RelayChain Nodes
     for i := range local.RelayChain.Nodes {
@@ -238,7 +236,6 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
         } else {
             local.RelayChain.Nodes[i].NodeType = newNodeType2
         }
-        local.RelayChain.Nodes[i].Prometheus = newPrometheus
     }
 
     // Update Prometheus for Para Nodes
@@ -248,9 +245,6 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
 		} else {
 			local.Parachains[i].Name = "acala"
 		}
-        for j := range local.Parachains[i].Nodes {			
-            local.Parachains[i].Nodes[j].Prometheus = newPrometheus
-        }
     }
 
     updatedJSON, err := json.MarshalIndent(local, "", "    ")
@@ -275,7 +269,7 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
 
 
 
-func UpdateParaChain(filePath, newChainType, newParaName string, newExplorer, newPrometheus bool) string {
+func UpdateParaChain(filePath, newChainType, newParaName string) string {
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -301,12 +295,9 @@ func UpdateParaChain(filePath, newChainType, newParaName string, newExplorer, ne
 		} `json:"nodes"`
 	}{}
 
-	// Update Name and Prometheus for Para Nodes
+	// Update Name  Para Nodes
 	for i := range local.Parachains {
 		local.Parachains[i].Name = newParaName
-		for j := range local.Parachains[i].Nodes {
-			local.Parachains[i].Nodes[j].Prometheus = newPrometheus
-		}
 	}
 
 	updatedJSON, err := json.MarshalIndent(local, "", "    ")
@@ -331,7 +322,7 @@ func UpdateParaChain(filePath, newChainType, newParaName string, newExplorer, ne
 	return tmpfile.Name()
 }
 
-func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName string, newExplorer, newPrometheus bool,newNodeType1,newNodeType2 string) string {
+func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName string,newNodeType1,newNodeType2 string) string {
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -349,19 +340,11 @@ func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName stri
 	// Update ChainType and RelayChain Name
 	local.ChainType = newChainType
 	local.RelayChain.Name = newRelayChainName
-	// Update Explorer
-	local.Explorer = newExplorer
-
-	for i := range local.RelayChain.Nodes {
-		local.RelayChain.Nodes[i].Prometheus = newPrometheus
-	}
 
 	// Update Name and Prometheus for Para Nodes
 	for i := range local.Parachains {
 		local.Parachains[i].Name = newParaName
-		for j := range local.Parachains[i].Nodes {
-			local.Parachains[i].Nodes[j].Prometheus = newPrometheus
-		}
+		
 	}
 	  // Update NodeType for RelayChain Nodes
 	  for i := range local.RelayChain.Nodes {
@@ -370,7 +353,6 @@ func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName stri
         } else {
             local.RelayChain.Nodes[i].NodeType = newNodeType2
         }
-        local.RelayChain.Nodes[i].Prometheus = newPrometheus
     }
 
 	updatedJSON, err := json.MarshalIndent(local, "", "    ")
