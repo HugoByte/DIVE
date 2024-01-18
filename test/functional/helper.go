@@ -14,38 +14,6 @@ import (
 	//"github.com/hugobyte/dive-core/cli/common"
 )
 
-type Configuration struct {
-	PrivatePort      int    `json:"private_port"`
-	PublicPort       int    `json:"public_port"`
-	P2PListenAddress string `json:"p2p_listen_address"`
-	P2PAddress       string `json:"p2p_address"`
-	CID              string `json:"cid"`
-}
-
-type Archway struct {
-	ChainID     string `json:"chain_id"`
-	Key         string `json:"key"`
-	PrivateGRPC int    `json:"private_grpc"`
-	PrivateHTTP int    `json:"private_http"`
-	PrivateTCP  int    `json:"private_tcp"`
-	PrivateRPC  int    `json:"private_rpc"`
-	PublicGRPC  int    `json:"public_grpc"`
-	PublicHTTP  int    `json:"public_http"`
-	PublicTCP   int    `json:"public_tcp"`
-	PublicRPC   int    `json:"public_rpc"`
-	Password    string `json:"password"`
-}
-
-type Neutron struct {
-	ChainID    string `json:"chain_id"`
-	Key        string `json:"key"`
-	Password   string `json:"password"`
-	PublicGRPC int    `json:"public_grpc"`
-	PublicTCP  int    `json:"public_tcp"`
-	PublicHTTP int    `json:"public_http"`
-	PublicRPC  int    `json:"public_rpc"`
-}
-
 func GetBinaryCommand() *exec.Cmd {
 	binaryPath := GetBinPath()
 	return exec.Command(binaryPath)
