@@ -212,7 +212,7 @@ type Configuration1 struct {
 	Explorer bool `json:"explorer"`
 }
 
-func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName string, newExplorer, newPrometheus bool, newNodeType1, newNodeType2 string) string {
+func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName string, newExplorer, newPrometheus bool, newNodeType1, newNodeType2 string, relayChain string) string {
     mutex.Lock()
     defer mutex.Unlock()
 
@@ -245,7 +245,12 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
 
     // Update Prometheus for Para Nodes
     for i := range local.Parachains {
-        for j := range local.Parachains[i].Nodes {
+		if relayChain == "kusama"{
+			local.Parachains[i].Name = "karura"
+		} else {
+			local.Parachains[i].Name = "acala"
+		}
+        for j := range local.Parachains[i].Nodes {			
             local.Parachains[i].Nodes[j].Prometheus = newPrometheus
         }
     }
