@@ -9,6 +9,7 @@ import (
 
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/kurtosis-tech/kurtosis/api/golang/engine/lib/kurtosis_context"
+	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/services"
 )
 
 type diveContext struct {
@@ -83,6 +84,33 @@ func (dc *diveContext) GetEnclaveContext(enclaveName string) (*enclaves.EnclaveC
 
 	return enclaveCtx, nil
 
+}
+
+func (dc *diveContext) GetAllEnlavesServices() (map[string]map[services.ServiceName]services.ServiceUUID, error) {
+	enclaves, err := dc.GetEnclaves()
+
+	if err != nil {
+		return nil, err
+	}
+
+	allEnclaveSevices := make(map[string]map[services.ServiceName]services.ServiceUUID)
+	for _, enclave := range enclaves {
+		enclaveContext, err := dc.GetEnclaveContext(enclave.Name)
+
+		if err != nil {
+			return nil, err
+		}
+
+		enclaveServices, err := enclaveContext.GetServices()
+
+		if err != nil {
+			return nil, err
+		}
+
+		allEnclaveSevices[enclave.Name] = enclaveServices
+	}
+
+	return allEnclaveSevices, nil
 }
 
 // The `CleanEnclaves` function is a method of the `diveContext` struct.
@@ -311,3 +339,4 @@ func (dc *diveContext) GetShortUuid(enclaveName string) (string, error) {
 	
 	return shortUuid, nil
 }
+
