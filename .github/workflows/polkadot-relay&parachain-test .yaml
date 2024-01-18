@@ -1,11 +1,11 @@
-name: Icon-Eth btp demo
+name: Polkadot Relay and Parachain Functional test
 
 on:
   workflow_dispatch:
 
 jobs:
-  icon_eth_demo:
-    name: btp demo between icon and eth
+  functional_test_polkadot_relay_parachain:
+    name: Polkadot Relay and Parachain Functional Testing
     runs-on: "ubuntu-latest"
 
     steps:
@@ -17,17 +17,13 @@ jobs:
         with:
           go-version: 1.21
 
-      - name: Installing local hardhat and Kurtosis CLI and starting the kurtosis engine
+      - name: Installing Kurtosis CLI and starting the kurtosis engine
         run: |
-          npm install --save-dev hardhat
           echo "deb [trusted=yes] https://apt.fury.io/kurtosis-tech/ /" | sudo tee /etc/apt/sources.list.d/kurtosis.list
           sudo apt update
           sudo apt install kurtosis-cli
           kurtosis engine start
 
-      - name: Running bridge between icon and eth
+      - name: Running Polkadot Relay and Parachain command tests
         run: |
-           cd cli && go build -o dive
-           ./dive bridge btp --chainA icon --chainB eth --verbose
-           mv output/dive/*.json ../test/dive.json
-           cd ../test && make run-demo CONFIG_FILE=dive.json
+           cd test && make run-relay&parachain-polkadot

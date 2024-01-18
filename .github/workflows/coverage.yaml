@@ -21,7 +21,7 @@ jobs:
 
       - name: GO test
         run: |
-          go list -f '{{.Dir}}/...' -m | xargs go test -short -timeout=3m -covermode=atomic -coverprofile=coverage.out
+          go list -f '{{.Dir}}/...' -m | grep -v '/test/functional/' |xargs go test -short -timeout=3m -covermode=atomic -coverprofile=coverage.out
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

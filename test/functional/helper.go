@@ -11,40 +11,38 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/hugobyte/dive-core/cli/common"
+	//"github.com/hugobyte/dive-core/cli/common"
 )
 
-type Configuration struct {
-	PrivatePort      int    `json:"private_port"`
-	PublicPort       int    `json:"public_port"`
-	P2PListenAddress string `json:"p2p_listen_address"`
-	P2PAddress       string `json:"p2p_address"`
-	CID              string `json:"cid"`
+type NodeInfo struct {
+	ServiceName    string `json:"service_name"`
+	EndpointPublic string `json:"endpoint"`
+	Nid            string `json:"nid"`
 }
 
-type Archway struct {
-	ChainID     string `json:"chain_id"`
-	Key         string `json:"key"`
-	PrivateGRPC int    `json:"private_grpc"`
-	PrivateHTTP int    `json:"private_http"`
-	PrivateTCP  int    `json:"private_tcp"`
-	PrivateRPC  int    `json:"private_rpc"`
-	PublicGRPC  int    `json:"public_grpc"`
-	PublicHTTP  int    `json:"public_http"`
-	PublicTCP   int    `json:"public_tcp"`
-	PublicRPC   int    `json:"public_rpc"`
-	Password    string `json:"password"`
+type Configuration1 struct {
+	ChainType  string `json:"chain_type"`
+	RelayChain struct {
+		Name  string `json:"name"`
+		Nodes []struct {
+			Name       string `json:"name"`
+			NodeType   string `json:"node_type"`
+			Prometheus bool   `json:"prometheus"`
+		} `json:"nodes"`
+	} `json:"relaychain"`
+	Parachains []struct {
+		Name  string `json:"name"`
+		Nodes []struct {
+			Name       string `json:"name"`
+			NodeType   string `json:"node_type"`
+			Prometheus bool   `json:"prometheus"`
+		} `json:"nodes"`
+	} `json:"Parachains"`
+	Explorer bool `json:"explorer"`
 }
 
-type Neutron struct {
-	ChainID    string `json:"chain_id"`
-	Key        string `json:"key"`
-	Password   string `json:"password"`
-	PublicGRPC int    `json:"public_grpc"`
-	PublicTCP  int    `json:"public_tcp"`
-	PublicHTTP int    `json:"public_http"`
-	PublicRPC  int    `json:"public_rpc"`
-}
+var mutex = &sync.Mutex{}
+var mutex3 = &sync.Mutex{}
 
 func GetBinaryCommand() *exec.Cmd {
 	binaryPath := GetBinPath()
@@ -108,56 +106,51 @@ func RunDecentralizedIconNode(enclaveName string) {
 
 func RunDecentralizedCustomIconNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path := UpdatePublicPort(enclaveName, ICON_CONFIG1)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", ICON_GENESIS1, "-d", "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", ICON_CONFIG1, "-g", ICON_GENESIS1, "-d", "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 func RunCustomIconNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path := UpdatePublicPort(enclaveName, ICON_CONFIG0)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", ICON_GENESIS0, "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", ICON_CONFIG0, "-g", ICON_GENESIS0, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 func RunCustomIconNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path := UpdatePublicPort(enclaveName, ICON_CONFIG1)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", ICON_GENESIS1, "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", ICON_CONFIG1, "-g", ICON_GENESIS1, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 func RunCustomArchwayNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path1 := UpdatePublicPorts(ARCHWAY_CONFIG1)
-	cmd.Args = append(cmd.Args, "chain", "archway", "-c", updated_path1, "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "archway", "-c", ARCHWAY_CONFIG1, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 func RunCustomArchwayNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path1 := UpdatePublicPorts(ARCHWAY_CONFIG0)
-	cmd.Args = append(cmd.Args, "chain", "archway", "-c", updated_path1, "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "archway", "-c", ARCHWAY_CONFIG0, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 func RunCustomNeutronNode1(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path2 := UpdateNeutronPublicPorts(NEUTRON_CONFIG1)
-	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", updated_path2, "--enclaveName", enclaveName)
+	//updated_path2 := UpdateNeutronPublicPorts(NEUTRON_CONFIG1)
+	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", NEUTRON_CONFIG1, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
 
 func RunCustomNeutronNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path2 := UpdateNeutronPublicPorts(NEUTRON_CONFIG0)
-	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", updated_path2, "--enclaveName", enclaveName)
+	//updated_path2 := UpdateNeutronPublicPorts(NEUTRON_CONFIG0)
+	cmd.Args = append(cmd.Args, "chain", "neutron", "-c",NEUTRON_CONFIG0 , "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -185,198 +178,9 @@ func RunHardhatNode(enclaveName string) {
 
 func RunDecentralizedCustomIconNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	updated_path := UpdatePublicPort(enclaveName, ICON_CONFIG0)
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c", updated_path, "-g", ICON_GENESIS0, "-d", "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c",ICON_CONFIG0 , "-g", ICON_GENESIS0, "-d", "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
-}
-
-var mutex = &sync.Mutex{}
-var mutex1 = &sync.Mutex{}
-var mutex2 = &sync.Mutex{}
-var mutex3 = &sync.Mutex{}
-
-func UpdatePublicPort(enclaveName string, filePath string) string {
-	mutex.Lock()
-	defer mutex.Unlock()
-	fileContent, err := os.ReadFile(filePath)
-	if err != nil {
-		panic(err)
-	}
-	// Unmarshal JSON into a struct
-	var config Configuration
-	err = json.Unmarshal(fileContent, &config)
-	if err != nil {
-		panic(err)
-	}
-
-	availablePort, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	config.PublicPort = availablePort
-	updatedJSON, err := json.MarshalIndent(config, "", "    ")
-	if err != nil {
-		panic(err)
-	}
-
-	tmpfilePath := fmt.Sprintf("updated-config-%s.json", enclaveName)
-    tmpfile, err := os.Create(tmpfilePath)
-    if err != nil {
-        panic(err)
-    }
-	defer tmpfile.Close()
-
-	// Write the updated JSON to the temporary file
-	_, err = tmpfile.Write(updatedJSON)
-	if err != nil {
-		panic(err)
-	}
-	return tmpfile.Name()
-}
-
-// Assuming Archway struct is defined as mentioned earlier
-
-func UpdatePublicPorts(filePath1 string) string {
-	mutex1.Lock()
-	defer mutex1.Unlock()
-
-	// Read the content of the existing JSON file
-	fileContent1, err := os.ReadFile(filePath1)
-	if err != nil {
-		panic(err)
-	}
-
-	// Unmarshal JSON into a struct
-	var archway Archway
-	err = json.Unmarshal(fileContent1, &archway)
-	if err != nil {
-		panic(err)
-	}
-
-	// Get available ports for PublicGRPC, PublicHTTP, PublicTCP, and PublicRPC
-	availableGRPC, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	availableHTTP, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	availableTCP, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	availableRPC, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-
-	// Update the Public ports fields in the Archway struct
-	archway.PublicGRPC = availableGRPC
-	archway.PublicHTTP = availableHTTP
-	archway.PublicTCP = availableTCP
-	archway.PublicRPC = availableRPC
-
-	// Marshal the updated struct into JSON with indentation
-	updatedJSON1, err := json.MarshalIndent(archway, "", "    ")
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(string(updatedJSON1))
-
-	// Generate a random name for the new file
-	name := GenerateRandomName()
-	tmpfilePath := fmt.Sprintf("updated-archway-%s.json", name)
-    tmpfile, err := os.Create(tmpfilePath)
-    if err != nil {
-        panic(err)
-    }
-
-	defer tmpfile.Close()
-
-	// Write the updated JSON to the temporary file
-	_, err = tmpfile.Write(updatedJSON1)
-	if err != nil {
-		panic(err)
-	}
-
-	return tmpfile.Name()
-}
-
-func UpdateNeutronPublicPorts(filePath2 string) string {
-	mutex2.Lock()
-	defer mutex2.Unlock()
-
-	// Read the content of the existing JSON file
-	fileContent2, err := os.ReadFile(filePath2)
-	if err != nil {
-		panic(err)
-	}
-
-	// Unmarshal JSON into a Neutron struct
-	var neutron Neutron
-	err = json.Unmarshal(fileContent2, &neutron)
-	if err != nil {
-		panic(err)
-	}
-
-	// Get available ports for PublicGRPC, PublicHTTP, PublicTCP, and PublicRPC
-	availableGRPC, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	availableHTTP, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	availableTCP, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-	availableRPC, err := common.GetAvailablePort()
-	if err != nil {
-		panic(err)
-	}
-
-	// Update the Public ports fields in the Neutron struct
-	neutron.PublicGRPC = availableGRPC
-	neutron.PublicHTTP = availableHTTP
-	neutron.PublicTCP = availableTCP
-	neutron.PublicRPC = availableRPC
-
-	// Marshal the updated struct into JSON with indentation
-	updatedJSON, err := json.MarshalIndent(neutron, "", "    ")
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(string(updatedJSON))
-
-	// Generate a random name for the new file
-	name := GenerateRandomName()
-	tmpfilePath := fmt.Sprintf("updated-neutron-%s.json", name)
-    tmpfile, err := os.Create(tmpfilePath)
-    if err != nil {
-        panic(err)
-    }
-
-	defer tmpfile.Close()
-
-	// Write the updated JSON to the temporary file
-	_, err = tmpfile.Write(updatedJSON)
-	if err != nil {
-		panic(err)
-	}
-
-	return tmpfile.Name()
-}
-
-type NodeInfo struct {
-	ServiceName    string `json:"service_name"`
-	EndpointPublic string `json:"endpoint"`
-	Nid            string `json:"nid"`
 }
 
 func GetServiceDetails(servicesJson string, service string) (serviceName string, endpoint string, nid string) {
@@ -406,29 +210,7 @@ func GetServiceDetails(servicesJson string, service string) (serviceName string,
 
 }
 
-type Configuration1 struct {
-	ChainType  string `json:"chain-type"`
-	RelayChain struct {
-		Name  string `json:"name"`
-		Nodes []struct {
-			Name       string `json:"name"`
-			NodeType   string `json:"node-type"`
-			Prometheus bool   `json:"prometheus"`
-		} `json:"nodes"`
-	} `json:"relaychain"`
-	Para []struct {
-		Name  string `json:"name"`
-		Nodes []struct {
-			Name       string `json:"name"`
-			NodeType   string `json:"node-type"`
-			Prometheus bool   `json:"prometheus"`
-		} `json:"nodes"`
-	} `json:"para"`
-	Explorer bool `json:"explorer"`
-}
-
-
-func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName string, newExplorer, newPrometheus bool) string {
+func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName string, newNodeType1, newNodeType2 string, relayChain string) string {
     mutex.Lock()
     defer mutex.Unlock()
 
@@ -446,18 +228,23 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
     // Update ChainType and RelayChain Name
     local.ChainType = newChainType
     local.RelayChain.Name = newRelayChainName
-    // Update Explorer details 
-    local.Explorer = newExplorer
 
+    // Update NodeType for RelayChain Nodes
     for i := range local.RelayChain.Nodes {
-        local.RelayChain.Nodes[i].Prometheus = newPrometheus
+        if i%2 == 0 {
+            local.RelayChain.Nodes[i].NodeType = newNodeType1
+        } else {
+            local.RelayChain.Nodes[i].NodeType = newNodeType2
+        }
     }
 
     // Update Prometheus for Para Nodes
-    for i := range local.Para {
-        for j := range local.Para[i].Nodes {
-            local.Para[i].Nodes[j].Prometheus = newPrometheus
-        }
+    for i := range local.Parachains {
+		if relayChain == "kusama"{
+			local.Parachains[i].Name = "karura"
+		} else {
+			local.Parachains[i].Name = "acala"
+		}
     }
 
     updatedJSON, err := json.MarshalIndent(local, "", "    ")
@@ -481,7 +268,8 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
 }
 
 
-func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bool) string {
+
+func UpdateParaChain(filePath, newChainType, newParaName string) string {
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -495,23 +283,21 @@ func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bo
 	if err != nil {
 		panic(err)
 	}
-
+//update chain type
+	local.ChainType = newChainType
 	// Remove content inside RelayChain
 	local.RelayChain = struct {
 		Name  string `json:"name"`
 		Nodes []struct {
 			Name       string `json:"name"`
-			NodeType   string `json:"node-type"`
+			NodeType   string `json:"node_type"`
 			Prometheus bool   `json:"prometheus"`
 		} `json:"nodes"`
 	}{}
 
-	// Update Name and Prometheus for Para Nodes
-	for i := range local.Para {
-		local.Para[i].Name = newParaName
-		for j := range local.Para[i].Nodes {
-			local.Para[i].Nodes[j].Prometheus = newPrometheus
-		}
+	// Update Name  Para Nodes
+	for i := range local.Parachains {
+		local.Parachains[i].Name = newParaName
 	}
 
 	updatedJSON, err := json.MarshalIndent(local, "", "    ")
@@ -536,7 +322,7 @@ func UpdateParaChain(filePath, newParaName string, newExplorer, newPrometheus bo
 	return tmpfile.Name()
 }
 
-func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName string, newExplorer, newPrometheus bool) string {
+func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName string,newNodeType1,newNodeType2 string) string {
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -554,20 +340,20 @@ func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName stri
 	// Update ChainType and RelayChain Name
 	local.ChainType = newChainType
 	local.RelayChain.Name = newRelayChainName
-	// Update Explorer
-	local.Explorer = newExplorer
-
-	for i := range local.RelayChain.Nodes {
-		local.RelayChain.Nodes[i].Prometheus = newPrometheus
-	}
 
 	// Update Name and Prometheus for Para Nodes
-	for i := range local.Para {
-		local.Para[i].Name = newParaName
-		for j := range local.Para[i].Nodes {
-			local.Para[i].Nodes[j].Prometheus = newPrometheus
-		}
+	for i := range local.Parachains {
+		local.Parachains[i].Name = newParaName
+		
 	}
+	  // Update NodeType for RelayChain Nodes
+	  for i := range local.RelayChain.Nodes {
+        if i%2 == 0 {
+            local.RelayChain.Nodes[i].NodeType = newNodeType1
+        } else {
+            local.RelayChain.Nodes[i].NodeType = newNodeType2
+        }
+    }
 
 	updatedJSON, err := json.MarshalIndent(local, "", "    ")
 	if err != nil {

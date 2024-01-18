@@ -27,7 +27,7 @@ const(
 	DEFAULT_ARCHWAY_SERVICENAME = "node-service-constantine-3"
 	DEFAULT_NEUTRON_SERVICENAME = "neutron-node-test-chain1"
 
-	LOCAL_CONFIG0 = "../../cli/sample-jsons/local.json"
+	LOCAL_CONFIG0 = "../../cli/sample-jsons/polkadot_config.json"
 	
 
 )
