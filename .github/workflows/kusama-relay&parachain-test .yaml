@@ -1,11 +1,11 @@
-name: Kusama Relaychain Functional test
+name: Kusama Relay and Parachain Functional test
 
 on:
   workflow_dispatch:
 
 jobs:
   functional_test_kusama:
-    name: Kusama Relaychain Functional Testing
+    name: Kusama Relay and Parachain Functional Testing
     runs-on: "ubuntu-latest"
 
     steps:
@@ -24,6 +24,6 @@ jobs:
           sudo apt install kurtosis-cli
           kurtosis engine start
 
-      - name: Running Kusama Relaychain command tests
+      - name: Running Kusama Relay and Parachain command tests
         run: |
-           cd test && make run-relaychain-kusama
+           cd test && make run-relay&parachain-kusama
