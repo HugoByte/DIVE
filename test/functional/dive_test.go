@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"testing"
 
 	"github.com/hugobyte/dive-core/cli/cmd/utility"
@@ -565,7 +566,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should run icon node first and then decentralise it", func() {
 			enclaveName := dive.GenerateRandomName()
 			dive.RunIconNode(enclaveName)
-			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(service_path[0] , dive.ICON_CONFIG0_SERVICENAME)
 			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", nid0, "-e", endpoint0, "-s", serviceName0, "--enclaveName", enclaveName)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
@@ -599,7 +601,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should handle invalid input for chain command", func() {
 			enclaveName := dive.GenerateRandomName()
 			dive.RunIconNode(enclaveName)
-			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(service_path[0], dive.ICON_CONFIG0_SERVICENAME)
 			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "invalidPassword", "-k", "keystores/keystore.json", "-n", nid0, "-e", endpoint0, "-s", serviceName0, "--enclaveName", enclaveName)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
@@ -609,7 +612,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should handle invalid input for chain command", func() {
 			enclaveName := dive.GenerateRandomName()
 			dive.RunIconNode(enclaveName)
-			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(service_path[0], dive.ICON_CONFIG0_SERVICENAME)
 			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/invalid.json", "-n", nid0, "-e", endpoint0, "-s", serviceName0, "--enclaveName", enclaveName)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
@@ -619,7 +623,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should handle invalid input for chain command", func() {
 			enclaveName := dive.GenerateRandomName()
 			dive.RunIconNode(enclaveName)
-			serviceName0, endpoint0, _ := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			serviceName0, endpoint0, _ := dive.GetServiceDetails(service_path[0], dive.ICON_CONFIG0_SERVICENAME)
 			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", "0x9", "-e", endpoint0, "-s", serviceName0, "--enclaveName", enclaveName)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
@@ -629,7 +634,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should handle invalid input for chain command", func() {
 			enclaveName := dive.GenerateRandomName()
 			dive.RunIconNode(enclaveName)
-			serviceName0, _, nid0 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			serviceName0, _, nid0 := dive.GetServiceDetails(service_path[0], dive.ICON_CONFIG0_SERVICENAME)
 			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", nid0, "-e", "http://172.16.0.3:9081/api/v3/icon_dex", "-s", serviceName0, "--enclaveName", enclaveName)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
@@ -639,7 +645,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should handle invalid input for chain command", func() {
 			enclaveName := dive.GenerateRandomName()
 			dive.RunIconNode(enclaveName)
-			_, endpoint0, nid0 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			_, endpoint0, nid0 := dive.GetServiceDetails(service_path[0], dive.ICON_CONFIG0_SERVICENAME)
 			cmd.Args = append(cmd.Args, "chain", "icon", "decentralize", "-p", "gochain", "-k", "keystores/keystore.json", "-n", nid0, "-e", endpoint0, "-s", "icon-node", "--enclaveName", enclaveName)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
