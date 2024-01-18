@@ -2,6 +2,7 @@ package polkadot
 
 import (
 	"fmt"
+	"regexp"
 	"slices"
 
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
@@ -12,13 +13,15 @@ import (
 )
 
 const (
-	localChain = "local"
-	polkadotJUrl = "http://127.0.0.1:80"
+	localChain   = "local"
+	polkadotJUrl = "http://127.0.0.1/?rpc=ws%3A%2F%2F127.0.0.1%3A43965#/explorer"
+	PolkadotJsServiceName = "polkadot-js-explorer"
 )
 
 func RunPolkadot(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 
 	enclaveContext, err := cli.Context().GetEnclaveContext(common.EnclaveName)
+
 	if err != nil {
 		return nil, common.WrapMessageToError(err, "Failed to retrieve the enclave context for Polkadot.")
 	}
@@ -160,14 +163,43 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 	}
 
 	if serviceConfig.Explorer {
-		explorerResult, err = startExplorer(cli, enclaveContext)
+		publicEndpoint := "ws://127.0.0.1:9944"
+		
+		var isExplorerRunning bool
+
+		allEclaveServices, err := cli.Context().GetAllEnlavesServices()
 		if err != nil {
 			return nil, err
 		}
-		finalResult = finalResult.ConcatenateDiveResults(explorerResult)
 
+		for _, enclave := range allEclaveServices {
+			for serviceName, _ := range enclave {
+				if serviceName ==  PolkadotJsServiceName {
+					isExplorerRunning = true
+				}
+			} 
+		}
+
+		if len(finalResult.Dive) > 0 {
+			for _, serviceResponse := range finalResult.Dive {
+				publicEndpoint = serviceResponse.PublicEndpoint
+				break
+			}
+		}
+		
+		if !isExplorerRunning {
+			explorerResult, err = startExplorer(cli, enclaveContext, publicEndpoint)
+			if err != nil {
+				return nil, err
+			}
+			finalResult = finalResult.ConcatenateDiveResults(explorerResult)
+		} else {
+			cli.Logger().Info("Explorer service is already running.")	
+		}
+		
+		url := updatePort(polkadotJUrl, extractPort(publicEndpoint))
 		cli.Logger().Info("Redirecting to Polkadote explorer UI...")
-		if err := common.OpenFile(polkadotJUrl); err != nil {
+		if err := common.OpenFile(url); err != nil {
 			cli.Logger().Fatalf(common.CodeOf(err), "Failed to open HugoByte Polkadot explorer UI with error %v", err)
 		}
 	}
@@ -273,7 +305,7 @@ func configureService(serviceConfig *utils.PolkadotServiceConfig) error {
 func flagCheck() error {
 
 	if configFilePath != "" {
-		if len(paraChain) != 0 || network != "" || explorer || metrics || noRelay{
+		if len(paraChain) != 0 || network != "" || explorer || metrics || noRelay {
 			return common.WrapMessageToError(common.ErrInvalidFlag, "The '-c' flag does not allow additional flags.")
 		}
 	}
@@ -351,8 +383,8 @@ func uploadFiles(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext) error {
 	return nil
 }
 
-func startExplorer(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext) (*common.DiveMultipleServiceResponse, error) {
-	para := `{"ws_url":"ws://127.0.0.1:9944"}`
+func startExplorer(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, publicEndpoint string) (*common.DiveMultipleServiceResponse, error) {
+	para := fmt.Sprintf(`{"ws_url":"%s"}`, publicEndpoint)
 	runConfig := common.GetStarlarkRunConfig(para, common.DivePolkaDotExplorerPath, runPolkadotExplorer)
 	explorerResponseData, err := startService(cli, enclaveCtx, runConfig, "Explorer")
 	if err != nil {
@@ -417,4 +449,19 @@ func startService(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, runConfi
 	}
 
 	return result, nil
+}
+
+func updatePort(url string, newPort string) string {
+	re := regexp.MustCompile(`ws%3A%2F%2F127\.0\.0\.1%3A(\d+)`)
+	newUrl := re.ReplaceAllString(url, fmt.Sprintf("ws%%3A%%2F%%2F127.0.0.1%%3A%s", newPort))
+	return newUrl
+}
+
+func extractPort(url string) string {
+	re := regexp.MustCompile(`ws://127\.0\.0\.1:(\d+)`)
+	match := re.FindStringSubmatch(url)
+	if len(match) > 1 {
+		return match[1]
+	}
+	return ""
 }

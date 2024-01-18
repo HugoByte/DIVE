@@ -7,6 +7,7 @@ import (
 
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/kurtosis-tech/kurtosis/api/golang/engine/lib/kurtosis_context"
+	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/services"
 	"github.com/spf13/cobra"
 )
 
@@ -85,6 +86,9 @@ type Context interface {
 
 	// GetEnclaves retrieves information about all enclaves currently running.
 	GetEnclaves() ([]EnclaveInfo, error)
+
+	// GetAllEnclavesServices retrives the all running services for all active enclaves.
+	GetAllEnlavesServices() (map[string]map[services.ServiceName]services.ServiceUUID, error) 
 
 	// GetEnclaveContext retrieves the context of a specific enclave by its name.
 	GetEnclaveContext(enclaveName string) (*enclaves.EnclaveContext, error)
