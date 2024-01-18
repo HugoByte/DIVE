@@ -5,8 +5,8 @@ go 1.21.4
 require (
 	github.com/google/uuid v1.5.0
 	github.com/hugobyte/dive-core/cli v0.0.0-20240117101917-8ee8b4124677
-	github.com/onsi/ginkgo/v2 v2.13.0
-	github.com/onsi/gomega v1.30.0
+	github.com/onsi/ginkgo/v2 v2.13.2
+	github.com/onsi/gomega v1.31.0
 )
 
 require (
@@ -17,7 +17,7 @@ require (
 	github.com/dsnet/compress v0.0.2-0.20230904184137-39efe44ab707 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
-	github.com/go-logr/logr v1.2.4 // indirect
+	github.com/go-logr/logr v1.3.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/go-yaml/yaml v2.1.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
@@ -53,7 +53,7 @@ require (
 	golang.org/x/sys v0.16.0 // indirect
 	golang.org/x/term v0.16.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	golang.org/x/tools v0.12.0 // indirect
+	golang.org/x/tools v0.14.0 // indirect
 	google.golang.org/genproto v0.0.0-20240116215550-a9fa1716bcac // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240116215550-a9fa1716bcac // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240116215550-a9fa1716bcac // indirect
