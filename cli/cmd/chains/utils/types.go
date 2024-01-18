@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"slices"
 
 	"github.com/hugobyte/dive-core/cli/common"
@@ -71,12 +72,36 @@ func (cs *CosmosServiceConfig) LoadConfigFromFile(cliContext *common.Cli, filePa
 	if err != nil {
 		return common.WrapMessageToError(err, "Failed To Load Configuration")
 	}
+
+	publicGrpc, err := common.GetAvailablePort()
+	if err != nil {
+		return common.WrapMessageToError(err, "error getting available gRPC port")
+	}
+	cs.PublicGrpc = &publicGrpc
+
+	publicHTTP, err := common.GetAvailablePort()
+	if err != nil {
+		return common.WrapMessageToError(err, "error getting available HTTP port")
+	}
+	cs.PublicHTTP = &publicHTTP
+
+	publicRPC, err := common.GetAvailablePort()
+	if err != nil {
+		return common.WrapMessageToError(err, "error getting available Rpc port")
+	}
+	cs.PublicRPC = &publicRPC
+
+	publicTCP, err := common.GetAvailablePort()
+	if err != nil {
+		return common.WrapMessageToError(err, "error getting available Tcp port")
+	}
+	cs.PublicTCP = &publicTCP
+
 	return nil
 }
 
 func (cc *CosmosServiceConfig) IsEmpty() error {
-	if cc.ChainID == nil || cc.Key == nil || cc.Password == nil ||
-		cc.PublicGrpc == nil || cc.PublicHTTP == nil || cc.PublicTCP == nil || cc.PublicRPC == nil {
+	if cc.ChainID == nil || cc.Key == nil || cc.Password == nil {
 		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In The Config File")
 	}
 
@@ -126,11 +151,19 @@ func (sc *IconServiceConfig) LoadConfigFromFile(cliContext *common.Cli, filePath
 		return common.WrapMessageToError(err, "Failed To Load Configuration")
 	}
 
+	sc.Port = 9080
+
+	availablePort, err := common.GetAvailablePort()
+	if err != nil {
+		return err
+	}
+	sc.PublicPort = availablePort
+
 	return nil
 }
 
 func (sc *IconServiceConfig) IsEmpty() error {
-	if sc.Port == 0 || sc.PublicPort == 0 || sc.P2PListenAddress == "" || sc.P2PAddress == "" || sc.Cid == "" {
+	if sc.P2PListenAddress == "" || sc.P2PAddress == "" || sc.Cid == "" {
 		return common.WrapMessageToErrorf(common.ErrEmptyFields, "Missing Fields In The Config File")
 	}
 	return nil
@@ -191,6 +224,17 @@ type PolkadotServiceConfig struct {
 }
 
 func (pc *ParaNodeConfig) EncodeToString() (string, error) {
+	encodedBytes, err := json.Marshal(pc)
+	if err != nil {
+		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
+	}
+
+	return string(encodedBytes), nil
+}
+
+type ParaNodeConfigList []ParaNodeConfig
+
+func (pc ParaNodeConfigList) EncodeToString() (string, error) {
 	encodedBytes, err := json.Marshal(pc)
 	if err != nil {
 		return "", common.WrapMessageToError(common.ErrDataMarshall, err.Error())
@@ -414,7 +458,7 @@ func (sc *PolkadotServiceConfig) ValidateConfig() error {
 	if sc.ChainType == "testnet" {
 		for _, paraChain := range sc.Para {
 			if slices.Contains(invalidTestNetParaChains, paraChain.Name) {
-				return fmt.Errorf("no Testnet for Para Chain: %s", paraChain.Name)
+				return fmt.Errorf("no Testnet for Parachain: %s", paraChain.Name)
 			}
 		}
 	}
@@ -422,7 +466,7 @@ func (sc *PolkadotServiceConfig) ValidateConfig() error {
 	for _, paraChain := range sc.Para {
 		for _, node := range paraChain.Nodes {
 			if !slices.Contains(validParaNodeType, node.NodeType) {
-				return fmt.Errorf("invalid Node Type for Para Chain: %s", node.NodeType)
+				return fmt.Errorf("invalid Node Type for Parachain: %s", node.NodeType)
 			}
 		}
 	}
@@ -469,4 +513,37 @@ func (sc *PolkadotServiceConfig) ConfigureFullNodes(network string) {
 		NodeType:   "full",
 		Prometheus: false,
 	})
+}
+
+func GetStopMessage(cliContext *common.Cli, filePath string, relayName string, paraChain []string) (string, error) {
+	stopMessage := "Parachain Nodes - "
+	serviceConfig := &PolkadotServiceConfig{}
+	var err error
+	if filePath != "" {
+		if !filepath.IsAbs(filePath) {
+			filePath, err = filepath.Abs(filePath)
+			if err != nil {
+				return "", err
+			}
+		}
+		err = cliContext.FileHandler().ReadJson(filePath, serviceConfig)
+		if err != nil {
+			return "", err
+		}
+		if len(serviceConfig.Para) == 0 {
+			return fmt.Sprintf("%s Relay Chain Started. ", relayName), nil
+		}
+		for _, parachain := range serviceConfig.Para {
+			stopMessage = stopMessage + parachain.Name + ", "
+		}
+	} else {
+		if len(paraChain) == 0 {
+			return fmt.Sprintf("%s Relay Chain Started. ", relayName), nil
+		}
+		for _, parachain := range paraChain {
+			stopMessage = stopMessage + parachain + ", "
+		}
+	}
+	stopMessage = stopMessage + fmt.Sprintf("Started For %s Relay Chain. ", relayName)
+	return stopMessage, nil
 }

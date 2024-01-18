@@ -31,5 +31,8 @@ doc/tags
 
 # log dir
 logs/
+output/
 
 node_modules/
+
+*.out

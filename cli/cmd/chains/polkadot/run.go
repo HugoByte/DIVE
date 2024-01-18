@@ -52,7 +52,7 @@ func RunPolkadot(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 
 	for _, paraChain := range serviceConfig.Para {
 		if !slices.Contains(polkadotParachains, paraChain.Name) {
-			return nil, common.WrapMessageToErrorf(common.ErrInvalidConfig, "Invalid Parachain - Parachain %s is not Supported for PolkaDot", paraChain.Name)
+			return nil, common.WrapMessageToErrorf(common.ErrInvalidConfig, "Invalid Parachain - Parachain %s is not Supported for Polkadot", paraChain.Name)
 		}
 	}
 
@@ -210,17 +210,13 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 func startParaChains(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, serviceConfig *utils.PolkadotServiceConfig, para string, ipAddress string) (*common.DiveMultipleServiceResponse, error) {
 	paraResult := &common.DiveMultipleServiceResponse{}
 	allParaResult := &common.DiveMultipleServiceResponse{}
-	var err error
 
 	if serviceConfig.ChainType == localChain {
-		var paraChains []string
-		for _, paraChain := range serviceConfig.Para {
-			paraChainConfig, err := paraChain.EncodeToString()
-			if err != nil {
-				return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
-			}
-
-			paraChains = append(paraChains, paraChainConfig)
+		paraNodeList := utils.ParaNodeConfigList(serviceConfig.Para)
+		var paraChains string
+		paraChains, err := paraNodeList.EncodeToString()
+		if err != nil {
+			return nil, err
 		}
 		param := fmt.Sprintf(`{"chain_type":"%s", "parachains": %s, "relay_chain_ip": "%s"}`, serviceConfig.ChainType, paraChains, ipAddress)
 		runParaConfig := getParaRunConfig(serviceConfig, enclaveContext, param)

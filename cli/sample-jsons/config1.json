@@ -1,6 +1,4 @@
 {
-  "private_port": 9081,
-  "public_port": 8091,
   "p2p_listen_address": "7081",
   "p2p_address": "8081",
   "cid": "0x42f1f3"
