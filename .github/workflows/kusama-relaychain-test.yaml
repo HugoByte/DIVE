@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  functional_test_kusama:
+  functional_test_kusama_relaychain:
     name: Kusama Relaychain Functional Testing
     runs-on: "ubuntu-latest"
 
