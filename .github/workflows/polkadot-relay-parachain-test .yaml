@@ -26,4 +26,4 @@ jobs:
 
       - name: Running Polkadot Relay and Parachain command tests
         run: |
-           cd test && make run-relay&parachain-polkadot
+           cd test && make run-relay-parachain-polkadot
