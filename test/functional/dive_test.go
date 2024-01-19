@@ -130,8 +130,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should start bridge between icon and eth by running icon node first and then decentralising it", func() {
 			enclaveName := dive.GenerateRandomName()
 			dive.RunIconNode(enclaveName)
-
-			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(service_path[0], dive.ICON_CONFIG0_SERVICENAME)
 			dive.DecentralizeCustomIconNode(nid0, endpoint0, serviceName0, enclaveName)
 
 			dive.RunEthNode(enclaveName)
@@ -147,7 +147,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			enclaveName := dive.GenerateRandomName()
 
 			dive.RunIconNode(enclaveName)
-			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(service_path[0], dive.ICON_CONFIG0_SERVICENAME)
 			dive.DecentralizeCustomIconNode(nid0, endpoint0, serviceName0, enclaveName)
 
 			dive.RunHardhatNode(enclaveName)
@@ -172,8 +173,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			enclaveName := dive.GenerateRandomName()
 			dive.RunDecentralizedIconNode(enclaveName)
 			dive.RunCustomIconNode1(enclaveName)
-
-			serviceName, endpoint, nid := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG1_SERVICENAME)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			serviceName, endpoint, nid := dive.GetServiceDetails(service_path[0], dive.ICON_CONFIG1_SERVICENAME)
 			dive.DecentralizeCustomIconNode(nid, endpoint, serviceName, enclaveName)
 
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", dive.ICON_CONFIG0_SERVICENAME, "--chainBServiceName", dive.ICON_CONFIG1_SERVICENAME, "--enclaveName", enclaveName)
@@ -187,11 +188,11 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			enclaveName := dive.GenerateRandomName()
 			dive.RunIconNode(enclaveName)
 			dive.RunCustomIconNode1(enclaveName)
-
-			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
+			service_path0, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(service_path0[0], dive.ICON_CONFIG0_SERVICENAME)
 			dive.DecentralizeCustomIconNode(nid0, endpoint0, serviceName0, enclaveName)
-
-			serviceName1, endpoint1, nid1 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG1_SERVICENAME)
+			service_path1, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			serviceName1, endpoint1, nid1 := dive.GetServiceDetails(service_path1[0], dive.ICON_CONFIG1_SERVICENAME)
 			dive.DecentralizeCustomIconNode(nid1, endpoint1, serviceName1, enclaveName)
 
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", dive.ICON_CONFIG0_SERVICENAME, "--chainBServiceName", dive.ICON_CONFIG1_SERVICENAME, "--enclaveName", enclaveName)
@@ -215,11 +216,11 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			enclaveName := dive.GenerateRandomName()
 			dive.RunCustomIconNode0(enclaveName)
 			dive.RunCustomIconNode1(enclaveName)
-
-			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG0_SERVICENAME)
+			service_path0, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			serviceName0, endpoint0, nid0 := dive.GetServiceDetails(service_path0[0], dive.ICON_CONFIG0_SERVICENAME)
 			dive.DecentralizeCustomIconNode(nid0, endpoint0, serviceName0, enclaveName)
-
-			serviceName1, endpoint1, nid1 := dive.GetServiceDetails(fmt.Sprintf("services_%s.json", enclaveName), dive.ICON_CONFIG1_SERVICENAME)
+			service_path1, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			serviceName1, endpoint1, nid1 := dive.GetServiceDetails(service_path1[0], dive.ICON_CONFIG1_SERVICENAME)
 			dive.DecentralizeCustomIconNode(nid1, endpoint1, serviceName1, enclaveName)
 
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "icon", "--chainAServiceName", dive.ICON_CONFIG0_SERVICENAME, "--chainBServiceName", dive.ICON_CONFIG1_SERVICENAME, "--enclaveName", enclaveName)
@@ -243,7 +244,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should handle invalid input for bridge command", func() {
 			enclaveName := dive.GenerateRandomName()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "icon", "--chainB", "invalid_input", "--enclaveName", enclaveName)
-			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
@@ -251,7 +251,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should handle invalid input for bridge command", func() {
 			enclaveName := dive.GenerateRandomName()
 			cmd.Args = append(cmd.Args, "bridge", "btp", "--chainA", "invalid_input", "--chainB", "eth", "--enclaveName", enclaveName)
-			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
@@ -259,7 +258,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should handle invalid input ibc bridge command", func() {
 			enclaveName := dive.GenerateRandomName()
 			cmd.Args = append(cmd.Args, "bridge", "ibc", "--chainA", "archway", "--chainB", "invalid", "--enclaveName", enclaveName)
-			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
 		})
@@ -592,7 +590,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 
 		ginkgo.It("should handle invalid input for chain command", func() {
 			enclaveName := dive.GenerateRandomName()
-			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "../../cli/sample-jsons/invalid_config.json", "-g", "./config/invalid-icon-3.zip", "--enclaveName", enclaveName)
+			cmd.Args = append(cmd.Args, "chain", "icon", "-c", "invalid_config.json", "-g", "./config/invalid-icon-3.zip", "--enclaveName", enclaveName)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
@@ -724,10 +722,9 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should run single custom archway node with invalid json path", func() {
 			enclaveName := dive.GenerateRandomName()
 			cmd.Args = append(cmd.Args, "chain", "archway", "-c", "../../cli/sample-jsons/invalid_archway.json", "--enclaveName", enclaveName)
-			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
-			dive.Clean(enclaveName)
+			defer dive.Clean(enclaveName)
 		})
 
 		ginkgo.It("should output user that chain is already running when trying to run archway chain that is already running", func() {
@@ -959,7 +956,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 					if paraChainName != "parallel" && paraChainName != "subzero" {
 						enclaveName := dive.GenerateRandomName()
 						config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "testnet", paraChainName)
-						cmd.Args = append(cmd.Args, "chain", relayChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
+						cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 						defer os.Remove(config)
 						err := cmd.Run()
 						gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -969,20 +966,20 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				ginkgo.It("should run custom parachain in mainnet for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "mainnet", paraChainName)
-					cmd.Args = append(cmd.Args, "chain", relayChainName, "--no-relay", "-c", config, "--enclaveName", enclaveName)
+					cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
 					defer os.Remove(config)
 					err := cmd.Run()
 					gomega.Expect(err).NotTo(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
 				})
-				ginkgo.It("should run single parachain in localnet for "+relayChainName+" and "+paraChainName, func() {
+				ginkgo.It("should not run single parachain in localnet for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-n", "local", "--enclaveName", enclaveName)
 					err := cmd.Run()
 					gomega.Expect(err).To(gomega.HaveOccurred())
 					dive.Clean(enclaveName)
 				})
-				ginkgo.It("should run single parachain without giving network type for "+relayChainName+" and "+paraChainName, func() {
+				ginkgo.It("should not run single parachain without giving network type for "+relayChainName+" and "+paraChainName, func() {
 					enclaveName := dive.GenerateRandomName()
 					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "--enclaveName", enclaveName)
 					err := cmd.Run()
