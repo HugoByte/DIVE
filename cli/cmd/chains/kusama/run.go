@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	localChain   = "local"
-	polkadotJUrl = "http://127.0.0.1/?rpc=ws://%s:%s#/explorer"
+	localChain            = "local"
+	polkadotJUrl          = "http://127.0.0.1/?rpc=ws://%s:%s#/explorer"
 	PolkadotJsServiceName = "polkadot-js-explorer"
 )
 
@@ -81,6 +81,25 @@ func RunKusama(cli *common.Cli) (*common.DiveMultipleServiceResponse, error) {
 		}
 	}
 
+	if serviceConfig.HasPrometheus() {
+		metricsResult, err := startMetrics(cli, enclaveContext, result)
+		if err != nil {
+			return nil, err
+		}
+		result = result.ConcatenateDiveResults(metricsResult)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if serviceConfig.Explorer {
+		explorerResult, err := startExplorer(cli, enclaveContext, result)
+		if err != nil {
+			return nil, err
+		}
+		result = result.ConcatenateDiveResults(explorerResult)
+	}
+
 	return result, nil
 
 }
@@ -90,8 +109,6 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 	kusamaResponseData := &common.DiveMultipleServiceResponse{}
 	paraResult := &common.DiveMultipleServiceResponse{}
 	finalResult := &common.DiveMultipleServiceResponse{}
-	explorerResult := &common.DiveMultipleServiceResponse{}
-	metricsResult := &common.DiveMultipleServiceResponse{}
 
 	param, err := serviceConfig.GetParamsForRelay()
 	if err != nil {
@@ -153,57 +170,6 @@ func startRelayAndParaChain(cli *common.Cli, enclaveContext *enclaves.EnclaveCon
 		}
 	}
 
-	if serviceConfig.HasPrometheus() {
-		metricsResult, err = startMetrics(cli, enclaveContext, finalResult)
-		finalResult = finalResult.ConcatenateDiveResults(metricsResult)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if serviceConfig.Explorer {
-		publicEndpoint := "ws://127.0.0.1:9944"
-		
-		var isExplorerRunning bool
-
-		allEclaveServices, err := cli.Context().GetAllEnlavesServices()
-		if err != nil {
-			return nil, err
-		}
-
-		for _, enclave := range allEclaveServices {
-			for serviceName, _ := range enclave {
-				if serviceName ==  PolkadotJsServiceName {
-					isExplorerRunning = true
-				}
-			} 
-		}
-
-		if len(finalResult.Dive) > 0 {
-			for _, serviceResponse := range finalResult.Dive {
-				publicEndpoint = serviceResponse.PublicEndpoint
-				break
-			}
-		}
-		
-		if !isExplorerRunning {
-			explorerResult, err = startExplorer(cli, enclaveContext, publicEndpoint)
-			if err != nil {
-				return nil, err
-			}
-			finalResult = finalResult.ConcatenateDiveResults(explorerResult)
-		} else {
-			cli.Logger().Info("Explorer service is already running.")	
-		}
-		
-		url := updatePort(polkadotJUrl, "127.0.0.1", extractPort(publicEndpoint))
-		cli.Logger().Info("Redirecting to Polkadote explorer UI...")
-		if err := common.OpenFile(url); err != nil {
-			cli.Logger().Fatalf(common.CodeOf(err), "Failed to open HugoByte Polkadot explorer UI with error %v", err)
-		}
-	}
-
-
 	return finalResult, nil
 }
 
@@ -231,7 +197,13 @@ func startParaChains(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, s
 			if err != nil {
 				return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
 			}
-			param := fmt.Sprintf(`{"chain_type": "%s", "relaychain_name": "%s", "parachain":%s}`, serviceConfig.ChainType, serviceConfig.RelayChain.Name, paraChainConfig)
+			var relayChainName string
+			if serviceConfig.ChainType == "testnet" {
+				relayChainName = "rococo"
+			} else {
+				relayChainName = "kusama"
+			}
+			param := fmt.Sprintf(`{"chain_type": "%s", "relaychain_name": "%s", "parachain":%s}`, serviceConfig.ChainType, relayChainName, paraChainConfig)
 			runParaConfig := getParaRunConfig(serviceConfig, enclaveContext, param)
 			paraResult, err = startService(cli, enclaveContext, runParaConfig, "Parachain")
 			if err != nil {
@@ -379,24 +351,62 @@ func uploadFiles(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext) error {
 	return nil
 }
 
-func startExplorer(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, publicEndpoint string) (*common.DiveMultipleServiceResponse, error) {
-	para := fmt.Sprintf(`{"ws_url":"%s"}`, publicEndpoint)
-
-	runConfig := common.GetStarlarkRunConfig(para, common.DivePolkaDotExplorerPath, runKusamaExplorer)
-	explorerResponseData, err := startService(cli, enclaveCtx, runConfig, "Explorer")
+func startExplorer(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, finalResult *common.DiveMultipleServiceResponse) (*common.DiveMultipleServiceResponse, error) {
+	publicEndpoint := "ws://127.0.0.1:9944"
+	var isExplorerRunning bool
+	explorerResponseData := &common.DiveMultipleServiceResponse{}
+	allEclaveServices, err := cli.Context().GetAllEnlavesServices()
 	if err != nil {
 		return nil, err
 	}
+
+	for _, enclave := range allEclaveServices {
+		for serviceName := range enclave {
+			if serviceName == PolkadotJsServiceName {
+				isExplorerRunning = true
+			}
+		}
+	}
+
+	if len(finalResult.Dive) > 0 {
+		for _, serviceResponse := range finalResult.Dive {
+			publicEndpoint = serviceResponse.PublicEndpoint
+			break
+		}
+	}
+
+	if !isExplorerRunning {
+		para := fmt.Sprintf(`{"ws_url":"%s"}`, publicEndpoint)
+		runConfig := common.GetStarlarkRunConfig(para, common.DivePolkaDotExplorerPath, runKusamaExplorer)
+		explorerResponseData, err = startService(cli, enclaveCtx, runConfig, "Explorer")
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		cli.Logger().Info("Explorer service is already running.")
+	}
+
+	url := updatePort(polkadotJUrl, "127.0.0.1", extractPort(publicEndpoint))
+	cli.Logger().Info("Redirecting to Polkadote explorer UI...")
+	if err := common.OpenFile(url); err != nil {
+		cli.Logger().Fatalf(common.CodeOf(err), "Failed to open HugoByte Polkadot explorer UI with error %v", err)
+	}
+
 	return explorerResponseData, nil
 }
 
-func startMetrics(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, final_result *common.DiveMultipleServiceResponse) (*common.DiveMultipleServiceResponse, error) {
-	service_details, err := final_result.EncodeToString()
+func startMetrics(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, finalResult *common.DiveMultipleServiceResponse) (*common.DiveMultipleServiceResponse, error) {
+	service_details, err := finalResult.EncodeToString()
 	if err != nil {
 		return nil, common.WrapMessageToError(common.ErrDataMarshall, err.Error())
 	}
 
-	paraPrometheus := fmt.Sprintf(`{"service_details":%s}`, service_details)
+	http_port_number, err := common.GetAvailablePort()
+	if err != nil {
+		return nil, err
+	}
+
+	paraPrometheus := fmt.Sprintf(`{"service_details":%s, "http_port_number":%d}`, service_details, http_port_number)
 
 	runConfigPrometheus := common.GetStarlarkRunConfig(paraPrometheus, common.DivePolkaDotPrometheusPath, runKusamaPrometheus)
 	prometheusResult, err := startService(cli, enclaveCtx, runConfigPrometheus, "Prometheus")
@@ -404,7 +414,13 @@ func startMetrics(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, final_re
 		return nil, err
 	}
 
-	runConfigGrafana := common.GetStarlarkRunConfig(`{}`, common.DivePolkaDotGrafanaPath, runKusamaGrafana)
+	port, err := common.GetAvailablePort()
+	if err != nil {
+		return nil, err
+	}
+
+	paraGrafana := fmt.Sprintf(`{"port":%d}`, port)
+	runConfigGrafana := common.GetStarlarkRunConfig(paraGrafana, common.DivePolkaDotGrafanaPath, runKusamaGrafana)
 	grafanaResult, err := startService(cli, enclaveCtx, runConfigGrafana, "Grafana")
 	if err != nil {
 		return nil, err
@@ -448,8 +464,8 @@ func startService(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, runConfi
 	return result, nil
 }
 
-func updatePort(url string, newIp string,newPort string) string {
-    newUrl := fmt.Sprintf(url, newIp, newPort)
+func updatePort(url string, newIp string, newPort string) string {
+	newUrl := fmt.Sprintf(url, newIp, newPort)
 	return newUrl
 }
 

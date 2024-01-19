@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+	"time"
 )
 
 var (
@@ -44,9 +45,12 @@ func GetCli(enclaveName string) *Cli {
 		os.Exit(1)
 	}
 
+	timeStamp := time.Now().Format("2006-01-02_15:04:05")
 	logDirPath := fmt.Sprintf(DiveLogDirectory, enclaveName)
-	errorLogFilePath := filepath.Join(pwd, logDirPath, DiveErrorLogFile)
-	infoLogFilePath := filepath.Join(pwd, logDirPath, DiveDitLogFile)
+	errorFileName := fmt.Sprintf(DiveErrorLogFile, timeStamp)
+	infoFileName := fmt.Sprintf(DiveDitLogFile, timeStamp)
+	errorLogFilePath := filepath.Join(pwd, logDirPath, errorFileName)
+	infoLogFilePath := filepath.Join(pwd, logDirPath, infoFileName)
 
 	cliContext.log = NewDiveLogger(infoLogFilePath, errorLogFilePath)
 	cliContext.fileHandler = fileHandler

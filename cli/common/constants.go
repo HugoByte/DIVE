@@ -27,8 +27,8 @@ const (
 	DiveDryRun                         = false
 	DiveDefaultParallelism             = 4
 	DiveLogDirectory                   = "/logs/%s"
-	DiveDitLogFile                     = "dive.log"
-	DiveErrorLogFile                   = "error.log"
+	DiveDitLogFile                     = "dive_%s.log"
+	DiveErrorLogFile                   = "error_%s.log"
 	DiveOutFileDirectory               = "/output/"
 	DiveOutFile                        = "dive_%s_%s.json"
 	ServiceFilePath                    = "services_%s_%s.json"
