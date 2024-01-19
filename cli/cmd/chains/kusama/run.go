@@ -201,7 +201,7 @@ func startParaChains(cli *common.Cli, enclaveContext *enclaves.EnclaveContext, s
 			if serviceConfig.ChainType == "testnet" {
 				relayChainName = "rococo"
 			} else {
-				relayChainName = "polkadot"
+				relayChainName = "kusama"
 			}
 			param := fmt.Sprintf(`{"chain_type": "%s", "relaychain_name": "%s", "parachain":%s}`, serviceConfig.ChainType, relayChainName, paraChainConfig)
 			runParaConfig := getParaRunConfig(serviceConfig, enclaveContext, param)
