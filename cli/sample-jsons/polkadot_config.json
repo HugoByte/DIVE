@@ -1,5 +1,5 @@
 {
-  "chain_type": "local",
+  "chain_type": "localnet",
   "relaychain": {
     "name": "rococo-local",
     "nodes": [
@@ -11,7 +11,7 @@
       {
         "name": "bob",
         "node_type": "validator",
-        "prometheus": true
+        "prometheus": false
 
       }
     ]
@@ -30,10 +30,10 @@
         {
           "name": "bob",
           "node_type": "full",
-          "prometheus": true
+          "prometheus": false
         }
       ]
     }
   ],
-  "explorer": true
+  "explorer": false
 }
