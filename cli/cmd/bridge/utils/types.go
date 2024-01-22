@@ -96,20 +96,20 @@ func (chains *Chains) GetServicesResponse(cli *common.Cli) (string, string, erro
 
 func (chains *Chains) CheckForBtpSupportedChains() error {
 	if !slices.Contains(supportedChainsForBtp, chains.ChainA) {
-		return fmt.Errorf("invalid Chain: %s", chains.ChainA)
+		return fmt.Errorf("invalid chain: %s", chains.ChainA)
 	}
 	if !slices.Contains(supportedChainsForBtp, chains.ChainB) {
-		return fmt.Errorf("invalid Chain: %s", chains.ChainB)
+		return fmt.Errorf("invalid chain: %s", chains.ChainB)
 	}
 	return nil
 }
 
 func (chains *Chains) CheckForIbcSupportedChains() error {
 	if !slices.Contains(supportedChainsForIbc, chains.ChainA) {
-		return fmt.Errorf("invalid Chain: %s", chains.ChainA)
+		return fmt.Errorf("invalid chain: %s", chains.ChainA)
 	}
 	if !slices.Contains(supportedChainsForIbc, chains.ChainB) {
-		return fmt.Errorf("invalid Chain: %s", chains.ChainB)
+		return fmt.Errorf("invalid chain: %s", chains.ChainB)
 	}
 	return nil
 }

@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	localChain            = "local"
+	localChain            = "localnet"
 	polkadotJUrl          = "http://127.0.0.1/?rpc=ws://%s:%s#/explorer"
 	PolkadotJsServiceName = "polkadot-js-explorer"
 )
@@ -257,9 +257,9 @@ func configureService(serviceConfig *utils.PolkadotServiceConfig) error {
 		}
 	}
 
-	if noRelay && serviceConfig.ChainType == "local" {
-		return common.WrapMessageToError(common.ErrInvalidFlag, "The '--no-relay' flag cannot be used with a 'local' network. This flag is only applicable for 'testnet' and 'mainnet' networks.")
-	} else if noRelay && serviceConfig.ChainType != "local" {
+	if noRelay && serviceConfig.ChainType == localChain {
+		return common.WrapMessageToError(common.ErrInvalidFlag, "The '--no-relay' flag cannot be used with a 'localnet' network. This flag is only applicable for 'testnet' and 'mainnet' networks.")
+	} else if noRelay && serviceConfig.ChainType != localChain {
 		serviceConfig.RelayChain = utils.RelayChainConfig{}
 	}
 
