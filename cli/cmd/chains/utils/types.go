@@ -418,7 +418,7 @@ func (sc *PolkadotServiceConfig) HasPrometheus() bool {
 
 func (sc *PolkadotServiceConfig) ValidateConfig() error {
 	var validChainTypes = []string{"localnet", "testnet", "mainnet"}
-	var validRelayNodeType = []string{"validator", "full"}
+	var validRelayNodeType = []string{"validator", "full", "archive"}
 	var validParaNodeType = []string{"collator", "full"}
 	var invalidTestNetParaChains = []string{"parallel", "subzero"}
 
