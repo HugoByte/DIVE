@@ -248,12 +248,12 @@ func configureService(serviceConfig *utils.PolkadotServiceConfig) error {
 	}
 
 	for i := range serviceConfig.RelayChain.Nodes {
-		serviceConfig.RelayChain.Nodes[i].AssignPorts(serviceConfig.RelayChain.Nodes[i].Prometheus)
+		serviceConfig.RelayChain.Nodes[i].AssignPorts(serviceConfig.RelayChain.Nodes[i].Prometheus, serviceConfig.RelayChain.Name)
 	}
 
 	for _, paraChain := range serviceConfig.Para {
 		for i := range paraChain.Nodes {
-			paraChain.Nodes[i].AssignPorts(paraChain.Nodes[i].Prometheus)
+			paraChain.Nodes[i].AssignPorts(paraChain.Nodes[i].Prometheus, paraChain.Name)
 		}
 	}
 

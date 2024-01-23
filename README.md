@@ -178,9 +178,9 @@ To set up an individual node, simply pass the name of the chain to the dive chai
 dive chain archway
 ```
 
-After running the command, **DIVE CLI** will automatically start the ICON node and handle the necessary initialization processes. Please wait for the ICON node to fully initialize, which may take a few moments.
+After running the command, **DIVE CLI** will automatically start the Archway node and handle the necessary initialization processes. Please wait for the Archway node to fully initialize, which may take a few moments.
 
-Once the initialization is complete, you can interact with the local ICON chain as needed.**DIVE CLI** sets up the ICON node on your local environment, enabling you to deploy and test smart contracts, explore transactions, and experiment with various ICON blockchain features
+Once the initialization is complete, you can interact with the local Archway chain as needed.**DIVE CLI** sets up the Archway node on your local environment, enabling you to deploy and test smart contracts, explore transactions, and experiment with various Archway blockchain features
 
 > Detailed output during execution can be enabled via Verbose flag.
 
@@ -188,20 +188,7 @@ Once the initialization is complete, you can interact with the local ICON chain 
 
 > Each Dive cli execution will be logged into log files under log folder in current working directory.
 
-After successful execution one can find service details in `services.json` created in output folder in current working directory.
-Example `services.json`:
-
-```json
-{
-    "node-service-constantine-3": {
-        "service_name": "node-service-constantine-3",
-        "endpoint_public": "http://127.0.0.1:9431",
-        "endpoint": "http://172.16.4.5:26657",
-        "chain_id": "constantine-3",
-        "chain_key": "constantine-3-key"
-    }
-}
-```
+After successful execution service details can be found in `services_xxxx_xxxx123xx.json`. For more details, refer to the [Service Details](#service-details)
 
 You can also pass your custom config using the `-c` flag:
 
@@ -258,19 +245,19 @@ dive bridge btp --chainA icon --chainB eth -b
 
 This command sets up btp bridge between icon and eth . After running this command **DIVE CLI** will automatically starts the ICON & ETH node, deploy contracts which is used for BTP and starts the relay to constantly exchange messages between the established connection.
 
-After successful bridge setup all the neccessary details with respect to bridge will be added to `dive.json` file that will be present in the output folder in current working directory.
+After successful bridge setup all the neccessary details with respect to bridge will be added to `dive_xxxx_xxxx123xx.json`. For more details, refer to the [Service Details](#service-details)
 
 > Checkout More details on how to setup [BTP](https://www.xcall.dev/quickstart/setting-up-a-local-environment-with-dive-cli) bridge
 
 ## Setting Up Relay and Para Chains
 
-To set up a relay chain, run this command:
+To set up a relaychain, run this command:
 
 ```bash
 dive chain kusama
 ```
 
-To set up a parachain in polkadot along with the relay chain, run this command:
+To set up a parachain in polkadot along with the relaychain, run this command:
 
 ```bash
 dive chain polkadot -p frequency
@@ -308,7 +295,7 @@ dive chain kusama -c path/to/config/file
 
 For detailed instructions on writing the configuration file, refer to the [Configuration File Guidelines](#configuration-file-guidelines)
 
-> Note: You can run a parachain without a relay chain only in testnet and mainnet networks.
+> Note: You can run a parachain without a relaychain only in testnet and mainnet networks.
 
 > Note: The default network type is localnet.
 
@@ -386,7 +373,7 @@ For **cosmos chain (Archway/Neutron):**
 
 - **chain_id:** The Chain ID of the chain.
 - **key:** The Key to use to spawn the node.
-- **password:** The pPassword to use to spawn the node.
+- **password:** The Password to use to spawn the node.
 
 For **Icon chain:**
 
@@ -394,24 +381,26 @@ For **Icon chain:**
 - **p2p_address:** The p2p address.
 - **cid:** The CID (Chain ID) of the node.
 
+> Note: The cid for ICON chain must be dervied from the genesis file.
+
 For  **Polkadot/Kusama:**
 
 - **chain_type:** Specifies the type of the network (e.g., "localnet","testnet", "mainnet").
-- **relaychain:** Configuration for the relay chain. (When chain_type is "testnet" or "mainenet", the "relaychain" can be an empty dictonary).
-  - **name:** Name of the relay chain (e.g., "rococo-local", "rococo", "polkadot" or "kusama").
-  - **nodes:** List of nodes on the relay chain, each with:
+- **relaychain:** Configuration for the relaychain. (When chain_type is "testnet" or "mainenet", the "relaychain" can be an empty dictonary).
+  - **name:** Name of the relaychain (e.g., "rococo-local", "rococo", "polkadot" or "kusama").
+  - **nodes:** List of nodes on the relaychain, each with:
     - **name:** Node name (e.g., "alice").
     - **node_type:** Node type, can be "validator" or "full".
     - **prometheus:** Whether Prometheus monitoring is enabled (true/false).
 - **parachains:** List of parachains, each with:
   - **name:** Parachain name (e.g., "kilt").
-  - **nodes:** List of nodes on the parachain, similar to relay chain nodes.
+  - **nodes:** List of nodes on the parachain, similar to relaychain nodes.
     - **name:** Node name (e.g., "alice").
     - **node_type:** Node type, can be "collator" or "full".
     - **prometheus:** Whether Prometheus monitoring is enabled (true/false).
 - **explorer:** Whether Polkadot js explorer is enabled (true/false).
 
-> Note: The polkadot/kusama command start two nodes in relay chain and one node in parachain by default in localnet. In testnet and mainnet, only one node is started for both by default. 
+> Note: The polkadot/kusama command start two nodes in relaychain and one node in parachain by default in localnet. In testnet and mainnet, only one node is started for both by default. 
 
 ## Config Templates
 
@@ -490,7 +479,7 @@ The service details returned after running a bridge command is as follows:
 ```
 ## Relay and Para Chains
 
-The service details returned after running a relay chain/para chain is as follows:
+The service details returned after running a relaychain/parachain is as follows:
 
 ```json
 {
@@ -542,7 +531,7 @@ The service details returned after running a relay chain/para chain is as follow
 }
 ```
 
-> Note: The service files are name as `services.json` and `dive.json` for chain and bridge commands respectively.
+> Note: The service files are named as `services_xxxx_xxxx123xx.json` and `dive_xxxx_xxxx123xx.json` for chain and bridge commands respectively.
 
 > Note: The file names for both chain and bridge commands contain the name of the enclave and the short UUID of the enclave. 
 
@@ -553,8 +542,9 @@ The logs are located within the 'logs' folder, further organized into individual
 You can find the 'logs' folder in the current working directory.
 
 Each folder named after the enclave, has two files:
-    - **dive.log** : It is created when the execution of a command starts. It contains the execution logs.
-    - **error.log** : It is created when an error occurs during the execution of the command. It contains the error logs.
+
+- **dive.log** : It is created when the execution of a command starts. It contains the execution logs.
+- **error.log** : It is created when an error occurs during the execution of the command. It contains the error logs.
 
 The file names also contain the timestamp which can be helpful to find a particular log file.
 
