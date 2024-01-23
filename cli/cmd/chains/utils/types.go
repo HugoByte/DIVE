@@ -204,6 +204,7 @@ type Ports struct {
 	RPCPort        int `json:"rpc_port"`
 	Lib2LibPort    int `json:"lib2lib_port"`
 	PrometheusPort int `json:"prometheus_port,omitempty"`
+	WSPort         int `json:"ws_port,omitempty"`
 }
 
 type RelayChainConfig struct {
@@ -273,12 +274,12 @@ func (sc *PolkadotServiceConfig) LoadConfigFromFile(cliContext *common.Cli, file
 	}
 
 	for i := range sc.RelayChain.Nodes {
-		sc.RelayChain.Nodes[i].AssignPorts(sc.RelayChain.Nodes[i].Prometheus)
+		sc.RelayChain.Nodes[i].AssignPorts(sc.RelayChain.Nodes[i].Prometheus, sc.RelayChain.Name)
 	}
 
 	for _, parachain := range sc.Para {
 		for i := range parachain.Nodes {
-			parachain.Nodes[i].AssignPorts(parachain.Nodes[i].Prometheus)
+			parachain.Nodes[i].AssignPorts(parachain.Nodes[i].Prometheus, parachain.Name)
 		}
 	}
 
@@ -295,15 +296,16 @@ func (sc *PolkadotServiceConfig) LoadDefaultConfig() error {
 	}
 
 	for i := range sc.RelayChain.Nodes {
-		sc.RelayChain.Nodes[i].AssignPorts(sc.RelayChain.Nodes[i].Prometheus)
+		sc.RelayChain.Nodes[i].AssignPorts(sc.RelayChain.Nodes[i].Prometheus, sc.RelayChain.Name)
 	}
 
 	sc.Para = []ParaNodeConfig{}
 	return nil
 }
 
-func (nc *NodeConfig) AssignPorts(prometheus bool) error {
-	var rpcPort, lib2libPort, prometheusPort int
+func (nc *NodeConfig) AssignPorts(prometheus bool, chainName string) error {
+	var wsPortEnabled = []string{"robonomics", "parallel", "subsocial", "litmus", "pendulum", "kilt"}
+	var rpcPort, lib2libPort, prometheusPort, wsPort int
 	var err error
 	rpcPort, err = common.GetAvailablePort()
 	if err != nil {
@@ -320,7 +322,13 @@ func (nc *NodeConfig) AssignPorts(prometheus bool) error {
 			return err
 		}
 	}
-	nc.Ports = Ports{RPCPort: rpcPort, Lib2LibPort: lib2libPort, PrometheusPort: prometheusPort}
+	if slices.Contains(wsPortEnabled, chainName) {
+		wsPort, err = common.GetAvailablePort()
+		if err != nil {
+			return err
+		}
+	}
+	nc.Ports = Ports{RPCPort: rpcPort, Lib2LibPort: lib2libPort, PrometheusPort: prometheusPort, WSPort: wsPort}
 	return nil
 }
 
@@ -421,6 +429,7 @@ func (sc *PolkadotServiceConfig) ValidateConfig() error {
 	var validRelayNodeType = []string{"validator", "full", "archive"}
 	var validParaNodeType = []string{"collator", "full"}
 	var invalidTestNetParaChains = []string{"parallel", "subzero"}
+	var inactiveTestNetParaChains = []string{"karura", "khala", "robonomics", "altair", "litmus", "calamari", "subsocial", "moonsama", "manta", "kylin", "centrifuge", "acala", "polkadex", "clover"}
 
 	if !slices.Contains(validChainTypes, sc.ChainType) {
 		return fmt.Errorf("invalid Chain Type: %s", sc.ChainType)
@@ -459,6 +468,10 @@ func (sc *PolkadotServiceConfig) ValidateConfig() error {
 		for _, paraChain := range sc.Para {
 			if slices.Contains(invalidTestNetParaChains, paraChain.Name) {
 				return fmt.Errorf("no testnet for parachain: %s", paraChain.Name)
+			}
+
+			if slices.Contains(inactiveTestNetParaChains, paraChain.Name) {
+				return fmt.Errorf("inactive testnet for parachain: %s", paraChain.Name)
 			}
 		}
 	}
