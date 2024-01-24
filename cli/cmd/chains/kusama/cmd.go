@@ -37,7 +37,7 @@ var (
 var KusamaCmd = common.NewDiveCommandBuilder().
 	SetUse("kusama").
 	SetShort("Build, initialize and start a Kusama node").
-	SetLong("The command starts the kusama relay chain and kusama parachain if -p flag is given").
+	SetLong("The command starts the kusama relaychain and kusama parachain if -p flag is given").
 	SetRun(kusama).
 	AddStringSliceFlagWithShortHand(&paraChain, "parachain", "p", []string{}, "specify the list of parachains to spawn parachain node").
 	AddStringFlagWithShortHand(&network, "network", "n", "", "specify the network to run (local/testnet/mainnet). Default will be local.").

@@ -37,7 +37,7 @@ var (
 var PolkadotCmd = common.NewDiveCommandBuilder().
 	SetUse("polkadot").
 	SetShort("Build, initialize and start a Polkadot node").
-	SetLong("The command starts the polkadot relay chain and polkadot parachain if -p flag is given").
+	SetLong("The command starts the polkadot relaychain and polkadot parachain if -p flag is given").
 	SetRun(polkadot).
 	AddStringSliceFlagWithShortHand(&paraChain, "parachain", "p", []string{}, "specify the list of parachains to spawn parachain node").
 	AddStringFlagWithShortHand(&network, "network", "n", "", "specify the network to run (local/testnet/mainnet). Default will be local.").
