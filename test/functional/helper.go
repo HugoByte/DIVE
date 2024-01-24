@@ -247,6 +247,17 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
 		}
     }
 
+	 // Remove content inside RelayChain
+	local.Parachains = []struct {
+		Name  string `json:"name"`
+		Nodes []struct {
+			Name       string `json:"name"`
+			NodeType   string `json:"node_type"`
+			Prometheus bool   `json:"prometheus"`
+		} `json:"nodes"`
+	}{}
+
+
     updatedJSON, err := json.MarshalIndent(local, "", "    ")
     if err != nil {
         panic(err)
@@ -375,3 +386,11 @@ func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName stri
 
 	return tmpfile.Name()
 }
+func CheckInvalidTestnet(selectedParaChain string, invalidParaChainlist []string)bool{
+		for _, paraChainName := range invalidParaChainlist {
+			if selectedParaChain == paraChainName {
+				return true
+			}
+		}
+		return false
+	}
