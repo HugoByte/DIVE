@@ -1,10 +1,15 @@
 {
-  "chain_type": "testnet",
+  "chain_type": "localnet",
   "relaychain": {
-    "name": "rococo",
+    "name": "rococo-local",
     "nodes": [
       {
         "name": "alice",
+        "node_type": "validator",
+        "prometheus": false
+      },
+      {
+        "name": "bob",
         "node_type": "validator",
         "prometheus": false
       }
@@ -13,16 +18,20 @@
 
   "parachains": [
     {
-      "name":"bifrost",
+      "name": "acala",
       "nodes": [
         {
           "name": "alice",
           "node_type": "collator",
           "prometheus": false
-
+        },
+        {
+          "name": "bob",
+          "node_type": "full",
+          "prometheus": false
         }
       ]
     }
   ],
-  "explorer": true
+  "explorer": false
 }
