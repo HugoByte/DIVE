@@ -7,7 +7,7 @@ import (
 
 	"slices"
 
-	"github.com/hugobyte/dive/cli/common"
+	"github.com/hugobyte/dive-alpha/cli/common"
 )
 
 var supportedChainsForBtp = []string{"icon", "eth", "hardhat"}
@@ -23,7 +23,7 @@ type Chains struct {
 
 func initChains(chainA, chainB, serviceA, serviceB string, bridge bool) *Chains {
 	return &Chains{
-		
+
 		chainA:            strings.ToLower(chainA),
 		chainB:            strings.ToLower(chainB),
 		chainAServiceName: serviceA,

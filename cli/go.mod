@@ -1,4 +1,4 @@
-module github.com/hugobyte/dive/cli
+module github.com/hugobyte/dive-alpha/cli
 
 go 1.21
 

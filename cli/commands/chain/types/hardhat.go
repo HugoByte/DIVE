@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/hugobyte/dive/cli/common"
+	"github.com/hugobyte/dive-alpha/cli/common"
 	"github.com/spf13/cobra"
 )
 
