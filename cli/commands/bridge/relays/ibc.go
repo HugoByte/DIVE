@@ -3,7 +3,7 @@ package relays
 import (
 	"fmt"
 
-	"github.com/hugobyte/dive/cli/common"
+	"github.com/hugobyte/dive-alpha/cli/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/spf13/cobra"
 )
