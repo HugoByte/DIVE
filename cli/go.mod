@@ -14,7 +14,6 @@ require (
 )
 
 require (
-	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/kurtosis-tech/kurtosis/utils v0.0.0-20240122181410-d3897630e34c // indirect
 	github.com/mholt/archiver v3.1.1+incompatible // indirect
