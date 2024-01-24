@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"testing"
 
-	dive "github.com/HugoByte/DIVE/test/functional"
-	"github.com/hugobyte/dive/cli/common"
+	"github.com/hugobyte/dive-alpha/cli/common"
+	dive "github.com/hugobyte/dive-alpha/test/functional"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 )

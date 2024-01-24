@@ -1,4 +1,4 @@
-module github.com/HugoByte/DIVE/test/functional
+module github.com/hugobyte/dive-alpha/test/functional
 
 go 1.21.0
 

@@ -2,7 +2,7 @@
 
 # D.I.V.E.
 
-[![run smoke testcases](https://github.com/HugoByte/DIVE/actions/workflows/smoke-test.yaml/badge.svg)](https://github.com/HugoByte/DIVE/actions/workflows/smoke-test.yaml)
+[![run smoke testcases](https://github.com/hugobyte/dive-alpha/actions/workflows/smoke-test.yaml/badge.svg)](https://github.com/hugobyte/dive-alpha/actions/workflows/smoke-test.yaml)
 
 ## About
 
@@ -54,18 +54,18 @@ Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually co
   ```
 - Install on **`linux`**
 
-  Please find the latest release [here](https://github.com/HugoByte/DIVE/releases)
+  Please find the latest release [here](https://github.com/hugobyte/dive-alpha/releases)
 
   Run below command to install DIVE CLI by mentioning latest release version and machine arch where dive is getting installed:
 
   ```shell
-  curl -L https://github.com/HugoByte/DIVE/releases/download/{latest-version}/dive-cli_{latest-version}_linux_{arch}.tar.gz | sudo  tar -xzv -C /usr/local/bin/ dive
+  curl -L https://github.com/hugobyte/dive-alpha/releases/download/{latest-version}/dive-cli_{latest-version}_linux_{arch}.tar.gz | sudo  tar -xzv -C /usr/local/bin/ dive
   ```
 
   For example, if the latest version is v0.0.13-beta and system's architecture is amd64, the command will be:
 
   ```shell
-  curl -L https://github.com/HugoByte/DIVE/releases/download/v0.0.13-beta/dive-cli_v0.0.13-beta_linux_amd64.tar.gz | sudo tar xzv -C /usr/local/bin/ dive
+  curl -L https://github.com/hugobyte/dive-alpha/releases/download/v0.0.13-beta/dive-cli_v0.0.13-beta_linux_amd64.tar.gz | sudo tar xzv -C /usr/local/bin/ dive
   ```
 
   Verify installation by running below command which should print out the dive version installed
@@ -76,7 +76,7 @@ Serving as an all-in-one solution, DIVE CLI eliminates the hassle of manually co
 
 - Install on **`windows`**:
   ```bash
-  Invoke-WebRequest -Uri "https://github.com/HugoByte/DIVE/releases/download/{latest-version}/dive-cli_{latest-version}_windows_{arch}.tar.gz" -OutFile dive.tar.gz
+  Invoke-WebRequest -Uri "https://github.com/hugobyte/dive-alpha/releases/download/{latest-version}/dive-cli_{latest-version}_windows_{arch}.tar.gz" -OutFile dive.tar.gz
   tar -xvzf dive.tar.gz
   dive.exe
   ```

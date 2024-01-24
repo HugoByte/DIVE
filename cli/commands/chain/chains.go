@@ -8,8 +8,8 @@ import (
 	"os"
 	"slices"
 
-	"github.com/hugobyte/dive/cli/commands/chain/types"
-	"github.com/hugobyte/dive/cli/common"
+	"github.com/hugobyte/dive-alpha/cli/commands/chain/types"
+	"github.com/hugobyte/dive-alpha/cli/common"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +33,7 @@ maintenance within the specified blockchain ecosystem.`,
 
 			if len(args) == 0 {
 				cmd.Help()
-				
+
 			} else if !slices.Contains(cmd.ValidArgs, args[0]) {
 
 				diveContext.Log.SetOutput(os.Stderr)
