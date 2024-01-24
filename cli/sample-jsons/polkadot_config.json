@@ -12,20 +12,18 @@
         "name": "bob",
         "node_type": "validator",
         "prometheus": false
-
       }
     ]
   },
 
   "parachains": [
     {
-      "name":"acala",
+      "name": "acala",
       "nodes": [
         {
           "name": "alice",
           "node_type": "collator",
           "prometheus": false
-
         },
         {
           "name": "bob",

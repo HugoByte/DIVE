@@ -1,6 +1,6 @@
 import { GasPrice } from "@cosmjs/stargate";
 import { exec } from "child_process";
-import { Secp256k1HdWallet } from "@cosmjs/launchpad";
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing"
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { Deployments } from "../setup/config";
 
@@ -12,7 +12,7 @@ export async function CreateSigningClient(
   endpoint: string
 ): Promise<[SigningCosmWasmClient, string]> {
 
-  const wallet = await Secp256k1HdWallet.fromMnemonic(mnemonic, { prefix: prefix });
+  const wallet = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix: prefix });
 
   // Get account address
   const accounts = await wallet.getAccounts();
