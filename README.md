@@ -2,7 +2,7 @@
 
 **Dive deeply into the world of Blockchain and Web 3.0 using **D.I.V.E.** (Deployable Infrastructure for Virtually Effortless blockchain integration)**
 
-[![Discord](https://img.shields.io/badge/Discord-hugobyte-00FF00?style=flat&logo=discord&logoColor=00FF00&labelColor=black)](https://discord.gg/GyRQSBN3Cu)
+[![Discord](https://img.shields.io/badge/Discord-hugobyte-2FC252?style=flat&logo=discord&labelColor=black)](https://discord.gg/GyRQSBN3Cu)
 
 # D.I.V.E.
 

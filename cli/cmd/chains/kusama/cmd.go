@@ -31,7 +31,7 @@ const (
 )
 
 var (
-	kusamaParachains = []string{"altair", "bajun", "bifrost", "calamari", "encointer", "karura", "khala", "litmus", "mangata", "moonriver", "robonomics", "subzero", "turing"}
+	kusamaParachains = []string{"altair", "bajun", "bifrost", "calamari", "encointer", "integritee", "karura", "khala", "litmus", "mangata", "moonriver", "robonomics", "subzero", "turing"}
 )
 
 var KusamaCmd = common.NewDiveCommandBuilder().
