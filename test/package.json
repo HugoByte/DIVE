@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@cosmjs/cosmwasm-stargate": "^0.32.2",
+    "@cosmjs/proto-signing": "^0.32.2",
     "@cosmjs/stargate": "^0.32.2",
     "@cosmjs/launchpad": "^0.27.1",
     "@iconfoundation/btp2-solidity-library": "^0.2.0",
