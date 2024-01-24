@@ -304,7 +304,8 @@ func (sc *PolkadotServiceConfig) LoadDefaultConfig() error {
 }
 
 func (nc *NodeConfig) AssignPorts(prometheus bool, chainName string) error {
-	var wsPortEnabled = []string{"robonomics", "parallel", "subsocial", "litmus", "pendulum", "kilt"}
+	var wsPortEnabled = []string{"robonomics", "parallel", "subsocial", "litmus", "pendulum", "kilt", "litentry", "zeitgeist", "kylin", "subzero", "integritee", "polkadex", "clover"}
+
 	var rpcPort, lib2libPort, prometheusPort, wsPort int
 	var err error
 	rpcPort, err = common.GetAvailablePort()
@@ -403,7 +404,7 @@ func (nc *NodeConfig) IsEmpty() error {
 }
 
 func (sc *PolkadotServiceConfig) HasPrometheus() bool {
-	// Check relay chain nodes
+	// Check relaychain nodes
 	if sc.RelayChain.Name != "" {
 		for _, node := range sc.RelayChain.Nodes {
 			if node.Prometheus {
@@ -548,19 +549,19 @@ func GetStopMessage(cliContext *common.Cli, filePath string, relayName string, p
 			return "", err
 		}
 		if len(serviceConfig.Para) == 0 {
-			return fmt.Sprintf("%s Relay Chain Started. ", relayName), nil
+			return fmt.Sprintf("%s Relaychain Started. ", relayName), nil
 		}
 		for _, parachain := range serviceConfig.Para {
 			stopMessage = stopMessage + parachain.Name + ", "
 		}
 	} else {
 		if len(paraChain) == 0 {
-			return fmt.Sprintf("%s Relay Chain Started. ", relayName), nil
+			return fmt.Sprintf("%s Relaychain Started. ", relayName), nil
 		}
 		for _, parachain := range paraChain {
 			stopMessage = stopMessage + parachain + ", "
 		}
 	}
-	stopMessage = stopMessage + fmt.Sprintf("Started For %s Relay Chain. ", relayName)
+	stopMessage = stopMessage + fmt.Sprintf("Started For %s Relaychain. ", relayName)
 	return stopMessage, nil
 }

@@ -264,7 +264,7 @@ func configureService(serviceConfig *utils.PolkadotServiceConfig) error {
 	}
 
 	if serviceConfig.ChainType == localChain && serviceConfig.RelayChain.Name == "" && len(serviceConfig.Para) != 0 {
-		return common.WrapMessageToError(common.ErrEmptyFields, "Cannot start a Parachain in local without Relay Chain")
+		return common.WrapMessageToError(common.ErrEmptyFields, "Cannot start a Parachain in local without Relaychain")
 	}
 
 	return nil
