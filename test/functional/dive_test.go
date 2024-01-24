@@ -909,10 +909,15 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			var paraChainNames []string
 
 			if relayChainName == "kusama" {
-				paraChainNames = []string{"karura", "altair", "bifrost", "mangata", "robonomics", "turing", "encointer", "bajun", "calamari", "khala", "litmus", "moonriver", "subzero"}
+				paraChainNames = []string{"karura", "altair", "bifrost", "mangata", "robonomics", "integritee","turing", "encointer", "bajun", "calamari", "khala", "litmus", "moonriver", "subzero"}
 			} else if relayChainName == "polkadot" {
-				paraChainNames = []string{"polkadex", "zeitgeist", "acala", "bifrost", "clover", "integritee", "kilt", "litentry", "moonbeam", "nodle", "pendulum", "ajuna", "centrifuge", "frequency", "kylin", "manta", "moonsama", "parallel", "phala", "subsocial"}
+				paraChainNames = []string{"polkadex", "zeitgeist", "acala", "bifrost", "clover",  "kilt", "litentry", "moonbeam", "nodle", "pendulum", "ajuna", "centrifuge", "frequency", "kylin", "manta", "moonsama", "parallel", "phala", "subsocial"}
 			}
+
+			var invalidParChainlist []string
+			invalidParChainlist = []string{"karura", "khala", "robonomics", "altair", "litmus", "subzero", "calamari", "subzero",
+				"subsocial", "parallel", "moonsama", "manta", "kylin", "centrifuge", "polkadex", "acala", "clover", "parallel"}
+
 
 			// Validate paraChain before running tests
 			if selectedParaChain != "default" {
@@ -937,7 +942,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 				paraChainName := paraChainName
 
 				ginkgo.It("should run single parachain  in testnet for "+relayChainName+" and "+paraChainName, func() {
-					if paraChainName != "parallel" && paraChainName != "subzero" {
+					if !dive.CheckInvalidTestnet(selectedParaChain, invalidParChainlist) {
 						enclaveName := dive.GenerateRandomName()
 						cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "--no-relay", "-n", "testnet", "--enclaveName", enclaveName)
 						err := cmd.Run()
@@ -953,7 +958,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 					dive.Clean(enclaveName)
 				})
 				ginkgo.It("should run custom parachain in testnet with for "+relayChainName+" and "+paraChainName, func() {
-					if paraChainName != "parallel" && paraChainName != "subzero" {
+					if !dive.CheckInvalidTestnet(selectedParaChain, invalidParChainlist) {
 						enclaveName := dive.GenerateRandomName()
 						config := dive.UpdateParaChain(dive.LOCAL_CONFIG0, "testnet", paraChainName)
 						cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
@@ -1043,10 +1048,15 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			var paraChainNames []string
 
 			if relayChainName == "kusama" {
-				paraChainNames = []string{"karura", "altair", "bifrost", "mangata", "robonomics", "turing", "encointer", "bajun", "calamari", "khala", "litmus", "moonriver", "subzero"}
+				paraChainNames = []string{"karura", "altair", "bifrost", "mangata", "robonomics", "turing", "integritee", "encointer", "bajun", "calamari", "khala", "litmus", "moonriver", "subzero"}
 			} else if relayChainName == "polkadot" {
-				paraChainNames = []string{"polkadex", "zeitgeist", "acala", "bifrost", "clover", "integritee", "kilt", "litentry", "moonbeam", "nodle", "pendulum", "ajuna", "centrifuge", "frequency", "kylin", "manta", "moonsama", "parallel", "phala", "subsocial"}
+				paraChainNames = []string{"polkadex", "zeitgeist", "acala", "bifrost", "clover", "kilt", "litentry", "moonbeam", "nodle", "pendulum", "ajuna", "centrifuge", "frequency", "kylin", "manta", "moonsama", "parallel", "phala", "subsocial"}
 			}
+
+			var invalidParChainlist []string
+			invalidParChainlist = []string{"karura", "khala", "robonomics", "altair", "litmus", "subzero", "calamari", "subzero",
+				"subsocial", "parallel", "moonsama", "manta", "kylin", "centrifuge", "polkadex", "acala", "clover", "parallel"}
+				
 
 			// Validate paraChain before running tests
 			if selectedParaChain != "default" {
@@ -1070,7 +1080,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 
 				paraChainName := paraChainName
 				ginkgo.It("should run single relaychain and parachain  in testnet for "+relayChainName+" and "+paraChainName, func() {
-					if paraChainName != "parallel" && paraChainName != "subzero" {
+					if !dive.CheckInvalidTestnet(selectedParaChain, invalidParChainlist) {
 					enclaveName := dive.GenerateRandomName()
 					cmd.Args = append(cmd.Args, "chain", relayChainName, "-p", paraChainName, "-n", "testnet", "--enclaveName", enclaveName)
 					defer dive.Clean(enclaveName)
@@ -1093,7 +1103,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 					dive.Clean(enclaveName)
 				})
 				ginkgo.It("should run custom relaychain and parachain in testnet for "+relayChainName+" and "+paraChainName, func() {
-					if paraChainName != "parallel" && paraChainName != "subzero" {
+					if !dive.CheckInvalidTestnet(selectedParaChain, invalidParChainlist) {
 					enclaveName := dive.GenerateRandomName()
 					config := dive.UpdateChainInfo(dive.LOCAL_CONFIG0, "testnet", "rococo", paraChainName,  "validator", "full")
 					cmd.Args = append(cmd.Args, "chain", relayChainName, "-c", config, "--enclaveName", enclaveName)
