@@ -33,4 +33,4 @@ jobs:
           KURT_CLI_VERSION: ${{ github.event.inputs.kurtosis_version }}
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         run: |
-          cd cli/ && goreleaser release --rm-dist --skip=publish
+          cd cli/ && goreleaser release --clean
