@@ -915,8 +915,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			}
 
 			var invalidParChainlist []string
-			invalidParChainlist = []string{"karura", "khala", "robonomics", "altair", "litmus", "subzero", "calamari", "subzero",
-				"subsocial", "parallel", "moonsama", "manta", "kylin", "centrifuge", "polkadex", "acala", "clover", "parallel"}
+			invalidParChainlist = []string{"karura", "khala", "robonomics", "altair", "litmus", "subzero", "calamari",
+				"subsocial", "parallel", "moonsama", "manta", "kylin", "centrifuge", "polkadex", "acala", "clover"}
 
 
 			// Validate paraChain before running tests
@@ -1054,8 +1054,8 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			}
 
 			var invalidParChainlist []string
-			invalidParChainlist = []string{"karura", "khala", "robonomics", "altair", "litmus", "subzero", "calamari", "subzero",
-				"subsocial", "parallel", "moonsama", "manta", "kylin", "centrifuge", "polkadex", "acala", "clover", "parallel"}
+			invalidParChainlist = []string{"karura", "khala", "robonomics", "altair", "litmus", "subzero", "calamari", 
+				"subsocial", "parallel", "moonsama", "manta", "kylin", "centrifuge", "polkadex", "acala", "clover"}
 				
 
 			// Validate paraChain before running tests
