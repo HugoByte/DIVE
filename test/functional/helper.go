@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sync"
+	
 
 	//"github.com/hugobyte/dive-core/cli/common"
 )
@@ -40,6 +41,24 @@ type Configuration1 struct {
 	} `json:"Parachains"`
 	Explorer bool `json:"explorer"`
 }
+
+
+var ParaChainNames []string
+var InvalidParChainlist []string
+
+func InitializeParaChainNames(relayChainName string) {
+
+	
+    if relayChainName == "kusama" {
+        ParaChainNames = []string{"karura", "altair", "bifrost", "mangata", "robonomics", "turing", "integritee", "encointer", "bajun", "calamari", "khala", "litmus", "moonriver", "subzero"}
+    } else if relayChainName == "polkadot" {
+        ParaChainNames = []string{"polkadex", "zeitgeist", "acala", "bifrost", "clover", "kilt", "litentry", "moonbeam", "nodle", "pendulum", "ajuna", "centrifuge", "frequency", "kylin", "manta", "moonsama", "parallel", "phala", "subsocial"}
+    }
+	InvalidParChainlist = []string{"karura", "khala", "robonomics", "altair", "litmus", "subzero", "calamari",
+	"subsocial", "parallel", "moonsama", "manta", "kylin", "centrifuge", "polkadex", "acala", "clover"}
+
+}
+
 
 var mutex = &sync.Mutex{}
 var mutex3 = &sync.Mutex{}
@@ -394,3 +413,4 @@ func CheckInvalidTestnet(selectedParaChain string, invalidParaChainlist []string
 		}
 		return false
 	}
+
