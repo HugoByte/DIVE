@@ -1,0 +1,20 @@
+{
+    "name": "e2e",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "@paraspell/sdk": "^3.0.11",
+      "@polkadot/api": "^10.11.2",
+      "@polkadot/api-base": "^10.11.2",
+      "@polkadot/apps-config": "^0.133.1",
+      "@polkadot/types": "^10.11.2",
+      "@polkadot/util": "^12.6.2"
+    }
+  }
