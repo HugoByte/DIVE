@@ -8,8 +8,11 @@ import (
 	"sync"
 
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
-	"github.com/kurtosis-tech/kurtosis/api/golang/engine/lib/kurtosis_context"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/services"
+	"github.com/kurtosis-tech/kurtosis/api/golang/engine/lib/kurtosis_context"
+	contexts_config_api "github.com/kurtosis-tech/kurtosis/contexts-config-store/api/golang"
+	contexts_config_generated_api "github.com/kurtosis-tech/kurtosis/contexts-config-store/api/golang/generated"
+	"github.com/kurtosis-tech/kurtosis/contexts-config-store/store"
 )
 
 type diveContext struct {
@@ -84,6 +87,39 @@ func (dc *diveContext) GetEnclaveContext(enclaveName string) (*enclaves.EnclaveC
 
 	return enclaveCtx, nil
 
+}
+
+func (dc *diveContext) IsLocalKurtosisContext() (bool, error) {
+	var isLocalContext bool
+	contextsConfigStore := store.GetContextsConfigStore()
+	currentContextsConfig, err := contextsConfigStore.GetKurtosisContextsConfig()
+
+	if err != nil {
+		return false, err
+	}
+
+	currentContextUuid := currentContextsConfig.GetCurrentContextUuid()
+	for _, kurtosisContext := range currentContextsConfig.GetContexts() {
+		if kurtosisContext.GetUuid().GetValue() == currentContextUuid.GetValue() {
+			contextVisitorForRemoteString := contexts_config_api.KurtosisContextVisitor[struct{}]{
+				VisitLocalOnlyContextV0: func(localContext *contexts_config_generated_api.LocalOnlyContextV0) (*struct{}, error) {
+					isLocalContext = true
+					return nil, nil
+				},
+				VisitRemoteContextV0: func(remoteContext *contexts_config_generated_api.RemoteContextV0) (*struct{}, error) {
+					isLocalContext = false
+					return nil, nil
+				},
+			}
+
+			_, err := contexts_config_api.Visit[struct{}](kurtosisContext, contextVisitorForRemoteString)
+			if err != nil {
+				return false, err
+			}
+		}
+	}
+
+	return isLocalContext, nil
 }
 
 func (dc *diveContext) GetAllEnlavesServices() (map[string]map[services.ServiceName]services.ServiceUUID, error) {
@@ -336,7 +372,7 @@ func (dc *diveContext) GetShortUuid(enclaveName string) (string, error) {
 			shortUuid = enclave.ShortUuid
 		}
 	}
-	
+
 	return shortUuid, nil
 }
 

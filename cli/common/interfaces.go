@@ -93,6 +93,9 @@ type Context interface {
 	// GetEnclaveContext retrieves the context of a specific enclave by its name.
 	GetEnclaveContext(enclaveName string) (*enclaves.EnclaveContext, error)
 
+	// IsLocalKurtosisContext checks whether current running kurtosis context is local.
+	IsLocalKurtosisContext() (bool, error)
+
 	// CleanEnclaves stops and cleans up all running enclaves.
 	CleanEnclaves() ([]*EnclaveInfo, error)
 

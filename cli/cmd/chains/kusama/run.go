@@ -386,10 +386,18 @@ func startExplorer(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, finalRe
 		cli.Logger().Info("Explorer service is already running.")
 	}
 
-	url := updatePort(polkadotJUrl, "127.0.0.1", extractPort(publicEndpoint))
-	cli.Logger().Info("Redirecting to Polkadote explorer UI...")
-	if err := common.OpenFile(url); err != nil {
-		cli.Logger().Fatalf(common.CodeOf(err), "Failed to open HugoByte Polkadot explorer UI with error %v", err)
+	isLocalContext, err := cli.Context().IsLocalKurtosisContext()
+
+	if err != nil {
+		return nil, err
+	}
+
+	if isLocalContext {
+		url := updatePort(polkadotJUrl, "127.0.0.1", extractPort(publicEndpoint))
+		cli.Logger().Info("Redirecting to Polkadote explorer UI...")
+		if err := common.OpenFile(url); err != nil {
+			cli.Logger().Fatalf(common.CodeOf(err), "Failed to open HugoByte Polkadot explorer UI with error %v", err)
+		}
 	}
 
 	return explorerResponseData, nil
