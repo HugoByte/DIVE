@@ -95,7 +95,7 @@ func (dc *diveContext) IsLocalKurtosisContext() (bool, error) {
 	currentContextsConfig, err := contextsConfigStore.GetKurtosisContextsConfig()
 
 	if err != nil {
-		return false, err
+		return false, WrapMessageToError(err, "Failed to get kurtosis context config.")
 	}
 
 	currentContextUuid := currentContextsConfig.GetCurrentContextUuid()
@@ -114,7 +114,7 @@ func (dc *diveContext) IsLocalKurtosisContext() (bool, error) {
 
 			_, err := contexts_config_api.Visit[struct{}](kurtosisContext, contextVisitorForRemoteString)
 			if err != nil {
-				return false, err
+				return false, WrapMessageToError(err, "Failed to run visitor, The visitor function could not be executed.")
 			}
 		}
 	}
