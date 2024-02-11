@@ -193,11 +193,17 @@ func (sc *HardhatServiceConfig) EncodeToString() (string, error) {
 
 // This code is for polkadot config file
 
+type Key struct {
+	PrivatePhrase string `json:"private_phrase"`
+	PublicKey     string `json:"public_key"`
+}
+
 type NodeConfig struct {
 	Name       string `json:"name"`
 	NodeType   string `json:"node_type"`
 	Prometheus bool   `json:"prometheus"`
 	Ports      Ports  `json:"ports"`
+	Key        Key    `json:"key,omitempty"`
 }
 
 type Ports struct {
@@ -215,6 +221,8 @@ type RelayChainConfig struct {
 type ParaNodeConfig struct {
 	Name  string       `json:"name"`
 	Nodes []NodeConfig `json:"nodes"`
+	SudoKey  Key          `json:"sudo_key,omitempty"`
+
 }
 
 type PolkadotServiceConfig struct {
@@ -222,6 +230,7 @@ type PolkadotServiceConfig struct {
 	RelayChain RelayChainConfig `json:"relaychain"`
 	Para       []ParaNodeConfig `json:"parachains"`
 	Explorer   bool             `json:"explorer"`
+	WithoutRegistration bool               `json:"without_registration"`
 }
 
 func (pc *ParaNodeConfig) EncodeToString() (string, error) {
