@@ -386,7 +386,7 @@ func startExplorer(cli *common.Cli, enclaveCtx *enclaves.EnclaveContext, finalRe
 	}
 
 	isLocalContext, err := cli.Context().IsLocalKurtosisContext()
-	
+
 	if err != nil {
 		return nil, err
 	}
