@@ -14,7 +14,7 @@ import (
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 
-	dive "github.com/HugoByte/DIVE/test/functional"
+	dive "github.com/hugobyte/dive/test/functional"
 )
 
 // To Print cli output to console
