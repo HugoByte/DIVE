@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/hugobyte/dive-core/cli/common"
+	"github.com/hugobyte/dive/cli/common"
 )
 
 type CosmosServiceConfig struct {
@@ -219,18 +219,17 @@ type RelayChainConfig struct {
 }
 
 type ParaNodeConfig struct {
-	Name  string       `json:"name"`
-	Nodes []NodeConfig `json:"nodes"`
-	SudoKey  Key          `json:"sudo_key,omitempty"`
-
+	Name    string       `json:"name"`
+	Nodes   []NodeConfig `json:"nodes"`
+	SudoKey Key          `json:"sudo_key,omitempty"`
 }
 
 type PolkadotServiceConfig struct {
-	ChainType  string           `json:"chain_type"`
-	RelayChain RelayChainConfig `json:"relaychain"`
-	Para       []ParaNodeConfig `json:"parachains"`
-	Explorer   bool             `json:"explorer"`
-	WithoutRegistration bool               `json:"without_registration"`
+	ChainType           string           `json:"chain_type"`
+	RelayChain          RelayChainConfig `json:"relaychain"`
+	Para                []ParaNodeConfig `json:"parachains"`
+	Explorer            bool             `json:"explorer"`
+	WithoutRegistration bool             `json:"without_registration"`
 }
 
 func (pc *ParaNodeConfig) EncodeToString() (string, error) {

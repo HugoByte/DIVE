@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"strconv"
 
-	chainutil "github.com/hugobyte/dive-core/cli/cmd/chains/utils"
+	chainutil "github.com/hugobyte/dive/cli/cmd/chains/utils"
 
-	"github.com/hugobyte/dive-core/cli/cmd/bridge/utils"
-	"github.com/hugobyte/dive-core/cli/cmd/chains/eth"
-	"github.com/hugobyte/dive-core/cli/cmd/chains/hardhat"
-	"github.com/hugobyte/dive-core/cli/cmd/chains/icon"
-	"github.com/hugobyte/dive-core/cli/common"
+	"github.com/hugobyte/dive/cli/cmd/bridge/utils"
+	"github.com/hugobyte/dive/cli/cmd/chains/eth"
+	"github.com/hugobyte/dive/cli/cmd/chains/hardhat"
+	"github.com/hugobyte/dive/cli/cmd/chains/icon"
+	"github.com/hugobyte/dive/cli/common"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 )
 

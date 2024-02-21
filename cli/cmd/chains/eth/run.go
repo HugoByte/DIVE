@@ -1,7 +1,7 @@
 package eth
 
 import (
-	"github.com/hugobyte/dive-core/cli/common"
+	"github.com/hugobyte/dive/cli/common"
 )
 
 func RunEth(cli *common.Cli) (*common.DiveServiceResponse, error) {
