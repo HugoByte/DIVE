@@ -4,14 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/onsi/gomega"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"sync"
 
-	//"github.com/hugobyte/dive-core/cli/common"
+	"github.com/google/uuid"
+	"github.com/onsi/gomega"
 )
 
 type NodeInfo struct {
@@ -150,7 +149,7 @@ func RunCustomNeutronNode1(enclaveName string) {
 func RunCustomNeutronNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
 	//updated_path2 := UpdateNeutronPublicPorts(NEUTRON_CONFIG0)
-	cmd.Args = append(cmd.Args, "chain", "neutron", "-c",NEUTRON_CONFIG0 , "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "neutron", "-c", NEUTRON_CONFIG0, "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -178,7 +177,7 @@ func RunHardhatNode(enclaveName string) {
 
 func RunDecentralizedCustomIconNode0(enclaveName string) {
 	cmd := GetBinaryCommand()
-	cmd.Args = append(cmd.Args, "chain", "icon", "-c",ICON_CONFIG0 , "-g", ICON_GENESIS0, "-d", "--enclaveName", enclaveName)
+	cmd.Args = append(cmd.Args, "chain", "icon", "-c", ICON_CONFIG0, "-g", ICON_GENESIS0, "-d", "--enclaveName", enclaveName)
 	err := cmd.Run()
 	gomega.Expect(err).NotTo(gomega.HaveOccurred())
 }
@@ -211,43 +210,43 @@ func GetServiceDetails(servicesJson string, service string) (serviceName string,
 }
 
 func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName string, newNodeType1, newNodeType2 string, relayChain string) string {
-    mutex.Lock()
-    defer mutex.Unlock()
+	mutex.Lock()
+	defer mutex.Unlock()
 
-    fileContent, err := os.ReadFile(filePath)
-    if err != nil {
-        panic(err)
-    }
+	fileContent, err := os.ReadFile(filePath)
+	if err != nil {
+		panic(err)
+	}
 
-    var local Configuration1
-    err = json.Unmarshal(fileContent, &local)
-    if err != nil {
-        panic(err)
-    }
+	var local Configuration1
+	err = json.Unmarshal(fileContent, &local)
+	if err != nil {
+		panic(err)
+	}
 
-    // Update ChainType and RelayChain Name
-    local.ChainType = newChainType
-    local.RelayChain.Name = newRelayChainName
+	// Update ChainType and RelayChain Name
+	local.ChainType = newChainType
+	local.RelayChain.Name = newRelayChainName
 
-    // Update NodeType for RelayChain Nodes
-    for i := range local.RelayChain.Nodes {
-        if i%2 == 0 {
-            local.RelayChain.Nodes[i].NodeType = newNodeType1
-        } else {
-            local.RelayChain.Nodes[i].NodeType = newNodeType2
-        }
-    }
+	// Update NodeType for RelayChain Nodes
+	for i := range local.RelayChain.Nodes {
+		if i%2 == 0 {
+			local.RelayChain.Nodes[i].NodeType = newNodeType1
+		} else {
+			local.RelayChain.Nodes[i].NodeType = newNodeType2
+		}
+	}
 
-    // Update Prometheus for Para Nodes
-    for i := range local.Parachains {
-		if relayChain == "kusama"{
+	// Update Prometheus for Para Nodes
+	for i := range local.Parachains {
+		if relayChain == "kusama" {
 			local.Parachains[i].Name = "karura"
 		} else {
 			local.Parachains[i].Name = "acala"
 		}
-    }
+	}
 
-	 // Remove content inside RelayChain
+	// Remove content inside RelayChain
 	local.Parachains = []struct {
 		Name  string `json:"name"`
 		Nodes []struct {
@@ -257,28 +256,25 @@ func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName str
 		} `json:"nodes"`
 	}{}
 
+	updatedJSON, err := json.MarshalIndent(local, "", "    ")
+	if err != nil {
+		panic(err)
+	}
 
-    updatedJSON, err := json.MarshalIndent(local, "", "    ")
-    if err != nil {
-        panic(err)
-    }
+	tmpfilePath := fmt.Sprintf("updated-config-%s.json", enclaveName)
+	tmpfile, err := os.Create(tmpfilePath)
+	if err != nil {
+		panic(err)
+	}
+	defer tmpfile.Close()
 
-    tmpfilePath := fmt.Sprintf("updated-config-%s.json", enclaveName)
-    tmpfile, err := os.Create(tmpfilePath)
-    if err != nil {
-        panic(err)
-    }
-    defer tmpfile.Close()
+	_, err = tmpfile.Write(updatedJSON)
+	if err != nil {
+		panic(err)
+	}
 
-    _, err = tmpfile.Write(updatedJSON)
-    if err != nil {
-        panic(err)
-    }
-
-    return tmpfile.Name()
+	return tmpfile.Name()
 }
-
-
 
 func UpdateParaChain(filePath, newChainType, newParaName string) string {
 	mutex.Lock()
@@ -294,7 +290,7 @@ func UpdateParaChain(filePath, newChainType, newParaName string) string {
 	if err != nil {
 		panic(err)
 	}
-//update chain type
+	//update chain type
 	local.ChainType = newChainType
 	// Remove content inside RelayChain
 	local.RelayChain = struct {
@@ -316,12 +312,11 @@ func UpdateParaChain(filePath, newChainType, newParaName string) string {
 		panic(err)
 	}
 
-    
-    tmpfilePath := fmt.Sprintf("updated-local.json")
-    tmpfile, err := os.Create(tmpfilePath)
-    if err != nil {
-        panic(err)
-    }
+	tmpfilePath := fmt.Sprintf("updated-local.json")
+	tmpfile, err := os.Create(tmpfilePath)
+	if err != nil {
+		panic(err)
+	}
 
 	defer tmpfile.Close()
 
@@ -333,7 +328,7 @@ func UpdateParaChain(filePath, newChainType, newParaName string) string {
 	return tmpfile.Name()
 }
 
-func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName string,newNodeType1,newNodeType2 string) string {
+func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName string, newNodeType1, newNodeType2 string) string {
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -355,16 +350,16 @@ func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName stri
 	// Update Name and Prometheus for Para Nodes
 	for i := range local.Parachains {
 		local.Parachains[i].Name = newParaName
-		
+
 	}
-	  // Update NodeType for RelayChain Nodes
-	  for i := range local.RelayChain.Nodes {
-        if i%2 == 0 {
-            local.RelayChain.Nodes[i].NodeType = newNodeType1
-        } else {
-            local.RelayChain.Nodes[i].NodeType = newNodeType2
-        }
-    }
+	// Update NodeType for RelayChain Nodes
+	for i := range local.RelayChain.Nodes {
+		if i%2 == 0 {
+			local.RelayChain.Nodes[i].NodeType = newNodeType1
+		} else {
+			local.RelayChain.Nodes[i].NodeType = newNodeType2
+		}
+	}
 
 	updatedJSON, err := json.MarshalIndent(local, "", "    ")
 	if err != nil {
@@ -372,10 +367,10 @@ func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName stri
 	}
 
 	tmpfilePath := fmt.Sprintf("updated-local.json")
-    tmpfile, err := os.Create(tmpfilePath)
-    if err != nil {
-        panic(err)
-    }
+	tmpfile, err := os.Create(tmpfilePath)
+	if err != nil {
+		panic(err)
+	}
 
 	defer tmpfile.Close()
 
@@ -386,11 +381,11 @@ func UpdateChainInfo(filePath, newChainType, newRelayChainName, newParaName stri
 
 	return tmpfile.Name()
 }
-func CheckInvalidTestnet(selectedParaChain string, invalidParaChainlist []string)bool{
-		for _, paraChainName := range invalidParaChainlist {
-			if selectedParaChain == paraChainName {
-				return true
-			}
+func CheckInvalidTestnet(selectedParaChain string, invalidParaChainlist []string) bool {
+	for _, paraChainName := range invalidParaChainlist {
+		if selectedParaChain == paraChainName {
+			return true
 		}
-		return false
 	}
+	return false
+}
