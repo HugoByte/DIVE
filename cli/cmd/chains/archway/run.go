@@ -1,8 +1,8 @@
 package archway
 
 import (
-	"github.com/hugobyte/dive-core/cli/cmd/chains/utils"
-	"github.com/hugobyte/dive-core/cli/common"
+	"github.com/hugobyte/dive/cli/cmd/chains/utils"
+	"github.com/hugobyte/dive/cli/common"
 )
 
 func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
@@ -21,7 +21,7 @@ func RunArchway(cli *common.Cli) (*common.DiveServiceResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	encodedServiceConfigDataString, err := serviceConfig.EncodeToString()
 
 	if err != nil {

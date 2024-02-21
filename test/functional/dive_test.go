@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/hugobyte/dive-core/cli/cmd/utility"
-	"github.com/hugobyte/dive-core/cli/common"
+	"github.com/hugobyte/dive/cli/cmd/utility"
+	"github.com/hugobyte/dive/cli/common"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 

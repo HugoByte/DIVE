@@ -4,9 +4,9 @@ import (
 	"os"
 	"slices"
 
-	"github.com/hugobyte/dive-core/cli/cmd/bridge/btp"
-	"github.com/hugobyte/dive-core/cli/cmd/bridge/ibc"
-	"github.com/hugobyte/dive-core/cli/common"
+	"github.com/hugobyte/dive/cli/cmd/bridge/btp"
+	"github.com/hugobyte/dive/cli/cmd/bridge/ibc"
+	"github.com/hugobyte/dive/cli/common"
 	"github.com/spf13/cobra"
 )
 

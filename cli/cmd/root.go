@@ -3,12 +3,12 @@ package cmd
 import (
 	"os"
 
-	"github.com/hugobyte/dive-core/cli/cmd/bridge"
-	"github.com/hugobyte/dive-core/cli/cmd/chains"
-	"github.com/hugobyte/dive-core/cli/cmd/social"
-	"github.com/hugobyte/dive-core/cli/cmd/utility"
-	"github.com/hugobyte/dive-core/cli/common"
-	"github.com/hugobyte/dive-core/cli/styles"
+	"github.com/hugobyte/dive/cli/cmd/bridge"
+	"github.com/hugobyte/dive/cli/cmd/chains"
+	"github.com/hugobyte/dive/cli/cmd/social"
+	"github.com/hugobyte/dive/cli/cmd/utility"
+	"github.com/hugobyte/dive/cli/common"
+	"github.com/hugobyte/dive/cli/styles"
 	"github.com/spf13/cobra"
 )
 

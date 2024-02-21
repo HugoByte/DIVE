@@ -3,8 +3,8 @@ package btp
 import (
 	"fmt"
 
-	"github.com/hugobyte/dive-core/cli/cmd/bridge/utils"
-	"github.com/hugobyte/dive-core/cli/common"
+	"github.com/hugobyte/dive/cli/cmd/bridge/utils"
+	"github.com/hugobyte/dive/cli/common"
 	"github.com/spf13/cobra"
 )
 

@@ -1,4 +1,4 @@
-module github.com/hugobyte/dive-core/cli
+module github.com/hugobyte/dive/cli
 
 go 1.21.4
 
@@ -26,7 +26,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/kurtosis-tech/kurtosis/contexts-config-store v0.0.0-20240124210655-a35e0a2cee4b // indirect
+	github.com/kurtosis-tech/kurtosis/contexts-config-store v0.0.0-20240124210655-a35e0a2cee4b
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.1 // indirect
 	github.com/stretchr/testify v1.8.4
