@@ -1,7 +1,7 @@
 package common
 
 // !!!!!!!!!!! DO NOT UPDATE! WILL BE UPDATED DURING THE RELEASE PROCESS !!!!!!!!!!!!!!!!!!!!!!
-const DiveVersion = "v0.1.0"
+const DiveVersion = "v0.1.2"
 
 const (
 	DiveEnclave                        = "dive"

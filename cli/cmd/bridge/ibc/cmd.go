@@ -3,7 +3,7 @@ package ibc
 import (
 	"fmt"
 
-	"github.com/hugobyte/dive-core/cli/common"
+	"github.com/hugobyte/dive/cli/common"
 	"github.com/spf13/cobra"
 )
 
@@ -56,6 +56,6 @@ func ibcRelay(cmd *cobra.Command, args []string) {
 	if err != nil {
 		cliContext.Fatal(err)
 	}
-	
+
 	cliContext.StopSpinnerIfNotVerbose(fmt.Sprintf("IBC Setup Completed between %s and %s. Please find the service details in the output folder present in current working directory - (output/%s/%s)\n", chainA, chainB, common.EnclaveName, serviceFileName), common.DiveLogs)
 }

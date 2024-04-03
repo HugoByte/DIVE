@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/hugobyte/dive-core/cli/common"
+	"github.com/hugobyte/dive/cli/common"
 )
 
 const (
@@ -58,7 +58,7 @@ func (chains *Chains) GetIbcRelayParams(src_service_config string, dst_service_c
 func (chains *Chains) GetServicesResponse(cli *common.Cli) (string, string, error) {
 
 	var serviceConfig = common.Services{}
-	
+
 	shortUuid, err := cli.Context().GetShortUuid(common.EnclaveName)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to get short uuid of enclave")

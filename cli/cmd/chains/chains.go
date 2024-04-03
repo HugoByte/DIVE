@@ -4,14 +4,14 @@ import (
 	"os"
 	"slices"
 
-	"github.com/hugobyte/dive-core/cli/cmd/chains/archway"
-	"github.com/hugobyte/dive-core/cli/cmd/chains/eth"
-	"github.com/hugobyte/dive-core/cli/cmd/chains/hardhat"
-	"github.com/hugobyte/dive-core/cli/cmd/chains/icon"
-	"github.com/hugobyte/dive-core/cli/cmd/chains/kusama"
-	"github.com/hugobyte/dive-core/cli/cmd/chains/neutron"
-	"github.com/hugobyte/dive-core/cli/cmd/chains/polkadot"
-	"github.com/hugobyte/dive-core/cli/common"
+	"github.com/hugobyte/dive/cli/cmd/chains/archway"
+	"github.com/hugobyte/dive/cli/cmd/chains/eth"
+	"github.com/hugobyte/dive/cli/cmd/chains/hardhat"
+	"github.com/hugobyte/dive/cli/cmd/chains/icon"
+	"github.com/hugobyte/dive/cli/cmd/chains/kusama"
+	"github.com/hugobyte/dive/cli/cmd/chains/neutron"
+	"github.com/hugobyte/dive/cli/cmd/chains/polkadot"
+	"github.com/hugobyte/dive/cli/common"
 	"github.com/spf13/cobra"
 )
 

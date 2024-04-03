@@ -9,12 +9,12 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/hugobyte/dive-core/cli/cmd/utility"
-	"github.com/hugobyte/dive-core/cli/common"
+	"github.com/hugobyte/dive/cli/cmd/utility"
+	"github.com/hugobyte/dive/cli/common"
 	"github.com/onsi/ginkgo/v2"
 	"github.com/onsi/gomega"
 
-	dive "github.com/HugoByte/DIVE/test/functional"
+	dive "github.com/hugobyte/dive/test/functional"
 )
 
 // To Print cli output to console
@@ -546,7 +546,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should run custom Icon node-0", func() {
 			enclaveName := dive.GenerateRandomName()
 			cmd.Args = append(cmd.Args, "chain", "icon", "-c", dive.ICON_CONFIG0, "-g", dive.ICON_GENESIS0, "--enclaveName", enclaveName)
-			defer os.Remove(dive.ICON_CONFIG0)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -555,7 +554,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should run custom Icon node-1", func() {
 			enclaveName := dive.GenerateRandomName()
 			cmd.Args = append(cmd.Args, "chain", "icon", "-c", dive.ICON_CONFIG1, "-g", dive.ICON_GENESIS1, "--enclaveName", enclaveName)
-			defer os.Remove(dive.ICON_CONFIG1)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -713,7 +711,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should run single custom archway node-1", func() {
 			enclaveName := dive.GenerateRandomName()
 			cmd.Args = append(cmd.Args, "chain", "archway", "-c", dive.ARCHWAY_CONFIG0, "--enclaveName", enclaveName)
-			defer os.Remove(dive.ARCHWAY_CONFIG0)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -749,7 +746,6 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 		ginkgo.It("should run single custom neutron node-1", func() {
 			enclaveName := dive.GenerateRandomName()
 			cmd.Args = append(cmd.Args, "chain", "neutron", "-c", dive.NEUTRON_CONFIG0, "--enclaveName", enclaveName)
-			defer os.Remove(dive.NEUTRON_CONFIG0)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())

@@ -8,8 +8,8 @@ import (
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/enclaves"
 	"github.com/kurtosis-tech/kurtosis/api/golang/core/lib/starlark_run_config"
 
-	"github.com/hugobyte/dive-core/cli/cmd/chains/utils"
-	"github.com/hugobyte/dive-core/cli/common"
+	"github.com/hugobyte/dive/cli/cmd/chains/utils"
+	"github.com/hugobyte/dive/cli/common"
 )
 
 const (

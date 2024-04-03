@@ -1,8 +1,8 @@
 package neutron
 
 import (
-	"github.com/hugobyte/dive-core/cli/cmd/chains/utils"
-	"github.com/hugobyte/dive-core/cli/common"
+	"github.com/hugobyte/dive/cli/cmd/chains/utils"
+	"github.com/hugobyte/dive/cli/common"
 )
 
 func RunNeutron(cli *common.Cli) (*common.DiveServiceResponse, error) {
