@@ -16,7 +16,6 @@ require (
 require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/kurtosis-tech/kurtosis/path-compression v0.0.0-20240327025009-5fab14a6ac02 // indirect
-	github.com/kurtosis-tech/kurtosis/utils v0.0.0-20240124210655-a35e0a2cee4b // indirect
 	github.com/mholt/archiver v3.1.1+incompatible // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 )
