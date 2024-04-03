@@ -31,7 +31,7 @@ const (
 )
 
 var (
-	polkadotParachains = []string{"acala", "ajuna", "bifrost", "centrifuge", "clover", "frequency", "kilt", "kylin", "litentry", "manta", "moonbeam", "moonsama", "nodle", "parallel", "pendulum", "phala", "polkadex", "subsocial", "zeitgeist"}
+	polkadotParachains = []string{"acala", "ajuna", "bifrost", "centrifuge", "clover", "frequency", "kilt", "kylin", "litentry", "manta", "moonbeam", "moonsama", "nodle", "parallel", "pendulum", "phala", "polkadex", "subsocial", "zeitgeist", "robonomics"}
 )
 
 var PolkadotCmd = common.NewDiveCommandBuilder().
