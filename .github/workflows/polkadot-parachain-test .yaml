@@ -1,6 +1,8 @@
 name: Polkadot Parachain Functional test
 
 on:
+  schedule:
+    - cron: "30 2 * * 2"
   workflow_dispatch:
 
 jobs:
