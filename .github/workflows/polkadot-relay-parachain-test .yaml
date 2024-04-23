@@ -1,6 +1,8 @@
 name: Polkadot Relay and Parachain Functional test
 
 on:
+  schedule:
+    - cron: "30 0 * * 5"
   workflow_dispatch:
 
 jobs:

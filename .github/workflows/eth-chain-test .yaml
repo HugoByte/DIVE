@@ -1,6 +1,8 @@
 name: Eth Chain Functional test
 
 on:
+  schedule:
+    - cron: "30 2 * * 1"
   workflow_dispatch:
 
 jobs:
