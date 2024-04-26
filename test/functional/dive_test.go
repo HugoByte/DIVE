@@ -706,6 +706,13 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			endpoint := dive.GetServiceDetailsCosmos(service_path[0], dive.DEFAULT_ARCHWAY_SERVICENAME)
+
+			// Get latest block and check if node is producing blocks
+			height, err := dive.GetCosmosLatestBlock(endpoint)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(height).Should(gomega.BeNumerically(">", 0))
 		})
 
 		ginkgo.It("should run single custom archway node-1", func() {
@@ -714,6 +721,13 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			endpoint := dive.GetServiceDetailsCosmos(service_path[0], dive.ARCHWAY_CONFIG0_SERVICENAME)
+
+			// Get latest block and check if node is producing blocks
+			height, err := dive.GetCosmosLatestBlock(endpoint)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(height).Should(gomega.BeNumerically(">", 0))
 		})
 
 		ginkgo.It("should run single custom archway node with invalid json path", func() {
