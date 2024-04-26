@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 	"sync"
 
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/google/uuid"
 	"github.com/onsi/gomega"
 )
@@ -17,6 +19,10 @@ type NodeInfo struct {
 	ServiceName    string `json:"service_name"`
 	EndpointPublic string `json:"endpoint"`
 	Nid            string `json:"nid"`
+}
+
+type CosmosNodeInfo struct{
+	EndpointPublic string `json:"endpoint_public"`
 }
 
 type Configuration1 struct {
@@ -42,6 +48,13 @@ type Configuration1 struct {
 
 var mutex = &sync.Mutex{}
 var mutex3 = &sync.Mutex{}
+
+func GetCosmosLatestBlock(nodeURI string) (height int64, err error) {
+	http, _ := client.NewClientFromNode(nodeURI)
+	cliCtx := client.Context{}.WithClient(http)
+	height, err = rpc.GetChainHeight(cliCtx)
+	return height, err
+}
 
 func GetBinaryCommand() *exec.Cmd {
 	binaryPath := GetBinPath()
@@ -203,9 +216,32 @@ func GetServiceDetails(servicesJson string, service string) (serviceName string,
 			endpoint = value.EndpointPublic
 			nid = value.Nid
 		}
-
 	}
 	return serviceName, endpoint, nid
+
+}
+
+func GetServiceDetailsCosmos(servicesJson string, service string) (endpoint string) {
+	var data map[string]CosmosNodeInfo
+	mutex3.Lock()
+	defer mutex3.Unlock()
+
+	fileContent2, err := os.ReadFile(servicesJson)
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(fileContent2, &data)
+	if err != nil {
+		panic(err)
+	}
+
+	for key, value := range data {
+		if key == service {
+			endpoint = value.EndpointPublic
+		}
+	}
+	return endpoint
 
 }
 
