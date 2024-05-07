@@ -12,6 +12,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/google/uuid"
+	iconclient "github.com/icon-project/icon-bridge/cmd/iconbridge/chain/icon"
+	iconlog "github.com/icon-project/icon-bridge/common/log"
 	"github.com/onsi/gomega"
 )
 
@@ -21,7 +23,7 @@ type NodeInfo struct {
 	Nid            string `json:"nid"`
 }
 
-type CosmosNodeInfo struct{
+type CosmosNodeInfo struct {
 	EndpointPublic string `json:"endpoint_public"`
 }
 
@@ -53,6 +55,17 @@ func GetCosmosLatestBlock(nodeURI string) (height int64, err error) {
 	http, _ := client.NewClientFromNode(nodeURI)
 	cliCtx := client.Context{}.WithClient(http)
 	height, err = rpc.GetChainHeight(cliCtx)
+	return height, err
+}
+
+func GetLatestBlockIcon(nodeURI string) (height int64, err error) {
+	var log iconlog.Logger
+	c:=iconclient.NewClient(nodeURI, log)
+	lastBlock, err := c.GetLastBlock()
+	if err!=nil{
+		return 0, fmt.Errorf("error occurred while receiving last block")
+	}
+	height=lastBlock.Height
 	return height, err
 }
 

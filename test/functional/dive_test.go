@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/hugobyte/dive/cli/cmd/utility"
 	"github.com/hugobyte/dive/cli/common"
@@ -527,12 +528,19 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 	})
 
 	ginkgo.Describe("Icon chain commands", func() {
-		ginkgo.It("should run single icon node testing", func() {
+		ginkgo.It("should run single icon node", func() {
 			enclaveName := dive.GenerateRandomName()
 			cmd.Args = append(cmd.Args, "chain", "icon", "--enclaveName", enclaveName)
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			time.Sleep(5 * time.Second)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			endpoint := dive.GetServiceDetailsCosmos(service_path[0], dive.ICON_CONFIG0_SERVICENAME)
+
+			height, err := dive.GetLatestBlockIcon(endpoint)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(height).Should(gomega.BeNumerically(">", 0))
 		})
 
 		ginkgo.It("should run single icon node along with decentralisation", func() {
@@ -541,6 +549,13 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			time.Sleep(5 * time.Second)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			endpoint := dive.GetServiceDetailsCosmos(service_path[0], dive.ICON_CONFIG0_SERVICENAME)
+
+			height, err := dive.GetLatestBlockIcon(endpoint)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(height).Should(gomega.BeNumerically(">", 0))
 		})
 
 		ginkgo.It("should run custom Icon node-0", func() {
@@ -549,6 +564,13 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			time.Sleep(5 * time.Second)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			endpoint := dive.GetServiceDetailsCosmos(service_path[0], dive.ICON_CONFIG0_SERVICENAME)
+
+			height, err := dive.GetLatestBlockIcon(endpoint)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(height).Should(gomega.BeNumerically(">", 0))
 		})
 
 		ginkgo.It("should run custom Icon node-1", func() {
@@ -557,6 +579,13 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			time.Sleep(5 * time.Second)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			endpoint := dive.GetServiceDetailsCosmos(service_path[0], dive.ICON_CONFIG1_SERVICENAME)
+
+			height, err := dive.GetLatestBlockIcon(endpoint)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(height).Should(gomega.BeNumerically(">", 0))
 		})
 
 		ginkgo.It("should run icon node first and then decentralise it", func() {
@@ -568,6 +597,13 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			time.Sleep(5 * time.Second)
+			service_path, _ = filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			endpoint := dive.GetServiceDetailsCosmos(service_path[0], dive.ICON_CONFIG0_SERVICENAME)
+
+			height, err := dive.GetLatestBlockIcon(endpoint)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(height).Should(gomega.BeNumerically(">", 0))
 		})
 
 		ginkgo.It("should handle invalid input for chain command", func() {
@@ -757,7 +793,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
 			endpoint := dive.GetServiceDetailsCosmos(service_path[0], dive.DEFAULT_NEUTRON_SERVICENAME)
-			
+
 			// Get latest block and check if node is producing blocks
 			height, err := dive.GetCosmosLatestBlock(endpoint)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
@@ -772,7 +808,7 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
 			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
 			endpoint := dive.GetServiceDetailsCosmos(service_path[0], dive.NEUTRON_CONFIG0_SERVICENAME)
-			
+
 			// Get latest block and check if node is producing blocks
 			height, err := dive.GetCosmosLatestBlock(endpoint)
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
