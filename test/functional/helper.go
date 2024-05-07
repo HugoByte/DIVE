@@ -27,6 +27,10 @@ type CosmosNodeInfo struct {
 	EndpointPublic string `json:"endpoint_public"`
 }
 
+type IconNodeInfo struct {
+	EndpointPublic string `json:"endpoint_public"`
+}
+
 type Configuration1 struct {
 	ChainType  string `json:"chain_type"`
 	RelayChain struct {
@@ -66,7 +70,7 @@ func GetLatestBlockIcon(nodeURI string) (height int64, err error) {
 		return 0, fmt.Errorf("error occurred while receiving last block")
 	}
 	height=lastBlock.Height
-	return height, err
+	return height, nil
 }
 
 func GetBinaryCommand() *exec.Cmd {
@@ -256,6 +260,29 @@ func GetServiceDetailsCosmos(servicesJson string, service string) (endpoint stri
 	}
 	return endpoint
 
+}
+
+func GetServiceDetailsIcon(servicesJson string, service string) (endpoint string) {
+	var data map[string]CosmosNodeInfo
+	mutex3.Lock()
+	defer mutex3.Unlock()
+
+	fileContent2, err := os.ReadFile(servicesJson)
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(fileContent2, &data)
+	if err != nil {
+		panic(err)
+	}
+
+	for key, value := range data {
+		if key == service {
+			endpoint = value.EndpointPublic
+		}
+	}
+	return endpoint
 }
 
 func UpdateRelayChain(filePath, newChainType, newRelayChainName, enclaveName string, newNodeType1, newNodeType2 string, relayChain string) string {
