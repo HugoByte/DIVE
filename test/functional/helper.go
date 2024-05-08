@@ -23,11 +23,7 @@ type NodeInfo struct {
 	Nid            string `json:"nid"`
 }
 
-type CosmosNodeInfo struct {
-	EndpointPublic string `json:"endpoint_public"`
-}
-
-type IconNodeInfo struct {
+type Node struct {
 	EndpointPublic string `json:"endpoint_public"`
 }
 
@@ -238,32 +234,8 @@ func GetServiceDetails(servicesJson string, service string) (serviceName string,
 
 }
 
-func GetServiceDetailsCosmos(servicesJson string, service string) (endpoint string) {
-	var data map[string]CosmosNodeInfo
-	mutex3.Lock()
-	defer mutex3.Unlock()
-
-	fileContent2, err := os.ReadFile(servicesJson)
-	if err != nil {
-		panic(err)
-	}
-
-	err = json.Unmarshal(fileContent2, &data)
-	if err != nil {
-		panic(err)
-	}
-
-	for key, value := range data {
-		if key == service {
-			endpoint = value.EndpointPublic
-		}
-	}
-	return endpoint
-
-}
-
-func GetServiceDetailsIcon(servicesJson string, service string) (endpoint string) {
-	var data map[string]CosmosNodeInfo
+func GetServiceDetail(servicesJson string, service string) (endpoint string) {
+	var data map[string]Node
 	mutex3.Lock()
 	defer mutex3.Unlock()
 
