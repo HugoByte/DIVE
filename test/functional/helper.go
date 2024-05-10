@@ -2,6 +2,7 @@ package dive
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/google/uuid"
 	"github.com/onsi/gomega"
 )
@@ -54,6 +56,19 @@ func GetCosmosLatestBlock(nodeURI string) (height int64, err error) {
 	cliCtx := client.Context{}.WithClient(http)
 	height, err = rpc.GetChainHeight(cliCtx)
 	return height, err
+}
+
+func GetHardhatLatestBlock(nodeURI string) (height uint64, err error) {
+	ctx := context.Background()
+	client, err:=ethclient.Dial(nodeURI)
+	if err!=nil{
+		return 0, fmt.Errorf("error in receiving client")
+	}
+	height, err=client.BlockNumber(ctx)
+	if err!=nil{
+		return 0, fmt.Errorf("error in receiving last block")
+	}
+	return height, nil
 }
 
 func GetBinaryCommand() *exec.Cmd {
