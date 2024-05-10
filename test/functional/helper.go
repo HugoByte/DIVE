@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"sync"
 
+	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v3"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/google/uuid"
@@ -21,7 +22,7 @@ type NodeInfo struct {
 	Nid            string `json:"nid"`
 }
 
-type CosmosNodeInfo struct{
+type CosmosNodeInfo struct {
 	EndpointPublic string `json:"endpoint_public"`
 }
 
@@ -54,6 +55,16 @@ func GetCosmosLatestBlock(nodeURI string) (height int64, err error) {
 	cliCtx := client.Context{}.WithClient(http)
 	height, err = rpc.GetChainHeight(cliCtx)
 	return height, err
+}
+
+func GetPolkadotLatestBlock(nodeURI string) (height int64, err error) {
+	api, err := gsrpc.NewSubstrateAPI(nodeURI)
+	lastBlock, err := api.RPC.Chain.GetBlockLatest()
+	if err != nil {
+		return 0, fmt.Errorf("error in receiving last block")
+	}
+	height = int64(lastBlock.Block.Header.Number)
+	return height, nil
 }
 
 func GetBinaryCommand() *exec.Cmd {
