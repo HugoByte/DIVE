@@ -63,11 +63,7 @@ require (
 	github.com/crate-crypto/go-kzg-4844 v1.0.0 // indirect
 	github.com/danieljoos/wincred v1.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-<<<<<<< HEAD
 	github.com/deckarep/golang-set/v2 v2.1.0 // indirect
-=======
-	github.com/deckarep/golang-set v1.8.0 // indirect
->>>>>>> ef1d62d0d9084cbc629ce045313288195eb8e410
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/dgraph-io/badger/v2 v2.2007.4 // indirect
@@ -77,12 +73,8 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/dvsekhvalnov/jose2go v1.6.0 // indirect
 	github.com/emicklei/dot v1.6.1 // indirect
-<<<<<<< HEAD
 	github.com/ethereum/c-kzg-4844 v1.0.0 // indirect
-=======
-	github.com/ethereum/go-ethereum v1.10.16 // indirect
 	github.com/evalphobia/logrus_fluent v0.5.4 // indirect
->>>>>>> ef1d62d0d9084cbc629ce045313288195eb8e410
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/felixge/httpsnoop v1.0.2 // indirect
 	github.com/fluent/fluent-logger-golang v1.4.0 // indirect
@@ -94,11 +86,7 @@ require (
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
-<<<<<<< HEAD
 	github.com/go-ole/go-ole v1.3.0 // indirect
-=======
-	github.com/go-stack/stack v1.8.0 // indirect
->>>>>>> ef1d62d0d9084cbc629ce045313288195eb8e410
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/go-yaml/yaml v2.1.0+incompatible // indirect
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
@@ -174,7 +162,6 @@ require (
 	github.com/prometheus/procfs v0.13.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5 // indirect
-	github.com/rjeczalik/notify v0.9.2 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/rs/cors v1.8.3 // indirect
 	github.com/rs/zerolog v1.32.0 // indirect
@@ -196,12 +183,9 @@ require (
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
 	github.com/tidwall/btree v1.7.0 // indirect
-<<<<<<< HEAD
+	github.com/tinylib/msgp v1.1.2 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
-=======
-	github.com/tinylib/msgp v1.1.2 // indirect
->>>>>>> ef1d62d0d9084cbc629ce045313288195eb8e410
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
