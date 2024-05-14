@@ -2,6 +2,7 @@ package dive
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/google/uuid"
 	iconclient "github.com/icon-project/icon-bridge/cmd/iconbridge/chain/icon"
 	iconlog "github.com/icon-project/icon-bridge/common/log"
@@ -66,6 +68,19 @@ func GetLatestBlockIcon(nodeURI string) (height int64, err error) {
 		return 0, fmt.Errorf("error occurred while receiving last block")
 	}
 	height=lastBlock.Height
+	return height, nil
+}
+
+func GetHardhatLatestBlock(nodeURI string) (height uint64, err error) {
+	ctx := context.Background()
+	client, err:=ethclient.Dial(nodeURI)
+	if err!=nil{
+		return 0, fmt.Errorf("error in receiving client")
+	}
+	height, err=client.BlockNumber(ctx)
+	if err!=nil{
+		return 0, fmt.Errorf("error in receiving last block")
+	}
 	return height, nil
 }
 

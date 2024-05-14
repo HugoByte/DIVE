@@ -723,6 +723,13 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			time.Sleep(2 * time.Second)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			endpoint := dive.GetServiceDetail(service_path[0], dive.HARDHAT_SERVICENAME)
+
+			height, err := dive.GetHardhatLatestBlock(endpoint)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(height).Should(gomega.BeNumerically(">", 0))
 		})
 
 		ginkgo.It("should output user that chain is already running when trying to run hardhat chain that is already running", func() {
@@ -732,6 +739,13 @@ var _ = ginkgo.Describe("DIVE CLI App", func() {
 			defer dive.Clean(enclaveName)
 			err := cmd.Run()
 			gomega.Expect(err).To(gomega.HaveOccurred())
+			time.Sleep(2 * time.Second)
+			service_path, _ := filepath.Glob(fmt.Sprintf("output/%s/services_%s_*.json", enclaveName, enclaveName))
+			endpoint := dive.GetServiceDetail(service_path[0], dive.HARDHAT_SERVICENAME)
+
+			height, err := dive.GetHardhatLatestBlock(endpoint)
+			gomega.Expect(err).NotTo(gomega.HaveOccurred())
+			gomega.Expect(height).Should(gomega.BeNumerically(">", 0))
 		})
 	})
 
